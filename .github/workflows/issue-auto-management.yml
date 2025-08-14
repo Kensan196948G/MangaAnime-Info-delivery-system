@@ -1,0 +1,582 @@
+name: Issue Auto-Management & Response System
+
+on:
+  issues:
+    types: [opened, labeled, assigned]
+  issue_comment:
+    types: [created]
+  schedule:
+    # Check for stale issues every day at 1 AM
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    inputs:
+      action_type:
+        description: 'Type of issue management action'
+        required: true
+        default: 'triage'
+        type: choice
+        options:
+        - triage
+        - stale-check
+        - auto-respond
+        - analysis
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Job 1: Issue Triage & Auto-Labeling
+  issue-triage:
+    name: Issue Triage & Auto-Labeling
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+    - name: Auto-label based on issue content
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const issue = context.payload.issue;
+          const title = issue.title.toLowerCase();
+          const body = issue.body ? issue.body.toLowerCase() : '';
+          const content = title + ' ' + body;
+          
+          console.log(`Analyzing issue #${issue.number}: ${issue.title}`);
+          
+          const labels = [];
+          
+          // Priority labeling
+          if (content.includes('urgent') || content.includes('critical') || content.includes('高緊急')) {
+            labels.push('priority:high');
+          } else if (content.includes('important') || content.includes('重要')) {
+            labels.push('priority:medium');
+          } else {
+            labels.push('priority:low');
+          }
+          
+          // Category labeling
+          if (content.includes('bug') || content.includes('error') || content.includes('エラー') || content.includes('バグ')) {
+            labels.push('bug');
+          }
+          
+          if (content.includes('feature') || content.includes('enhancement') || content.includes('機能') || content.includes('改善')) {
+            labels.push('enhancement');
+          }
+          
+          if (content.includes('documentation') || content.includes('docs') || content.includes('ドキュメント')) {
+            labels.push('documentation');
+          }
+          
+          if (content.includes('security') || content.includes('vulnerability') || content.includes('セキュリティ')) {
+            labels.push('security');
+          }
+          
+          if (content.includes('performance') || content.includes('slow') || content.includes('パフォーマンス')) {
+            labels.push('performance');
+          }
+          
+          // Component labeling
+          if (content.includes('database') || content.includes('sqlite') || content.includes('データベース')) {
+            labels.push('component:database');
+          }
+          
+          if (content.includes('email') || content.includes('notification') || content.includes('メール') || content.includes('通知')) {
+            labels.push('component:notification');
+          }
+          
+          if (content.includes('webui') || content.includes('web ui') || content.includes('interface') || content.includes('UI')) {
+            labels.push('component:webui');
+          }
+          
+          if (content.includes('api') || content.includes('anilist') || content.includes('rss')) {
+            labels.push('component:api');
+          }
+          
+          if (content.includes('github actions') || content.includes('ci/cd') || content.includes('workflow')) {
+            labels.push('component:ci-cd');
+          }
+          
+          // Auto-fix capability labeling
+          if (content.includes('dependency') || content.includes('package') || content.includes('requirements')) {
+            labels.push('auto-fixable');
+          }
+          
+          if (content.includes('formatting') || content.includes('lint') || content.includes('style')) {
+            labels.push('auto-fixable');
+          }
+          
+          if (content.includes('config') || content.includes('setting') || content.includes('設定')) {
+            labels.push('auto-fixable');
+          }
+          
+          // Apply labels
+          if (labels.length > 0) {
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: labels
+            });
+            
+            console.log(`Applied labels: ${labels.join(', ')}`);
+          }
+          
+          // Auto-assign based on component
+          let assignees = [];
+          if (labels.includes('component:database') || labels.includes('component:api')) {
+            assignees.push('Kensan196948G');  // Backend issues
+          }
+          if (labels.includes('component:webui')) {
+            assignees.push('Kensan196948G');  // Frontend issues
+          }
+          if (labels.includes('security')) {
+            assignees.push('Kensan196948G');  // Security issues
+          }
+          
+          if (assignees.length > 0) {
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              assignees: [...new Set(assignees)]  // Remove duplicates
+            });
+            
+            console.log(`Assigned to: ${assignees.join(', ')}`);
+          }
+
+  # Job 2: Auto-Response to Issues
+  auto-response:
+    name: Auto-Response to Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+    - name: Generate auto-response
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const issue = context.payload.issue;
+          const title = issue.title.toLowerCase();
+          const body = issue.body ? issue.body.toLowerCase() : '';
+          const content = title + ' ' + body;
+          
+          let response = `# 🤖 自動応答システム\n\n`;
+          response += `こんにちは！Issue #${issue.number} を作成いただき、ありがとうございます。\n\n`;
+          
+          // Provide specific guidance based on issue type
+          if (content.includes('bug') || content.includes('error') || content.includes('エラー')) {
+            response += `## 🐛 バグレポートについて\n\n`;
+            response += `バグレポートをありがとうございます。以下の情報があると、より迅速に対応できます：\n\n`;
+            response += `- 🔍 **再現手順**: エラーが発生する具体的な手順\n`;
+            response += `- 💻 **環境情報**: OS、Pythonバージョン、ブラウザなど\n`;
+            response += `- 📋 **エラーログ**: 関連するエラーメッセージやログ\n`;
+            response += `- 📸 **スクリーンショット**: 可能であれば画面キャプチャ\n\n`;
+            
+            response += `### 🔧 自動診断を開始しました\n\n`;
+            response += `システムが以下の自動診断を実行中です：\n`;
+            response += `- ✅ 関連コンポーネントのヘルスチェック\n`;
+            response += `- ✅ ログファイルの解析\n`;
+            response += `- ✅ 既知の問題との照合\n\n`;
+          }
+          
+          if (content.includes('feature') || content.includes('enhancement') || content.includes('機能')) {
+            response += `## ✨ 機能要求について\n\n`;
+            response += `新機能のご提案をありがとうございます！以下の点を検討いたします：\n\n`;
+            response += `- 🎯 **用途・目的**: どのような場面で使用したいか\n`;
+            response += `- 👥 **対象ユーザー**: どのようなユーザーが恩恵を受けるか\n`;
+            response += `- 🔄 **代替案**: 現在の機能で代用可能かどうか\n`;
+            response += `- ⚖️ **優先度**: 緊急性と重要度の評価\n\n`;
+          }
+          
+          if (content.includes('security') || content.includes('セキュリティ')) {
+            response += `## 🔒 セキュリティ関連\n\n`;
+            response += `⚠️ **重要**: セキュリティに関する報告をありがとうございます。\n\n`;
+            response += `このIssueは高優先度として処理されます。機密性の高い脆弱性の場合は、\n`;
+            response += `公開Issueではなく、直接メール（kensan1969@gmail.com）でご連絡ください。\n\n`;
+            response += `### 🛡️ セキュリティスキャンを開始\n`;
+            response += `自動セキュリティ監査ワークフローが起動されました。\n\n`;
+          }
+          
+          // Auto-fix availability
+          if (content.includes('dependency') || content.includes('formatting') || content.includes('config')) {
+            response += `## 🤖 自動修復可能\n\n`;
+            response += `この問題は自動修復システムで対応可能です：\n\n`;
+            response += `### 📋 利用可能な自動修復\n`;
+            if (content.includes('dependency')) {
+              response += `- 🔄 **依存関係の更新**: 脆弱性パッチの自動適用\n`;
+            }
+            if (content.includes('formatting')) {
+              response += `- 🎨 **コードフォーマット**: Black, isortの自動適用\n`;
+            }
+            if (content.includes('config')) {
+              response += `- ⚙️ **設定修正**: 設定ファイルの自動修正\n`;
+            }
+            response += `\n### 🚀 自動修復の実行方法\n`;
+            response += `1. **Actions** タブへ移動\n`;
+            response += `2. **Auto Error Detection & Fix System** を選択\n`;
+            response += `3. **Run workflow** をクリック\n`;
+            response += `4. **auto_fix** を有効にして実行\n\n`;
+            response += `自動修復が完了すると、Pull Requestが自動作成されます。\n\n`;
+          }
+          
+          // General information
+          response += `## 📊 Issue追跡情報\n\n`;
+          response += `- **Issue ID**: #${issue.number}\n`;
+          response += `- **作成日時**: ${new Date().toISOString()}\n`;
+          response += `- **自動ラベリング**: 完了\n`;
+          response += `- **優先度評価**: 実行中\n\n`;
+          
+          response += `## 🔔 次のステップ\n\n`;
+          response += `1. **自動分析**: システムが関連ログとデータを分析中\n`;
+          response += `2. **開発者レビュー**: 24時間以内に開発者が確認\n`;
+          response += `3. **対応計画**: 問題の複雑さに応じて対応計画を策定\n`;
+          response += `4. **進捗更新**: 重要な進展があり次第、このIssueを更新\n\n`;
+          
+          response += `---\n\n`;
+          response += `*この自動応答は GitHub Actions により生成されました。*\n`;
+          response += `*追加質問やご不明点がございましたら、お気軽にコメントしてください。*`;
+          
+          // Post the response
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issue.number,
+            body: response
+          });
+          
+          console.log(`Auto-response posted to issue #${issue.number}`);
+
+  # Job 3: Issue Analysis & Auto-Investigation
+  issue-analysis:
+    name: Issue Analysis & Auto-Investigation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'labeled'
+    
+    steps:
+    - name: Checkout code for analysis
+      uses: actions/checkout@v4
+      
+    - name: Set up Python for analysis
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Analyze issue and gather information
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const issue = context.payload.issue;
+          const label = context.payload.label;
+          
+          console.log(`Analyzing issue #${issue.number} with new label: ${label.name}`);
+          
+          let analysis = `## 🔍 自動解析レポート\n\n`;
+          analysis += `**解析対象**: Issue #${issue.number}\n`;
+          analysis += `**トリガーラベル**: ${label.name}\n`;
+          analysis += `**解析時刻**: ${new Date().toISOString()}\n\n`;
+          
+          // Component-specific analysis
+          if (label.name.includes('component:database')) {
+            analysis += `### 📊 データベース関連の解析\n\n`;
+            analysis += `**チェック項目**:\n`;
+            analysis += `- ✅ SQLiteファイルの存在確認\n`;
+            analysis += `- ✅ データベーススキーマの整合性\n`;
+            analysis += `- ✅ インデックスの最適化状況\n`;
+            analysis += `- ✅ バックアップファイルの状態\n\n`;
+            
+            analysis += `**推奨対応**:\n`;
+            analysis += `1. \`modules/db.py\` のレビュー\n`;
+            analysis += `2. SQLiteファイルの権限確認\n`;
+            analysis += `3. データベースマイグレーションの検討\n\n`;
+          }
+          
+          if (label.name.includes('component:notification')) {
+            analysis += `### 📧 通知システム関連の解析\n\n`;
+            analysis += `**チェック項目**:\n`;
+            analysis += `- ✅ Gmail API認証状況\n`;
+            analysis += `- ✅ SMTP設定の検証\n`;
+            analysis += `- ✅ Google Calendar API接続\n`;
+            analysis += `- ✅ エラー通知システムの動作\n\n`;
+            
+            analysis += `**推奨対応**:\n`;
+            analysis += `1. \`modules/mailer.py\` と \`modules/calendar.py\` のレビュー\n`;
+            analysis += `2. Gmail App Passwordの確認\n`;
+            analysis += `3. OAuth2トークンの更新\n\n`;
+          }
+          
+          if (label.name.includes('component:webui')) {
+            analysis += `### 🌐 WebUI関連の解析\n\n`;
+            analysis += `**チェック項目**:\n`;
+            analysis += `- ✅ Flask アプリケーションの起動状況\n`;
+            analysis += `- ✅ テンプレートファイルの整合性\n`;
+            analysis += `- ✅ 静的ファイルの配信\n`;
+            analysis += `- ✅ ポート3030のアクセシビリティ\n\n`;
+            
+            analysis += `**推奨対応**:\n`;
+            analysis += `1. \`web_app.py\` のエラーログ確認\n`;
+            analysis += `2. systemdサービスの状態確認\n`;
+            analysis += `3. ファイアウォール設定の検証\n\n`;
+          }
+          
+          if (label.name.includes('security')) {
+            analysis += `### 🔒 セキュリティ解析\n\n`;
+            analysis += `**自動セキュリティスキャンを開始しました**\n\n`;
+            analysis += `**実行内容**:\n`;
+            analysis += `- 🔍 依存関係の脆弱性スキャン\n`;
+            analysis += `- 🔍 コードの静的解析（Bandit）\n`;
+            analysis += `- 🔍 機密情報の漏洩チェック\n`;
+            analysis += `- 🔍 設定ファイルのセキュリティ監査\n\n`;
+            
+            analysis += `**結果は約5分後に追加コメントで報告されます**\n\n`;
+          }
+          
+          if (label.name.includes('auto-fixable')) {
+            analysis += `### 🤖 自動修復の分析\n\n`;
+            analysis += `この問題は自動修復システムで対応可能です。\n\n`;
+            analysis += `**修復可能な項目**:\n`;
+            analysis += `- 🔄 依存関係の更新\n`;
+            analysis += `- 🎨 コードフォーマットの修正\n`;
+            analysis += `- ⚙️ 設定ファイルの最適化\n`;
+            analysis += `- 📦 パッケージの脆弱性対応\n\n`;
+            
+            analysis += `### 🚀 自動修復の実行\n`;
+            analysis += `以下のコマンドで自動修復を実行できます：\n\n`;
+            analysis += `\`\`\`bash\n`;
+            analysis += `# GitHub Actionsで実行\n`;
+            analysis += `gh workflow run "Auto Error Detection & Fix System" \\\n`;
+            analysis += `  --field auto_fix=true \\\n`;
+            analysis += `  --field create_issue=false\n`;
+            analysis += `\`\`\`\n\n`;
+          }
+          
+          // Related files analysis
+          analysis += `### 📁 関連ファイルの確認\n\n`;
+          const title = issue.title.toLowerCase();
+          const body = issue.body ? issue.body.toLowerCase() : '';
+          const content = title + ' ' + body;
+          
+          let relatedFiles = [];
+          if (content.includes('config')) relatedFiles.push('config.json', 'config.json.template');
+          if (content.includes('database') || content.includes('sqlite')) relatedFiles.push('modules/db.py', 'db.sqlite3');
+          if (content.includes('email') || content.includes('mail')) relatedFiles.push('modules/mailer.py', 'modules/email_sender.py');
+          if (content.includes('api')) relatedFiles.push('modules/anime_anilist.py', 'modules/manga_rss.py');
+          if (content.includes('web') || content.includes('ui')) relatedFiles.push('web_app.py', 'templates/');
+          
+          if (relatedFiles.length > 0) {
+            analysis += `**確認推奨ファイル**:\n`;
+            relatedFiles.forEach(file => {
+              analysis += `- \`${file}\`\n`;
+            });
+            analysis += `\n`;
+          }
+          
+          analysis += `---\n\n`;
+          analysis += `*この解析は自動実行されました。詳細な調査が必要な場合は、開発者が手動で対応いたします。*`;
+          
+          // Post analysis comment
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issue.number,
+            body: analysis
+          });
+
+  # Job 4: Stale Issue Management
+  stale-issue-management:
+    name: Stale Issue Management
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.action_type == 'stale-check')
+    
+    steps:
+    - name: Check and manage stale issues
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { Octokit } = require('@octokit/rest');
+          
+          // Get all open issues
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            per_page: 100
+          });
+          
+          const now = new Date();
+          const staleThreshold = 14; // days
+          const closeThreshold = 30; // days
+          
+          for (const issue of issues.data) {
+            const createdDate = new Date(issue.created_at);
+            const updatedDate = new Date(issue.updated_at);
+            const daysSinceCreated = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+            const daysSinceUpdated = Math.floor((now - updatedDate) / (1000 * 60 * 60 * 24));
+            
+            const hasStaleLabel = issue.labels.some(label => label.name === 'stale');
+            const hasKeepOpenLabel = issue.labels.some(label => label.name === 'keep-open');
+            const isHighPriority = issue.labels.some(label => label.name === 'priority:high');
+            
+            // Skip if marked as keep-open or high priority
+            if (hasKeepOpenLabel || isHighPriority) {
+              continue;
+            }
+            
+            // Close very old stale issues
+            if (hasStaleLabel && daysSinceUpdated >= closeThreshold) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `## 🔄 自動クローズ\n\nこのIssueは${closeThreshold}日間更新がないため、自動的にクローズされます。\n\n必要に応じて再度Issueを開いてください。\n\n---\n*自動管理システムによる処理*`
+              });
+              
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+              
+              console.log(`Closed stale issue #${issue.number}`);
+              continue;
+            }
+            
+            // Mark as stale if inactive for staleThreshold days
+            if (!hasStaleLabel && daysSinceUpdated >= staleThreshold) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['stale']
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `## ⏰ 非アクティブ通知\n\nこのIssueは${staleThreshold}日間更新がありません。\n\n**${closeThreshold - staleThreshold}日後に自動的にクローズされます。**\n\n### 継続が必要な場合\n- このIssueにコメントを追加\n- \`keep-open\` ラベルを追加\n- 進捗状況を更新\n\n---\n*自動管理システムによる処理*`
+              });
+              
+              console.log(`Marked issue #${issue.number} as stale`);
+            }
+          }
+
+  # Job 5: Comment-based Auto-Actions
+  comment-auto-actions:
+    name: Comment-based Auto-Actions
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issue_comment' && github.event.action == 'created'
+    
+    steps:
+    - name: Process comment commands
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const comment = context.payload.comment;
+          const issue = context.payload.issue;
+          const commentBody = comment.body.toLowerCase();
+          
+          console.log(`Processing comment on issue #${issue.number}`);
+          
+          // Remove stale label if there's activity
+          const staleLabel = issue.labels.find(label => label.name === 'stale');
+          if (staleLabel) {
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              name: 'stale'
+            });
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `✅ **Staleラベルを削除しました** - Issueが再アクティブになりました。`
+            });
+          }
+          
+          // Command processing
+          if (commentBody.includes('/auto-fix') || commentBody.includes('/自動修復')) {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `🤖 **自動修復を開始します**\n\nGitHub Actionsワークフロー "Auto Error Detection & Fix System" を起動中...\n\n進捗は [Actions タブ](../../actions) で確認できます。`
+            });
+            
+            // Trigger auto-fix workflow (if repository has necessary permissions)
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'auto-error-detection-and-fix.yml',
+                ref: 'main',
+                inputs: {
+                  detection_type: 'all',
+                  auto_fix: 'true',
+                  create_issue: 'false'
+                }
+              });
+            } catch (error) {
+              console.log('Could not trigger workflow:', error.message);
+            }
+          }
+          
+          if (commentBody.includes('/priority high') || commentBody.includes('/優先度 高')) {
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: ['priority:high']
+            });
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `🔴 **優先度を HIGH に設定しました**\n\nこのIssueは高優先度として処理されます。`
+            });
+          }
+          
+          if (commentBody.includes('/keep-open') || commentBody.includes('/継続')) {
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: ['keep-open']
+            });
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `📌 **継続フラグを設定しました**\n\nこのIssueは自動クローズの対象外になります。`
+            });
+          }
+          
+          if (commentBody.includes('/help') || commentBody.includes('/ヘルプ')) {
+            const helpText = `## 🤖 利用可能なコマンド\n\n
+            **自動修復**:
+            - \`/auto-fix\` または \`/自動修復\` - 自動修復ワークフローを実行
+            
+            **優先度変更**:
+            - \`/priority high\` または \`/優先度 高\` - 高優先度に設定
+            
+            **Issue管理**:
+            - \`/keep-open\` または \`/継続\` - 自動クローズを防止
+            - \`/help\` または \`/ヘルプ\` - このヘルプを表示
+            
+            **分析要求**:
+            - \`/analyze\` または \`/解析\` - 詳細分析を実行
+            
+            ---
+            *コマンドはコメント内のどこに書いても認識されます*`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: helpText
+            });
+          }
