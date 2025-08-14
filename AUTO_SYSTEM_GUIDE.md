@@ -177,13 +177,17 @@ https://github.com/Kensan196948G/MangaAnime-Info-delivery-system/actions
 
 #### 通知の確認
 ```bash
-# メール通知先
+# メール通知先（成功時のみ）
 kensan1969@gmail.com
+
+# 通知設定
+✅ 成功通知: エラー検知・自動修復成功時
+❌ 失敗通知: 無効化（GitHub Actionsログで確認）
 
 # GitHub通知
 - Issue作成・更新
 - PR作成・マージ
-- ワークフロー成功・失敗
+- ワークフロー成功・失敗（ログのみ）
 ```
 
 ---
@@ -342,6 +346,7 @@ python -c "import json; print(json.load(open('config.json')))"
 2. **カスタマイズ**: プロジェクトに応じて検知条件を調整
 3. **監視**: エラー検知の精度を定期的に評価
 4. **ドキュメント**: 新しい自動修復パターンを文書化
+5. **失敗確認**: GitHub Actionsログで失敗詳細を確認（メール通知なし）
 
 ### セキュリティ考慮事項
 

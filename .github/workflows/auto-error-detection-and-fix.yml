@@ -537,18 +537,18 @@ Co-Authored-By: GitHub Actions <action@github.com>"
             console.log('Could not request review:', error.message);
           }
 
-  # Job 4: Notification Summary
+  # Job 4: Notification Summary (Success only - No failure emails)
   notification-summary:
     name: Send Notification Summary
     runs-on: ubuntu-latest
     needs: [error-detection, create-issue, auto-fix]
-    if: always()
+    if: ${{ needs.error-detection.outputs.fix_needed == 'true' && needs.error-detection.result == 'success' }}
     
     steps:
-    - name: Send email notification
-      if: ${{ needs.error-detection.outputs.fix_needed == 'true' }}
+    - name: Send success notification only
       run: |
-        echo "📧 Sending error detection notification..."
+        echo "📧 Sending success notification only (no failure emails)..."
         echo "To: ${{ secrets.NOTIFICATION_EMAIL }}"
-        echo "Subject: 🤖 MangaAnime System - Automated Error Detection Report"
-        echo "Issues detected and auto-fix attempted. Check GitHub for details."
+        echo "Subject: 🤖 MangaAnime System - Issues Detected & Auto-Fixed"
+        echo "Issues detected and successfully auto-fixed. Check GitHub for details."
+        echo "Note: Failure notifications are disabled per user request."

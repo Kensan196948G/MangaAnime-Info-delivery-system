@@ -501,11 +501,11 @@ jobs:
         echo "✅ All tests passed! Sending success notification..."
         # Add notification logic here (Slack, Discord, email, etc.)
         
-    - name: Notify on failure
+    - name: Log failure (no email notification)
       if: ${{ needs.test-summary.result == 'failure' }}
       run: |
-        echo "❌ Tests failed! Sending failure notification..."
-        # Add notification logic here (Slack, Discord, email, etc.)
+        echo "❌ Tests failed! Logging failure (email notifications disabled per user request)"
+        echo "Check GitHub Actions logs for details instead of email notifications"
         
     - name: Send status to external monitoring
       run: |
