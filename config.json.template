@@ -1,0 +1,123 @@
+{
+  "system": {
+    "name": "MangaAnime情報配信システム",
+    "version": "1.0.0",
+    "environment": "production",
+    "timezone": "Asia/Tokyo",
+    "log_level": "INFO"
+  },
+  
+  "database": {
+    "path": "./db.sqlite3",
+    "backup_enabled": true,
+    "backup_retention_days": 30
+  },
+  
+  "apis": {
+    "anilist": {
+      "graphql_url": "https://graphql.anilist.co",
+      "rate_limit": {
+        "requests_per_minute": 90,
+        "retry_delay_seconds": 5
+      },
+      "timeout_seconds": 30
+    },
+    
+    "syoboi_calendar": {
+      "base_url": "https://cal.syoboi.jp",
+      "endpoints": {
+        "json": "/json.php",
+        "db": "/db.php"
+      },
+      "timeout_seconds": 15
+    },
+    
+    "rss_feeds": {
+      "timeout_seconds": 20,
+      "user_agent": "MangaAnimeNotifier/1.0 (https://github.com/user/manga-anime-notifier)",
+      "feeds": [
+        {
+          "name": "dアニメストア",
+          "url": "https://anime.dmkt-sp.jp/animestore/CF/rss/",
+          "category": "anime",
+          "enabled": true
+        },
+        {
+          "name": "BookWalker新刊",
+          "url": "https://bookwalker.jp/series/rss/",
+          "category": "manga", 
+          "enabled": true
+        }
+      ]
+    }
+  },
+  
+  "google": {
+    "credentials_file": "./credentials.json",
+    "token_file": "./token.json",
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.send",
+      "https://www.googleapis.com/auth/calendar.events"
+    ],
+    
+    "gmail": {
+      "from_email": "your-email@gmail.com",
+      "to_email": "your-email@gmail.com",
+      "subject_prefix": "[アニメ・マンガ情報]",
+      "html_template_enabled": true
+    },
+    
+    "calendar": {
+      "calendar_id": "primary",
+      "event_duration_hours": 1,
+      "reminder_minutes": [60, 10]
+    }
+  },
+  
+  "filtering": {
+    "ng_keywords": [
+      "エロ", "R18", "成人向け", "BL", "百合", "ボーイズラブ", 
+      "アダルト", "18禁", "官能", "ハーレクイン"
+    ],
+    "ng_genres": [
+      "Hentai", "Ecchi"
+    ],
+    "exclude_tags": [
+      "Adult Cast", "Erotica"
+    ]
+  },
+  
+  "scheduling": {
+    "default_run_time": "08:00",
+    "timezone": "Asia/Tokyo",
+    "max_execution_time_minutes": 30,
+    "retry_attempts": 3,
+    "retry_delay_minutes": 5
+  },
+  
+  "notification": {
+    "email": {
+      "enabled": true,
+      "max_items_per_email": 20,
+      "include_images": true,
+      "template_style": "modern"
+    },
+    
+    "calendar": {
+      "enabled": true,
+      "create_all_day_events": false,
+      "color_by_type": {
+        "anime": "blue",
+        "manga": "green"
+      }
+    }
+  },
+  
+  "logging": {
+    "file_path": "./logs/app.log",
+    "max_file_size_mb": 10,
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "date_format": "%Y-%m-%d %H:%M:%S"
+  }
+}

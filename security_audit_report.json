@@ -1,0 +1,1350 @@
+{
+  "metadata": {
+    "report_generated": "2025-08-09T14:49:31.630453",
+    "project_path": ".",
+    "audit_version": "1.0",
+    "total_checks_performed": 12
+  },
+  "executive_summary": {
+    "overall_score": 67.5,
+    "total_findings": 46,
+    "critical_issues": 6,
+    "recommendations": [
+      "Address 6 critical security issues immediately",
+      "Fix 12 high-priority security vulnerabilities",
+      "High number of findings. Consider security training for development team."
+    ]
+  },
+  "detailed_findings": {
+    "weak_crypto": [
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "init_demo_db.py",
+        "line_number": 92,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "init_demo_db.py",
+        "line_number": 103,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: hashlib.md5(...",
+        "file_path": "modules/filter_logic.py",
+        "line_number": 229,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "line_number": 87,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "line_number": 168,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "line_number": 181,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/fixtures/test_data_manager.py",
+        "line_number": 150,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/fixtures/test_data_manager.py",
+        "line_number": 548,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 236,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 242,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 434,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 440,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 589,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 637,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "init_demo_db.py",
+        "line_number": 92,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "init_demo_db.py",
+        "line_number": 103,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: hashlib.md5(...",
+        "file_path": "modules/filter_logic.py",
+        "line_number": 229,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "line_number": 87,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "line_number": 168,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "line_number": 181,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/fixtures/test_data_manager.py",
+        "line_number": 150,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/fixtures/test_data_manager.py",
+        "line_number": 548,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 236,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 242,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 434,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 440,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 589,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "weak_crypto",
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "line_number": 637,
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "cwe_id": null,
+        "cvss_score": null
+      }
+    ],
+    "sql_injection": [
+      {
+        "severity": "HIGH",
+        "category": "sql_injection",
+        "description": "Potential SQL injection vulnerability: SELECT.*\\+.*FROM...",
+        "file_path": "modules/security_compliance.py",
+        "line_number": 67,
+        "remediation": "Use parameterized queries or ORM methods",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "sql_injection",
+        "description": "Potential SQL injection vulnerability: INSERT.*\\+.*VALUES...",
+        "file_path": "modules/security_compliance.py",
+        "line_number": 68,
+        "remediation": "Use parameterized queries or ORM methods",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "sql_injection",
+        "description": "Potential SQL injection vulnerability: SELECT COUNT(*) FROM releases WHERE notified = 0\\\"...",
+        "file_path": "tests/test_e2e_workflow.py",
+        "line_number": 89,
+        "remediation": "Use parameterized queries or ORM methods",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "sql_injection",
+        "description": "Potential SQL injection vulnerability: insert.return_value.execute.return_value = {\\n    ...",
+        "file_path": "tests/test_e2e_workflow.py",
+        "line_number": 89,
+        "remediation": "Use parameterized queries or ORM methods",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "sql_injection",
+        "description": "Potential SQL injection vulnerability: SELECT.*\\+.*FROM...",
+        "file_path": "modules/security_compliance.py",
+        "line_number": 67,
+        "remediation": "Use parameterized queries or ORM methods",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "sql_injection",
+        "description": "Potential SQL injection vulnerability: INSERT.*\\+.*VALUES...",
+        "file_path": "modules/security_compliance.py",
+        "line_number": 68,
+        "remediation": "Use parameterized queries or ORM methods",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "sql_injection",
+        "description": "Potential SQL injection vulnerability: SELECT COUNT(*) FROM releases WHERE notified = 0\\\"...",
+        "file_path": "tests/test_e2e_workflow.py",
+        "line_number": 89,
+        "remediation": "Use parameterized queries or ORM methods",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "sql_injection",
+        "description": "Potential SQL injection vulnerability: insert.return_value.execute.return_value = {\\n    ...",
+        "file_path": "tests/test_e2e_workflow.py",
+        "line_number": 89,
+        "remediation": "Use parameterized queries or ORM methods",
+        "cwe_id": null,
+        "cvss_score": null
+      }
+    ],
+    "command_injection": [
+      {
+        "severity": "HIGH",
+        "category": "command_injection",
+        "description": "Potential command injection: shell=True.*\\+.*user...",
+        "file_path": "modules/security_compliance.py",
+        "line_number": 78,
+        "remediation": "Avoid shell=True and validate all inputs",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "command_injection",
+        "description": "Potential command injection: os.system(\"ls \" +...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "line_number": 551,
+        "remediation": "Avoid shell=True and validate all inputs",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "command_injection",
+        "description": "Potential command injection: shell=True.*\\+.*user...",
+        "file_path": "modules/security_compliance.py",
+        "line_number": 78,
+        "remediation": "Avoid shell=True and validate all inputs",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "HIGH",
+        "category": "command_injection",
+        "description": "Potential command injection: os.system(\"ls \" +...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "line_number": 551,
+        "remediation": "Avoid shell=True and validate all inputs",
+        "cwe_id": null,
+        "cvss_score": null
+      }
+    ],
+    "hardcoded_secrets": [
+      {
+        "severity": "CRITICAL",
+        "category": "hardcoded_secrets",
+        "description": "Hardcoded secret detected: password = \"hardcoded_password\"...",
+        "file_path": "tests/test_qa_comprehensive.py",
+        "line_number": 262,
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "CRITICAL",
+        "category": "hardcoded_secrets",
+        "description": "Hardcoded secret detected: password = \"hardcoded_password_123\"...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "line_number": 535,
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "CRITICAL",
+        "category": "hardcoded_secrets",
+        "description": "Hardcoded secret detected: api_key = \"sk-1234567890abcdef\"...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "line_number": 536,
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "CRITICAL",
+        "category": "hardcoded_secrets",
+        "description": "Hardcoded secret detected: password = \"hardcoded_password\"...",
+        "file_path": "tests/test_qa_comprehensive.py",
+        "line_number": 262,
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "CRITICAL",
+        "category": "hardcoded_secrets",
+        "description": "Hardcoded secret detected: password = \"hardcoded_password_123\"...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "line_number": 535,
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "cwe_id": null,
+        "cvss_score": null
+      },
+      {
+        "severity": "CRITICAL",
+        "category": "hardcoded_secrets",
+        "description": "Hardcoded secret detected: api_key = \"sk-1234567890abcdef\"...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "line_number": 536,
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "cwe_id": null,
+        "cvss_score": null
+      }
+    ]
+  },
+  "compliance_results": [
+    {
+      "check_name": "configuration_security",
+      "passed": false,
+      "score": 70.0,
+      "findings": [
+        {
+          "severity": "MEDIUM",
+          "category": "configuration",
+          "description": "Config file config.json has insecure permissions: 664",
+          "file_path": "config.json",
+          "line_number": null,
+          "remediation": "Set permissions to 600 (owner read/write only)",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "configuration",
+          "description": "Config file config.json.template has insecure permissions: 664",
+          "file_path": "config.json.template",
+          "line_number": null,
+          "remediation": "Set permissions to 600 (owner read/write only)",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "HIGH",
+          "category": "configuration",
+          "description": "Potential hardcoded credential in config.json: token_file",
+          "file_path": "config.json",
+          "line_number": null,
+          "remediation": "Move sensitive values to environment variables",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "config_files_checked": 2
+      },
+      "timestamp": 1754718571.3049111
+    },
+    {
+      "check_name": "dependency_security",
+      "passed": false,
+      "score": 35.0,
+      "findings": [
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: google-auth>=2.17.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: google-auth-oauthlib>=1.0.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: google-auth-httplib2>=0.1.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: google-api-python-client>=2.80.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: feedparser>=6.0.10",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: beautifulsoup4>=4.12.0  # HTML\u30d1\u30fc\u30b9\u7528\uff08RSS\u5185\u306eHTML\u51e6\u7406\uff09",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: requests>=2.31.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: aiohttp>=3.8.5",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: urllib3>=1.26.0  # \u30bb\u30ad\u30e5\u30ea\u30c6\u30a3\u30a2\u30c3\u30d7\u30c7\u30fc\u30c8",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: pytz>=2023.3  # \u30bf\u30a4\u30e0\u30be\u30fc\u30f3\u51e6\u7406\uff08Asia/Tokyo\u5bfe\u5fdc\uff09",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: python-dateutil>=2.8.2  # \u65e5\u4ed8\u89e3\u6790",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: pydantic>=2.0.0  # \u8a2d\u5b9a\u30d0\u30ea\u30c7\u30fc\u30b7\u30e7\u30f3\uff08\u5c06\u6765\u306e\u62e1\u5f35\u7528\uff09",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: cryptography>=41.0.0  # OAuth2\u30c8\u30fc\u30af\u30f3\u6697\u53f7\u5316",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "requirements_file_exists": true
+      },
+      "timestamp": 1754718571.30502
+    },
+    {
+      "check_name": "database_security",
+      "passed": true,
+      "score": 100.0,
+      "findings": [],
+      "details": {
+        "db_file_exists": true
+      },
+      "timestamp": 1754718571.3051317
+    },
+    {
+      "check_name": "authentication_security",
+      "passed": false,
+      "score": 60.0,
+      "findings": [
+        {
+          "severity": "HIGH",
+          "category": "authentication",
+          "description": "Token file token.json has insecure permissions: 664",
+          "file_path": "token.json",
+          "line_number": null,
+          "remediation": "Set token file permissions to 600",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "HIGH",
+          "category": "authentication",
+          "description": "Token file credentials.json has insecure permissions: 664",
+          "file_path": "credentials.json",
+          "line_number": null,
+          "remediation": "Set token file permissions to 600",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "token_files_checked": 2
+      },
+      "timestamp": 1754718571.3055627
+    },
+    {
+      "check_name": "api_security",
+      "passed": false,
+      "score": 85.0,
+      "findings": [
+        {
+          "severity": "MEDIUM",
+          "category": "api_security",
+          "description": "No rate limiting detected in manga_rss.py",
+          "file_path": "modules/manga_rss.py",
+          "line_number": null,
+          "remediation": "Implement rate limiting for API calls",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "modules_checked": 2
+      },
+      "timestamp": 1754718571.3058832
+    },
+    {
+      "check_name": "input_validation",
+      "passed": false,
+      "score": 55.0,
+      "findings": [
+        {
+          "severity": "MEDIUM",
+          "category": "input_validation",
+          "description": "No input sanitization detected in anime_anilist.py",
+          "file_path": "modules/anime_anilist.py",
+          "line_number": null,
+          "remediation": "Use InputSanitizer class for all external inputs",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "input_validation",
+          "description": "No input sanitization detected in manga_rss.py",
+          "file_path": "modules/manga_rss.py",
+          "line_number": null,
+          "remediation": "Use InputSanitizer class for all external inputs",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "input_validation",
+          "description": "No input sanitization detected in filter_logic.py",
+          "file_path": "modules/filter_logic.py",
+          "line_number": null,
+          "remediation": "Use InputSanitizer class for all external inputs",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "modules_checked": 3
+      },
+      "timestamp": 1754718571.3062057
+    },
+    {
+      "check_name": "configuration_security",
+      "passed": false,
+      "score": 70.0,
+      "findings": [
+        {
+          "severity": "MEDIUM",
+          "category": "configuration",
+          "description": "Config file config.json has insecure permissions: 664",
+          "file_path": "config.json",
+          "line_number": null,
+          "remediation": "Set permissions to 600 (owner read/write only)",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "configuration",
+          "description": "Config file config.json.template has insecure permissions: 664",
+          "file_path": "config.json.template",
+          "line_number": null,
+          "remediation": "Set permissions to 600 (owner read/write only)",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "HIGH",
+          "category": "configuration",
+          "description": "Potential hardcoded credential in config.json: token_file",
+          "file_path": "config.json",
+          "line_number": null,
+          "remediation": "Move sensitive values to environment variables",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "config_files_checked": 2
+      },
+      "timestamp": 1754718571.6021686
+    },
+    {
+      "check_name": "dependency_security",
+      "passed": false,
+      "score": 35.0,
+      "findings": [
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: google-auth>=2.17.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: google-auth-oauthlib>=1.0.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: google-auth-httplib2>=0.1.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: google-api-python-client>=2.80.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: feedparser>=6.0.10",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: beautifulsoup4>=4.12.0  # HTML\u30d1\u30fc\u30b9\u7528\uff08RSS\u5185\u306eHTML\u51e6\u7406\uff09",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: requests>=2.31.0",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: aiohttp>=3.8.5",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: urllib3>=1.26.0  # \u30bb\u30ad\u30e5\u30ea\u30c6\u30a3\u30a2\u30c3\u30d7\u30c7\u30fc\u30c8",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: pytz>=2023.3  # \u30bf\u30a4\u30e0\u30be\u30fc\u30f3\u51e6\u7406\uff08Asia/Tokyo\u5bfe\u5fdc\uff09",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: python-dateutil>=2.8.2  # \u65e5\u4ed8\u89e3\u6790",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: pydantic>=2.0.0  # \u8a2d\u5b9a\u30d0\u30ea\u30c7\u30fc\u30b7\u30e7\u30f3\uff08\u5c06\u6765\u306e\u62e1\u5f35\u7528\uff09",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "dependencies",
+          "description": "Unpinned dependency: cryptography>=41.0.0  # OAuth2\u30c8\u30fc\u30af\u30f3\u6697\u53f7\u5316",
+          "file_path": "requirements.txt",
+          "line_number": null,
+          "remediation": "Pin dependency versions using == operator",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "requirements_file_exists": true
+      },
+      "timestamp": 1754718571.6022878
+    },
+    {
+      "check_name": "database_security",
+      "passed": true,
+      "score": 100.0,
+      "findings": [],
+      "details": {
+        "db_file_exists": true
+      },
+      "timestamp": 1754718571.602411
+    },
+    {
+      "check_name": "authentication_security",
+      "passed": false,
+      "score": 60.0,
+      "findings": [
+        {
+          "severity": "HIGH",
+          "category": "authentication",
+          "description": "Token file token.json has insecure permissions: 664",
+          "file_path": "token.json",
+          "line_number": null,
+          "remediation": "Set token file permissions to 600",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "HIGH",
+          "category": "authentication",
+          "description": "Token file credentials.json has insecure permissions: 664",
+          "file_path": "credentials.json",
+          "line_number": null,
+          "remediation": "Set token file permissions to 600",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "token_files_checked": 2
+      },
+      "timestamp": 1754718571.6028705
+    },
+    {
+      "check_name": "api_security",
+      "passed": false,
+      "score": 85.0,
+      "findings": [
+        {
+          "severity": "MEDIUM",
+          "category": "api_security",
+          "description": "No rate limiting detected in manga_rss.py",
+          "file_path": "modules/manga_rss.py",
+          "line_number": null,
+          "remediation": "Implement rate limiting for API calls",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "modules_checked": 2
+      },
+      "timestamp": 1754718571.6030943
+    },
+    {
+      "check_name": "input_validation",
+      "passed": false,
+      "score": 55.0,
+      "findings": [
+        {
+          "severity": "MEDIUM",
+          "category": "input_validation",
+          "description": "No input sanitization detected in anime_anilist.py",
+          "file_path": "modules/anime_anilist.py",
+          "line_number": null,
+          "remediation": "Use InputSanitizer class for all external inputs",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "input_validation",
+          "description": "No input sanitization detected in manga_rss.py",
+          "file_path": "modules/manga_rss.py",
+          "line_number": null,
+          "remediation": "Use InputSanitizer class for all external inputs",
+          "cwe_id": null,
+          "cvss_score": null
+        },
+        {
+          "severity": "MEDIUM",
+          "category": "input_validation",
+          "description": "No input sanitization detected in filter_logic.py",
+          "file_path": "modules/filter_logic.py",
+          "line_number": null,
+          "remediation": "Use InputSanitizer class for all external inputs",
+          "cwe_id": null,
+          "cvss_score": null
+        }
+      ],
+      "details": {
+        "modules_checked": 3
+      },
+      "timestamp": 1754718571.6034145
+    }
+  ],
+  "security_metrics": {
+    "files_scanned": 1632,
+    "findings_per_file": 0.028186274509803922,
+    "compliance_score": 67.5,
+    "security_coverage": 0.16666666666666666,
+    "audit_timestamp": 1754718571.6304142
+  },
+  "remediation_plan": {
+    "immediate_action": [
+      {
+        "description": "Potential SQL injection vulnerability: SELECT.*\\+.*FROM...",
+        "file_path": "modules/security_compliance.py",
+        "remediation": "Use parameterized queries or ORM methods",
+        "category": "sql_injection"
+      },
+      {
+        "description": "Potential SQL injection vulnerability: INSERT.*\\+.*VALUES...",
+        "file_path": "modules/security_compliance.py",
+        "remediation": "Use parameterized queries or ORM methods",
+        "category": "sql_injection"
+      },
+      {
+        "description": "Potential command injection: shell=True.*\\+.*user...",
+        "file_path": "modules/security_compliance.py",
+        "remediation": "Avoid shell=True and validate all inputs",
+        "category": "command_injection"
+      },
+      {
+        "description": "Hardcoded secret detected: password = \"hardcoded_password\"...",
+        "file_path": "tests/test_qa_comprehensive.py",
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "category": "hardcoded_secrets"
+      },
+      {
+        "description": "Hardcoded secret detected: password = \"hardcoded_password_123\"...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "category": "hardcoded_secrets"
+      },
+      {
+        "description": "Hardcoded secret detected: api_key = \"sk-1234567890abcdef\"...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "category": "hardcoded_secrets"
+      },
+      {
+        "description": "Potential command injection: os.system(\"ls \" +...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "remediation": "Avoid shell=True and validate all inputs",
+        "category": "command_injection"
+      },
+      {
+        "description": "Potential SQL injection vulnerability: SELECT COUNT(*) FROM releases WHERE notified = 0\\\"...",
+        "file_path": "tests/test_e2e_workflow.py",
+        "remediation": "Use parameterized queries or ORM methods",
+        "category": "sql_injection"
+      },
+      {
+        "description": "Potential SQL injection vulnerability: insert.return_value.execute.return_value = {\\n    ...",
+        "file_path": "tests/test_e2e_workflow.py",
+        "remediation": "Use parameterized queries or ORM methods",
+        "category": "sql_injection"
+      },
+      {
+        "description": "Potential SQL injection vulnerability: SELECT.*\\+.*FROM...",
+        "file_path": "modules/security_compliance.py",
+        "remediation": "Use parameterized queries or ORM methods",
+        "category": "sql_injection"
+      },
+      {
+        "description": "Potential SQL injection vulnerability: INSERT.*\\+.*VALUES...",
+        "file_path": "modules/security_compliance.py",
+        "remediation": "Use parameterized queries or ORM methods",
+        "category": "sql_injection"
+      },
+      {
+        "description": "Potential command injection: shell=True.*\\+.*user...",
+        "file_path": "modules/security_compliance.py",
+        "remediation": "Avoid shell=True and validate all inputs",
+        "category": "command_injection"
+      },
+      {
+        "description": "Hardcoded secret detected: password = \"hardcoded_password\"...",
+        "file_path": "tests/test_qa_comprehensive.py",
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "category": "hardcoded_secrets"
+      },
+      {
+        "description": "Hardcoded secret detected: password = \"hardcoded_password_123\"...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "category": "hardcoded_secrets"
+      },
+      {
+        "description": "Hardcoded secret detected: api_key = \"sk-1234567890abcdef\"...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "remediation": "Move secrets to environment variables or secure configuration",
+        "category": "hardcoded_secrets"
+      },
+      {
+        "description": "Potential command injection: os.system(\"ls \" +...",
+        "file_path": "tests/test_security_comprehensive.py",
+        "remediation": "Avoid shell=True and validate all inputs",
+        "category": "command_injection"
+      },
+      {
+        "description": "Potential SQL injection vulnerability: SELECT COUNT(*) FROM releases WHERE notified = 0\\\"...",
+        "file_path": "tests/test_e2e_workflow.py",
+        "remediation": "Use parameterized queries or ORM methods",
+        "category": "sql_injection"
+      },
+      {
+        "description": "Potential SQL injection vulnerability: insert.return_value.execute.return_value = {\\n    ...",
+        "file_path": "tests/test_e2e_workflow.py",
+        "remediation": "Use parameterized queries or ORM methods",
+        "category": "sql_injection"
+      }
+    ],
+    "short_term": [
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "init_demo_db.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "init_demo_db.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: hashlib.md5(...",
+        "file_path": "modules/filter_logic.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/fixtures/test_data_manager.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/fixtures/test_data_manager.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "init_demo_db.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "init_demo_db.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: hashlib.md5(...",
+        "file_path": "modules/filter_logic.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/test_utils.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/fixtures/test_data_manager.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/fixtures/test_data_manager.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      },
+      {
+        "description": "Weak cryptographic function: random.random()...",
+        "file_path": "tests/mocks/advanced_api_mocks.py",
+        "remediation": "Use secure hash functions like SHA-256 or bcrypt",
+        "category": "weak_crypto"
+      }
+    ],
+    "long_term": []
+  }
+}

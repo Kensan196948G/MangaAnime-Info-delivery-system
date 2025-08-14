@@ -1,0 +1,11 @@
+{
+  "swarmId": "swarm_1755134160_yOk6bI1C",
+  "objective": "CLAUDE.mdの仕様に従い、Context7の分析結果を参考に、MangaAnime情報配信システムを12体SubAgentで並列開発してください development 12",
+  "startTime": "2025-08-14T01:16:00Z",
+  "logFile": "./swarm-runs/swarm_1755134160_yOk6bI1C/swarm.log",
+  "args": [
+  "--strategy",
+  "--max-agents",
+  "--parallel"
+]
+}

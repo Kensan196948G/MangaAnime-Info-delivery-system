@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+</head>
+<body>
+    <h1>API Debug Test</h1>
+    
+    <div>
+        <h2>Collection Processes</h2>
+        <button onclick="testCollectionProcesses()">Test Collection Processes API</button>
+        <pre id="collection-result"></pre>
+    </div>
+    
+    <div>
+        <h2>Collection Status</h2>
+        <button onclick="testCollectionStatus()">Test Collection Status API</button>
+        <pre id="status-result"></pre>
+    </div>
+    
+    <script>
+        function testCollectionProcesses() {
+            document.getElementById('collection-result').textContent = 'Loading...';
+            fetch('/api/collection-processes')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('collection-result').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('collection-result').textContent = 'Error: ' + error.message;
+                });
+        }
+        
+        function testCollectionStatus() {
+            document.getElementById('status-result').textContent = 'Loading...';
+            fetch('/api/collection-status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status-result').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('status-result').textContent = 'Error: ' + error.message;
+                });
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            testCollectionProcesses();
+            testCollectionStatus();
+        });
+    </script>
+</body>
+</html>

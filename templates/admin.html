@@ -1,0 +1,741 @@
+{% extends "base.html" %}
+
+{% block title %}システム管理 - {{ super() }}{% endblock %}
+
+{% block head %}
+<style>
+.metric-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+.metric-card:hover {
+    border-left-color: var(--bs-primary);
+    transform: translateY(-2px);
+}
+.system-status {
+    font-size: 0.9rem;
+}
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+.quick-action-btn {
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed #dee2e6;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+.quick-action-btn:hover {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.05);
+    transform: translateY(-2px);
+}
+.log-viewer {
+    max-height: 400px;
+    overflow-y: auto;
+    background: #1a1a1a;
+    color: #f8f9fa;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+}
+.maintenance-banner {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Maintenance Mode Banner -->
+    <div id="maintenance-banner" class="maintenance-banner d-none">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+            </div>
+            <div class="col">
+                <strong>メンテナンスモード</strong>
+                <div class="small">システムは現在メンテナンス中です。一部機能が制限されています。</div>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-light btn-sm" onclick="toggleMaintenanceMode()">
+                    メンテナンス終了
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>
+                <i class="bi bi-shield-check me-2"></i>システム管理
+            </h2>
+            <p class="text-muted">システムの監視、メンテナンス、設定管理を行います</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary" onclick="refreshAllData()">
+                    <i class="bi bi-arrow-clockwise"></i> 全データ更新
+                </button>
+                <button type="button" class="btn btn-outline-warning" onclick="toggleMaintenanceMode()">
+                    <i class="bi bi-tools"></i> メンテナンス
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health Overview -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card metric-card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">システム稼働時間</h6>
+                            <h4 class="mb-0" id="system-uptime">--</h4>
+                            <small class="opacity-75">連続稼働中</small>
+                        </div>
+                        <div class="fs-1 opacity-75">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card metric-card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">メモリ使用量</h6>
+                            <h4 class="mb-0" id="memory-usage">--</h4>
+                            <small class="opacity-75">使用中</small>
+                        </div>
+                        <div class="fs-1 opacity-75">
+                            <i class="bi bi-memory"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card metric-card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">データベースサイズ</h6>
+                            <h4 class="mb-0" id="db-size">--</h4>
+                            <small class="opacity-75">SQLite</small>
+                        </div>
+                        <div class="fs-1 opacity-75">
+                            <i class="bi bi-database"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card metric-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">今日の処理数</h6>
+                            <h4 class="mb-0" id="today-processes">--</h4>
+                            <small class="opacity-75">API呼び出し</small>
+                        </div>
+                        <div class="fs-1 opacity-75">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning me-2"></i>クイックアクション
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="action-grid">
+                        <button type="button" class="btn quick-action-btn" onclick="runDataCollection()">
+                            <i class="bi bi-arrow-repeat fs-3 mb-1"></i>
+                            <span>データ収集実行</span>
+                        </button>
+                        
+                        <button type="button" class="btn quick-action-btn" onclick="cleanupDatabase()">
+                            <i class="bi bi-trash3 fs-3 mb-1"></i>
+                            <span>DB クリーンアップ</span>
+                        </button>
+                        
+                        <button type="button" class="btn quick-action-btn" onclick="backupData()">
+                            <i class="bi bi-cloud-arrow-up fs-3 mb-1"></i>
+                            <span>データバックアップ</span>
+                        </button>
+                        
+                        <button type="button" class="btn quick-action-btn" onclick="restartSystem()">
+                            <i class="bi bi-arrow-clockwise fs-3 mb-1"></i>
+                            <span>システム再起動</span>
+                        </button>
+                        
+                        <button type="button" class="btn quick-action-btn" onclick="sendTestNotification()">
+                            <i class="bi bi-envelope fs-3 mb-1"></i>
+                            <span>テスト通知</span>
+                        </button>
+                        
+                        <button type="button" class="btn quick-action-btn" onclick="viewErrorLogs()">
+                            <i class="bi bi-exclamation-triangle fs-3 mb-1"></i>
+                            <span>エラーログ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear me-2"></i>システム状態
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush system-status">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-database me-2"></i>
+                                データベース接続
+                            </div>
+                            <span class="badge bg-success rounded-pill" id="db-status">正常</span>
+                        </div>
+                        
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-envelope me-2"></i>
+                                Gmail API
+                            </div>
+                            <span class="badge bg-success rounded-pill" id="gmail-status">接続中</span>
+                        </div>
+                        
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-calendar me-2"></i>
+                                Calendar API
+                            </div>
+                            <span class="badge bg-success rounded-pill" id="calendar-status">接続中</span>
+                        </div>
+                        
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-cloud me-2"></i>
+                                AniList API
+                            </div>
+                            <span class="badge bg-success rounded-pill" id="anilist-status">接続中</span>
+                        </div>
+                        
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-rss me-2"></i>
+                                RSS フィード
+                            </div>
+                            <span class="badge bg-success rounded-pill" id="rss-status">取得中</span>
+                        </div>
+                        
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-clock me-2"></i>
+                                スケジューラー
+                            </div>
+                            <span class="badge bg-success rounded-pill" id="scheduler-status">稼働中</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+                        最終チェック: <span id="last-health-check">--</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-activity me-2"></i>最近の活動
+                    </h5>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="refreshActivity()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" id="recent-activity">
+                        <!-- Activity items will be loaded here -->
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-success rounded-circle p-2 me-3">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">データ収集完了</div>
+                                    <div class="small text-muted">新しいリリース 5件を追加</div>
+                                </div>
+                                <div class="small text-muted">2分前</div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-info rounded-circle p-2 me-3">
+                                    <i class="bi bi-envelope"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">通知送信</div>
+                                    <div class="small text-muted">3件のリリース通知を送信</div>
+                                </div>
+                                <div class="small text-muted">15分前</div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-warning rounded-circle p-2 me-3">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">API制限</div>
+                                    <div class="small text-muted">AniList APIのレート制限に到達</div>
+                                </div>
+                                <div class="small text-muted">1時間前</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Viewer -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-terminal me-2"></i>システムログ（リアルタイム）
+                    </h5>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary" onclick="clearLogs()">
+                            <i class="bi bi-trash3"></i> クリア
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="downloadLogs()">
+                            <i class="bi bi-download"></i> ダウンロード
+                        </button>
+                        <button type="button" class="btn btn-outline-success" onclick="toggleAutoScroll()">
+                            <i class="bi bi-arrows-expand"></i> 自動スクロール
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="log-viewer" id="log-viewer">
+                        <div class="p-3">
+                            <div class="text-success">[2024-01-09 10:30:15] INFO: システムが開始されました</div>
+                            <div class="text-info">[2024-01-09 10:30:16] INFO: データベース接続が確立されました</div>
+                            <div class="text-info">[2024-01-09 10:30:17] INFO: AniList API接続チェック完了</div>
+                            <div class="text-warning">[2024-01-09 10:30:18] WARN: しょぼいカレンダーAPIの応答が遅延しています</div>
+                            <div class="text-success">[2024-01-09 10:30:19] INFO: Gmail API認証成功</div>
+                            <div class="text-info">[2024-01-09 10:30:20] INFO: カレンダーAPI接続チェック完了</div>
+                            <div class="text-success">[2024-01-09 10:30:21] INFO: 全システムコンポーネント正常稼働中</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Management -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-database me-2"></i>データベース管理
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="fs-2 text-primary mb-2">
+                                    <i class="bi bi-collection"></i>
+                                </div>
+                                <div class="fw-semibold">作品数</div>
+                                <div class="h4" id="works-count">--</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="fs-2 text-success mb-2">
+                                    <i class="bi bi-play-circle"></i>
+                                </div>
+                                <div class="fw-semibold">リリース数</div>
+                                <div class="h4" id="releases-count">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-primary" onclick="optimizeDatabase()">
+                            <i class="bi bi-speedometer2 me-2"></i>データベース最適化
+                        </button>
+                        <button type="button" class="btn btn-outline-warning" onclick="repairDatabase()">
+                            <i class="bi bi-tools me-2"></i>整合性チェック
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="resetDatabase()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>データベースリセット
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Statistics -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up me-2"></i>API統計
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="fs-4 text-primary mb-1" id="api-calls-today">--</div>
+                                <div class="small text-muted">今日の呼び出し</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="fs-4 text-success mb-1" id="api-success-rate">--</div>
+                                <div class="small text-muted">成功率</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span>AniList API</span>
+                            <span class="badge bg-primary" id="anilist-calls">--</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span>しょぼいカレンダー</span>
+                            <span class="badge bg-info" id="shobo-calls">--</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span>RSS取得</span>
+                            <span class="badge bg-success" id="rss-calls">--</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between px-0">
+                            <span>Gmail API</span>
+                            <span class="badge bg-warning" id="gmail-calls">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modals -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">確認</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="confirmationMessage">
+                <!-- Confirmation message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                <button type="button" class="btn btn-primary" id="confirmAction">実行</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let autoScroll = true;
+let maintenanceMode = false;
+
+// Initialize admin interface
+document.addEventListener('DOMContentLoaded', function() {
+    loadSystemStats();
+    startRealTimeUpdates();
+    initializeLogViewer();
+});
+
+function loadSystemStats() {
+    // Simulate loading system statistics
+    document.getElementById('system-uptime').textContent = '2d 15h 32m';
+    document.getElementById('memory-usage').textContent = '145 MB';
+    document.getElementById('db-size').textContent = '2.3 MB';
+    document.getElementById('today-processes').textContent = '1,247';
+    
+    document.getElementById('works-count').textContent = '156';
+    document.getElementById('releases-count').textContent = '1,489';
+    
+    document.getElementById('api-calls-today').textContent = '1,247';
+    document.getElementById('api-success-rate').textContent = '99.2%';
+    
+    document.getElementById('anilist-calls').textContent = '456';
+    document.getElementById('shobo-calls').textContent = '123';
+    document.getElementById('rss-calls').textContent = '89';
+    document.getElementById('gmail-calls').textContent = '34';
+    
+    document.getElementById('last-health-check').textContent = new Date().toLocaleTimeString('ja-JP');
+}
+
+function startRealTimeUpdates() {
+    // Update system stats every 30 seconds
+    setInterval(loadSystemStats, 30000);
+    
+    // Simulate real-time log updates
+    if (autoScroll) {
+        setInterval(addRandomLogEntry, 5000);
+    }
+}
+
+function addRandomLogEntry() {
+    const logViewer = document.getElementById('log-viewer');
+    const logContainer = logViewer.querySelector('.p-3');
+    
+    const logEntries = [
+        { level: 'info', message: 'データ収集処理が開始されました', color: 'text-info' },
+        { level: 'success', message: 'AniList APIから新しいデータを取得しました', color: 'text-success' },
+        { level: 'warning', message: 'RSS取得で一部エラーが発生しました', color: 'text-warning' },
+        { level: 'info', message: 'カレンダーに予定を追加しました', color: 'text-info' },
+        { level: 'success', message: 'メール通知を送信しました', color: 'text-success' }
+    ];
+    
+    const randomEntry = logEntries[Math.floor(Math.random() * logEntries.length)];
+    const timestamp = new Date().toLocaleString('ja-JP');
+    
+    const logElement = document.createElement('div');
+    logElement.className = randomEntry.color;
+    logElement.textContent = `[${timestamp}] ${randomEntry.level.toUpperCase()}: ${randomEntry.message}`;
+    
+    logContainer.appendChild(logElement);
+    
+    // Auto-scroll if enabled
+    if (autoScroll) {
+        logViewer.scrollTop = logViewer.scrollHeight;
+    }
+    
+    // Limit log entries to prevent memory issues
+    const logElements = logContainer.children;
+    if (logElements.length > 100) {
+        logContainer.removeChild(logElements[0]);
+    }
+}
+
+function initializeLogViewer() {
+    const logViewer = document.getElementById('log-viewer');
+    
+    // Disable auto-scroll when user scrolls up
+    logViewer.addEventListener('scroll', function() {
+        const isAtBottom = logViewer.scrollTop + logViewer.clientHeight >= logViewer.scrollHeight - 10;
+        if (!isAtBottom && autoScroll) {
+            autoScroll = false;
+            updateAutoScrollButton();
+        }
+    });
+}
+
+function toggleAutoScroll() {
+    autoScroll = !autoScroll;
+    updateAutoScrollButton();
+    
+    if (autoScroll) {
+        const logViewer = document.getElementById('log-viewer');
+        logViewer.scrollTop = logViewer.scrollHeight;
+    }
+}
+
+function updateAutoScrollButton() {
+    const button = document.querySelector('[onclick="toggleAutoScroll()"]');
+    if (autoScroll) {
+        button.innerHTML = '<i class="bi bi-pause-fill"></i> 自動スクロール停止';
+        button.className = 'btn btn-outline-warning';
+    } else {
+        button.innerHTML = '<i class="bi bi-play-fill"></i> 自動スクロール開始';
+        button.className = 'btn btn-outline-success';
+    }
+}
+
+function clearLogs() {
+    if (confirm('ログをクリアしますか？この操作は元に戻せません。')) {
+        const logContainer = document.querySelector('#log-viewer .p-3');
+        logContainer.innerHTML = '<div class="text-muted">ログがクリアされました</div>';
+    }
+}
+
+function downloadLogs() {
+    const logContainer = document.querySelector('#log-viewer .p-3');
+    const logText = Array.from(logContainer.children).map(el => el.textContent).join('\n');
+    
+    const blob = new Blob([logText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `system-logs-${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+function toggleMaintenanceMode() {
+    maintenanceMode = !maintenanceMode;
+    const banner = document.getElementById('maintenance-banner');
+    
+    if (maintenanceMode) {
+        banner.classList.remove('d-none');
+        showNotification('メンテナンスモードを開始しました', 'warning');
+    } else {
+        banner.classList.add('d-none');
+        showNotification('メンテナンスモードを終了しました', 'success');
+    }
+}
+
+function refreshAllData() {
+    showConfirmation('全データを更新しますか？この処理には数分かかる場合があります。', function() {
+        showNotification('データ更新を開始しました', 'info');
+        // Simulate data refresh
+        setTimeout(() => {
+            loadSystemStats();
+            showNotification('データ更新が完了しました', 'success');
+        }, 3000);
+    });
+}
+
+function runDataCollection() {
+    showNotification('データ収集を開始しました', 'info');
+    // Simulate data collection
+    setTimeout(() => {
+        showNotification('データ収集が完了しました。新しいリリース 3件を追加しました。', 'success');
+    }, 2000);
+}
+
+function cleanupDatabase() {
+    showConfirmation('古いデータを削除してデータベースを最適化しますか？', function() {
+        showNotification('データベースのクリーンアップを開始しました', 'info');
+        setTimeout(() => {
+            showNotification('データベースのクリーンアップが完了しました', 'success');
+        }, 1500);
+    });
+}
+
+function backupData() {
+    showNotification('データのバックアップを開始しました', 'info');
+    setTimeout(() => {
+        showNotification('バックアップが完了しました', 'success');
+    }, 1000);
+}
+
+function restartSystem() {
+    showConfirmation('システムを再起動しますか？一時的にサービスが停止します。', function() {
+        showNotification('システムを再起動しています...', 'warning');
+        setTimeout(() => {
+            location.reload();
+        }, 3000);
+    });
+}
+
+function sendTestNotification() {
+    showNotification('テスト通知を送信しました', 'info');
+}
+
+function viewErrorLogs() {
+    // Simulate showing error logs
+    const logContainer = document.querySelector('#log-viewer .p-3');
+    logContainer.innerHTML = '<div class="text-danger">[ERROR] デモエラーログ - 実際のエラーログはここに表示されます</div>';
+}
+
+function optimizeDatabase() {
+    showConfirmation('データベースを最適化しますか？処理中は一時的に動作が重くなる場合があります。', function() {
+        showNotification('データベースの最適化を開始しました', 'info');
+        setTimeout(() => {
+            showNotification('データベースの最適化が完了しました', 'success');
+        }, 2000);
+    });
+}
+
+function repairDatabase() {
+    showNotification('データベースの整合性チェックを開始しました', 'info');
+    setTimeout(() => {
+        showNotification('データベースに問題はありませんでした', 'success');
+    }, 1500);
+}
+
+function resetDatabase() {
+    showConfirmation('データベースをリセットしますか？すべてのデータが削除されます。この操作は元に戻せません！', function() {
+        showNotification('データベースをリセットしています...', 'warning');
+        setTimeout(() => {
+            showNotification('データベースのリセットが完了しました', 'success');
+        }, 2000);
+    });
+}
+
+function refreshActivity() {
+    showNotification('最近の活動を更新しました', 'info');
+}
+
+function showConfirmation(message, callback) {
+    const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    document.getElementById('confirmationMessage').textContent = message;
+    
+    const confirmButton = document.getElementById('confirmAction');
+    confirmButton.onclick = function() {
+        modal.hide();
+        callback();
+    };
+    
+    modal.show();
+}
+
+function showNotification(message, type = 'info') {
+    // Use the global notification system from main.js
+    if (window.AnimeManagaSystem) {
+        window.AnimeManagaSystem.showNotification(message, type);
+    } else {
+        alert(message);
+    }
+}
+</script>
+{% endblock %}

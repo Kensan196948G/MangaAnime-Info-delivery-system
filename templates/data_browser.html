@@ -1,0 +1,970 @@
+{% extends "base.html" %}
+
+{% block title %}データブラウザ - アニメ・マンガ情報配信システム{% endblock %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" rel="stylesheet">
+<style>
+.data-browser-container {
+    max-height: calc(100vh - 200px);
+}
+
+.filter-section {
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.filter-section.collapsed {
+    max-height: 60px;
+    overflow: hidden;
+}
+
+.work-card {
+    transition: all 0.2s ease;
+    border: 1px solid #dee2e6;
+}
+
+.work-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.work-card.anime {
+    border-left: 4px solid #0d6efd;
+}
+
+.work-card.manga {
+    border-left: 4px solid #6f42c1;
+}
+
+.genre-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    margin: 0.125rem;
+    display: inline-block;
+}
+
+.platform-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+}
+
+.quality-score {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.quality-score.excellent {
+    background: linear-gradient(135deg, #198754, #20c997);
+    color: white;
+}
+
+.quality-score.good {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: white;
+}
+
+.quality-score.fair {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: white;
+}
+
+.quality-score.poor {
+    background: linear-gradient(135deg, #dc3545, #e83e8c);
+    color: white;
+}
+
+.search-highlight {
+    background-color: #fff3cd;
+    font-weight: bold;
+}
+
+.data-table-container {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.sticky-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.calendar-view {
+    display: none;
+}
+
+.calendar-view.active {
+    display: block;
+}
+
+.calendar-day {
+    min-height: 80px;
+    border: 1px solid #dee2e6;
+    padding: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+    background-color: #f8f9fa;
+}
+
+.calendar-day.has-releases {
+    background-color: #e3f2fd;
+}
+
+.calendar-day.today {
+    background-color: #fff3e0;
+    border-color: #ff9800;
+}
+
+.calendar-event {
+    font-size: 0.7rem;
+    background: #0d6efd;
+    color: white;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin: 1px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.calendar-event.anime {
+    background: #0d6efd;
+}
+
+.calendar-event.manga {
+    background: #6f42c1;
+}
+
+@media (max-width: 768px) {
+    .filter-section {
+        padding: 0.75rem;
+    }
+    
+    .work-card {
+        margin-bottom: 0.75rem;
+    }
+    
+    .genre-tag {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.3rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- ページヘッダー -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">データブラウザ</h1>
+            <p class="text-muted mb-0">収集済みの作品データを検索・閲覧</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="viewMode" id="cardView" checked>
+                <label class="btn btn-outline-primary" for="cardView">
+                    <i class="bi bi-grid-3x3-gap"></i> カード
+                </label>
+                <input type="radio" class="btn-check" name="viewMode" id="tableView">
+                <label class="btn btn-outline-primary" for="tableView">
+                    <i class="bi bi-table"></i> テーブル
+                </label>
+                <input type="radio" class="btn-check" name="viewMode" id="calendarView">
+                <label class="btn btn-outline-primary" for="calendarView">
+                    <i class="bi bi-calendar"></i> カレンダー
+                </label>
+            </div>
+            <button class="btn btn-primary" id="exportBtn">
+                <i class="bi bi-download"></i> エクスポート
+            </button>
+        </div>
+    </div>
+
+    <!-- 検索・フィルター -->
+    <div class="filter-section" id="filterSection">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">検索・フィルター</h5>
+            <button class="btn btn-sm btn-outline-secondary" id="toggleFilter">
+                <i class="bi bi-chevron-up" id="filterToggleIcon"></i>
+            </button>
+        </div>
+        
+        <div id="filterContent">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">キーワード検索</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchInput" 
+                               placeholder="作品名、作者名、説明文で検索">
+                        <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">作品タイプ</label>
+                    <select class="form-select" id="typeFilter">
+                        <option value="">すべて</option>
+                        <option value="anime">アニメ</option>
+                        <option value="manga">マンガ</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">配信プラットフォーム</label>
+                    <select class="form-select" id="platformFilter">
+                        <option value="">すべて</option>
+                        <option value="Netflix">Netflix</option>
+                        <option value="Amazon Prime">Amazon Prime</option>
+                        <option value="dアニメストア">dアニメストア</option>
+                        <option value="BookWalker">BookWalker</option>
+                        <option value="マガポケ">マガポケ</option>
+                        <option value="Kindle">Kindle</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">品質スコア</label>
+                    <select class="form-select" id="qualityFilter">
+                        <option value="">すべて</option>
+                        <option value="excellent">優秀 (90-100)</option>
+                        <option value="good">良好 (70-89)</option>
+                        <option value="fair">普通 (50-69)</option>
+                        <option value="poor">要改善 (0-49)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">配信開始日</label>
+                    <input type="text" class="form-control" id="startDateFilter" placeholder="開始日を選択">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">配信終了日</label>
+                    <input type="text" class="form-control" id="endDateFilter" placeholder="終了日を選択">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">ジャンル</label>
+                    <select class="form-select" id="genreFilter">
+                        <option value="">すべて</option>
+                        <option value="Action">アクション</option>
+                        <option value="Adventure">アドベンチャー</option>
+                        <option value="Comedy">コメディ</option>
+                        <option value="Drama">ドラマ</option>
+                        <option value="Fantasy">ファンタジー</option>
+                        <option value="Romance">ロマンス</option>
+                        <option value="Sci-Fi">SF</option>
+                        <option value="Thriller">スリラー</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">並び順</label>
+                    <select class="form-select" id="sortOrder">
+                        <option value="newest">最新順</option>
+                        <option value="oldest">古い順</option>
+                        <option value="title_asc">タイトル昇順</option>
+                        <option value="title_desc">タイトル降順</option>
+                        <option value="quality_desc">品質スコア降順</option>
+                        <option value="popularity">人気順</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex gap-2 align-items-center">
+                        <button class="btn btn-primary" id="applyFilters">
+                            <i class="bi bi-search"></i> 検索実行
+                        </button>
+                        <button class="btn btn-outline-secondary" id="resetFilters">
+                            <i class="bi bi-arrow-clockwise"></i> リセット
+                        </button>
+                        <div class="ms-auto">
+                            <small class="text-muted">
+                                結果: <span id="resultCount">0</span> 件 / 
+                                <span id="totalCount">0</span> 件中
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 結果表示エリア -->
+    <div id="resultsContainer">
+        <!-- カードビュー -->
+        <div id="cardViewContainer" class="view-container active">
+            <div class="row" id="cardResults">
+                <!-- ローディング用スケルトン -->
+                <div class="col-md-6 col-lg-4 mb-3 loading-item">
+                    <div class="card work-card">
+                        <div class="card-body">
+                            <div class="loading-skeleton" style="height: 20px; margin-bottom: 10px; border-radius: 4px;"></div>
+                            <div class="loading-skeleton" style="height: 15px; margin-bottom: 8px; border-radius: 4px; width: 70%;"></div>
+                            <div class="loading-skeleton" style="height: 40px; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 mb-3 loading-item">
+                    <div class="card work-card">
+                        <div class="card-body">
+                            <div class="loading-skeleton" style="height: 20px; margin-bottom: 10px; border-radius: 4px;"></div>
+                            <div class="loading-skeleton" style="height: 15px; margin-bottom: 8px; border-radius: 4px; width: 70%;"></div>
+                            <div class="loading-skeleton" style="height: 40px; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ページネーション -->
+            <nav id="cardPagination" class="d-flex justify-content-center mt-4">
+                <!-- ページネーションコントロール -->
+            </nav>
+        </div>
+
+        <!-- テーブルビュー -->
+        <div id="tableViewContainer" class="view-container">
+            <div class="data-table-container">
+                <table class="table table-hover">
+                    <thead class="sticky-header table-light">
+                        <tr>
+                            <th scope="col">
+                                <input type="checkbox" id="selectAll" class="form-check-input">
+                            </th>
+                            <th scope="col">作品名 <i class="bi bi-arrow-up-down text-muted"></i></th>
+                            <th scope="col">タイプ</th>
+                            <th scope="col">プラットフォーム</th>
+                            <th scope="col">配信日</th>
+                            <th scope="col">品質</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableResults">
+                        <!-- テーブルデータ -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- ページネーション -->
+            <nav id="tablePagination" class="d-flex justify-content-center mt-4">
+                <!-- ページネーションコントロール -->
+            </nav>
+        </div>
+
+        <!-- カレンダービュー -->
+        <div id="calendarViewContainer" class="view-container calendar-view">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" id="prevMonth">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-outline-primary" id="currentMonth">
+                        2024年1月
+                    </button>
+                    <button class="btn btn-outline-primary" id="nextMonth">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="d-flex gap-2">
+                    <div class="d-flex align-items-center">
+                        <div class="calendar-event anime me-2"></div>
+                        <small>アニメ</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="calendar-event manga me-2"></div>
+                        <small>マンガ</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- カレンダーグリッド -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 作品詳細モーダル -->
+<div class="modal fade" id="workDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="workDetailTitle">作品詳細</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="workDetailBody">
+                <!-- 作品詳細内容 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                <button type="button" class="btn btn-primary" id="addToCalendar">
+                    <i class="bi bi-calendar-plus"></i> カレンダーに追加
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ja.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 状態管理
+    let currentView = 'card';
+    let currentPage = 1;
+    let totalPages = 1;
+    let currentFilters = {};
+    let allData = [];
+    let filteredData = [];
+    let selectedItems = new Set();
+    
+    // 日付ピッカーの初期化
+    const startDatePicker = flatpickr("#startDateFilter", {
+        locale: "ja",
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+    
+    const endDatePicker = flatpickr("#endDateFilter", {
+        locale: "ja", 
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+    
+    // ビューモード切り替え
+    document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                currentView = this.id.replace('View', '').toLowerCase();
+                switchView(currentView);
+            }
+        });
+    });
+    
+    function switchView(view) {
+        // すべてのビューコンテナを非表示
+        document.querySelectorAll('.view-container').forEach(container => {
+            container.style.display = 'none';
+        });
+        
+        // 選択されたビューを表示
+        const targetContainer = document.getElementById(`${view}ViewContainer`);
+        if (targetContainer) {
+            targetContainer.style.display = 'block';
+            
+            // ビュー固有の初期化処理
+            switch(view) {
+                case 'card':
+                    renderCardView();
+                    break;
+                case 'table':
+                    renderTableView();
+                    break;
+                case 'calendar':
+                    renderCalendarView();
+                    break;
+            }
+        }
+    }
+    
+    // フィルター展開/折りたたみ
+    document.getElementById('toggleFilter').addEventListener('click', function() {
+        const filterSection = document.getElementById('filterSection');
+        const icon = document.getElementById('filterToggleIcon');
+        
+        if (filterSection.classList.contains('collapsed')) {
+            filterSection.classList.remove('collapsed');
+            icon.className = 'bi bi-chevron-up';
+        } else {
+            filterSection.classList.add('collapsed');
+            icon.className = 'bi bi-chevron-down';
+        }
+    });
+    
+    // 検索・フィルター機能
+    document.getElementById('applyFilters').addEventListener('click', applyFilters);
+    document.getElementById('resetFilters').addEventListener('click', resetFilters);
+    document.getElementById('clearSearch').addEventListener('click', () => {
+        document.getElementById('searchInput').value = '';
+        applyFilters();
+    });
+    
+    // リアルタイム検索
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(applyFilters, 500);
+    });
+    
+    function applyFilters() {
+        showLoading();
+        
+        // フィルター条件を収集
+        currentFilters = {
+            search: document.getElementById('searchInput').value,
+            type: document.getElementById('typeFilter').value,
+            platform: document.getElementById('platformFilter').value,
+            quality: document.getElementById('qualityFilter').value,
+            startDate: document.getElementById('startDateFilter').value,
+            endDate: document.getElementById('endDateFilter').value,
+            genre: document.getElementById('genreFilter').value,
+            sort: document.getElementById('sortOrder').value,
+            page: currentPage
+        };
+        
+        // APIリクエスト
+        fetch('/api/works?' + new URLSearchParams(currentFilters))
+            .then(response => response.json())
+            .then(data => {
+                allData = data.works || [];
+                filteredData = allData;
+                totalPages = data.totalPages || 1;
+                
+                updateResultCount(data.total || 0, data.filtered || 0);
+                renderCurrentView();
+                hideLoading();
+            })
+            .catch(error => {
+                console.error('Filter error:', error);
+                showError('検索中にエラーが発生しました。');
+                hideLoading();
+            });
+    }
+    
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('typeFilter').value = '';
+        document.getElementById('platformFilter').value = '';
+        document.getElementById('qualityFilter').value = '';
+        document.getElementById('startDateFilter').value = '';
+        document.getElementById('endDateFilter').value = '';
+        document.getElementById('genreFilter').value = '';
+        document.getElementById('sortOrder').value = 'newest';
+        startDatePicker.clear();
+        endDatePicker.clear();
+        applyFilters();
+    }
+    
+    function renderCurrentView() {
+        switch(currentView) {
+            case 'card':
+                renderCardView();
+                break;
+            case 'table':
+                renderTableView();
+                break;
+            case 'calendar':
+                renderCalendarView();
+                break;
+        }
+    }
+    
+    function renderCardView() {
+        const container = document.getElementById('cardResults');
+        
+        if (filteredData.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-search display-1 text-muted"></i>
+                    <h4 class="text-muted">検索結果がありません</h4>
+                    <p class="text-muted">検索条件を変更して再度お試しください。</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = filteredData.map(work => `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card work-card ${work.type}" data-work-id="${work.id}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0" style="font-size: 1rem;">
+                                ${highlightSearchTerm(work.title)}
+                            </h5>
+                            <div class="quality-score ${getQualityClass(work.quality_score)}">
+                                ${work.quality_score}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <span class="badge bg-${work.type === 'anime' ? 'primary' : 'secondary'} me-1">
+                                ${work.type === 'anime' ? 'アニメ' : 'マンガ'}
+                            </span>
+                            ${work.platforms?.map(platform => `
+                                <span class="platform-badge bg-light text-dark border me-1">${platform}</span>
+                            `).join('') || ''}
+                        </div>
+                        
+                        <p class="card-text small text-muted mb-2" style="height: 40px; overflow: hidden;">
+                            ${work.description ? highlightSearchTerm(work.description.substring(0, 100)) + '...' : '説明なし'}
+                        </p>
+                        
+                        ${work.genres?.length ? `
+                            <div class="mb-2">
+                                ${work.genres.slice(0, 3).map(genre => `
+                                    <span class="genre-tag bg-light text-secondary border">${genre}</span>
+                                `).join('')}
+                                ${work.genres.length > 3 ? '<span class="genre-tag bg-light text-secondary border">+' + (work.genres.length - 3) + '</span>' : ''}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar"></i> ${formatDate(work.next_release_date) || '未定'}
+                            </small>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="showWorkDetail(${work.id})">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="addToWatchlist(${work.id})">
+                                    <i class="bi bi-bookmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        renderPagination('cardPagination');
+    }
+    
+    function renderTableView() {
+        const tbody = document.getElementById('tableResults');
+        
+        if (filteredData.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <i class="bi bi-search text-muted"></i>
+                        <div class="text-muted">検索結果がありません</div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = filteredData.map(work => `
+            <tr data-work-id="${work.id}">
+                <td>
+                    <input type="checkbox" class="form-check-input" value="${work.id}" 
+                           onchange="toggleSelection(${work.id})">
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="border-start border-3 border-${work.type === 'anime' ? 'primary' : 'secondary'} ps-2">
+                            <div class="fw-medium">${highlightSearchTerm(work.title)}</div>
+                            <small class="text-muted">${work.title_en || ''}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge bg-${work.type === 'anime' ? 'primary' : 'secondary'}">
+                        ${work.type === 'anime' ? 'アニメ' : 'マンガ'}
+                    </span>
+                </td>
+                <td>
+                    <div class="d-flex flex-wrap gap-1">
+                        ${work.platforms?.slice(0, 2).map(platform => `
+                            <span class="platform-badge bg-light text-dark border">${platform}</span>
+                        `).join('') || ''}
+                        ${work.platforms?.length > 2 ? `<small class="text-muted">+${work.platforms.length - 2}</small>` : ''}
+                    </div>
+                </td>
+                <td>
+                    <small>${formatDate(work.next_release_date) || '未定'}</small>
+                </td>
+                <td>
+                    <div class="quality-score ${getQualityClass(work.quality_score)}" style="width: 30px; height: 30px; font-size: 0.7rem;">
+                        ${work.quality_score}
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" onclick="showWorkDetail(${work.id})" title="詳細表示">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-success" onclick="addToWatchlist(${work.id})" title="ウォッチリストに追加">
+                            <i class="bi bi-bookmark"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+        renderPagination('tablePagination');
+    }
+    
+    function renderCalendarView() {
+        // カレンダーグリッドの実装
+        const grid = document.getElementById('calendarGrid');
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+        
+        // カレンダーグリッドのHTMLを生成
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        
+        let calendarHTML = '<div class="row">';
+        
+        // 曜日ヘッダー
+        const dayHeaders = ['日', '月', '火', '水', '木', '金', '土'];
+        dayHeaders.forEach(day => {
+            calendarHTML += `<div class="col text-center fw-bold py-2 border-bottom">${day}</div>`;
+        });
+        
+        // 日付セル
+        for (let i = 0; i < 42; i++) {
+            if (i % 7 === 0) {
+                calendarHTML += '</div><div class="row">';
+            }
+            
+            const date = i - firstDay + 1;
+            const isCurrentMonth = date > 0 && date <= daysInMonth;
+            const isToday = isCurrentMonth && date === currentDate.getDate();
+            
+            if (isCurrentMonth) {
+                const dayReleases = filteredData.filter(work => {
+                    const releaseDate = new Date(work.next_release_date);
+                    return releaseDate.getDate() === date && releaseDate.getMonth() === currentMonth;
+                });
+                
+                calendarHTML += `
+                    <div class="col calendar-day ${isToday ? 'today' : ''} ${dayReleases.length ? 'has-releases' : ''}" 
+                         onclick="showDayDetails('${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}')">
+                        <div class="fw-bold mb-1">${date}</div>
+                        ${dayReleases.slice(0, 3).map(work => `
+                            <div class="calendar-event ${work.type}" title="${work.title}">
+                                ${work.title.substring(0, 10)}${work.title.length > 10 ? '...' : ''}
+                            </div>
+                        `).join('')}
+                        ${dayReleases.length > 3 ? `<div class="calendar-event" style="background: #6c757d;">+${dayReleases.length - 3}</div>` : ''}
+                    </div>
+                `;
+            } else {
+                calendarHTML += '<div class="col calendar-day"></div>';
+            }
+        }
+        
+        calendarHTML += '</div>';
+        grid.innerHTML = calendarHTML;
+    }
+    
+    function renderPagination(containerId) {
+        const container = document.getElementById(containerId);
+        if (totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        let paginationHTML = '<ul class="pagination">';
+        
+        // 前のページ
+        paginationHTML += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1})" aria-label="前のページ">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        `;
+        
+        // ページ番号
+        for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+            paginationHTML += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                </li>
+            `;
+        }
+        
+        // 次のページ
+        paginationHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage + 1})" aria-label="次のページ">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        `;
+        
+        paginationHTML += '</ul>';
+        container.innerHTML = paginationHTML;
+    }
+    
+    // ユーティリティ関数
+    function highlightSearchTerm(text) {
+        const searchTerm = document.getElementById('searchInput').value;
+        if (!searchTerm || !text) return text;
+        
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        return text.replace(regex, '<span class="search-highlight">$1</span>');
+    }
+    
+    function getQualityClass(score) {
+        if (score >= 90) return 'excellent';
+        if (score >= 70) return 'good';
+        if (score >= 50) return 'fair';
+        return 'poor';
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return null;
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ja-JP');
+    }
+    
+    function showLoading() {
+        document.querySelectorAll('.loading-item').forEach(item => {
+            item.style.display = 'block';
+        });
+    }
+    
+    function hideLoading() {
+        document.querySelectorAll('.loading-item').forEach(item => {
+            item.style.display = 'none';
+        });
+    }
+    
+    function updateResultCount(total, filtered) {
+        document.getElementById('resultCount').textContent = filtered;
+        document.getElementById('totalCount').textContent = total;
+    }
+    
+    function showError(message) {
+        // エラーメッセージの表示
+        console.error(message);
+    }
+    
+    // グローバル関数（HTMLから呼び出し用）
+    window.changePage = function(page) {
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            applyFilters();
+        }
+    };
+    
+    window.showWorkDetail = function(workId) {
+        // 作品詳細モーダルを表示
+        fetch(`/api/works/${workId}`)
+            .then(response => response.json())
+            .then(work => {
+                document.getElementById('workDetailTitle').textContent = work.title;
+                document.getElementById('workDetailBody').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>基本情報</h6>
+                            <p><strong>タイプ:</strong> ${work.type === 'anime' ? 'アニメ' : 'マンガ'}</p>
+                            <p><strong>配信プラットフォーム:</strong> ${work.platforms?.join(', ') || '未定'}</p>
+                            <p><strong>ジャンル:</strong> ${work.genres?.join(', ') || '未設定'}</p>
+                            <p><strong>次回配信日:</strong> ${formatDate(work.next_release_date) || '未定'}</p>
+                            
+                            <h6>説明</h6>
+                            <p>${work.description || '説明がありません。'}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="quality-score ${getQualityClass(work.quality_score)} mx-auto mb-3" 
+                                     style="width: 60px; height: 60px; font-size: 1.2rem;">
+                                    ${work.quality_score}
+                                </div>
+                                <small class="text-muted d-block">品質スコア</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                new bootstrap.Modal(document.getElementById('workDetailModal')).show();
+            })
+            .catch(error => {
+                console.error('Work detail fetch error:', error);
+            });
+    };
+    
+    window.addToWatchlist = function(workId) {
+        fetch('/api/watchlist/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ work_id: workId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 成功メッセージの表示
+                showToast('ウォッチリストに追加しました', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Add to watchlist error:', error);
+        });
+    };
+    
+    window.toggleSelection = function(workId) {
+        if (selectedItems.has(workId)) {
+            selectedItems.delete(workId);
+        } else {
+            selectedItems.add(workId);
+        }
+        
+        // 全選択チェックボックスの状態を更新
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        const checkedCount = document.querySelectorAll('tbody input[type="checkbox"]:checked').length;
+        
+        selectAllCheckbox.checked = checkedCount === checkboxes.length;
+        selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+    };
+    
+    window.showDayDetails = function(date) {
+        // カレンダーの日付詳細表示
+        const dayReleases = filteredData.filter(work => {
+            return work.next_release_date && work.next_release_date.startsWith(date);
+        });
+        
+        if (dayReleases.length > 0) {
+            // 日付詳細モーダルを表示（実装簡略）
+            alert(`${date}の配信予定: ${dayReleases.length}件`);
+        }
+    };
+    
+    function showToast(message, type = 'info') {
+        // トースト通知の表示（簡易実装）
+        console.log(`Toast: ${message} (${type})`);
+    }
+    
+    // 初期化
+    applyFilters();
+});
+</script>
+{% endblock %}

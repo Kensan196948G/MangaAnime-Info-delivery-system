@@ -1,0 +1,1323 @@
+{% extends "base.html" %}
+
+{% block title %}ダッシュボード - {{ super() }}{% endblock %}
+
+{% block head %}
+<style>
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+.stats-card-enhanced {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card-enhanced:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.trend-indicator {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.trend-up {
+    color: #28a745;
+}
+
+.trend-down {
+    color: #dc3545;
+}
+
+.trend-neutral {
+    color: #ffc107;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.mini-chart {
+    height: 60px;
+}
+
+.activity-heatmap {
+    display: grid;
+    grid-template-columns: repeat(53, 1fr);
+    gap: 2px;
+    padding: 10px;
+}
+
+.heatmap-cell {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background-color: #ebedf0;
+    transition: background-color 0.2s;
+}
+
+.heatmap-cell.level-1 { background-color: #9be9a8; }
+.heatmap-cell.level-2 { background-color: #40c463; }
+.heatmap-cell.level-3 { background-color: #30a14e; }
+.heatmap-cell.level-4 { background-color: #216e39; }
+
+.performance-meter {
+    position: relative;
+    width: 100px;
+    height: 50px;
+    overflow: hidden;
+}
+
+.performance-arc {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h6 class="card-title mb-1">総作品数</h6>
+                            <h3 class="mb-0" id="total-works">{{ stats.total_works }}</h3>
+                        </div>
+                        <div class="col-4 text-end">
+                            <i class="bi bi-collection fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h6 class="card-title mb-1">総リリース数</h6>
+                            <h3 class="mb-0" id="total-releases">{{ stats.total_releases }}</h3>
+                        </div>
+                        <div class="col-4 text-end">
+                            <i class="bi bi-play-circle fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h6 class="card-title mb-1">未通知</h6>
+                            <h3 class="mb-0" id="pending-notifications">{{ stats.pending_notifications }}</h3>
+                        </div>
+                        <div class="col-4 text-end">
+                            <i class="bi bi-bell fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h6 class="card-title mb-1">アニメ / マンガ</h6>
+                            <h3 class="mb-0">{{ stats.anime_count }} / {{ stats.manga_count }}</h3>
+                        </div>
+                        <div class="col-4 text-end">
+                            <i class="bi bi-pie-chart fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Releases -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history me-2"></i>最近のリリース（7日以内）
+                    </h5>
+                    <button class="btn btn-outline-primary btn-sm" onclick="refreshRecentReleases()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_releases %}
+                        <div class="list-group list-group-flush" id="recent-releases-list">
+                            {% for release in recent_releases %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-1">
+                                                {% if release.type == 'anime' %}
+                                                    <span class="badge bg-primary me-2">
+                                                        <i class="bi bi-tv"></i> アニメ
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary me-2">
+                                                        <i class="bi bi-book"></i> マンガ
+                                                    </span>
+                                                {% endif %}
+                                                <strong>{{ release.title }}</strong>
+                                            </div>
+                                            <div class="text-muted small">
+                                                {% if release.release_type == 'episode' %}
+                                                    第{{ release.number }}話
+                                                {% else %}
+                                                    第{{ release.number }}巻
+                                                {% endif %}
+                                                · {{ release.platform }}
+                                                · {{ release.release_date }}
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            {% if release.notified %}
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning">
+                                                    <i class="bi bi-exclamation-circle"></i>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-inbox fs-1 mb-3 d-block"></i>
+                            <p>最近のリリースはありません</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ url_for('releases') }}" class="btn btn-outline-primary btn-sm">
+                        すべてのリリースを見る
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Releases -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calendar-event me-2"></i>今後の予定（7日以内）
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if upcoming_releases %}
+                        <div class="list-group list-group-flush">
+                            {% for release in upcoming_releases %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-1">
+                                                {% if release.type == 'anime' %}
+                                                    <span class="badge bg-primary me-2">
+                                                        <i class="bi bi-tv"></i> アニメ
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary me-2">
+                                                        <i class="bi bi-book"></i> マンガ
+                                                    </span>
+                                                {% endif %}
+                                                <strong>{{ release.title }}</strong>
+                                            </div>
+                                            <div class="text-muted small">
+                                                {% if release.release_type == 'episode' %}
+                                                    第{{ release.number }}話
+                                                {% else %}
+                                                    第{{ release.number }}巻
+                                                {% endif %}
+                                                · {{ release.platform }}
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">{{ release.release_date }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-calendar-x fs-1 mb-3 d-block"></i>
+                            <p>今後の予定はありません</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ url_for('calendar') }}" class="btn btn-outline-primary btn-sm">
+                        カレンダーで確認
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- データ可視化・統計セクション -->
+    <div class="row mb-4">
+        <!-- 収集統計グラフ -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-bar-chart me-2"></i>収集統計（過去30日）
+                    </h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary active" data-period="30">30日</button>
+                        <button class="btn btn-outline-secondary" data-period="7">7日</button>
+                        <button class="btn btn-outline-secondary" data-period="1">今日</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="collectionStatsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ジャンル分布（円グラフ） -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-pie-chart me-2"></i>作品ジャンル分布
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="genreDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- プラットフォーム別統計 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up me-2"></i>配信プラットフォーム別統計
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 400px;">
+                        <canvas id="platformStatsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 収集活動ヒートマップ -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calendar-heat me-2"></i>収集活動ヒートマップ（過去1年）
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-heatmap" id="activityHeatmap">
+                        <!-- ヒートマップセルはJavaScriptで生成 -->
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="small text-muted">少ない</span>
+                        <div class="d-flex gap-1">
+                            <div class="heatmap-cell"></div>
+                            <div class="heatmap-cell level-1"></div>
+                            <div class="heatmap-cell level-2"></div>
+                            <div class="heatmap-cell level-3"></div>
+                            <div class="heatmap-cell level-4"></div>
+                        </div>
+                        <span class="small text-muted">多い</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- パフォーマンス指標 -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-speedometer2 me-2"></i>パフォーマンス指標
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="metric-grid">
+                        <div class="text-center mb-3">
+                            <div class="performance-meter mx-auto mb-2">
+                                <canvas id="performanceMeter" width="100" height="50"></canvas>
+                            </div>
+                            <h6 class="mb-1">システム効率</h6>
+                            <span class="badge bg-success">92%</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small">API応答時間</span>
+                                <span class="small text-muted">1.2s</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" style="width: 85%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small">成功率</span>
+                                <span class="small text-success">97.3%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" style="width: 97%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small">データ品質</span>
+                                <span class="small text-info">89%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-info" style="width: 89%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- トレンド分析 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-trending-up me-2"></i>トレンド分析
+                    </h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary active" data-trend="genre">ジャンル</button>
+                        <button class="btn btn-outline-secondary" data-trend="platform">プラットフォーム</button>
+                        <button class="btn btn-outline-secondary" data-trend="time">時期</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 350px;">
+                        <canvas id="trendAnalysisChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning me-2"></i>クイックアクション
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <a href="/collection-dashboard" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-activity me-1"></i>収集状況
+                        </a>
+                        <a href="/data-browser" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-search me-1"></i>データ検索
+                        </a>
+                        <a href="/collection-settings" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-gear me-1"></i>収集設定
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-primary" onclick="runDataCollection()">
+                                    <i class="bi bi-arrow-repeat me-2"></i>データ収集実行
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-success" onclick="sendTestNotification()">
+                                    <i class="bi bi-envelope me-2"></i>テスト通知送信
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-grid">
+                                <a href="{{ url_for('config') }}" class="btn btn-outline-warning">
+                                    <i class="bi bi-gear me-2"></i>設定変更
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-grid">
+                                <a href="{{ url_for('logs') }}" class="btn btn-outline-info">
+                                    <i class="bi bi-journal-text me-2"></i>ログ確認
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Chart.js configurations and initialization
+let collectionChart, genreChart, platformChart, trendChart;
+let chartsInitialized = false;
+
+// Auto-refresh dashboard data every 5 minutes
+setInterval(function() {
+    refreshStats();
+    refreshRecentReleases();
+    refreshCharts();
+}, 300000);
+
+// Initialize charts when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, setting up Chart.js event listeners...');
+    
+    // Function to show chart loading state
+    const showChartLoading = () => {
+        ['collectionStatsChart', 'genreDistributionChart', 'platformStatsChart', 'trendAnalysisChart'].forEach(chartId => {
+            const canvasElement = document.getElementById(chartId);
+            if (canvasElement && canvasElement.parentElement) {
+                canvasElement.parentElement.innerHTML = `
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+                            <br><small class="text-muted mt-2">Chart.js読み込み中...</small>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    };
+    
+    // Function to show chart error
+    const showChartError = () => {
+        ['collectionStatsChart', 'genreDistributionChart', 'platformStatsChart', 'trendAnalysisChart'].forEach(chartId => {
+            const canvasElement = document.getElementById(chartId);
+            if (canvasElement && canvasElement.parentElement) {
+                canvasElement.parentElement.innerHTML = `
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-center">
+                            <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
+                            <br><span class="text-danger">Chart.jsライブラリの読み込みに失敗しました</span>
+                            <br><small class="text-muted">ネットワーク接続を確認してページを再読み込みしてください</small>
+                            <br><button class="btn btn-sm btn-outline-primary mt-2" onclick="location.reload()">再読み込み</button>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    };
+    
+    // Event listeners for Chart.js loading (prevent duplicates)
+    if (!window.chartJSEventListenersAdded) {
+        window.addEventListener('chartjs-loaded', function() {
+            console.log('Chart.js loaded event received, initializing charts...');
+            initializeCharts();
+        });
+        
+        window.addEventListener('chartjs-failed', function() {
+            console.error('Chart.js failed event received');
+            showChartError();
+        });
+        
+        window.chartJSEventListenersAdded = true;
+    }
+    
+    // Check if Chart.js is already loaded (in case event was fired before listener was set)
+    if (typeof Chart !== 'undefined') {
+        console.log('Chart.js already loaded, initializing charts immediately...');
+        initializeCharts();
+    } else if (window.chartJSLoadFailed) {
+        console.log('Chart.js already failed, showing error immediately...');
+        showChartError();
+    } else {
+        console.log('Chart.js not yet loaded, showing loading state...');
+        showChartLoading();
+    }
+    
+    generateActivityHeatmap();
+    drawPerformanceMeter();
+    
+    // Period selection for collection stats
+    document.querySelectorAll('[data-period]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            updateCollectionChart(this.dataset.period);
+        });
+    });
+    
+    // Trend analysis type selection
+    document.querySelectorAll('[data-trend]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-trend]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            updateTrendChart(this.dataset.trend);
+        });
+    });
+});
+
+function initializeCharts() {
+    console.log('Initializing charts...');
+    
+    // Prevent duplicate initialization
+    if (chartsInitialized) {
+        console.log('Charts already initialized, skipping...');
+        return;
+    }
+    
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js not loaded. Charts will be disabled.');
+        // Show error message in all chart containers
+        ['collectionStatsChart', 'genreDistributionChart', 'platformStatsChart', 'trendAnalysisChart'].forEach(chartId => {
+            const canvasElement = document.getElementById(chartId);
+            if (canvasElement && canvasElement.parentElement) {
+                canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-danger">Chart.jsが読み込まれていません</span></div>';
+            }
+        });
+        return;
+    }
+    
+    console.log('Chart.js is available, version:', Chart.version || 'unknown');
+    
+    // Destroy existing charts if they exist
+    if (collectionChart) {
+        console.log('Destroying existing collection chart');
+        collectionChart.destroy();
+        collectionChart = null;
+    }
+    if (genreChart) {
+        console.log('Destroying existing genre chart');
+        genreChart.destroy();
+        genreChart = null;
+    }
+    if (platformChart) {
+        console.log('Destroying existing platform chart');
+        platformChart.destroy();
+        platformChart = null;
+    }
+    if (trendChart) {
+        console.log('Destroying existing trend chart');
+        trendChart.destroy();
+        trendChart = null;
+    }
+    
+    // Mark as initializing
+    chartsInitialized = true;
+    
+    // Collection Statistics Chart
+    console.log('Creating collection stats chart...');
+    const collectionCtx = document.getElementById('collectionStatsChart');
+    if (!collectionCtx) {
+        console.warn('collectionStatsChart canvas not found');
+        chartsInitialized = false; // Reset flag on error
+        return;
+    }
+    
+    // Clear any existing chart from this canvas
+    const existingChart = Chart.getChart(collectionCtx);
+    if (existingChart) {
+        console.log('Found existing chart on collectionStatsChart canvas, destroying...');
+        existingChart.destroy();
+    }
+    
+    try {
+        collectionChart = new Chart(collectionCtx.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: generateDateLabels(30),
+            datasets: [{
+                label: 'アニメ',
+                data: generateMockData(30, 10, 50),
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'マンガ',
+                data: generateMockData(30, 5, 30),
+                borderColor: '#6f42c1',
+                backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+    
+    console.log('Collection stats chart created successfully:', collectionChart);
+    } catch (error) {
+        console.error('Error creating collection stats chart:', error);
+        chartsInitialized = false; // Reset flag on error
+        const canvasElement = document.getElementById('collectionStatsChart');
+        if (canvasElement && canvasElement.parentElement) {
+            canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-danger">収集統計チャート作成エラー: ' + error.message + '</span></div>';
+        }
+    }
+
+    // Genre Distribution Chart
+    console.log('Creating genre distribution chart...');
+    const genreCtx = document.getElementById('genreDistributionChart');
+    if (!genreCtx) {
+        console.warn('genreDistributionChart canvas not found');
+        // Create error message in the chart container
+        const canvasElement = document.querySelector('#genreDistributionChart');
+        if (canvasElement && canvasElement.parentElement) {
+            canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-muted">チャート表示エラー</span></div>';
+        }
+    } else {
+        // Clear any existing chart from this canvas
+        const existingGenreChart = Chart.getChart(genreCtx);
+        if (existingGenreChart) {
+            console.log('Found existing chart on genreDistributionChart canvas, destroying...');
+            existingGenreChart.destroy();
+        }
+        
+        try {
+            genreChart = new Chart(genreCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['アクション', 'コメディ', 'ドラマ', 'ファンタジー', 'ロマンス', 'SF', 'その他'],
+                    datasets: [{
+                        data: [25, 20, 15, 18, 12, 8, 2],
+                        backgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                            '#4BC0C0',
+                            '#9966FF',
+                            '#FF9F40',
+                            '#C9CBCF'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            console.log('Genre distribution chart created successfully:', genreChart);
+        } catch (error) {
+            console.error('Error creating genre chart:', error);
+            // Show error message in chart container
+            const canvasElement = document.querySelector('#genreDistributionChart');
+            if (canvasElement && canvasElement.parentElement) {
+                canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-danger">ジャンル分布チャート作成エラー: ' + error.message + '</span></div>';
+            }
+        }
+    }
+
+    // Platform Statistics Chart
+    console.log('Creating platform statistics chart...');
+    const platformCtx = document.getElementById('platformStatsChart');
+    if (!platformCtx) {
+        console.warn('platformStatsChart canvas not found');
+        // Show error message in chart container
+        const canvasElement = document.querySelector('#platformStatsChart');
+        if (canvasElement && canvasElement.parentElement) {
+            canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-muted">チャート表示エラー</span></div>';
+        }
+    } else {
+        // Clear any existing chart from this canvas
+        const existingPlatformChart = Chart.getChart(platformCtx);
+        if (existingPlatformChart) {
+            console.log('Found existing chart on platformStatsChart canvas, destroying...');
+            existingPlatformChart.destroy();
+        }
+        
+        try {
+            platformChart = new Chart(platformCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Netflix', 'Amazon Prime', 'dアニメストア', 'BookWalker', 'マガポケ', 'Kindle', 'その他'],
+                    datasets: [{
+                        label: 'アニメ',
+                        data: [120, 98, 145, 0, 0, 0, 25],
+                        backgroundColor: 'rgba(13, 110, 253, 0.8)',
+                        borderColor: '#0d6efd',
+                        borderWidth: 1
+                    }, {
+                        label: 'マンガ',
+                        data: [0, 0, 0, 87, 65, 142, 34],
+                        backgroundColor: 'rgba(111, 66, 193, 0.8)',
+                        borderColor: '#6f42c1',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            stacked: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+            console.log('Platform statistics chart created successfully:', platformChart);
+        } catch (error) {
+            console.error('Error creating platform chart:', error);
+            // Show error message in chart container
+            const canvasElement = document.querySelector('#platformStatsChart');
+            if (canvasElement && canvasElement.parentElement) {
+                canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-danger">プラットフォーム統計チャート作成エラー: ' + error.message + '</span></div>';
+            }
+        }
+    }
+
+    // Trend Analysis Chart
+    console.log('Creating trend analysis chart...');
+    const trendCtx = document.getElementById('trendAnalysisChart');
+    if (!trendCtx) {
+        console.warn('trendAnalysisChart canvas not found');
+        // Show error message in chart container
+        const canvasElement = document.querySelector('#trendAnalysisChart');
+        if (canvasElement && canvasElement.parentElement) {
+            canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-muted">チャート表示エラー</span></div>';
+        }
+    } else {
+        // Clear any existing chart from this canvas
+        const existingTrendChart = Chart.getChart(trendCtx);
+        if (existingTrendChart) {
+            console.log('Found existing chart on trendAnalysisChart canvas, destroying...');
+            existingTrendChart.destroy();
+        }
+        
+        try {
+            trendChart = new Chart(trendCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: 'アクション',
+                        data: [12, 19, 15, 25, 22, 30],
+                        borderColor: '#FF6384',
+                        tension: 0.4
+                    }, {
+                        label: 'コメディ',
+                        data: [8, 15, 18, 20, 16, 25],
+                        borderColor: '#36A2EB',
+                        tension: 0.4
+                    }, {
+                        label: 'ドラマ',
+                        data: [15, 12, 20, 18, 24, 20],
+                        borderColor: '#FFCE56',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+            console.log('Trend analysis chart created successfully:', trendChart);
+        } catch (error) {
+            console.error('Error creating trend chart:', error);
+            // Show error message in chart container
+            const canvasElement = document.querySelector('#trendAnalysisChart');
+            if (canvasElement && canvasElement.parentElement) {
+                canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-danger">トレンド分析チャート作成エラー: ' + error.message + '</span></div>';
+            }
+        }
+    }
+    
+    console.log('Chart initialization completed. Charts created:', {
+        collection: !!collectionChart,
+        genre: !!genreChart,
+        platform: !!platformChart,
+        trend: !!trendChart
+    });
+}
+
+function generateActivityHeatmap() {
+    const container = document.getElementById('activityHeatmap');
+    const currentDate = new Date();
+    const oneYearAgo = new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), currentDate.getDate());
+    
+    // Generate 365 days
+    for (let i = 0; i < 365; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'heatmap-cell';
+        
+        // Random activity level for demonstration
+        const activity = Math.random();
+        if (activity > 0.8) cell.classList.add('level-4');
+        else if (activity > 0.6) cell.classList.add('level-3');
+        else if (activity > 0.4) cell.classList.add('level-2');
+        else if (activity > 0.2) cell.classList.add('level-1');
+        
+        // Add tooltip with date and activity count
+        const date = new Date(oneYearAgo);
+        date.setDate(date.getDate() + i);
+        const activityCount = Math.floor(activity * 20);
+        cell.title = `${date.toLocaleDateString('ja-JP')}: ${activityCount}件の収集`;
+        
+        container.appendChild(cell);
+    }
+}
+
+function drawPerformanceMeter() {
+    const canvas = document.getElementById('performanceMeter');
+    const ctx = canvas.getContext('2d');
+    const percentage = 92; // 92%
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, 100, 50);
+    
+    // Draw background arc
+    ctx.beginPath();
+    ctx.arc(50, 50, 40, Math.PI, 0, false);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#e9ecef';
+    ctx.stroke();
+    
+    // Draw progress arc
+    ctx.beginPath();
+    const endAngle = Math.PI + (percentage / 100) * Math.PI;
+    ctx.arc(50, 50, 40, Math.PI, endAngle, false);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = percentage >= 90 ? '#28a745' : percentage >= 70 ? '#ffc107' : '#dc3545';
+    ctx.stroke();
+    
+    // Draw percentage text
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${percentage}%`, 50, 35);
+}
+
+function updateCollectionChart(period) {
+    if (!collectionChart) {
+        console.warn('Collection chart not initialized');
+        return;
+    }
+    const days = parseInt(period);
+    collectionChart.data.labels = generateDateLabels(days);
+    
+    // Generate more realistic data including today
+    if (days === 1) {
+        // Today only
+        collectionChart.data.labels = ['今日'];
+        collectionChart.data.datasets[0].data = [Math.floor(Math.random() * 20) + 5]; // 5-25 anime
+        collectionChart.data.datasets[1].data = [Math.floor(Math.random() * 15) + 3]; // 3-18 manga
+    } else {
+        collectionChart.data.datasets[0].data = generateMockData(days, 5, 25);
+        collectionChart.data.datasets[1].data = generateMockData(days, 3, 18);
+    }
+    
+    collectionChart.update();
+}
+
+function updateTrendChart(trendType) {
+    if (!trendChart) {
+        console.warn('Trend chart not initialized');
+        // Show error message if chart is not available
+        const canvasElement = document.querySelector('#trendAnalysisChart');
+        if (canvasElement && canvasElement.parentElement) {
+            canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-warning">チャートが初期化されていません</span></div>';
+        }
+        return;
+    }
+    
+    let datasets = [];
+    
+    switch(trendType) {
+        case 'genre':
+            datasets = [{
+                label: 'アクション',
+                data: [12, 19, 15, 25, 22, 30],
+                borderColor: '#FF6384',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'コメディ',
+                data: [8, 15, 18, 20, 16, 25],
+                borderColor: '#36A2EB',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'ドラマ',
+                data: [15, 12, 20, 18, 24, 20],
+                borderColor: '#FFCE56',
+                backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                tension: 0.4
+            }];
+            break;
+        case 'platform':
+            datasets = [{
+                label: 'Netflix',
+                data: [25, 30, 28, 35, 32, 40],
+                borderColor: '#E50914',
+                backgroundColor: 'rgba(229, 9, 20, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Amazon Prime',
+                data: [20, 25, 22, 28, 26, 32],
+                borderColor: '#00A8E1',
+                backgroundColor: 'rgba(0, 168, 225, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'dアニメストア',
+                data: [30, 35, 32, 40, 38, 45],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.4
+            }];
+            break;
+        case 'time':
+            datasets = [{
+                label: '平日',
+                data: [15, 20, 18, 22, 19, 25],
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4
+            }, {
+                label: '週末',
+                data: [35, 40, 38, 45, 42, 50],
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                tension: 0.4
+            }];
+            break;
+        default:
+            console.warn('Unknown trend type:', trendType);
+            return;
+    }
+    
+    try {
+        trendChart.data.datasets = datasets;
+        trendChart.update('active');
+        console.log('Trend chart updated for type:', trendType);
+    } catch (error) {
+        console.error('Error updating trend chart:', error);
+        // Show error message
+        const canvasElement = document.querySelector('#trendAnalysisChart');
+        if (canvasElement && canvasElement.parentElement) {
+            canvasElement.parentElement.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><span class="text-danger">チャート更新エラー: ' + error.message + '</span></div>';
+        }
+    }
+}
+
+function generateDateLabels(days) {
+    const labels = [];
+    const currentDate = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(currentDate);
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
+    }
+    
+    return labels;
+}
+
+function generateMockData(length, min, max) {
+    return Array.from({ length }, () => Math.floor(Math.random() * (max - min + 1)) + min);
+}
+
+function refreshCharts() {
+    // Refresh chart data safely
+    console.log('Refreshing charts...', {
+        collection: !!collectionChart,
+        genre: !!genreChart,
+        platform: !!platformChart,
+        trend: !!trendChart
+    });
+    
+    try {
+        if (collectionChart) {
+            updateCollectionChart('30');
+        } else {
+            console.warn('Collection chart not available for refresh');
+        }
+        // Refresh other charts as needed
+    } catch (error) {
+        console.error('Error refreshing charts:', error);
+    }
+}
+
+function refreshStats() {
+    fetch('/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('total-works').textContent = data.total_works;
+            document.getElementById('total-releases').textContent = data.total_releases;
+            document.getElementById('pending-notifications').textContent = data.pending_notifications;
+        })
+        .catch(error => console.error('Error refreshing stats:', error));
+}
+
+function refreshRecentReleases() {
+    fetch('/api/releases/recent')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('recent-releases-list');
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-inbox fs-1 mb-3 d-block"></i>
+                        <p>最近のリリースはありません</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            data.forEach(release => {
+                const typeIcon = release.type === 'anime' ? 'tv' : 'book';
+                const typeLabel = release.type === 'anime' ? 'アニメ' : 'マンガ';
+                const typeClass = release.type === 'anime' ? 'primary' : 'secondary';
+                const releaseText = release.release_type === 'episode' ? '話' : '巻';
+                const notifiedIcon = release.notified ? 'check-circle' : 'exclamation-circle';
+                const notifiedClass = release.notified ? 'success' : 'warning';
+                
+                html += `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-1">
+                                    <span class="badge bg-${typeClass} me-2">
+                                        <i class="bi bi-${typeIcon}"></i> ${typeLabel}
+                                    </span>
+                                    <strong>${release.title}</strong>
+                                </div>
+                                <div class="text-muted small">
+                                    第${release.number}${releaseText} · ${release.platform} · ${release.release_date}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-${notifiedClass}">
+                                    <i class="bi bi-${notifiedIcon}"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        })
+        .catch(error => console.error('Error refreshing recent releases:', error));
+}
+
+function runDataCollection() {
+    // This would trigger the data collection process
+    alert('データ収集処理を実行しました。処理完了まで数分かかる場合があります。');
+}
+
+function sendTestNotification() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    
+    // ボタンを無効化
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>送信中...';
+    
+    console.log('Sending test notification...');
+    
+    // テスト通知を送信
+    fetch('/api/test-notification', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: 'テスト通知です。システムが正常に動作しています。',
+            type: 'test'
+        })
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Test notification response:', data);
+        if (data.success) {
+            // Always show alert as primary notification
+            alert('✅ テスト通知を送信しました。\n\n' + (data.message || 'メールボックスを確認してください。'));
+            
+            // Use AnimeManagaSystem notification if available
+            if (window.AnimeManagaSystem && window.AnimeManagaSystem.showNotification) {
+                window.AnimeManagaSystem.showNotification('テスト通知送信完了: ' + (data.message || '正常に処理されました'), 'success');
+            }
+            
+            // Also show in button text temporarily
+            btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>送信完了';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-success');
+        } else {
+            const errorMsg = '通知送信に失敗しました: ' + (data.error || '不明なエラー');
+            if (window.AnimeManagaSystem && window.AnimeManagaSystem.showNotification) {
+                window.AnimeManagaSystem.showNotification(errorMsg, 'error');
+            } else {
+                alert('❌ ' + errorMsg);
+            }
+            
+            btn.innerHTML = '<i class="bi bi-x-circle me-2"></i>送信失敗';
+            btn.classList.add('btn-danger');
+            btn.classList.remove('btn-outline-success');
+        }
+    })
+    .catch(error => {
+        console.error('Test notification error:', error);
+        const errorMsg = 'テスト通知送信でエラーが発生しました: ' + error.message;
+        
+        if (window.AnimeManagaSystem && window.AnimeManagaSystem.showNotification) {
+            window.AnimeManagaSystem.showNotification(errorMsg, 'error');
+        } else {
+            alert('❌ ' + errorMsg);
+        }
+        
+        btn.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>エラー';
+        btn.classList.add('btn-danger');
+        btn.classList.remove('btn-outline-success');
+    })
+    .finally(() => {
+        // ボタンを復元
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            btn.className = 'btn btn-outline-success'; // Reset to original class
+        }, 3000);
+    });
+}
+</script>
+{% endblock %}

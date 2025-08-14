@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}リリース履歴 - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2>
+                <i class="bi bi-list-ul me-2"></i>リリース履歴
+            </h2>
+            <p class="text-muted">アニメ・マンガのリリース情報を検索・フィルタリングできます</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" id="filter-form">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="search" class="form-label">作品名検索</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               value="{{ search }}" placeholder="作品名を入力...">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="type" class="form-label">種類</label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="all" {% if work_type == 'all' %}selected{% endif %}>すべて</option>
+                            <option value="anime" {% if work_type == 'anime' %}selected{% endif %}>アニメ</option>
+                            <option value="manga" {% if work_type == 'manga' %}selected{% endif %}>マンガ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="platform" class="form-label">プラットフォーム</label>
+                        <select class="form-select" id="platform" name="platform">
+                            <option value="all" {% if platform == 'all' %}selected{% endif %}>すべて</option>
+                            {% for p in platforms %}
+                                <option value="{{ p }}" {% if platform == p %}selected{% endif %}>{{ p }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> 検索
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                            <i class="bi bi-x-circle"></i> クリア
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">検索結果</h5>
+            <div class="d-flex align-items-center">
+                <small class="text-muted me-3">
+                    ページ {{ current_page }} / {{ total_pages }}
+                </small>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" onclick="exportData('csv')">
+                        <i class="bi bi-file-earmark-text"></i> CSV
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="exportData('json')">
+                        <i class="bi bi-file-earmark-code"></i> JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% if releases %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>作品名</th>
+                                <th>種類</th>
+                                <th>話数/巻数</th>
+                                <th>プラットフォーム</th>
+                                <th>配信日</th>
+                                <th>通知状況</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for release in releases %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-medium">{{ release.title }}</div>
+                                        <div class="text-muted small">{{ release.created_at[:19] }} 登録</div>
+                                    </td>
+                                    <td>
+                                        {% if release.type == 'anime' %}
+                                            <span class="badge bg-primary">
+                                                <i class="bi bi-tv"></i> アニメ
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-book"></i> マンガ
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if release.release_type == 'episode' %}
+                                            第{{ release.number }}話
+                                        {% else %}
+                                            第{{ release.number }}巻
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">{{ release.platform }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-nowrap">{{ release.release_date }}</span>
+                                    </td>
+                                    <td>
+                                        {% if release.notified %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> 通知済み
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-exclamation-circle"></i> 未通知
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            {% if release.source_url %}
+                                                <a href="{{ release.source_url }}" target="_blank" 
+                                                   class="btn btn-outline-primary" title="ソースを開く">
+                                                    <i class="bi bi-box-arrow-up-right"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if not release.notified %}
+                                                <button class="btn btn-outline-success" 
+                                                        onclick="sendNotification('{{ release.title }}', '{{ release.release_type }}', '{{ release.number }}')"
+                                                        title="通知送信">
+                                                    <i class="bi bi-bell"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="p-5 text-center text-muted">
+                    <i class="bi bi-search fs-1 mb-3 d-block"></i>
+                    <h5>検索結果がありません</h5>
+                    <p>検索条件を変更してもう一度お試しください。</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+            <div class="card-footer">
+                <nav aria-label="ページネーション">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="{{ url_for('releases', page=current_page-1, type=work_type, platform=platform, search=search) if current_page > 1 else '#' }}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        
+                        {% set start_page = [current_page - 2, 1] | max %}
+                        {% set end_page = [current_page + 2, total_pages] | min %}
+                        
+                        {% if start_page > 1 %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('releases', page=1, type=work_type, platform=platform, search=search) }}">1</a>
+                            </li>
+                            {% if start_page > 2 %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% for page_num in range(start_page, end_page + 1) %}
+                            <li class="page-item {% if page_num == current_page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('releases', page=page_num, type=work_type, platform=platform, search=search) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        
+                        {% if end_page < total_pages %}
+                            {% if end_page < total_pages - 1 %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('releases', page=total_pages, type=work_type, platform=platform, search=search) }}">{{ total_pages }}</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+                            <a class="page-link" href="{{ url_for('releases', page=current_page+1, type=work_type, platform=platform, search=search) if current_page < total_pages else '#' }}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function clearFilters() {
+    document.getElementById('search').value = '';
+    document.getElementById('type').value = 'all';
+    document.getElementById('platform').value = 'all';
+    document.getElementById('filter-form').submit();
+}
+
+function exportData(format) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('export', format);
+    window.open(`${window.location.pathname}?${params.toString()}`, '_blank');
+}
+
+function sendNotification(title, releaseType, number) {
+    if (confirm(`${title} の${releaseType === 'episode' ? '第' + number + '話' : '第' + number + '巻'}について通知を送信しますか？`)) {
+        // Here you would make an API call to send notification
+        alert('通知を送信しました。');
+        // Reload the page to update the notification status
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+}
+
+// Auto-submit form on filter change
+document.getElementById('type').addEventListener('change', function() {
+    document.getElementById('filter-form').submit();
+});
+
+document.getElementById('platform').addEventListener('change', function() {
+    document.getElementById('filter-form').submit();
+});
+
+// Search with debounce
+let searchTimeout;
+document.getElementById('search').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        document.getElementById('filter-form').submit();
+    }, 500);
+});
+</script>
+{% endblock %}

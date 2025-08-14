@@ -1,0 +1,1182 @@
+{% extends "base.html" %}
+
+{% block title %}収集設定 - アニメ・マンガ情報配信システム{% endblock %}
+
+{% block head %}
+<style>
+.settings-tab-content {
+    min-height: 500px;
+}
+
+.source-config-card {
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+.source-config-card.enabled {
+    border-left: 4px solid #198754;
+    background-color: rgba(25, 135, 84, 0.02);
+}
+
+.source-config-card.disabled {
+    border-left: 4px solid #6c757d;
+    background-color: rgba(108, 117, 125, 0.02);
+}
+
+.source-config-card.error {
+    border-left: 4px solid #dc3545;
+    background-color: rgba(220, 53, 69, 0.02);
+}
+
+.connection-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-weight: 500;
+}
+
+.connection-status.connected {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.connection-status.disconnected {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.connection-status.testing {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.keyword-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 1rem;
+    padding: 0.25rem 0.75rem;
+    margin: 0.125rem;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.keyword-tag:hover {
+    background: #e9ecef;
+}
+
+.keyword-tag .remove-keyword {
+    cursor: pointer;
+    color: #dc3545;
+    font-weight: bold;
+    padding: 0 4px;
+}
+
+.keyword-tag .remove-keyword:hover {
+    color: #b02a37;
+}
+
+.schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.schedule-item:hover {
+    background: #e9ecef;
+}
+
+.schedule-item.active {
+    border-color: #198754;
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+.test-connection-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.test-connection-btn.testing::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.form-floating-textarea {
+    position: relative;
+}
+
+.form-floating-textarea .form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.advanced-settings {
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.stats-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.backup-restore-section {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+@media (max-width: 768px) {
+    .source-config-card {
+        margin-bottom: 1rem;
+    }
+    
+    .schedule-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- ページヘッダー -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">収集設定</h1>
+            <p class="text-muted mb-0">データ収集源とシステム設定の管理</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="importBtn">
+                <i class="bi bi-upload"></i> 設定インポート
+            </button>
+            <button class="btn btn-outline-primary" id="exportBtn">
+                <i class="bi bi-download"></i> 設定エクスポート
+            </button>
+            <button class="btn btn-success" id="saveAllBtn">
+                <i class="bi bi-check-lg"></i> すべて保存
+            </button>
+        </div>
+    </div>
+
+    <!-- タブナビゲーション -->
+    <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="sources-tab" data-bs-toggle="tab" data-bs-target="#sources" type="button" role="tab">
+                <i class="bi bi-globe me-1"></i>収集ソース
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="filters-tab" data-bs-toggle="tab" data-bs-target="#filters" type="button" role="tab">
+                <i class="bi bi-funnel me-1"></i>フィルター
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab">
+                <i class="bi bi-clock me-1"></i>スケジュール
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">
+                <i class="bi bi-bell me-1"></i>通知設定
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab">
+                <i class="bi bi-gear me-1"></i>詳細設定
+            </button>
+        </li>
+    </ul>
+
+    <!-- タブコンテンツ -->
+    <div class="tab-content settings-tab-content" id="settingsTabContent">
+        
+        <!-- 収集ソース設定 -->
+        <div class="tab-pane fade show active" id="sources" role="tabpanel">
+            <div class="py-4">
+                <div class="row">
+                    <!-- AniList API設定 -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card source-config-card enabled">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">AniList GraphQL API</h5>
+                                    <small class="text-muted">アニメ情報収集</small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="connection-status connected">
+                                        <i class="bi bi-check-circle"></i> 接続中
+                                    </span>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="anilistEnabled" checked>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">API URL</label>
+                                    <input type="url" class="form-control" value="https://graphql.anilist.co" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">リクエスト間隔（秒）</label>
+                                    <input type="number" class="form-control" value="1" min="0.5" step="0.1">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">最大同時接続数</label>
+                                    <input type="number" class="form-control" value="2" min="1" max="5">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary test-connection-btn" onclick="testConnection('anilist')">
+                                        <i class="bi bi-wifi"></i> 接続テスト
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="resetToDefaults('anilist')">
+                                        <i class="bi bi-arrow-clockwise"></i> デフォルト
+                                    </button>
+                                </div>
+                                <div class="stats-grid mt-3">
+                                    <div class="stats-card">
+                                        <div class="stats-value">1,247</div>
+                                        <small class="text-muted">取得作品数</small>
+                                    </div>
+                                    <div class="stats-card">
+                                        <div class="stats-value">98.5%</div>
+                                        <small class="text-muted">成功率</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- しょぼいカレンダー設定 -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card source-config-card enabled">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">しょぼいカレンダー</h5>
+                                    <small class="text-muted">TV放送スケジュール</small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="connection-status connected">
+                                        <i class="bi bi-check-circle"></i> 接続中
+                                    </span>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="shoboEnabled" checked>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">API URL</label>
+                                    <input type="url" class="form-control" value="http://cal.syoboi.jp/json.php" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">取得期間（日）</label>
+                                    <input type="number" class="form-control" value="30" min="1" max="365">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">更新頻度</label>
+                                    <select class="form-select">
+                                        <option value="hourly">1時間ごと</option>
+                                        <option value="daily" selected>1日1回</option>
+                                        <option value="weekly">1週間に1回</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary test-connection-btn" onclick="testConnection('shobo')">
+                                        <i class="bi bi-wifi"></i> 接続テスト
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="resetToDefaults('shobo')">
+                                        <i class="bi bi-arrow-clockwise"></i> デフォルト
+                                    </button>
+                                </div>
+                                <div class="stats-grid mt-3">
+                                    <div class="stats-card">
+                                        <div class="stats-value">89</div>
+                                        <small class="text-muted">放送局数</small>
+                                    </div>
+                                    <div class="stats-card">
+                                        <div class="stats-value">87.2%</div>
+                                        <small class="text-muted">成功率</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BookWalker RSS設定 -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card source-config-card error">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">BookWalker RSS</h5>
+                                    <small class="text-muted">電子書籍情報</small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="connection-status disconnected">
+                                        <i class="bi bi-exclamation-circle"></i> エラー
+                                    </span>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="bookwalkerEnabled" checked>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <strong>接続エラー:</strong> タイムアウトが発生しています。URL を確認してください。
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">RSS URL</label>
+                                    <input type="url" class="form-control" 
+                                           value="https://bookwalker.jp/rss/new-releases.xml" 
+                                           placeholder="RSSフィードのURL">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">ユーザーエージェント</label>
+                                    <input type="text" class="form-control" 
+                                           value="Manga-Anime-Collector/1.0"
+                                           placeholder="HTTPリクエストのユーザーエージェント">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">タイムアウト（秒）</label>
+                                    <input type="number" class="form-control" value="30" min="5" max="300">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary test-connection-btn" onclick="testConnection('bookwalker')">
+                                        <i class="bi bi-wifi"></i> 接続テスト
+                                    </button>
+                                    <button class="btn btn-outline-warning" onclick="diagnoseProblem('bookwalker')">
+                                        <i class="bi bi-tools"></i> 問題診断
+                                    </button>
+                                </div>
+                                <div class="stats-grid mt-3">
+                                    <div class="stats-card">
+                                        <div class="stats-value">0</div>
+                                        <small class="text-muted">取得作品数</small>
+                                    </div>
+                                    <div class="stats-card">
+                                        <div class="stats-value">23.1%</div>
+                                        <small class="text-muted">成功率</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- カスタムRSSフィード -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card source-config-card disabled">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">カスタムRSSフィード</h5>
+                                    <small class="text-muted">独自のRSSソース</small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="connection-status disconnected">
+                                        <i class="bi bi-dash-circle"></i> 無効
+                                    </span>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="customRssEnabled">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">RSS URLs（1行につき1つのURL）</label>
+                                    <textarea class="form-control" rows="4" 
+                                              placeholder="https://example1.com/rss
+https://example2.com/feed
+https://example3.com/updates.xml"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">更新間隔（分）</label>
+                                    <input type="number" class="form-control" value="60" min="15" max="1440">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary" id="addCustomRss">
+                                        <i class="bi bi-plus-lg"></i> RSS追加
+                                    </button>
+                                    <button class="btn btn-outline-primary test-connection-btn" onclick="testConnection('custom')">
+                                        <i class="bi bi-wifi"></i> 一括テスト
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- フィルター設定 -->
+        <div class="tab-pane fade" id="filters" role="tabpanel">
+            <div class="py-4">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">NGワード設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">NGワードを追加</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="newNgKeyword" 
+                                               placeholder="除外したいキーワードを入力">
+                                        <button class="btn btn-outline-primary" id="addNgKeyword">
+                                            <i class="bi bi-plus-lg"></i> 追加
+                                        </button>
+                                    </div>
+                                    <small class="form-text text-muted">タイトル、説明、ジャンル、タグに含まれる作品を除外します</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">現在のNGワード</label>
+                                    <div class="border rounded p-3" id="ngKeywordsList" style="min-height: 120px;">
+                                        <div class="keyword-tag">
+                                            エロ <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>
+                                        </div>
+                                        <div class="keyword-tag">
+                                            R18 <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>
+                                        </div>
+                                        <div class="keyword-tag">
+                                            成人向け <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>
+                                        </div>
+                                        <div class="keyword-tag">
+                                            BL <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>
+                                        </div>
+                                        <div class="keyword-tag">
+                                            百合 <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>
+                                        </div>
+                                        <div class="keyword-tag">
+                                            ボーイズラブ <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">フィルター強度</label>
+                                    <select class="form-select">
+                                        <option value="strict" selected>厳格（部分一致も除外）</option>
+                                        <option value="normal">標準（完全一致のみ除外）</option>
+                                        <option value="loose">緩い（明確なマッチのみ除外）</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableWhitelist">
+                                    <label class="form-check-label" for="enableWhitelist">
+                                        ホワイトリスト機能を有効にする（指定キーワードを含む作品のみ収集）
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">フィルター統計</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="stats-grid">
+                                    <div class="stats-card">
+                                        <div class="stats-value text-success">2,341</div>
+                                        <small class="text-muted">許可された作品</small>
+                                    </div>
+                                    <div class="stats-card">
+                                        <div class="stats-value text-danger">147</div>
+                                        <small class="text-muted">除外された作品</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <h6>よく除外されるキーワード</h6>
+                                    <div class="progress mb-1">
+                                        <div class="progress-bar bg-danger" style="width: 45%"></div>
+                                    </div>
+                                    <small>R18: 67件</small>
+                                    
+                                    <div class="progress mb-1 mt-2">
+                                        <div class="progress-bar bg-warning" style="width: 30%"></div>
+                                    </div>
+                                    <small>BL: 44件</small>
+                                    
+                                    <div class="progress mb-1 mt-2">
+                                        <div class="progress-bar bg-info" style="width: 20%"></div>
+                                    </div>
+                                    <small>成人向け: 28件</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">クイック設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <button class="btn btn-outline-secondary btn-sm mb-2 w-100" onclick="loadPreset('family')">
+                                    <i class="bi bi-house"></i> ファミリー向け
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm mb-2 w-100" onclick="loadPreset('general')">
+                                    <i class="bi bi-people"></i> 一般向け
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm mb-2 w-100" onclick="loadPreset('all')">
+                                    <i class="bi bi-globe"></i> 制限なし
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm w-100" onclick="customizeFilter()">
+                                    <i class="bi bi-gear"></i> カスタマイズ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スケジュール設定 -->
+        <div class="tab-pane fade" id="schedule" role="tabpanel">
+            <div class="py-4">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">収集スケジュール</h5>
+                                <button class="btn btn-primary btn-sm" id="addScheduleBtn">
+                                    <i class="bi bi-plus-lg"></i> スケジュール追加
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="scheduleList">
+                                    <!-- 定期収集スケジュール -->
+                                    <div class="schedule-item active">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" checked>
+                                            </div>
+                                            <i class="bi bi-clock text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-medium">定期収集 - 毎日</div>
+                                            <small class="text-muted">毎日 08:00 に全ソースから情報収集</small>
+                                        </div>
+                                        <div class="d-flex gap-1">
+                                            <select class="form-select form-select-sm" style="width: 80px;">
+                                                <option value="0">0時</option>
+                                                <option value="6">6時</option>
+                                                <option value="8" selected>8時</option>
+                                                <option value="12">12時</option>
+                                                <option value="18">18時</option>
+                                            </select>
+                                            <button class="btn btn-outline-secondary btn-sm">
+                                                <i class="bi bi-gear"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="schedule-item">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" checked>
+                                            </div>
+                                            <i class="bi bi-calendar-week text-success"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-medium">週次まとめ収集</div>
+                                            <small class="text-muted">日曜日 23:00 に週次データの整理と通知</small>
+                                        </div>
+                                        <div class="d-flex gap-1">
+                                            <select class="form-select form-select-sm" style="width: 100px;">
+                                                <option value="sunday" selected>日曜日</option>
+                                                <option value="monday">月曜日</option>
+                                                <option value="saturday">土曜日</option>
+                                            </select>
+                                            <button class="btn btn-outline-secondary btn-sm">
+                                                <i class="bi bi-gear"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="schedule-item">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox">
+                                            </div>
+                                            <i class="bi bi-lightning text-warning"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-medium">緊急更新チェック</div>
+                                            <small class="text-muted">1時間ごとに重要な更新をチェック（無効）</small>
+                                        </div>
+                                        <div class="d-flex gap-1">
+                                            <select class="form-select form-select-sm" style="width: 80px;">
+                                                <option value="15">15分</option>
+                                                <option value="30">30分</option>
+                                                <option value="60" selected>1時間</option>
+                                            </select>
+                                            <button class="btn btn-outline-secondary btn-sm">
+                                                <i class="bi bi-gear"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle"></i>
+                                        <strong>注意:</strong> スケジュール変更後は、システムの再起動が必要です。
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">次回実行予定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>定期収集</span>
+                                    <strong class="text-primary">明日 08:00</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>週次まとめ</span>
+                                    <strong class="text-success">日曜日 23:00</strong>
+                                </div>
+                                
+                                <hr>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">手動実行</label>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="runCollectionNow()">
+                                            <i class="bi bi-play-circle"></i> 今すぐ収集実行
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="testSchedule()">
+                                            <i class="bi bi-check-circle"></i> スケジュールテスト
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">実行履歴</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <div class="flex-grow-1">
+                                            <small class="text-muted">今日 08:00</small>
+                                            <div class="small">定期収集完了 (127件)</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <div class="flex-grow-1">
+                                            <small class="text-muted">昨日 23:00</small>
+                                            <div class="small">週次まとめ完了</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+                                        <div class="flex-grow-1">
+                                            <small class="text-muted">昨日 08:00</small>
+                                            <div class="small">部分的な収集 (警告あり)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知設定 -->
+        <div class="tab-pane fade" id="notifications" role="tabpanel">
+            <div class="py-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">通知設定</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label">通知先メールアドレス</label>
+                                    <input type="email" class="form-control" 
+                                           value="user@example.com" 
+                                           placeholder="通知を受信するメールアドレス">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">通知頻度</label>
+                                    <select class="form-select">
+                                        <option value="immediate">即座に通知</option>
+                                        <option value="daily" selected>1日1回まとめて</option>
+                                        <option value="weekly">1週間1回まとめて</option>
+                                        <option value="disabled">通知しない</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">通知する内容</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="notifyNewReleases" checked>
+                                        <label class="form-check-label" for="notifyNewReleases">新作リリース</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="notifySystemStatus" checked>
+                                        <label class="form-check-label" for="notifySystemStatus">システム状態</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="notifyErrors">
+                                        <label class="form-check-label" for="notifyErrors">エラー通知</label>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-outline-primary" onclick="testNotification()">
+                                    <i class="bi bi-envelope"></i> テスト通知送信
+                                </button>
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">通知プレビュー</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="border rounded p-3 bg-white">
+                                            <strong>件名:</strong> [アニメ・マンガ配信] 新作情報 - 2024/01/15<br>
+                                            <hr class="my-2">
+                                            <strong>今日の新着:</strong><br>
+                                            • 【アニメ】魔法少女リリカルなのは新シリーズ<br>
+                                            • 【マンガ】転生したらスライムだった件 第20巻<br>
+                                            • 【配信】dアニメストアに5作品追加<br>
+                                            <hr class="my-2">
+                                            <small class="text-muted">
+                                                配信予定: 3件 | エラー: 0件<br>
+                                                システム状態: 正常
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 詳細設定 -->
+        <div class="tab-pane fade" id="advanced" role="tabpanel">
+            <div class="py-4">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">システム設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">データ保持期間（日）</label>
+                                            <input type="number" class="form-control" value="365" min="30" max="1095">
+                                            <small class="form-text text-muted">古いデータを自動削除する期間</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">最大同時処理数</label>
+                                            <input type="number" class="form-control" value="5" min="1" max="10">
+                                            <small class="form-text text-muted">収集時の並列処理数</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">ログレベル</label>
+                                            <select class="form-select">
+                                                <option value="DEBUG">デバッグ</option>
+                                                <option value="INFO" selected>情報</option>
+                                                <option value="WARNING">警告</option>
+                                                <option value="ERROR">エラーのみ</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">タイムゾーン</label>
+                                            <select class="form-select">
+                                                <option value="Asia/Tokyo" selected>日本標準時 (JST)</option>
+                                                <option value="UTC">協定世界時 (UTC)</option>
+                                                <option value="America/New_York">東部標準時 (EST)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">データベース管理</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="backup-restore-section">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6><i class="bi bi-download"></i> バックアップ</h6>
+                                            <p class="small mb-2">データベースと設定をエクスポート</p>
+                                            <button class="btn btn-outline-primary btn-sm">
+                                                <i class="bi bi-download"></i> フルバックアップ
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6><i class="bi bi-upload"></i> 復元</h6>
+                                            <p class="small mb-2">バックアップファイルから復元</p>
+                                            <input type="file" class="form-control form-control-sm mb-2" accept=".sql,.zip">
+                                            <button class="btn btn-outline-warning btn-sm">
+                                                <i class="bi bi-upload"></i> 復元実行
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <button class="btn btn-outline-info w-100" onclick="optimizeDatabase()">
+                                            <i class="bi bi-speedometer2"></i> DB最適化
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-outline-secondary w-100" onclick="cleanupOldData()">
+                                            <i class="bi bi-trash"></i> 古いデータ削除
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-outline-danger w-100" onclick="resetAllSettings()">
+                                            <i class="bi bi-arrow-clockwise"></i> 設定リセット
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">システム情報</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td>システム版本:</td>
+                                        <td>v2.1.0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>データベースサイズ:</td>
+                                        <td>15.7 MB</td>
+                                    </tr>
+                                    <tr>
+                                        <td>作品数:</td>
+                                        <td>2,341</td>
+                                    </tr>
+                                    <tr>
+                                        <td>リリース数:</td>
+                                        <td>18,907</td>
+                                    </tr>
+                                    <tr>
+                                        <td>最終更新:</td>
+                                        <td>2024/01/15 08:00</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">クイックアクション</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="exportLogs()">
+                                        <i class="bi bi-file-earmark-text"></i> ログエクスポート
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="checkUpdates()">
+                                        <i class="bi bi-arrow-up-circle"></i> 更新確認
+                                    </button>
+                                    <button class="btn btn-outline-info btn-sm" onclick="systemDiagnostics()">
+                                        <i class="bi bi-tools"></i> システム診断
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 設定インポートモーダル -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">設定インポート</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">設定ファイル</label>
+                    <input type="file" class="form-control" accept=".json">
+                </div>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    現在の設定は上書きされます。事前にエクスポートしてバックアップを作成してください。
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                <button type="button" class="btn btn-primary">インポート実行</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // NGキーワード追加機能
+    document.getElementById('addNgKeyword').addEventListener('click', function() {
+        const input = document.getElementById('newNgKeyword');
+        const keyword = input.value.trim();
+        
+        if (keyword) {
+            addNgKeywordTag(keyword);
+            input.value = '';
+        }
+    });
+    
+    // Enterキーでキーワード追加
+    document.getElementById('newNgKeyword').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('addNgKeyword').click();
+        }
+    });
+    
+    // スケジュール追加
+    document.getElementById('addScheduleBtn').addEventListener('click', function() {
+        // スケジュール追加モーダルの表示（実装簡略）
+        console.log('Add schedule modal');
+    });
+    
+    // 全体保存
+    document.getElementById('saveAllBtn').addEventListener('click', function() {
+        saveAllSettings();
+    });
+});
+
+function addNgKeywordTag(keyword) {
+    const container = document.getElementById('ngKeywordsList');
+    const tag = document.createElement('div');
+    tag.className = 'keyword-tag';
+    tag.innerHTML = `${keyword} <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>`;
+    container.appendChild(tag);
+}
+
+function removeKeyword(element) {
+    element.parentElement.remove();
+}
+
+function testConnection(source) {
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    
+    button.classList.add('testing');
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> テスト中...';
+    button.disabled = true;
+    
+    // 実際のテスト処理（モック）
+    setTimeout(() => {
+        button.classList.remove('testing');
+        button.innerHTML = '<i class="bi bi-check-circle"></i> 成功';
+        button.className = 'btn btn-success test-connection-btn';
+        
+        setTimeout(() => {
+            button.innerHTML = originalContent;
+            button.className = 'btn btn-outline-primary test-connection-btn';
+            button.disabled = false;
+        }, 2000);
+    }, 3000);
+}
+
+function resetToDefaults(source) {
+    if (confirm('設定をデフォルト値にリセットしますか？')) {
+        // リセット処理（実装簡略）
+        console.log(`Reset ${source} to defaults`);
+    }
+}
+
+function diagnoseProblem(source) {
+    // 問題診断の実行（実装簡略）
+    alert(`${source}の問題診断を実行します。`);
+}
+
+function loadPreset(type) {
+    // プリセット読み込み（実装簡略）
+    console.log(`Load preset: ${type}`);
+}
+
+function customizeFilter() {
+    // カスタムフィルター設定（実装簡略）
+    console.log('Open custom filter dialog');
+}
+
+function runCollectionNow() {
+    if (confirm('手動収集を実行しますか？')) {
+        // 手動収集実行（実装簡略）
+        console.log('Run collection now');
+    }
+}
+
+function testSchedule() {
+    // スケジュールテスト（実装簡略）
+    console.log('Test schedule');
+}
+
+function testNotification() {
+    const button = event.target;
+    const originalText = button.textContent;
+    
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> 送信中...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        button.innerHTML = '<i class="bi bi-check-circle"></i> 送信完了';
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 2000);
+    }, 2000);
+}
+
+function saveAllSettings() {
+    const button = document.getElementById('saveAllBtn');
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> 保存中...';
+    button.disabled = true;
+    
+    // 設定保存処理（実装簡略）
+    setTimeout(() => {
+        button.innerHTML = '<i class="bi bi-check-lg"></i> 保存完了';
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 2000);
+    }, 1500);
+}
+
+function optimizeDatabase() {
+    if (confirm('データベースを最適化しますか？処理には時間がかかる場合があります。')) {
+        console.log('Optimize database');
+    }
+}
+
+function cleanupOldData() {
+    if (confirm('古いデータを削除しますか？この操作は取り消せません。')) {
+        console.log('Cleanup old data');
+    }
+}
+
+function resetAllSettings() {
+    if (confirm('すべての設定をリセットしますか？この操作は取り消せません。')) {
+        if (confirm('本当にリセットしてもよろしいですか？')) {
+            console.log('Reset all settings');
+        }
+    }
+}
+
+function exportLogs() {
+    console.log('Export logs');
+}
+
+function checkUpdates() {
+    console.log('Check for updates');
+}
+
+function systemDiagnostics() {
+    console.log('Run system diagnostics');
+}
+</script>
+{% endblock %}

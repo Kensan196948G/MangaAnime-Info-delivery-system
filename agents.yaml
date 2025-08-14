@@ -1,0 +1,25 @@
+agents:
+  - id: agent-MangaAnime-CTO
+    goal: システム全体の方針・レビュー・構成設計
+    role: CTO
+    description: 全エージェントの作業結果を統合・レビューし、アーキテクチャ判断を行う。技術方針の決定とセキュリティ要件の定義を担当。
+
+  - id: agent-MangaAnime-DevAPI
+    goal: バックエンドAPI開発とデータベース設計・実装
+    role: バックエンド開発者
+    description: AniList GraphQL API、RSS収集、Gmail/Calendar API統合、SQLiteデータベース操作を実装。メインロジックとcronスケジューリングを担当。
+
+  - id: agent-MangaAnime-DevUI
+    goal: Web管理UI開発（将来拡張機能）
+    role: フロントエンド開発者
+    description: Flask + BootstrapでのWeb管理画面を構築。現Phase1では基本設計のみ、コア機能完成後に本格実装。
+
+  - id: agent-MangaAnime-QA
+    goal: セキュリティレビュー・品質保証・ユーザビリティテスト
+    role: QA担当
+    description: OAuth2認証実装の検証、セキュリティホールの特定、API設計レビュー、エラーハンドリング品質確保を担当。
+
+  - id: agent-MangaAnime-Tester
+    goal: 自動テスト生成と実行・CI/CD構築
+    role: テストエンジニア
+    description: pytest基盤での単体・統合・パフォーマンステストを実装。外部API接続テストとモック環境構築を担当。

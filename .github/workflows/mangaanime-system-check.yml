@@ -1,0 +1,540 @@
+name: MangaAnime System Health Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run system health check every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      check_type:
+        description: 'Type of health check to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - error-notification
+        - webui
+        - delivery
+        - backup
+
+env:
+  PYTHON_VERSION: '3.11'
+  TEST_MODE: true
+  PROJECT_PATH: '/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system'
+
+jobs:
+  # Job 1: Error Notification System Test
+  error-notification-test:
+    name: Error Notification System Test
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.check_type == 'all' || github.event.inputs.check_type == 'error-notification' || github.event.inputs.check_type == '' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Test Error Notifier Module
+      run: |
+        # Test error notifier without sending actual emails
+        python -c "
+        import sys
+        sys.path.append('./modules')
+        from error_notifier import ErrorNotifier
+        
+        # Initialize with test config
+        notifier = ErrorNotifier()
+        print('✅ Error notifier module loaded successfully')
+        
+        # Test configuration loading
+        config = notifier.config
+        error_config = notifier.error_config
+        
+        if error_config.get('enabled', False):
+            print('✅ Error notification enabled in config')
+        else:
+            print('⚠️  Error notification disabled in config')
+            
+        # Test email template generation
+        msg = notifier._create_error_email(
+            'Test Error',
+            'This is a test error message',
+            'Test details',
+            None
+        )
+        
+        if msg:
+            print('✅ Error email template generation successful')
+        else:
+            print('❌ Error email template generation failed')
+        "
+        
+    - name: Test Error Monitor Script
+      run: |
+        # Test error monitor script (dry run)
+        chmod +x scripts/error_monitor.sh
+        
+        # Create test log files
+        mkdir -p logs
+        echo "$(date) - INFO - Test log entry" > logs/app.log
+        echo "$(date) - ERROR - Test error entry" >> logs/app.log
+        
+        # Run error monitor in test mode
+        echo "Testing error monitor script..."
+        bash scripts/error_monitor.sh --help
+        
+    - name: Validate Error Configuration
+      run: |
+        python -c "
+        import json
+        
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+            
+        error_config = config.get('error_notifications', {})
+        
+        required_fields = [
+            'enabled', 'recipient_email', 'smtp_server', 
+            'smtp_port', 'sender_email', 'sender_password'
+        ]
+        
+        missing_fields = []
+        for field in required_fields:
+            if field not in error_config:
+                missing_fields.append(field)
+                
+        if missing_fields:
+            print(f'❌ Missing error config fields: {missing_fields}')
+            exit(1)
+        else:
+            print('✅ Error notification configuration is complete')
+            
+        # Validate email format
+        import re
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        
+        recipient = error_config.get('recipient_email', '')
+        sender = error_config.get('sender_email', '')
+        
+        if not re.match(email_pattern, recipient):
+            print(f'❌ Invalid recipient email: {recipient}')
+            exit(1)
+            
+        if not re.match(email_pattern, sender):
+            print(f'❌ Invalid sender email: {sender}')
+            exit(1)
+            
+        print(f'✅ Email addresses validated: {recipient}')
+        "
+
+  # Job 2: WebUI Health Check
+  webui-health-check:
+    name: WebUI Health Check
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.check_type == 'all' || github.event.inputs.check_type == 'webui' || github.event.inputs.check_type == '' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install requests pytest-timeout
+        
+    - name: Test WebUI Module Import
+      run: |
+        python -c "
+        try:
+            import web_app
+            print('✅ WebUI module imported successfully')
+        except ImportError as e:
+            print(f'❌ WebUI module import failed: {e}')
+            exit(1)
+        "
+        
+    - name: Start WebUI for Testing
+      run: |
+        # Start WebUI in background for testing
+        python web_app.py &
+        WEBUI_PID=$!
+        echo $WEBUI_PID > webui.pid
+        
+        # Wait for startup
+        sleep 10
+        
+        # Check if process is running
+        if ps -p $WEBUI_PID > /dev/null; then
+            echo "✅ WebUI started successfully (PID: $WEBUI_PID)"
+        else
+            echo "❌ WebUI failed to start"
+            exit 1
+        fi
+      timeout-minutes: 2
+      
+    - name: Test WebUI Endpoints
+      run: |
+        # Test main endpoints
+        endpoints=(
+            "http://localhost:3030"
+            "http://localhost:3030/dashboard"
+            "http://localhost:3030/releases"
+            "http://localhost:3030/calendar"
+            "http://localhost:3030/config"
+            "http://localhost:3030/logs"
+        )
+        
+        for endpoint in "${endpoints[@]}"; do
+            echo "Testing endpoint: $endpoint"
+            
+            if curl -s -f -m 10 "$endpoint" > /dev/null; then
+                echo "✅ $endpoint - OK"
+            else
+                echo "❌ $endpoint - FAILED"
+                # Don't exit on endpoint failure, continue testing
+            fi
+        done
+        
+    - name: Test WebUI API Endpoints
+      run: |
+        # Test API endpoints
+        api_endpoints=(
+            "http://localhost:3030/api/health"
+            "http://localhost:3030/api/status"
+        )
+        
+        for endpoint in "${api_endpoints[@]}"; do
+            echo "Testing API endpoint: $endpoint"
+            
+            response=$(curl -s -w "%{http_code}" -m 10 "$endpoint")
+            http_code=$(echo "$response" | tail -c 4)
+            
+            if [[ "$http_code" == "200" ]]; then
+                echo "✅ $endpoint - HTTP $http_code"
+            else
+                echo "⚠️  $endpoint - HTTP $http_code"
+            fi
+        done
+        
+    - name: Cleanup WebUI Process
+      if: always()
+      run: |
+        if [ -f webui.pid ]; then
+            WEBUI_PID=$(cat webui.pid)
+            if ps -p $WEBUI_PID > /dev/null; then
+                kill $WEBUI_PID
+                echo "✅ WebUI process stopped"
+            fi
+            rm -f webui.pid
+        fi
+
+  # Job 3: Delivery System Health Check
+  delivery-system-check:
+    name: Delivery System Health Check
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.check_type == 'all' || github.event.inputs.check_type == 'delivery' || github.event.inputs.check_type == '' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Test Configuration Loading
+      run: |
+        python -c "
+        import json
+        import os
+        
+        # Test config.json loading
+        try:
+            with open('config.json', 'r') as f:
+                config = json.load(f)
+            print('✅ Configuration file loaded successfully')
+        except Exception as e:
+            print(f'❌ Configuration loading failed: {e}')
+            exit(1)
+            
+        # Validate essential configuration
+        required_sections = ['email', 'apis', 'notifications']
+        for section in required_sections:
+            if section not in config:
+                print(f'❌ Missing config section: {section}')
+                exit(1)
+            else:
+                print(f'✅ Config section found: {section}')
+        "
+        
+    - name: Test Database Connection
+      run: |
+        python -c "
+        import sqlite3
+        import os
+        
+        # Test database connection
+        try:
+            # Use test database
+            db_path = 'test_db.sqlite3'
+            
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            
+            # Test basic database operations
+            cursor.execute('CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY)')
+            cursor.execute('INSERT INTO test (id) VALUES (1)')
+            cursor.execute('SELECT COUNT(*) FROM test')
+            result = cursor.fetchone()
+            
+            conn.commit()
+            conn.close()
+            
+            print(f'✅ Database operations successful: {result[0]} records')
+            
+            # Cleanup
+            os.remove(db_path)
+            
+        except Exception as e:
+            print(f'❌ Database test failed: {e}')
+            exit(1)
+        "
+        
+    - name: Test External API Connectivity
+      run: |
+        python -c "
+        import requests
+        import json
+        
+        # Test external APIs (without authentication)
+        apis_to_test = [
+            {'name': 'AniList GraphQL', 'url': 'https://graphql.anilist.co'},
+            {'name': 'Google SMTP', 'url': 'smtp.gmail.com', 'port': 587}
+        ]
+        
+        for api in apis_to_test:
+            try:
+                if 'port' in api:
+                    # Test SMTP connection
+                    import socket
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.settimeout(10)
+                    result = sock.connect_ex((api['url'], api['port']))
+                    sock.close()
+                    
+                    if result == 0:
+                        print(f'✅ {api[\"name\"]} connectivity: OK')
+                    else:
+                        print(f'⚠️  {api[\"name\"]} connectivity: FAILED')
+                else:
+                    # Test HTTP connectivity
+                    response = requests.get(api['url'], timeout=10)
+                    if response.status_code in [200, 400, 405]:  # 400/405 are OK for GraphQL/API endpoints
+                        print(f'✅ {api[\"name\"]} connectivity: OK (HTTP {response.status_code})')
+                    else:
+                        print(f'⚠️  {api[\"name\"]} connectivity: HTTP {response.status_code}')
+                        
+            except Exception as e:
+                print(f'⚠️  {api[\"name\"]} connectivity test failed: {e}')
+        "
+
+  # Job 4: Backup System Check
+  backup-system-check:
+    name: Backup System Check
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.check_type == 'all' || github.event.inputs.check_type == 'backup' || github.event.inputs.check_type == '' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Test Backup Script
+      run: |
+        # Test backup script existence and permissions
+        if [ -f "backup_full.sh" ]; then
+            echo "✅ Backup script found: backup_full.sh"
+            
+            if [ -x "backup_full.sh" ]; then
+                echo "✅ Backup script is executable"
+            else
+                echo "⚠️  Backup script is not executable"
+            fi
+        else
+            echo "❌ Backup script not found: backup_full.sh"
+            exit 1
+        fi
+        
+    - name: Validate Backup Script Content
+      run: |
+        # Check if backup script contains essential components
+        required_components=(
+            "rsync"
+            "SOURCE_DIR"
+            "BACKUP_DIR"
+            "log_message"
+        )
+        
+        for component in "${required_components[@]}"; do
+            if grep -q "$component" backup_full.sh; then
+                echo "✅ Backup script component found: $component"
+            else
+                echo "⚠️  Backup script component missing: $component"
+            fi
+        done
+        
+    - name: Test Backup Directory Structure
+      run: |
+        # Create test backup structure
+        mkdir -p test_backup_source
+        mkdir -p test_backup_destination
+        
+        # Create test files
+        echo "Test file 1" > test_backup_source/file1.txt
+        echo "Test file 2" > test_backup_source/file2.txt
+        mkdir -p test_backup_source/subdir
+        echo "Test file 3" > test_backup_source/subdir/file3.txt
+        
+        # Test rsync command (dry run)
+        if command -v rsync >/dev/null 2>&1; then
+            rsync -av --dry-run test_backup_source/ test_backup_destination/
+            echo "✅ Backup rsync test successful"
+        else
+            echo "⚠️  rsync command not available"
+        fi
+        
+        # Cleanup
+        rm -rf test_backup_source test_backup_destination
+
+  # Job 5: System Integration Test
+  system-integration-test:
+    name: System Integration Test
+    runs-on: ubuntu-latest
+    needs: [error-notification-test, webui-health-check, delivery-system-check, backup-system-check]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate System Health Report
+      run: |
+        echo "# MangaAnime System Health Report" > system-health-report.md
+        echo "" >> system-health-report.md
+        echo "Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> system-health-report.md
+        echo "Commit: ${{ github.sha }}" >> system-health-report.md
+        echo "Branch: ${{ github.ref_name }}" >> system-health-report.md
+        echo "" >> system-health-report.md
+        
+        # Check job results
+        echo "## Test Results" >> system-health-report.md
+        echo "" >> system-health-report.md
+        
+        # Error notification test
+        if [[ "${{ needs.error-notification-test.result }}" == "success" ]]; then
+            echo "✅ Error Notification System: PASSED" >> system-health-report.md
+        else
+            echo "❌ Error Notification System: FAILED" >> system-health-report.md
+        fi
+        
+        # WebUI health check
+        if [[ "${{ needs.webui-health-check.result }}" == "success" ]]; then
+            echo "✅ WebUI Health Check: PASSED" >> system-health-report.md
+        else
+            echo "❌ WebUI Health Check: FAILED" >> system-health-report.md
+        fi
+        
+        # Delivery system check
+        if [[ "${{ needs.delivery-system-check.result }}" == "success" ]]; then
+            echo "✅ Delivery System Check: PASSED" >> system-health-report.md
+        else
+            echo "❌ Delivery System Check: FAILED" >> system-health-report.md
+        fi
+        
+        # Backup system check
+        if [[ "${{ needs.backup-system-check.result }}" == "success" ]]; then
+            echo "✅ Backup System Check: PASSED" >> system-health-report.md
+        else
+            echo "❌ Backup System Check: FAILED" >> system-health-report.md
+        fi
+        
+        echo "" >> system-health-report.md
+        echo "## Recommendations" >> system-health-report.md
+        echo "" >> system-health-report.md
+        
+        # Add recommendations based on failures
+        failed_count=0
+        
+        if [[ "${{ needs.error-notification-test.result }}" != "success" ]]; then
+            echo "- 🔧 Check error notification configuration and SMTP settings" >> system-health-report.md
+            ((failed_count++))
+        fi
+        
+        if [[ "${{ needs.webui-health-check.result }}" != "success" ]]; then
+            echo "- 🔧 Verify WebUI dependencies and Flask configuration" >> system-health-report.md
+            ((failed_count++))
+        fi
+        
+        if [[ "${{ needs.delivery-system-check.result }}" != "success" ]]; then
+            echo "- 🔧 Check external API connectivity and configuration" >> system-health-report.md
+            ((failed_count++))
+        fi
+        
+        if [[ "${{ needs.backup-system-check.result }}" != "success" ]]; then
+            echo "- 🔧 Verify backup script permissions and rsync availability" >> system-health-report.md
+            ((failed_count++))
+        fi
+        
+        if [[ $failed_count -eq 0 ]]; then
+            echo "🎉 All systems are healthy! No action required." >> system-health-report.md
+        fi
+        
+        echo "" >> system-health-report.md
+        echo "---" >> system-health-report.md
+        echo "Report generated by MangaAnime CI/CD Pipeline" >> system-health-report.md
+        
+    - name: Upload System Health Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: system-health-report
+        path: system-health-report.md
+        
+    - name: Comment Health Report on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('system-health-report.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: report
+          });

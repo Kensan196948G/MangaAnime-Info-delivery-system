@@ -1,0 +1,690 @@
+{% extends "base.html" %}
+
+{% block title %}設定 - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2>
+                <i class="bi bi-gear me-2"></i>システム設定
+            </h2>
+            <p class="text-muted">アニメ・マンガ情報配信システムの各種設定を管理できます</p>
+        </div>
+    </div>
+
+    <form method="POST" id="config-form">
+        <div class="row">
+            <!-- General Settings -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-sliders me-2"></i>基本設定
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="notification_email" class="form-label">
+                                通知先メールアドレス
+                            </label>
+                            <input type="email" class="form-control" id="notification_email" 
+                                   name="notification_email" value="{{ config.notification_email }}"
+                                   placeholder="example@gmail.com" required>
+                            <div class="form-text">
+                                リリース通知が送信されるGmailアドレスを設定してください
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="check_interval_hours" class="form-label">
+                                チェック間隔（時間）
+                            </label>
+                            <select class="form-select" id="check_interval_hours" name="check_interval_hours">
+                                <option value="1" {% if config.check_interval_hours == 1 %}selected{% endif %}>1時間</option>
+                                <option value="6" {% if config.check_interval_hours == 6 %}selected{% endif %}>6時間</option>
+                                <option value="12" {% if config.check_interval_hours == 12 %}selected{% endif %}>12時間</option>
+                                <option value="24" {% if config.check_interval_hours == 24 %}selected{% endif %}>24時間</option>
+                            </select>
+                            <div class="form-text">
+                                新しいリリース情報をチェックする間隔を設定してください
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Source Settings -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-database me-2"></i>データソース設定
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-text mb-3">
+                            情報収集に使用するデータソースを選択してください
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="anilist" name="anilist" 
+                                   {% if config.enabled_sources.anilist %}checked{% endif %}>
+                            <label class="form-check-label" for="anilist">
+                                <strong>AniList GraphQL API</strong>
+                                <div class="text-muted small">アニメの放送予定・配信プラットフォーム情報</div>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="shobo_calendar" name="shobo_calendar"
+                                   {% if config.enabled_sources.shobo_calendar %}checked{% endif %}>
+                            <label class="form-check-label" for="shobo_calendar">
+                                <strong>しょぼいカレンダーAPI</strong>
+                                <div class="text-muted small">日本国内TV放送スケジュール</div>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="bookwalker_rss" name="bookwalker_rss"
+                                   {% if config.enabled_sources.bookwalker_rss %}checked{% endif %}>
+                            <label class="form-check-label" for="bookwalker_rss">
+                                <strong>BookWalker RSS</strong>
+                                <div class="text-muted small">電子書籍の新刊情報</div>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="mangapocket_rss" name="mangapocket_rss"
+                                   {% if config.enabled_sources.mangapocket_rss %}checked{% endif %}>
+                            <label class="form-check-label" for="mangapocket_rss">
+                                <strong>マガポケ RSS</strong>
+                                <div class="text-muted small">マガジンポケットの更新情報</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delivery Settings -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-send me-2"></i>配信設定
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Email Notifications -->
+                            <div class="col-lg-6">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-envelope me-2"></i>メール通知設定
+                                </h6>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="email_enabled" name="email_enabled"
+                                           {% if config.email.enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_enabled">
+                                        <strong>メール通知を有効にする</strong>
+                                        <div class="text-muted small">新しいリリース情報をメールで受信します</div>
+                                    </label>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email_subject_prefix" class="form-label">
+                                        メール件名プレフィックス
+                                    </label>
+                                    <input type="text" class="form-control" id="email_subject_prefix" 
+                                           name="email_subject_prefix" value="{{ config.email.subject_prefix or 'MangaAnime配信システム' }}"
+                                           placeholder="MangaAnime配信システム">
+                                    <div class="form-text">
+                                        メールの件名の先頭に付けるテキストを設定してください
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email_format" class="form-label">
+                                        メールフォーマット
+                                    </label>
+                                    <select class="form-select" id="email_format" name="email_format">
+                                        <option value="html" {% if config.email.format == 'html' %}selected{% endif %}>HTML形式（推奨）</option>
+                                        <option value="plain" {% if config.email.format == 'plain' %}selected{% endif %}>テキスト形式</option>
+                                    </select>
+                                    <div class="form-text">
+                                        メールの形式を選択してください
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Calendar Settings -->
+                            <div class="col-lg-6">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-calendar me-2"></i>カレンダー連携設定
+                                </h6>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="calendar_enabled" name="calendar_enabled"
+                                           {% if config.calendar.enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="calendar_enabled">
+                                        <strong>Googleカレンダー連携を有効にする</strong>
+                                        <div class="text-muted small">リリース予定をカレンダーに自動登録します</div>
+                                    </label>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="calendar_id" class="form-label">
+                                        カレンダーID
+                                    </label>
+                                    <input type="text" class="form-control" id="calendar_id" 
+                                           name="calendar_id" value="{{ config.calendar.calendar_id or 'primary' }}"
+                                           placeholder="primary">
+                                    <div class="form-text">
+                                        イベントを追加するGoogleカレンダーのIDを設定してください
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="calendar_event_duration" class="form-label">
+                                        イベント期間（分）
+                                    </label>
+                                    <select class="form-select" id="calendar_event_duration" name="calendar_event_duration">
+                                        <option value="30" {% if config.calendar.event_duration == 30 %}selected{% endif %}>30分</option>
+                                        <option value="60" {% if config.calendar.event_duration == 60 %}selected{% endif %}>1時間</option>
+                                        <option value="120" {% if config.calendar.event_duration == 120 %}selected{% endif %}>2時間</option>
+                                    </select>
+                                    <div class="form-text">
+                                        カレンダーイベントの継続時間を設定してください
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Notification Filters -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-funnel me-2"></i>通知フィルター設定
+                                </h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="notify_anime" name="notify_anime"
+                                                   {% if config.notifications.anime %}checked{% endif %}>
+                                            <label class="form-check-label" for="notify_anime">
+                                                アニメの新エピソード配信
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="notify_manga" name="notify_manga"
+                                                   {% if config.notifications.manga %}checked{% endif %}>
+                                            <label class="form-check-label" for="notify_manga">
+                                                マンガの新巻発売
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="notify_updates" name="notify_updates"
+                                                   {% if config.notifications.updates %}checked{% endif %}>
+                                            <label class="form-check-label" for="notify_updates">
+                                                作品情報の更新
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="min_notification_interval" class="form-label">
+                                                最小通知間隔（分）
+                                            </label>
+                                            <select class="form-select" id="min_notification_interval" name="min_notification_interval">
+                                                <option value="15" {% if config.notifications.min_interval == 15 %}selected{% endif %}>15分</option>
+                                                <option value="30" {% if config.notifications.min_interval == 30 %}selected{% endif %}>30分</option>
+                                                <option value="60" {% if config.notifications.min_interval == 60 %}selected{% endif %}>1時間</option>
+                                                <option value="180" {% if config.notifications.min_interval == 180 %}selected{% endif %}>3時間</option>
+                                            </select>
+                                            <div class="form-text">
+                                                同じ作品の通知を送信する最小間隔を設定してください
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="max_notifications_per_day" class="form-label">
+                                                1日あたりの最大通知数
+                                            </label>
+                                            <select class="form-select" id="max_notifications_per_day" name="max_notifications_per_day">
+                                                <option value="10" {% if config.notifications.max_per_day == 10 %}selected{% endif %}>10件</option>
+                                                <option value="25" {% if config.notifications.max_per_day == 25 %}selected{% endif %}>25件</option>
+                                                <option value="50" {% if config.notifications.max_per_day == 50 %}selected{% endif %}>50件</option>
+                                                <option value="100" {% if config.notifications.max_per_day == 100 %}selected{% endif %}>100件</option>
+                                                <option value="0" {% if config.notifications.max_per_day == 0 %}selected{% endif %}>制限なし</option>
+                                            </select>
+                                            <div class="form-text">
+                                                スパムを防ぐため、1日あたりの通知数制限を設定してください
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NG Keywords -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-shield-exclamation me-2"></i>NGワード設定
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <label for="ng_keywords" class="form-label">
+                                    フィルタリングするキーワード
+                                </label>
+                                <textarea class="form-control" id="ng_keywords" name="ng_keywords" 
+                                          rows="8" placeholder="キーワードを1行に1つずつ入力してください">{{ config.ng_keywords | join('\n') }}</textarea>
+                                <div class="form-text">
+                                    これらのキーワードを含む作品は自動的に除外されます。<br>
+                                    各キーワードを改行で区切って入力してください。
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-info-circle me-1"></i>設定のヒント
+                                        </h6>
+                                        <ul class="list-unstyled small mb-0">
+                                            <li class="mb-2">
+                                                <i class="bi bi-check2 text-success me-1"></i>
+                                                部分一致で検索されます
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="bi bi-check2 text-success me-1"></i>
+                                                ひらがな・カタカナも対応
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="bi bi-check2 text-success me-1"></i>
+                                                英語キーワードも使用可能
+                                            </li>
+                                            <li>
+                                                <i class="bi bi-check2 text-success me-1"></i>
+                                                大文字・小文字は区別されません
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm w-100" 
+                                            onclick="addCommonNGWords()">
+                                        <i class="bi bi-plus-circle me-1"></i>一般的なNGワードを追加
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Configuration -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-key me-2"></i>API設定
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>注意:</strong> APIキー等の機密情報は別途設定ファイルで管理されています。
+                            Webインターフェースからは変更できません。
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Google API設定</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        Gmail API
+                                        <span class="badge bg-success rounded-pill" id="gmail-status">有効</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        Calendar API
+                                        <span class="badge bg-success rounded-pill" id="calendar-status">有効</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>外部API設定</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        AniList API
+                                        <span class="badge bg-success rounded-pill" id="anilist-status">有効</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        しょぼいカレンダー
+                                        <span class="badge bg-success rounded-pill" id="shobo-status">有効</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary" onclick="resetToDefaults()">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>デフォルトに戻す
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="testConfiguration()">
+                                    <i class="bi bi-check-circle me-2"></i>設定をテスト
+                                </button>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-2"></i>設定を保存
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addCommonNGWords() {
+    const commonNGWords = [
+        'R18',
+        'R-18',
+        '成人向け',
+        'アダルト',
+        'エロ',
+        'BL',
+        'ボーイズラブ',
+        '百合',
+        'GL',
+        'ガールズラブ',
+        '18禁',
+        '官能'
+    ];
+    
+    const textarea = document.getElementById('ng_keywords');
+    const currentWords = textarea.value.split('\n').filter(word => word.trim());
+    
+    commonNGWords.forEach(word => {
+        if (!currentWords.includes(word)) {
+            currentWords.push(word);
+        }
+    });
+    
+    textarea.value = currentWords.join('\n');
+    
+    // Highlight the added words
+    textarea.focus();
+    textarea.scrollTop = textarea.scrollHeight;
+}
+
+function resetToDefaults() {
+    if (confirm('すべての設定をデフォルト値に戻しますか？この操作は元に戻せません。')) {
+        // Reset form to default values
+        document.getElementById('notification_email').value = '';
+        document.getElementById('check_interval_hours').value = '24';
+        
+        // Enable all sources
+        document.getElementById('anilist').checked = true;
+        document.getElementById('shobo_calendar').checked = true;
+        document.getElementById('bookwalker_rss').checked = true;
+        document.getElementById('mangapocket_rss').checked = true;
+        
+        // Reset NG keywords to defaults
+        const defaultNGWords = ['エロ', 'R18', '成人向け', 'BL', '百合', 'ボーイズラブ'];
+        document.getElementById('ng_keywords').value = defaultNGWords.join('\n');
+    }
+}
+
+function testConfiguration() {
+    // Collect form data
+    const formData = new FormData(document.getElementById('config-form'));
+    
+    // Show loading state
+    const testBtn = event.target;
+    const originalText = testBtn.innerHTML;
+    testBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>テスト中...';
+    testBtn.disabled = true;
+    
+    // Create a comprehensive test results display
+    const createTestModal = () => {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'testResultModal';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">設定テスト結果</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="test-progress" class="mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                <span>テストを実行中...</span>
+                            </div>
+                        </div>
+                        <div id="test-results" style="display: none;">
+                            <!-- Results will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        return modal;
+    };
+    
+    // Real API test call
+    fetch('/api/test-configuration', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Create and show modal
+        const modal = createTestModal();
+        const bootstrap_modal = new bootstrap.Modal(modal);
+        bootstrap_modal.show();
+        
+        // Hide progress, show results
+        setTimeout(() => {
+            document.getElementById('test-progress').style.display = 'none';
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.style.display = 'block';
+            
+            const summary = data.summary;
+            const results = data.results;
+            
+            let resultsHtml = `
+                <div class="alert ${data.success ? 'alert-success' : 'alert-warning'} mb-3">
+                    <h6 class="alert-heading">${data.success ? '✓ すべてのテストが成功' : '⚠ 一部のテストで問題'}</h6>
+                    <p class="mb-0">${summary.message}</p>
+                </div>
+                
+                <div class="row">
+            `;
+            
+            // Gmail Test Results
+            const gmail = results.gmail;
+            resultsHtml += `
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-envelope me-2"></i>Gmail接続</span>
+                            <span class="badge ${gmail.status === 'success' ? 'bg-success' : 'bg-danger'}">${gmail.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${gmail.message}</p>
+                            ${gmail.details.server ? `<small class="text-muted">サーバー: ${gmail.details.server}:${gmail.details.port}</small>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Database Test Results  
+            const database = results.database;
+            resultsHtml += `
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-database me-2"></i>データベース</span>
+                            <span class="badge ${database.status === 'success' ? 'bg-success' : 'bg-danger'}">${database.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${database.message}</p>
+                            ${database.details.works_count !== undefined ? 
+                                `<small class="text-muted">作品: ${database.details.works_count}件, リリース: ${database.details.releases_count}件</small>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // AniList Test Results
+            const anilist = results.anilist;
+            resultsHtml += `
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-globe me-2"></i>AniList API</span>
+                            <span class="badge ${anilist.status === 'success' ? 'bg-success' : 'bg-danger'}">${anilist.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${anilist.message}</p>
+                            ${anilist.details.response_time ? `<small class="text-muted">応答時間: ${anilist.details.response_time}</small>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // RSS Feeds Test Results
+            const rss_feeds = results.rss_feeds;
+            resultsHtml += `
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-rss me-2"></i>RSSフィード</span>
+                            <span class="badge ${rss_feeds.status === 'success' ? 'bg-success' : 'bg-warning'}">${rss_feeds.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${rss_feeds.message}</p>
+                            ${rss_feeds.details.feeds ? `
+                                <div class="mt-2">
+                                    ${rss_feeds.details.feeds.map(feed => `
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small>${feed.name}</small>
+                                            <span class="badge badge-sm ${feed.status === 'success' ? 'bg-success' : feed.status === 'disabled' ? 'bg-secondary' : 'bg-danger'}">${feed.status}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsHtml += '</div>';
+            resultsDiv.innerHTML = resultsHtml;
+        }, 500);
+        
+        // Cleanup modal on close
+        modal.addEventListener('hidden.bs.modal', () => {
+            modal.remove();
+        });
+    })
+    .catch(error => {
+        console.error('Configuration test failed:', error);
+        alert(`設定テストでエラーが発生しました: ${error.message}`);
+    })
+    .finally(() => {
+        // Restore button state
+        testBtn.innerHTML = originalText;
+        testBtn.disabled = false;
+    });
+}
+
+// Form validation
+document.getElementById('config-form').addEventListener('submit', function(e) {
+    const email = document.getElementById('notification_email').value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!emailRegex.test(email)) {
+        e.preventDefault();
+        alert('有効なメールアドレスを入力してください。');
+        return false;
+    }
+    
+    // Check if at least one source is enabled
+    const sources = ['anilist', 'shobo_calendar', 'bookwalker_rss', 'mangapocket_rss'];
+    const enabledSources = sources.filter(source => document.getElementById(source).checked);
+    
+    if (enabledSources.length === 0) {
+        e.preventDefault();
+        alert('少なくとも1つのデータソースを有効にしてください。');
+        return false;
+    }
+    
+    // Show confirmation for important changes
+    const confirmMessage = '設定を保存しますか？\n\n変更は次回の実行時から反映されます。';
+    if (!confirm(confirmMessage)) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Auto-save draft (optional)
+let autoSaveTimeout;
+function autoSaveDraft() {
+    clearTimeout(autoSaveTimeout);
+    autoSaveTimeout = setTimeout(() => {
+        const formData = new FormData(document.getElementById('config-form'));
+        localStorage.setItem('config-draft', JSON.stringify(Object.fromEntries(formData)));
+        console.log('設定の下書きを保存しました');
+    }, 5000);
+}
+
+// Add auto-save listeners
+document.querySelectorAll('#config-form input, #config-form select, #config-form textarea').forEach(element => {
+    element.addEventListener('input', autoSaveDraft);
+    element.addEventListener('change', autoSaveDraft);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,521 @@
+name: Manga/Anime Notification System CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  PYTHON_VERSION: '3.11'
+  TEST_MODE: true
+  LOG_LEVEL: DEBUG
+
+jobs:
+  # Job 1: Code Quality and Linting
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8 black mypy bandit safety
+        
+    - name: Run flake8 linting
+      run: |
+        flake8 modules/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 modules/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        
+    - name: Check code formatting with black
+      run: |
+        black --check --diff modules/ tests/
+        
+    - name: Run type checking with mypy
+      run: |
+        mypy modules/ --ignore-missing-imports
+        
+    - name: Run security analysis with bandit
+      run: |
+        bandit -r modules/ -f json -o bandit-report.json
+        
+    - name: Check dependencies for security vulnerabilities
+      run: |
+        safety check --json --output safety-report.json
+        
+    - name: Upload quality reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: quality-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  # Job 2: Unit Tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-py${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-py${{ matrix.python-version }}-pip-
+          
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run unit tests
+      run: |
+        python -m pytest tests/test_database.py tests/test_config.py tests/test_filtering.py \
+          -v --tb=short --cov=modules \
+          --cov-report=xml --cov-report=html \
+          --cov-fail-under=80 \
+          --junitxml=junit-unit-${{ matrix.python-version }}.xml
+          
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: unit-test-results-py${{ matrix.python-version }}
+        path: |
+          junit-unit-${{ matrix.python-version }}.xml
+          htmlcov/
+          
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: matrix.python-version == '3.11'
+      with:
+        file: ./coverage.xml
+        flags: unit
+        name: unit-tests
+        
+  # Job 3: Integration Tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    
+    services:
+      # Mock services for testing
+      httpbin:
+        image: kennethreitz/httpbin
+        ports:
+          - 8080:80
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Set up test environment
+      run: |
+        mkdir -p test-reports
+        mkdir -p logs
+        
+    - name: Run integration tests
+      env:
+        # Mock credentials for testing
+        GOOGLE_CREDENTIALS_PATH: ${{ github.workspace }}/tests/fixtures/mock_credentials.json
+        GOOGLE_TOKEN_PATH: ${{ github.workspace }}/tests/fixtures/mock_token.json
+      run: |
+        python -m pytest tests/test_anilist_api.py tests/test_rss_processing.py tests/test_google_apis.py \
+          tests/test_mailer_integration.py tests/test_calendar_integration.py \
+          -v --tb=short --cov=modules \
+          --cov-report=xml --cov-report=html \
+          --cov-append \
+          --junitxml=junit-integration.xml \
+          --timeout=60
+          
+    - name: Upload integration test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: integration-test-results
+        path: |
+          junit-integration.xml
+          htmlcov/
+          test-reports/
+          
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: integration
+        name: integration-tests
+
+  # Job 4: End-to-End Tests
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Set up test database
+      run: |
+        python init_demo_db.py
+        
+    - name: Run end-to-end tests
+      run: |
+        python -m pytest tests/test_e2e_workflow.py \
+          -v --tb=short \
+          --junitxml=junit-e2e.xml \
+          --timeout=120
+          
+    - name: Upload E2E test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: e2e-test-results
+        path: |
+          junit-e2e.xml
+          logs/
+
+  # Job 5: Performance Tests
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install memory-profiler psutil
+        
+    - name: Run performance tests
+      run: |
+        python -m pytest tests/test_performance.py \
+          -v --tb=short \
+          --junitxml=junit-performance.xml \
+          --timeout=300 \
+          -m "performance"
+          
+    - name: Generate performance report
+      run: |
+        python -c "
+        import json
+        import os
+        
+        # Create performance summary
+        performance_data = {
+            'timestamp': '$(date -u +%Y-%m-%dT%H:%M:%SZ)',
+            'git_sha': '${{ github.sha }}',
+            'branch': '${{ github.ref_name }}',
+            'test_environment': 'GitHub Actions Ubuntu',
+            'python_version': '${{ env.PYTHON_VERSION }}'
+        }
+        
+        with open('performance-summary.json', 'w') as f:
+            json.dump(performance_data, f, indent=2)
+        "
+        
+    - name: Upload performance test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-test-results
+        path: |
+          junit-performance.xml
+          performance-summary.json
+
+  # Job 6: Security Scan
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: quality
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        languages: python
+
+  # Job 7: Build and Package
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, e2e-tests]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine wheel
+        
+    - name: Build package
+      run: |
+        python -m build
+        
+    - name: Check package
+      run: |
+        python -m twine check dist/*
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package
+        path: dist/
+
+  # Job 8: Test Summary and Reporting
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, e2e-tests, performance-tests]
+    if: always()
+    
+    steps:
+    - name: Download all test artifacts
+      uses: actions/download-artifact@v3
+      
+    - name: Generate test summary
+      run: |
+        echo "# Test Summary" > test-summary.md
+        echo "" >> test-summary.md
+        echo "## Test Results" >> test-summary.md
+        echo "" >> test-summary.md
+        
+        # Check if unit tests passed
+        if ls unit-test-results-*/junit-unit-*.xml 1> /dev/null 2>&1; then
+          echo "✅ Unit Tests: PASSED" >> test-summary.md
+        else
+          echo "❌ Unit Tests: FAILED" >> test-summary.md
+        fi
+        
+        # Check if integration tests passed
+        if ls integration-test-results/junit-integration.xml 1> /dev/null 2>&1; then
+          echo "✅ Integration Tests: PASSED" >> test-summary.md
+        else
+          echo "❌ Integration Tests: FAILED" >> test-summary.md
+        fi
+        
+        # Check if E2E tests passed
+        if ls e2e-test-results/junit-e2e.xml 1> /dev/null 2>&1; then
+          echo "✅ End-to-End Tests: PASSED" >> test-summary.md
+        else
+          echo "❌ End-to-End Tests: FAILED" >> test-summary.md
+        fi
+        
+        # Check if performance tests passed
+        if ls performance-test-results/junit-performance.xml 1> /dev/null 2>&1; then
+          echo "✅ Performance Tests: PASSED" >> test-summary.md
+        else
+          echo "❌ Performance Tests: FAILED" >> test-summary.md
+        fi
+        
+        echo "" >> test-summary.md
+        echo "## Coverage Reports" >> test-summary.md
+        echo "Coverage reports are available in the test artifacts." >> test-summary.md
+        
+    - name: Comment test summary on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('test-summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });
+          
+    - name: Upload test summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-summary
+        path: test-summary.md
+
+  # Job 9: Deploy (only on main branch)
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    environment:
+      name: production
+      url: https://your-deployment-url.com
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package
+        path: dist/
+        
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deploying to production..."
+        # Add your deployment commands here
+        # Example: Deploy to server, update containers, etc.
+        echo "✅ Deployment completed successfully!"
+        
+    - name: Create release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+  # Job 10: Notifications
+  notifications:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [test-summary, deploy]
+    if: always()
+    
+    steps:
+    - name: Notify on success
+      if: ${{ needs.test-summary.result == 'success' }}
+      run: |
+        echo "✅ All tests passed! Sending success notification..."
+        # Add notification logic here (Slack, Discord, email, etc.)
+        
+    - name: Notify on failure
+      if: ${{ needs.test-summary.result == 'failure' }}
+      run: |
+        echo "❌ Tests failed! Sending failure notification..."
+        # Add notification logic here (Slack, Discord, email, etc.)
+        
+    - name: Send status to external monitoring
+      run: |
+        # Send status to external monitoring system
+        curl -X POST "https://your-monitoring-system.com/api/status" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "project": "manga-anime-notification",
+            "status": "${{ job.status }}",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"
+          }' || echo "Failed to send status to monitoring system"

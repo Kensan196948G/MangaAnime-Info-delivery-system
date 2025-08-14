@@ -1,0 +1,81 @@
+name: "MangaAnime Development Workflow"
+description: "アニメ・マンガ情報配信システム並列開発ワークフロー"
+
+phases:
+  phase1:
+    name: "基盤設計・DB設計フェーズ"
+    parallel_agents:
+      - agent-MangaAnime-CTO
+      - agent-MangaAnime-DevAPI
+      - agent-MangaAnime-QA
+    tasks:
+      - 全体アーキテクチャ設計
+      - データベーススキーマ設計
+      - セキュリティ要件定義
+      - テスト基盤構築
+    duration: "2-3日"
+
+  phase2:
+    name: "情報収集機能実装フェーズ"
+    parallel_agents:
+      - agent-MangaAnime-DevAPI
+      - agent-MangaAnime-Tester
+      - agent-MangaAnime-QA
+    tasks:
+      - AniList GraphQL API実装
+      - RSS情報収集実装
+      - データ正規化ロジック実装
+      - 単体テスト作成
+    duration: "3-4日"
+
+  phase3:
+    name: "通知・連携機能実装フェーズ"
+    parallel_agents:
+      - agent-MangaAnime-DevAPI
+      - agent-MangaAnime-Tester
+      - agent-MangaAnime-QA
+    tasks:
+      - Gmail API統合実装
+      - Google Calendar API統合実装
+      - フィルタリングロジック実装
+      - API連携テスト作成
+    duration: "3-4日"
+
+  phase4:
+    name: "統合・エラーハンドリング強化フェーズ"
+    parallel_agents:
+      - agent-MangaAnime-CTO
+      - agent-MangaAnime-DevAPI
+      - agent-MangaAnime-Tester
+      - agent-MangaAnime-QA
+    tasks:
+      - 全機能統合
+      - エラーハンドリング強化
+      - ログ機能実装
+      - 統合テスト実行
+    duration: "2-3日"
+
+  phase5:
+    name: "最終テスト・デプロイ準備フェーズ"
+    parallel_agents:
+      - agent-MangaAnime-CTO
+      - agent-MangaAnime-Tester
+      - agent-MangaAnime-QA
+      - agent-MangaAnime-DevUI
+    tasks:
+      - パフォーマンステスト
+      - セキュリティ監査
+      - デプロイ準備
+      - Web UI基本設計（将来拡張）
+    duration: "2-3日"
+
+dependencies:
+  - phase1 -> phase2
+  - phase2 -> phase3
+  - phase3 -> phase4
+  - phase4 -> phase5
+
+coordination_rules:
+  - CTO承認後に次フェーズ移行
+  - QAレビュー必須項目は全Agent作業完了前に実施
+  - Testerは各フェーズで継続的テスト実行

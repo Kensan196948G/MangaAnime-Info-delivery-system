@@ -1,0 +1,133 @@
+{
+    "name": "アニメ・マンガ情報配信システム",
+    "short_name": "AnimeManagInfo",
+    "description": "アニメとマンガの最新リリース情報を自動で収集・通知するシステム",
+    "version": "1.0.0",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0d6efd",
+    "theme_color": "#0d6efd",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "ja",
+    "icons": [
+        {
+            "src": "/static/icons/icon-72x72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/static/icons/icon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/static/icons/icon-128x128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/static/icons/icon-144x144.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/static/icons/icon-152x152.png",
+            "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/static/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/static/icons/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/static/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable any"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "ダッシュボード",
+            "short_name": "Dashboard",
+            "description": "メインダッシュボードを開く",
+            "url": "/",
+            "icons": [
+                {
+                    "src": "/static/icons/shortcut-dashboard.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "収集状況",
+            "short_name": "Collection",
+            "description": "収集状況ダッシュボードを開く",
+            "url": "/collection-dashboard",
+            "icons": [
+                {
+                    "src": "/static/icons/shortcut-collection.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "データ検索",
+            "short_name": "Search",
+            "description": "作品データを検索",
+            "url": "/data-browser",
+            "icons": [
+                {
+                    "src": "/static/icons/shortcut-search.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "収集設定",
+            "short_name": "Settings",
+            "description": "収集設定を管理",
+            "url": "/collection-settings",
+            "icons": [
+                {
+                    "src": "/static/icons/shortcut-settings.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "categories": ["entertainment", "lifestyle", "news"],
+    "screenshots": [
+        {
+            "src": "/static/screenshots/desktop-dashboard.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/static/screenshots/mobile-dashboard.png",
+            "sizes": "360x640",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ],
+    "prefer_related_applications": false,
+    "related_applications": [],
+    "permissions": [
+        "notifications"
+    ]
+}
