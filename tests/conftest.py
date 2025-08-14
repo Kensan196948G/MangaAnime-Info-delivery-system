@@ -343,6 +343,21 @@ def sample_config_data():
             "timezone": "Asia/Tokyo",
             "log_level": "INFO"
         },
+        "database": {
+            "path": "db.sqlite3",
+            "backup_enabled": True
+        },
+        "apis": {
+            "anilist": {
+                "graphql_url": "https://graphql.anilist.co",
+                "rate_limit": {"requests_per_minute": 90},
+                "timeout_seconds": 30
+            },
+            "rss_feeds": {
+                "timeout_seconds": 30,
+                "user_agent": "MangaAnime-Info-System/1.0"
+            }
+        },
         "email": {
             "smtp_server": "smtp.gmail.com",
             "smtp_port": 587,
