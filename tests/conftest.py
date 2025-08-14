@@ -333,6 +333,54 @@ def performance_test_config():
         "cpu_usage_limit": 80.0  # percentage
     }
 
+@pytest.fixture
+def sample_config_data():
+    """Sample configuration data for testing."""
+    return {
+        "system": {
+            "name": "MangaAnime情報配信システム",
+            "environment": "production",
+            "timezone": "Asia/Tokyo",
+            "log_level": "INFO"
+        },
+        "email": {
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "username": "test@gmail.com",
+            "use_tls": True
+        },
+        "notifications": {
+            "enabled": True,
+            "email_enabled": True,
+            "calendar_enabled": True
+        },
+        "error_notifications": {
+            "enabled": True,
+            "recipient": "error@example.com"
+        },
+        "filtering": {
+            "ng_keywords": ["エロ", "R18", "成人向け"],
+            "ng_genres": ["Hentai", "Ecchi"]
+        }
+    }
+
+@pytest.fixture
+def temp_config_file(tmp_path):
+    """Create a temporary config file for testing."""
+    config_data = {
+        "system": {
+            "name": "Test System",
+            "environment": "test"
+        },
+        "database": {
+            "path": ":memory:"
+        }
+    }
+    
+    config_file = tmp_path / "test_config.json"
+    config_file.write_text(json.dumps(config_data, indent=2))
+    return str(config_file)
+
 # Test markers configuration
 def pytest_configure(config):
     """Configure pytest markers."""
