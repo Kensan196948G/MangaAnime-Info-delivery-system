@@ -2,8 +2,8 @@ name: Auto Error Detection & Fix System
 
 on:
   schedule:
-    # Run every 2 hours for continuous monitoring
-    - cron: '0 */2 * * *'
+    # Run every 1 hour for continuous monitoring
+    - cron: '0 */1 * * *'
   workflow_dispatch:
     inputs:
       detection_type:
