@@ -42,4 +42,3 @@ pytest-cov>=4.1.0
 black>=23.7.0
 flake8>=6.0.0
 bandit>=1.7.5
-cryptography>=41.0.0
