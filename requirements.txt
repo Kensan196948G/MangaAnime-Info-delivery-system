@@ -20,6 +20,7 @@ aiohttp>=3.8.5
 # Data Processing
 pandas>=2.0.3
 sqlalchemy>=2.0.19
+pytz>=2023.3
 
 # Security & Encryption
 cryptography>=41.0.3

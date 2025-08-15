@@ -9,7 +9,7 @@
 4. 未通知リリースの通知処理（Gmail + Googleカレンダー）
 
 Usage:
-    python3 release_notifier.py [--config CONFIG_PATH] [--dry-run] [--verbose]
+    python3 release_notifier.py [--config CONFIG_PATH] [--dry-run] [--verbose] [--force-send]
     
 Environment Variables:
     DATABASE_PATH: データベースファイルのパス
@@ -36,20 +36,23 @@ sys.path.insert(0, str(project_root))
 from modules.config import get_config, ConfigManager
 from modules.db import DatabaseManager
 from modules.logger import setup_logging
+from modules.email_scheduler import EmailScheduler
 
 
 class ReleaseNotifierSystem:
     """アニメ・マンガ情報配信システムメインクラス"""
     
-    def __init__(self, config_path: Optional[str] = None, dry_run: bool = False):
+    def __init__(self, config_path: Optional[str] = None, dry_run: bool = False, force_send: bool = False):
         """
         システムの初期化
         
         Args:
             config_path (Optional[str]): 設定ファイルパス
             dry_run (bool): ドライランモード（実際の通知は送信しない）
+            force_send (bool): 強制送信モード（時刻に関係なく送信）
         """
         self.dry_run = dry_run
+        self.force_send = force_send
         self.config = get_config(config_path)
         
         # ログの設定
@@ -71,6 +74,9 @@ class ReleaseNotifierSystem:
         
         # データベースの初期化
         self.db = DatabaseManager(self.config.get_db_path())
+        
+        # メール配信スケジューラーの初期化
+        self.email_scheduler = EmailScheduler(self.config)
         
         # モジュール初期化（遅延インポートで循環参照を回避）
         self._collectors = None
@@ -276,12 +282,13 @@ class ReleaseNotifierSystem:
         self.logger.info(f"💾 データベース保存完了: {len(new_releases)} 件の新しいリリース")
         return new_releases
     
-    def send_notifications(self, new_releases: List[Dict[str, Any]]) -> bool:
+    def send_notifications(self, new_releases: List[Dict[str, Any]], force_send: bool = False) -> bool:
         """
-        メール通知とカレンダーイベントの作成
+        メール通知とカレンダーイベントの作成（分散配信対応）
         
         Args:
             new_releases (List[Dict[str, Any]]): 新しいリリース情報
+            force_send (bool): 強制送信フラグ（時刻に関係なく送信）
             
         Returns:
             bool: 通知処理が成功した場合True
@@ -290,10 +297,18 @@ class ReleaseNotifierSystem:
             self.logger.info("📧 新しいリリースがないため、通知をスキップします")
             return True
         
-        self.logger.info(f"📧 通知処理を開始します: {len(new_releases)} 件")
+        self.logger.info(f"📧 分散配信対応通知処理を開始: {len(new_releases)} 件")
         self._import_modules()
         
+        # 配信計画の作成
+        batches = self.email_scheduler.plan_delivery(new_releases)
+        
+        if not batches:
+            self.logger.warning("📧 配信バッチが作成されませんでした")
+            return False
+        
         success = True
+        sent_batches = 0
         
         try:
             # Gmail認証
@@ -306,57 +321,99 @@ class ReleaseNotifierSystem:
                 self.logger.error("Google Calendar認証に失敗しました")
                 return False
             
+            # 各バッチの処理
+            for batch in batches:
+                should_send = force_send or self.email_scheduler.should_send_now(batch.schedule)
+                
+                if not should_send:
+                    next_time = self.email_scheduler.get_next_delivery_time(batch.schedule)
+                    self.logger.info(
+                        f"📧 バッチ {batch.current_batch}/{batch.total_batches} は "
+                        f"{batch.schedule.to_time_str()} 配信予定 (次回: {next_time.strftime('%m/%d %H:%M')})"
+                    )
+                    continue
+                
+                # バッチ配信実行
+                batch_success = self._send_batch(batch)
+                
+                if batch_success:
+                    sent_batches += 1
+                    self.email_scheduler.mark_batch_sent(batch.batch_id)
+                    self.logger.info(
+                        f"✅ バッチ {batch.current_batch}/{batch.total_batches} "
+                        f"配信完了 ({len(batch.releases)} 件)"
+                    )
+                else:
+                    self.logger.error(
+                        f"❌ バッチ {batch.current_batch}/{batch.total_batches} "
+                        f"配信失敗"
+                    )
+                    success = False
+            
+            # 統計更新
+            self.statistics['notifications_sent'] += sent_batches
+            
+            if sent_batches > 0:
+                self.logger.info(f"📧 分散配信完了: {sent_batches}/{len(batches)} バッチ送信")
+            else:
+                self.logger.info("📧 配信時刻ではないため、バッチ送信をスキップ")
+            
+        except Exception as e:
+            self.logger.error(f"分散配信処理エラー: {e}")
+            success = False
+        
+        return success
+    
+    def _send_batch(self, batch) -> bool:
+        """
+        単一バッチの送信処理
+        
+        Args:
+            batch: EmailBatch オブジェクト
+            
+        Returns:
+            bool: 送信成功の場合True
+        """
+        try:
             if not self.dry_run:
                 # メール通知の作成と送信
-                try:
-                    notification = self._email_generator.generate_release_notification(new_releases)
-                    
-                    if self._mailer.send_notification(notification):
-                        self.logger.info("✅ メール通知を送信しました")
-                        self.statistics['notifications_sent'] += 1
-                    else:
-                        self.logger.error("❌ メール通知の送信に失敗しました")
-                        success = False
-                        
-                except Exception as e:
-                    self.logger.error(f"メール通知エラー: {e}")
-                    success = False
+                notification = self._email_generator.generate_release_notification(
+                    batch.releases,
+                    subject_prefix=batch.get_subject_prefix()
+                )
+                
+                if not self._mailer.send_notification(notification):
+                    self.logger.error(f"バッチ {batch.batch_id} のメール送信に失敗")
+                    return False
                 
                 # カレンダーイベントの作成
-                try:
-                    calendar_results = self._calendar.bulk_create_release_events(new_releases)
-                    created_events = len([v for v in calendar_results.values() if v])
-                    
-                    if created_events > 0:
-                        self.logger.info(f"✅ カレンダーイベントを {created_events} 件作成しました")
-                        self.statistics['calendar_events_created'] = created_events
-                    else:
-                        self.logger.warning("⚠️ カレンダーイベントが作成されませんでした")
-                        
-                except Exception as e:
-                    self.logger.error(f"カレンダーイベント作成エラー: {e}")
-                    success = False
+                calendar_results = self._calendar.bulk_create_release_events(batch.releases)
+                created_events = len([v for v in calendar_results.values() if v])
+                
+                if created_events > 0:
+                    self.logger.info(f"✅ カレンダーイベントを {created_events} 件作成")
+                    self.statistics['calendar_events_created'] += created_events
                 
                 # データベースの通知済みフラグ更新
-                for release in new_releases:
+                for release in batch.releases:
                     if 'release_id' in release:
                         self.db.mark_release_notified(release['release_id'])
-            
+                        
             else:
-                self.logger.info("🔒 ドライランモード: 実際の通知は送信されていません")
+                self.logger.info(f"🔒 [DRY-RUN] バッチ {batch.batch_id} ({len(batch.releases)} 件)")
                 
                 # ドライラン用の詳細表示
-                for release in new_releases:
+                for release in batch.releases:
                     title = release.get('title', '不明なタイトル')
                     number = release.get('number', '')
                     platform = release.get('platform', '')
                     self.logger.info(f"  📧 [DRY-RUN] {title} {number} ({platform})")
             
+            return True
+            
         except Exception as e:
-            self.logger.error(f"通知処理エラー: {e}")
-            success = False
-        
-        return success
+            self.logger.error(f"バッチ送信エラー: {e}")
+            return False
     
     def cleanup_old_data(self):
         """古いデータのクリーンアップ"""
@@ -371,6 +428,18 @@ class ReleaseNotifierSystem:
                 
         except Exception as e:
             self.logger.error(f"データクリーンアップエラー: {e}")
+    
+    def _format_delivery_stats(self) -> str:
+        """分散配信統計のフォーマット"""
+        try:
+            stats = self.email_scheduler.get_delivery_stats()
+            return f"""総バッチ数: {stats['total_batches']}
+  送信済みバッチ数: {stats['sent_batches']}
+  未送信バッチ数: {stats['pending_batches']}
+  完了率: {stats['completion_rate']:.1f}%
+  最終更新: {stats['last_update']}"""
+        except Exception:
+            return "統計取得エラー"
     
     def generate_report(self) -> str:
         """実行結果レポートの生成 - Phase 2 Enhanced"""
@@ -413,6 +482,9 @@ class ReleaseNotifierSystem:
   総作品数: {self.db.get_work_stats().get('total', 0)}
   総リリース数: {self.db.get_work_stats().get('total_releases', 0)}
   未通知数: {len(self.db.get_unnotified_releases(100))}
+
+📅 分散配信統計:
+  {self._format_delivery_stats()}
 
 📀 Phase 2 パフォーマンス指標:
   モニタリングアクティブ: {health_status.get('monitoring_active', False)}
@@ -468,10 +540,14 @@ class ReleaseNotifierSystem:
             new_releases = self.save_to_database(processed_items)
             
             # ステップ4: 通知処理
-            notification_success = self.send_notifications(new_releases)
+            force_send = getattr(self, 'force_send', False)
+            notification_success = self.send_notifications(new_releases, force_send=force_send)
             
             # ステップ5: クリーンアップ
             self.cleanup_old_data()
+            
+            # ステップ6: スケジューラーの古いデータクリーンアップ
+            self.email_scheduler.cleanup_old_state()
             
             # レポート生成
             report = self.generate_report()
@@ -537,7 +613,13 @@ def main():
   python3 release_notifier.py                    # 通常実行
   python3 release_notifier.py --dry-run          # ドライラン（通知なし）
   python3 release_notifier.py --verbose          # 詳細ログ
-  python3 release_notifier.py --config custom.json --dry-run --verbose'''
+  python3 release_notifier.py --force-send       # 強制送信（時刻無視）
+  python3 release_notifier.py --config custom.json --dry-run --verbose
+  
+分散配信について:
+  ・100件以上のリリース: 2回分散（朝8時、夜20時）
+  ・200件以上のリリース: 3回分散（朝8時、昼12時、夜20時）
+  ・日本時間（Asia/Tokyo）で配信'''
     )
     
     parser.add_argument(
@@ -555,6 +637,11 @@ def main():
         action='store_true', 
         help='詳細ログを出力'
     )
+    parser.add_argument(
+        '--force-send', 
+        action='store_true', 
+        help='時刻に関係なく強制的に通知を送信'
+    )
     
     args = parser.parse_args()
     
@@ -569,7 +656,8 @@ def main():
         # システムの実行
         with ReleaseNotifierSystem(
             config_path=args.config,
-            dry_run=args.dry_run
+            dry_run=args.dry_run,
+            force_send=args.force_send
         ) as system:
             success = system.run()
             exit_code = 0 if success else 1

@@ -612,13 +612,15 @@ class EmailTemplateGenerator:
         self.notification_config = config.get('notification', {}).get('email', {})
     
     def generate_release_notification(self, releases: List[Dict[str, Any]], 
-                                    date_str: str = None) -> EmailNotification:
+                                    date_str: str = None,
+                                    subject_prefix: str = None) -> EmailNotification:
         """
         Generate email notification for new releases.
         
         Args:
             releases: List of release dictionaries
             date_str: Date string for the notification
+            subject_prefix: Custom subject prefix for batched delivery
             
         Returns:
             EmailNotification: Generated email notification
@@ -628,7 +630,8 @@ class EmailTemplateGenerator:
                 date_str = datetime.now().strftime('%Y年%m月%d日')
             
             # Generate subject
-            subject_prefix = self.gmail_config.get('subject_prefix', '[アニメ・マンガ情報]')
+            if subject_prefix is None:
+                subject_prefix = self.gmail_config.get('subject_prefix', '[アニメ・マンガ情報]')
             anime_count = len([r for r in releases if r.get('type') == 'anime'])
             manga_count = len([r for r in releases if r.get('type') == 'manga'])
             
