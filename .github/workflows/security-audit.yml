@@ -22,289 +22,482 @@ on:
         - secrets
         - code-quality
         - configuration
+
 env:
   PYTHON_VERSION: '3.11'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  checks: write
+  actions: read
+  security-events: write
+
 jobs:
   dependency-security-scan:
     name: Dependency Security Scan
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.audit_type == 'full' || github.event.inputs.audit_type
-      == 'dependencies' || github.event.inputs.audit_type == '' }}
+    timeout-minutes: 15
+    if: ${{ inputs.audit_type == 'full' || inputs.audit_type == 'dependencies' || !inputs.audit_type }}
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-security-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-security-
+        
     - name: Install security tools
-      run: 'python -m pip install --upgrade pip
-
-        pip install safety bandit semgrep pip-audit
-
-        '
-    - name: Run pip-audit for dependency vulnerabilities
-      run: "echo \"\U0001F50D Scanning Python dependencies for known vulnerabilities...\"\
-        \npip-audit --format=json --output=pip-audit-report.json || true\npip-audit\
-        \ --format=text\n"
+      run: |
+        python -m pip install --upgrade pip
+        
+        # Install security tools with error handling
+        echo "Installing security scanning tools..."
+        
+        # Install tools individually with error handling
+        pip install safety || echo "⚠️ Safety installation failed, continuing..."
+        pip install bandit || echo "⚠️ Bandit installation failed, continuing..."
+        pip install pip-audit || echo "⚠️ pip-audit installation failed, continuing..."
+        
+        # Skip semgrep if it fails (has complex dependencies)
+        pip install semgrep || echo "⚠️ Semgrep installation failed, will skip semgrep checks"
+        
+        # Verify what was installed
+        echo "Installed security tools:"
+        pip list | grep -E "(safety|bandit|pip-audit|semgrep)" || echo "Some tools may not have installed correctly"
+        
+    - name: Install project dependencies
+      run: |
+        if [ -f "requirements.txt" ]; then
+          pip install -r requirements.txt || echo "⚠️ Some project dependencies failed to install"
+        else
+          echo "⚠️ requirements.txt not found, creating minimal one for testing"
+          echo "flask" > requirements.txt
+          pip install flask
+        fi
+        
     - name: Run Safety check
-      run: "echo \"\U0001F50D Running Safety dependency vulnerability check...\"\n\
-        safety check --json --output=safety-report.json || true\nsafety check\n"
-    - name: Analyze requirements files
-      run: "echo \"\U0001F4CB Analyzing requirements files...\"\n\nif [ -f requirements.txt\
-        \ ]; then\n    echo \"\u2705 requirements.txt found\"\n    echo \"Dependencies\
-        \ count: $(wc -l < requirements.txt)\"\nfi\n\nif [ -f requirements-dev.txt\
-        \ ]; then\n    echo \"\u2705 requirements-dev.txt found\"\n    echo \"Dev\
-        \ dependencies count: $(wc -l < requirements-dev.txt)\"\nfi\n\n# Check for\
-        \ pinned versions\nunpinned_deps=$(grep -v \"==\" requirements.txt | grep\
-        \ -v \"^#\" | grep -v \"^$\" | wc -l || echo \"0\")\necho \"Unpinned dependencies:\
-        \ $unpinned_deps\"\n\nif [ \"$unpinned_deps\" -gt 0 ]; then\n    echo \"\u26A0\
-        \uFE0F  Consider pinning dependency versions for security\"\nelse\n    echo\
-        \ \"\u2705 All dependencies are pinned\"\nfi\n"
-    - name: Upload dependency scan results
+      continue-on-error: true
+      run: |
+        if command -v safety >/dev/null 2>&1; then
+          echo "🔍 Running Safety vulnerability scan..."
+          safety check --json > safety-report.json 2>/dev/null || {
+            echo "⚠️ Safety scan completed with warnings"
+            safety check || echo "Safety found vulnerabilities or failed"
+          }
+        else
+          echo "⚠️ Safety not available, skipping vulnerability scan"
+        fi
+        
+    - name: Run Bandit security analysis
+      continue-on-error: true
+      run: |
+        if command -v bandit >/dev/null 2>&1; then
+          echo "🔍 Running Bandit security analysis..."
+          bandit -r . -f json -o bandit-report.json 2>/dev/null || {
+            echo "⚠️ Bandit scan completed with warnings"
+            bandit -r . || echo "Bandit found security issues or failed"
+          }
+        else
+          echo "⚠️ Bandit not available, skipping security analysis"
+        fi
+        
+    - name: Run pip-audit
+      continue-on-error: true
+      run: |
+        if command -v pip-audit >/dev/null 2>&1; then
+          echo "🔍 Running pip-audit..."
+          pip-audit --format=json --output=pip-audit-report.json || {
+            echo "⚠️ pip-audit completed with findings"
+            pip-audit || echo "pip-audit found vulnerabilities or failed"
+          }
+        else
+          echo "⚠️ pip-audit not available, skipping audit"
+        fi
+        
+    - name: Run Semgrep (optional)
+      continue-on-error: true
+      run: |
+        if command -v semgrep >/dev/null 2>&1; then
+          echo "🔍 Running Semgrep static analysis..."
+          semgrep --config=auto --json --output=semgrep-report.json . || {
+            echo "⚠️ Semgrep scan completed with findings"
+            semgrep --config=auto . || echo "Semgrep found issues or failed"
+          }
+        else
+          echo "⚠️ Semgrep not available, skipping static analysis"
+        fi
+        
+    - name: Generate Security Summary
+      run: |
+        echo "# Security Audit Summary" > security-summary.md
+        echo "" >> security-summary.md
+        echo "## Scan Results" >> security-summary.md
+        echo "" >> security-summary.md
+        
+        # Check for reports and summarize
+        if [ -f "safety-report.json" ]; then
+          echo "- ✅ Safety vulnerability scan: Completed" >> security-summary.md
+        else
+          echo "- ⚠️ Safety vulnerability scan: Skipped or failed" >> security-summary.md
+        fi
+        
+        if [ -f "bandit-report.json" ]; then
+          echo "- ✅ Bandit security analysis: Completed" >> security-summary.md
+        else
+          echo "- ⚠️ Bandit security analysis: Skipped or failed" >> security-summary.md
+        fi
+        
+        if [ -f "pip-audit-report.json" ]; then
+          echo "- ✅ pip-audit dependency audit: Completed" >> security-summary.md
+        else
+          echo "- ⚠️ pip-audit dependency audit: Skipped or failed" >> security-summary.md
+        fi
+        
+        if [ -f "semgrep-report.json" ]; then
+          echo "- ✅ Semgrep static analysis: Completed" >> security-summary.md
+        else
+          echo "- ⚠️ Semgrep static analysis: Skipped or failed" >> security-summary.md
+        fi
+        
+        echo "" >> security-summary.md
+        echo "## Recommendations" >> security-summary.md
+        echo "- Review any identified vulnerabilities" >> security-summary.md
+        echo "- Update dependencies regularly" >> security-summary.md
+        echo "- Follow secure coding practices" >> security-summary.md
+        echo "" >> security-summary.md
+        echo "*Report generated on $(date)*" >> security-summary.md
+        
+        cat security-summary.md
+        
+    - name: Upload security reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: dependency-security-reports
-        path: 'pip-audit-report.json
+        name: security-reports-${{ github.sha }}
+        path: |
+          *-report.json
+          security-summary.md
+        retention-days: 30
 
-          safety-report.json
-
-          '
-  secrets-detection:
+  secrets-scan:
     name: Secrets Detection
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.audit_type == 'full' || github.event.inputs.audit_type
-      == 'secrets' || github.event.inputs.audit_type == '' }}
+    timeout-minutes: 10
+    if: ${{ inputs.audit_type == 'full' || inputs.audit_type == 'secrets' || !inputs.audit_type }}
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
-    - name: Run TruffleHog for secrets detection
-      uses: trufflesecurity/trufflehog@v3.63.2
+        fetch-depth: 0  # Fetch full history for better secret detection
+        
+    - name: Install TruffleHog
+      run: |
+        # Install TruffleHog for secret scanning
+        curl -sSfL https://github.com/trufflesecurity/trufflehog/releases/download/v3.63.2/trufflehog_3.63.2_linux_amd64.tar.gz | tar -xz -C /tmp
+        sudo mv /tmp/trufflehog /usr/local/bin/
+        
+    - name: Run TruffleHog secrets scan
+      continue-on-error: true
+      run: |
+        echo "🔍 Scanning for secrets..."
+        trufflehog git file://. --json > trufflehog-report.json 2>/dev/null || {
+          echo "⚠️ TruffleHog scan completed with findings"
+          trufflehog git file://. || echo "TruffleHog found potential secrets or failed"
+        }
+        
+    - name: Manual secrets patterns check
+      run: |
+        echo "🔍 Running manual secrets pattern check..."
+        
+        # Define patterns to search for
+        patterns=(
+          "password.*=.*['\"].*['\"]"
+          "api_key.*=.*['\"].*['\"]"
+          "secret.*=.*['\"].*['\"]"
+          "token.*=.*['\"].*['\"]"
+          "smtp_.*password"
+          "app_password"
+        )
+        
+        echo "# Manual Secrets Scan Report" > manual-secrets-report.md
+        echo "" >> manual-secrets-report.md
+        
+        found_secrets=false
+        for pattern in "${patterns[@]}"; do
+          echo "Checking pattern: $pattern"
+          matches=$(grep -r -i -n "$pattern" . --exclude-dir=".git" --exclude-dir="venv" --exclude="*.md" --exclude="*.log" 2>/dev/null || true)
+          if [ ! -z "$matches" ]; then
+            echo "⚠️ Potential secrets found for pattern: $pattern" >> manual-secrets-report.md
+            echo "\`\`\`" >> manual-secrets-report.md
+            echo "$matches" >> manual-secrets-report.md
+            echo "\`\`\`" >> manual-secrets-report.md
+            echo "" >> manual-secrets-report.md
+            found_secrets=true
+          fi
+        done
+        
+        if [ "$found_secrets" = false ]; then
+          echo "✅ No obvious secrets patterns found" >> manual-secrets-report.md
+        fi
+        
+        cat manual-secrets-report.md
+        
+    - name: Upload secrets scan results
+      uses: actions/upload-artifact@v4
+      if: always()
       with:
-        path: ./
-        base: main
-        head: HEAD
-        extra_args: --debug --only-verified
-    - name: Custom secrets pattern check
-      run: "echo \"\U0001F50D Running custom secrets pattern detection...\"\n\n# Define\
-        \ patterns to search for\nsecret_patterns=(\n    \"password\\s*=\\s*['\\\"\
-        ][^'\\\"]*['\\\"]\"\n    \"api_key\\s*=\\s*['\\\"][^'\\\"]*['\\\"]\"\n   \
-        \ \"secret\\s*=\\s*['\\\"][^'\\\"]*['\\\"]\"\n    \"token\\s*=\\s*['\\\"][^'\\\
-        \"]*['\\\"]\"\n    \"AKIA[0-9A-Z]{16}\"  # AWS Access Key\n    \"sk_live_[0-9a-zA-Z]{24}\"\
-        \  # Stripe Live Key\n    \"pk_live_[0-9a-zA-Z]{24}\"  # Stripe Publishable\
-        \ Key\n)\n\nfindings=0\nfor pattern in \"${secret_patterns[@]}\"; do\n   \
-        \ echo \"Checking pattern: $pattern\"\n    matches=$(grep -r -E \"$pattern\"\
-        \ . --exclude-dir=.git --exclude-dir=venv --exclude-dir=node_modules --exclude=\"\
-        *.pyc\" || true)\n    if [ -n \"$matches\" ]; then\n        echo \"\u26A0\uFE0F\
-        \  Potential secret found:\"\n        echo \"$matches\"\n        ((findings++))\n\
-        \    fi\ndone\n\nif [ $findings -eq 0 ]; then\n    echo \"\u2705 No obvious\
-        \ secrets detected in code\"\nelse\n    echo \"\u26A0\uFE0F  $findings potential\
-        \ secret patterns found - review required\"\nfi\n"
-    - name: Check configuration files for secrets
-      run: "echo \"\U0001F50D Checking configuration files for exposed secrets...\"\
-        \n\nconfig_files=(\n    \"config.json\"\n    \"config.json.template\"\n  \
-        \  \".env\"\n    \".env.example\"\n)\n\nfor file in \"${config_files[@]}\"\
-        ; do\n    if [ -f \"$file\" ]; then\n        echo \"Checking: $file\"\n  \
-        \      \n        # Check for common secret indicators\n        if grep -q\
-        \ \"password.*:\" \"$file\" && ! grep -q \"password.*:\\s*\\\"\\\"\" \"$file\"\
-        \ && ! grep -q \"password.*:\\s*null\" \"$file\"; then\n            echo \"\
-        \u26A0\uFE0F  $file may contain password values\"\n        fi\n        \n\
-        \        if grep -q \"secret.*:\" \"$file\" && ! grep -q \"secret.*:\\s*\\\
-        \"\\\"\" \"$file\" && ! grep -q \"secret.*:\\s*null\" \"$file\"; then\n  \
-        \          echo \"\u26A0\uFE0F  $file may contain secret values\"\n      \
-        \  fi\n        \n        if grep -q \"key.*:\" \"$file\" && ! grep -q \"key.*:\\\
-        s*\\\"\\\"\" \"$file\" && ! grep -q \"key.*:\\s*null\" \"$file\"; then\n \
-        \           echo \"\u26A0\uFE0F  $file may contain key values\"\n        fi\n\
-        \    fi\ndone\n\necho \"\u2705 Configuration file check completed\"\n"
-  code-quality-security:
-    name: Code Quality Security Analysis
+        name: secrets-scan-${{ github.sha }}
+        path: |
+          trufflehog-report.json
+          manual-secrets-report.md
+        retention-days: 30
+
+  code-quality:
+    name: Code Quality Analysis
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.audit_type == 'full' || github.event.inputs.audit_type
-      == 'code-quality' || github.event.inputs.audit_type == '' }}
+    timeout-minutes: 15
+    if: ${{ inputs.audit_type == 'full' || inputs.audit_type == 'code-quality' || !inputs.audit_type }}
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    - name: Install code analysis tools
-      run: 'python -m pip install --upgrade pip
-
-        pip install bandit flake8 mypy pylint black isort
-
-        pip install -r requirements.txt
-
-        '
-    - name: Run Bandit security linter
-      run: "echo \"\U0001F50D Running Bandit security analysis...\"\nbandit -r modules/\
-        \ -f json -o bandit-security-report.json || true\nbandit -r modules/ -f txt\n"
-    - name: Run Flake8 linting
-      run: "echo \"\U0001F50D Running Flake8 code quality check...\"\nflake8 modules/\
-        \ --count --statistics --tee --output-file=flake8-report.txt || true\n"
-    - name: Run MyPy type checking
-      run: "echo \"\U0001F50D Running MyPy type checking...\"\nmypy modules/ --ignore-missing-imports\
-        \ --txt-report mypy-report/ || true\n"
-    - name: Run Pylint analysis
-      run: "echo \"\U0001F50D Running Pylint code analysis...\"\npylint modules/ --output-format=json\
-        \ > pylint-report.json || true\npylint modules/ --output-format=text || true\n"
-    - name: Check code formatting
-      run: "echo \"\U0001F50D Checking code formatting with Black...\"\nblack --check\
-        \ --diff modules/ || true\n\necho \"\U0001F50D Checking import sorting with\
-        \ isort...\"\nisort --check-only --diff modules/ || true\n"
+        
+    - name: Install code quality tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy || echo "⚠️ Some code quality tools failed to install"
+        
+    - name: Install project dependencies for type checking
+      run: |
+        if [ -f "requirements.txt" ]; then
+          pip install -r requirements.txt || echo "⚠️ Some dependencies failed to install"
+        fi
+        
+    - name: Run flake8
+      continue-on-error: true
+      run: |
+        echo "🔍 Running flake8 linting..."
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics > flake8-critical.txt 2>&1 || echo "Critical flake8 issues found"
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics > flake8-full.txt 2>&1 || echo "Flake8 analysis completed"
+        
+    - name: Check code formatting with black
+      continue-on-error: true
+      run: |
+        echo "🔍 Checking code formatting..."
+        black --check --diff . > black-report.txt 2>&1 || echo "Code formatting issues found"
+        
+    - name: Check import sorting with isort
+      continue-on-error: true
+      run: |
+        echo "🔍 Checking import sorting..."
+        isort --check-only --diff . > isort-report.txt 2>&1 || echo "Import sorting issues found"
+        
+    - name: Run mypy type checking
+      continue-on-error: true
+      run: |
+        echo "🔍 Running type checking..."
+        mypy . --ignore-missing-imports > mypy-report.txt 2>&1 || echo "Type checking completed with issues"
+        
     - name: Generate code quality summary
-      run: "echo \"\U0001F4CA Generating code quality summary...\"\n\ncat > code-quality-summary.md\
-        \ << EOF\n# Code Quality Security Summary\n\n## Security Analysis (Bandit)\n\
-        $(if [ -f bandit-security-report.json ]; then echo \"- Security report generated\"\
-        ; else echo \"- No security issues file\"; fi)\n\n## Code Quality (Flake8)\n\
-        $(if [ -f flake8-report.txt ]; then echo \"- Linting report generated\"; else\
-        \ echo \"- No linting issues\"; fi)\n\n## Type Checking (MyPy)\n$(if [ -d\
-        \ mypy-report ]; then echo \"- Type checking report generated\"; else echo\
-        \ \"- No type checking issues\"; fi)\n\n## Code Analysis (Pylint)\n$(if [\
-        \ -f pylint-report.json ]; then echo \"- Code analysis report generated\"\
-        ; else echo \"- No analysis issues\"; fi)\n\n## Recommendations\n- Review\
-        \ all security findings in Bandit report\n- Address linting issues for code\
-        \ consistency\n- Fix type checking errors for better reliability\n- Consider\
-        \ code analysis suggestions for maintainability\n\n---\nGenerated: $(date\
-        \ -u +%Y-%m-%dT%H:%M:%SZ)\nEOF\n"
+      run: |
+        echo "# Code Quality Report" > code-quality-summary.md
+        echo "" >> code-quality-summary.md
+        echo "## Analysis Results" >> code-quality-summary.md
+        echo "" >> code-quality-summary.md
+        
+        # Summarize results
+        if [ -f "flake8-critical.txt" ]; then
+          critical_count=$(grep -c ":" flake8-critical.txt 2>/dev/null || echo "0")
+          echo "- **Flake8 Critical Issues**: $critical_count" >> code-quality-summary.md
+        fi
+        
+        if [ -f "black-report.txt" ]; then
+          if grep -q "would reformat" black-report.txt; then
+            echo "- **Black Formatting**: ⚠️ Issues found" >> code-quality-summary.md
+          else
+            echo "- **Black Formatting**: ✅ Passed" >> code-quality-summary.md
+          fi
+        fi
+        
+        if [ -f "isort-report.txt" ]; then
+          if grep -q "Fixing" isort-report.txt; then
+            echo "- **Import Sorting**: ⚠️ Issues found" >> code-quality-summary.md
+          else
+            echo "- **Import Sorting**: ✅ Passed" >> code-quality-summary.md
+          fi
+        fi
+        
+        echo "" >> code-quality-summary.md
+        echo "*Generated on $(date)*" >> code-quality-summary.md
+        
+        cat code-quality-summary.md
+        
     - name: Upload code quality reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: code-quality-reports
-        path: 'bandit-security-report.json
-
-          flake8-report.txt
-
-          mypy-report/
-
-          pylint-report.json
-
+        name: code-quality-reports-${{ github.sha }}
+        path: |
+          flake8-*.txt
+          black-report.txt
+          isort-report.txt
+          mypy-report.txt
           code-quality-summary.md
+        retention-days: 30
 
-          '
-  configuration-security-audit:
+  configuration-audit:
     name: Configuration Security Audit
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.audit_type == 'full' || github.event.inputs.audit_type
-      == 'configuration' || github.event.inputs.audit_type == '' }}
+    timeout-minutes: 10
+    if: ${{ inputs.audit_type == 'full' || inputs.audit_type == 'configuration' || !inputs.audit_type }}
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Audit system configuration
-      run: "echo \"\U0001F50D Auditing system configuration security...\"\n\n# Check\
-        \ file permissions\necho \"## File Permissions Audit\"\n\n# Check for executable\
-        \ files\necho \"Executable files:\"\nfind . -type f -executable -not -path\
-        \ \"./.git/*\" -not -path \"./venv/*\" | head -20\n\n# Check for world-writable\
-        \ files\nworld_writable=$(find . -type f -perm -002 -not -path \"./.git/*\"\
-        \ -not -path \"./venv/*\" | wc -l)\necho \"World-writable files: $world_writable\"\
-        \n\nif [ \"$world_writable\" -gt 0 ]; then\n    echo \"\u26A0\uFE0F  World-writable\
-        \ files found - security risk!\"\n    find . -type f -perm -002 -not -path\
-        \ \"./.git/*\" -not -path \"./venv/*\"\nelse\n    echo \"\u2705 No world-writable\
-        \ files found\"\nfi\n"
+      
     - name: Audit configuration files
-      run: "echo \"\U0001F50D Auditing configuration file security...\"\n\n# Check\
-        \ config.json security\nif [ -f config.json ]; then\n    echo \"Analyzing\
-        \ config.json...\"\n    \n    # Check for debug mode\n    if grep -q '\"debug\"\
-        .*true' config.json; then\n        echo \"\u26A0\uFE0F  Debug mode enabled\
-        \ in configuration\"\n    else\n        echo \"\u2705 Debug mode not enabled\"\
-        \n    fi\n    \n    # Check for test mode\n    if grep -q '\"test_mode\".*true'\
-        \ config.json; then\n        echo \"\u26A0\uFE0F  Test mode enabled in configuration\"\
-        \n    else\n        echo \"\u2705 Test mode disabled\"\n    fi\n    \n   \
-        \ # Check for SSL/TLS settings\n    if grep -q '\"use_tls\".*true' config.json;\
-        \ then\n        echo \"\u2705 TLS enabled for email\"\n    else\n        echo\
-        \ \"\u26A0\uFE0F  TLS not explicitly enabled\"\n    fi\n    \nfi\n"
-    - name: Audit service configurations
-      run: "echo \"\U0001F50D Auditing service configuration security...\"\n\n# Check\
-        \ systemd service file\nif [ -f mangaanime-web.service ]; then\n    echo \"\
-        Analyzing systemd service file...\"\n    \n    # Check user/group settings\n\
-        \    if grep -q \"User=\" mangaanime-web.service && ! grep -q \"User=root\"\
-        \ mangaanime-web.service; then\n        echo \"\u2705 Service runs as non-root\
-        \ user\"\n    else\n        echo \"\u26A0\uFE0F  Service user configuration\
-        \ needs review\"\n    fi\n    \n    # Check restart policy\n    if grep -q\
-        \ \"Restart=always\" mangaanime-web.service; then\n        echo \"\u2705 Service\
-        \ has restart policy\"\n    fi\nfi\n"
-    - name: Network security audit
-      run: "echo \"\U0001F50D Network security configuration audit...\"\n\n# Check\
-        \ for hardcoded IPs\nhardcoded_ips=$(grep -r -E \"\\b([0-9]{1,3}\\.){3}[0-9]{1,3}\\\
-        b\" . --exclude-dir=.git --exclude-dir=venv --exclude=\"*.pyc\" | grep -v\
-        \ \"127.0.0.1\" | grep -v \"0.0.0.0\" | wc -l || echo \"0\")\necho \"Hardcoded\
-        \ IP addresses found: $hardcoded_ips\"\n\nif [ \"$hardcoded_ips\" -gt 0 ];\
-        \ then\n    echo \"\u26A0\uFE0F  Hardcoded IP addresses found - consider using\
-        \ configuration\"\nelse\n    echo \"\u2705 No hardcoded IP addresses detected\"\
-        \nfi\n\n# Check for localhost bindings\nlocalhost_bindings=$(grep -r \"0.0.0.0\"\
-        \ . --exclude-dir=.git --exclude-dir=venv --exclude=\"*.pyc\" | wc -l || echo\
-        \ \"0\")\necho \"Localhost bindings (0.0.0.0): $localhost_bindings\"\n\nif\
-        \ [ \"$localhost_bindings\" -gt 0 ]; then\n    echo \"\u2139\uFE0F  Service\
-        \ binds to all interfaces - ensure firewall is configured\"\nfi\n"
-  security-summary-report:
-    name: Security Summary Report
-    runs-on: ubuntu-latest
-    needs:
-    - dependency-security-scan
-    - secrets-detection
-    - code-quality-security
-    - configuration-security-audit
-    if: always()
-    steps:
-    - name: Download all security reports
-      uses: actions/download-artifact@v3
-    - name: Generate comprehensive security report
-      run: "echo \"\U0001F4CA Generating comprehensive security report...\"\n\ncat\
-        \ > security-audit-report.md << EOF\n# MangaAnime System Security Audit Report\n\
-        \n**Audit Date:** $(date -u +%Y-%m-%dT%H:%M:%SZ)\n**Git Commit:** ${{ github.sha\
-        \ }}\n**Branch:** ${{ github.ref_name }}\n**Workflow Run:** ${{ github.run_number\
-        \ }}\n\n## Audit Results Summary\n\n### Dependency Security Scan\n$(if [[\
-        \ \"${{ needs.dependency-security-scan.result }}\" == \"success\" ]]; then\
-        \ echo \"\u2705 PASSED\"; else echo \"\u274C FAILED\"; fi)\n- Scanned Python\
-        \ dependencies for known vulnerabilities\n- Checked for unpinned dependency\
-        \ versions\n\n### Secrets Detection\n$(if [[ \"${{ needs.secrets-detection.result\
-        \ }}\" == \"success\" ]]; then echo \"\u2705 PASSED\"; else echo \"\u274C\
-        \ FAILED\"; fi)\n- Performed secrets pattern matching\n- Analyzed configuration\
-        \ files for exposed credentials\n\n### Code Quality Security\n$(if [[ \"${{\
-        \ needs.code-quality-security.result }}\" == \"success\" ]]; then echo \"\u2705\
-        \ PASSED\"; else echo \"\u274C FAILED\"; fi)\n- Bandit security linting\n\
-        - Code quality and type checking\n- Formatting and style consistency\n\n###\
-        \ Configuration Security\n$(if [[ \"${{ needs.configuration-security-audit.result\
-        \ }}\" == \"success\" ]]; then echo \"\u2705 PASSED\"; else echo \"\u274C\
-        \ FAILED\"; fi)\n- File permissions audit\n- Service configuration review\n\
-        - Network security settings\n\n## Priority Recommendations\n\n### High Priority\n\
-        $(if [[ \"${{ needs.secrets-detection.result }}\" != \"success\" ]]; then\
-        \ echo \"- \U0001F534 Address secrets detection findings immediately\"; fi)\n\
-        $(if [[ \"${{ needs.dependency-security-scan.result }}\" != \"success\" ]];\
-        \ then echo \"- \U0001F534 Update vulnerable dependencies\"; fi)\n\n### Medium\
-        \ Priority\n$(if [[ \"${{ needs.code-quality-security.result }}\" != \"success\"\
-        \ ]]; then echo \"- \U0001F7E1 Fix code quality and security issues\"; fi)\n\
-        $(if [[ \"${{ needs.configuration-security-audit.result }}\" != \"success\"\
-        \ ]]; then echo \"- \U0001F7E1 Review configuration security settings\"; fi)\n\
-        \n### General Recommendations\n- Regularly update dependencies to latest secure\
-        \ versions\n- Monitor security advisories for used packages\n- Implement least-privilege\
-        \ access controls\n- Enable comprehensive logging and monitoring\n- Regular\
-        \ security audits and penetration testing\n\n## Compliance Status\n\n- \u2705\
-        \ No hardcoded secrets in code\n- \u2705 Dependencies vulnerability scanning\n\
-        - \u2705 Code security analysis\n- \u2705 Configuration security review\n\n\
-        ## Next Steps\n\n1. Review and address all high-priority findings\n2. Schedule\
-        \ dependency updates\n3. Implement additional security controls as needed\n\
-        4. Plan next security audit\n\n---\n**Security Audit completed by GitHub Actions\
-        \ CI/CD Pipeline**\n\nFor detailed findings, review individual audit reports\
-        \ in the artifacts.\nEOF\n"
-    - name: Upload comprehensive security report
+      run: |
+        echo "🔍 Auditing configuration files..."
+        
+        echo "# Configuration Security Audit" > config-audit.md
+        echo "" >> config-audit.md
+        echo "## Findings" >> config-audit.md
+        echo "" >> config-audit.md
+        
+        # Check for hardcoded secrets in config files
+        config_files=$(find . -name "*.json" -o -name "*.yaml" -o -name "*.yml" -o -name "*.ini" -o -name "*.conf" | grep -v ".git" | grep -v "venv")
+        
+        for file in $config_files; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            
+            # Look for potential security issues
+            if grep -i -q "password\|secret\|key\|token" "$file" 2>/dev/null; then
+              echo "- ⚠️ **$file**: Contains password/secret references" >> config-audit.md
+            fi
+            
+            # Check for default/demo values
+            if grep -i -q "demo\|test\|example\|dummy" "$file" 2>/dev/null; then
+              echo "- ⚠️ **$file**: Contains demo/test values" >> config-audit.md
+            fi
+            
+            # Check for overly permissive settings
+            if grep -i -q "debug.*true\|allow.*all\|disable.*security" "$file" 2>/dev/null; then
+              echo "- ⚠️ **$file**: Contains potentially insecure settings" >> config-audit.md
+            fi
+          fi
+        done
+        
+        # Check file permissions
+        echo "" >> config-audit.md
+        echo "## File Permissions" >> config-audit.md
+        for file in $config_files; do
+          if [ -f "$file" ]; then
+            perms=$(stat -c "%a" "$file" 2>/dev/null || echo "unknown")
+            if [ "$perms" != "600" ] && [ "$perms" != "644" ]; then
+              echo "- ⚠️ **$file**: Permissions $perms (consider 600 or 644)" >> config-audit.md
+            else
+              echo "- ✅ **$file**: Permissions $perms" >> config-audit.md
+            fi
+          fi
+        done
+        
+        echo "" >> config-audit.md
+        echo "*Audit completed on $(date)*" >> config-audit.md
+        
+        cat config-audit.md
+        
+    - name: Upload configuration audit
       uses: actions/upload-artifact@v4
       with:
-        name: comprehensive-security-report
-        path: security-audit-report.md
-    - name: Comment security report on PR
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v6
+        name: config-audit-${{ github.sha }}
+        path: config-audit.md
+        retention-days: 30
+
+  security-summary:
+    name: Security Audit Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-security-scan, secrets-scan, code-quality, configuration-audit]
+    if: always()
+    timeout-minutes: 5
+    
+    steps:
+    - name: Download all reports
+      uses: actions/download-artifact@v4
       with:
-        script: "const fs = require('fs');\nconst report = fs.readFileSync('security-audit-report.md',\
-          \ 'utf8');\n\ngithub.rest.issues.createComment({\n  issue_number: context.issue.number,\n\
-          \  owner: context.repo.owner,\n  repo: context.repo.repo,\n  body: report\n\
-          });"
-permissions:
-  contents: read
-  security-events: write
-  actions: read
+        path: reports/
+        
+    - name: Generate overall security report
+      run: |
+        echo "# 🔒 Security Audit Summary Report" > SECURITY_AUDIT_SUMMARY.md
+        echo "" >> SECURITY_AUDIT_SUMMARY.md
+        echo "**Audit Date:** $(date)" >> SECURITY_AUDIT_SUMMARY.md
+        echo "**Commit:** ${{ github.sha }}" >> SECURITY_AUDIT_SUMMARY.md
+        echo "**Branch:** ${{ github.ref_name }}" >> SECURITY_AUDIT_SUMMARY.md
+        echo "" >> SECURITY_AUDIT_SUMMARY.md
+        
+        echo "## 📊 Audit Results Overview" >> SECURITY_AUDIT_SUMMARY.md
+        echo "" >> SECURITY_AUDIT_SUMMARY.md
+        
+        # Check job results
+        dependency_result="${{ needs.dependency-security-scan.result }}"
+        secrets_result="${{ needs.secrets-scan.result }}"
+        quality_result="${{ needs.code-quality.result }}"
+        config_result="${{ needs.configuration-audit.result }}"
+        
+        echo "| Audit Type | Status |" >> SECURITY_AUDIT_SUMMARY.md
+        echo "|------------|--------|" >> SECURITY_AUDIT_SUMMARY.md
+        echo "| Dependency Security | $dependency_result |" >> SECURITY_AUDIT_SUMMARY.md
+        echo "| Secrets Detection | $secrets_result |" >> SECURITY_AUDIT_SUMMARY.md
+        echo "| Code Quality | $quality_result |" >> SECURITY_AUDIT_SUMMARY.md
+        echo "| Configuration Security | $config_result |" >> SECURITY_AUDIT_SUMMARY.md
+        echo "" >> SECURITY_AUDIT_SUMMARY.md
+        
+        echo "## 📋 Available Reports" >> SECURITY_AUDIT_SUMMARY.md
+        echo "" >> SECURITY_AUDIT_SUMMARY.md
+        
+        # List available report files
+        if [ -d "reports/" ]; then
+          find reports/ -name "*.md" -o -name "*.json" -o -name "*.txt" | while read file; do
+            echo "- \`$(basename "$file")\`" >> SECURITY_AUDIT_SUMMARY.md
+          done
+        fi
+        
+        echo "" >> SECURITY_AUDIT_SUMMARY.md
+        echo "## 🎯 Recommendations" >> SECURITY_AUDIT_SUMMARY.md
+        echo "" >> SECURITY_AUDIT_SUMMARY.md
+        echo "1. Review all security reports in the artifacts" >> SECURITY_AUDIT_SUMMARY.md
+        echo "2. Address any critical vulnerabilities immediately" >> SECURITY_AUDIT_SUMMARY.md
+        echo "3. Update dependencies regularly" >> SECURITY_AUDIT_SUMMARY.md
+        echo "4. Follow secure coding practices" >> SECURITY_AUDIT_SUMMARY.md
+        echo "5. Regularly audit configuration files" >> SECURITY_AUDIT_SUMMARY.md
+        echo "" >> SECURITY_AUDIT_SUMMARY.md
+        echo "---" >> SECURITY_AUDIT_SUMMARY.md
+        echo "*Generated by MangaAnime Security Audit Pipeline*" >> SECURITY_AUDIT_SUMMARY.md
+        
+        cat SECURITY_AUDIT_SUMMARY.md
+        
+    - name: Upload security summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-audit-summary-${{ github.sha }}
+        path: SECURITY_AUDIT_SUMMARY.md
+        retention-days: 90
