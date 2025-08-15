@@ -1,5 +1,5 @@
 name: System Health Check (Fixed)
-true:
+on:
   push:
     branches:
     - main
@@ -7,8 +7,8 @@ true:
     branches:
     - main
   schedule:
-  - cron: 0 */6 * * *
-  workflow_dispatch: null
+  - cron: '0 */6 * * *'
+  workflow_dispatch:
 env:
   PYTHON_VERSION: '3.11'
   TEST_MODE: true

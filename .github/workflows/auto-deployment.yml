@@ -1,5 +1,5 @@
 name: MangaAnime Auto Deployment
-true:
+on:
   push:
     branches:
     - main

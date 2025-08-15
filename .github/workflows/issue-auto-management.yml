@@ -1,5 +1,5 @@
 name: Issue Auto-Management & Response System
-true:
+on:
   issues:
     types:
     - opened
@@ -9,7 +9,7 @@ true:
     types:
     - created
   schedule:
-  - cron: 0 1 * * *
+  - cron: '0 1 * * *'
   workflow_dispatch:
     inputs:
       action_type:

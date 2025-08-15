@@ -1,5 +1,5 @@
 name: MangaAnime System Health Check
-true:
+on:
   push:
     branches:
     - main
@@ -8,7 +8,7 @@ true:
     branches:
     - main
   schedule:
-  - cron: 0 */6 * * *
+  - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
       check_type:
