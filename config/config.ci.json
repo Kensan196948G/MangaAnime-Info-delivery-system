@@ -1,0 +1,52 @@
+{
+  "system": {
+    "name": "MangaAnime CI Test System",
+    "version": "1.0.0",
+    "environment": "test",
+    "timezone": "UTC",
+    "log_level": "DEBUG"
+  },
+  
+  "database": {
+    "path": "./test.db",
+    "backup_enabled": false
+  },
+  
+  "apis": {
+    "anilist": {
+      "graphql_url": "https://graphql.anilist.co",
+      "rate_limit": {
+        "requests_per_minute": 90,
+        "retry_delay_seconds": 5
+      },
+      "timeout_seconds": 10
+    }
+  },
+  
+  "email": {
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "sender_email": "test@example.com",
+    "sender_password": "${GMAIL_APP_PASSWORD}",
+    "use_tls": true,
+    "enabled": false
+  },
+  
+  "error_notifications": {
+    "enabled": false,
+    "recipient_email": "test@example.com",
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "sender_email": "test@example.com",
+    "sender_password": "${GMAIL_APP_PASSWORD}",
+    "use_tls": true
+  },
+  
+  "notifications": {
+    "anime": true,
+    "manga": true
+  },
+  
+  "ng_keywords": ["test_ng_keyword"],
+  "notification_email": "test@example.com"
+}
