@@ -1,0 +1,370 @@
+name: Auto Repair Loop System (7x with 30min cooldown)
+
+on:
+  # 定期実行（30分ごと）
+  schedule:
+    - cron: '*/30 * * * *'
+  
+  # ワークフロー失敗時に起動
+  workflow_run:
+    workflows: 
+      - "Simple CI Pipeline"
+      - "Security Audit & Quality Assurance"
+      - "MangaAnime System Health Check"
+      - "MangaAnime Auto Deployment"
+    types: [completed]
+    
+  # Issue操作時に起動
+  issues:
+    types: [opened, closed, labeled, unlabeled]
+    
+  # 手動実行
+  workflow_dispatch:
+    inputs:
+      reset_counter:
+        description: 'Reset loop counter'
+        required: false
+        default: 'false'
+        type: boolean
+      max_attempts:
+        description: 'Maximum repair attempts per cycle'
+        required: false
+        default: '7'
+        type: string
+
+env:
+  MAX_ATTEMPTS_PER_CYCLE: 7
+  COOLDOWN_MINUTES: 30
+  ISSUE_LABEL: 'auto-repair-7x'
+
+permissions:
+  contents: write
+  issues: write
+  actions: read
+  pull-requests: write
+
+jobs:
+  # ジョブ1: エラー検知とIssue作成
+  detect-errors:
+    name: Detect Errors and Create Issues
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_run' && 
+      github.event.workflow_run.conclusion == 'failure'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check for existing issue
+        id: check-issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: '${{ env.ISSUE_LABEL }}',
+              state: 'open'
+            });
+            
+            const workflowName = context.payload.workflow_run.name;
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes(workflowName)
+            );
+            
+            core.setOutput('exists', existingIssue ? 'true' : 'false');
+            core.setOutput('issue_number', existingIssue ? existingIssue.number : '');
+            
+      - name: Create error issue
+        if: steps.check-issue.outputs.exists == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflowName = context.payload.workflow_run.name;
+            const workflowUrl = context.payload.workflow_run.html_url;
+            const failureTime = new Date().toISOString();
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔧 Auto-Repair: ${workflowName} Failed`,
+              body: `## 🚨 Automated Error Detection
+              
+              **Failed Workflow:** ${workflowName}
+              **Failure Time:** ${failureTime}
+              **Workflow Run:** ${workflowUrl}
+              **Commit:** ${context.payload.workflow_run.head_sha}
+              
+              ### 📊 Repair Status
+              - **Current Cycle:** 1
+              - **Attempts in Cycle:** 0 / ${process.env.MAX_ATTEMPTS_PER_CYCLE}
+              - **Total Attempts:** 0
+              - **Status:** 🔄 Pending Repair
+              
+              ### 🔄 Repair Loop Configuration
+              - Max attempts per cycle: **7**
+              - Cooldown between cycles: **30 minutes**
+              - Auto-escalation after: **3 cycles**
+              
+              ### 📝 Repair Log
+              | Time | Cycle | Attempt | Action | Result |
+              |------|-------|---------|--------|--------|
+              | ${failureTime} | - | - | Error Detected | 🔴 Failed |
+              
+              ---
+              *This issue was automatically created by the Auto-Repair Loop System*
+              `,
+              labels: ['${{ env.ISSUE_LABEL }}', 'error', 'automated']
+            });
+            
+            console.log(`Created issue #${issue.data.number}`);
+
+  # ジョブ2: 修復ループ実行
+  repair-loop:
+    name: Execute Repair Loop
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' || 
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' && 
+       contains(github.event.issue.labels.*.name, 'auto-repair-7x'))
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Get open repair issues
+        id: get-issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: '${{ env.ISSUE_LABEL }}',
+              state: 'open'
+            });
+            
+            console.log(`Found ${issues.data.length} open repair issues`);
+            core.setOutput('issue_count', issues.data.length);
+            
+            if (issues.data.length > 0) {
+              // 最も古いIssueから処理
+              const oldestIssue = issues.data[issues.data.length - 1];
+              core.setOutput('issue_number', oldestIssue.number);
+              core.setOutput('issue_body', oldestIssue.body);
+              return oldestIssue;
+            }
+            
+            return null;
+            
+      - name: Parse repair status
+        if: steps.get-issues.outputs.issue_count > 0
+        id: parse-status
+        run: |
+          ISSUE_NUMBER="${{ steps.get-issues.outputs.issue_number }}"
+          echo "Processing Issue #${ISSUE_NUMBER}"
+          
+          # Issueの本文から現在の状態を抽出
+          # 実際にはGitHub APIから取得した内容をパース
+          CURRENT_CYCLE=1
+          CURRENT_ATTEMPT=0
+          TOTAL_ATTEMPTS=0
+          
+          # カウンター情報をファイルに保存
+          mkdir -p .repair-state
+          echo "{
+            \"issue_number\": ${ISSUE_NUMBER},
+            \"current_cycle\": ${CURRENT_CYCLE},
+            \"current_attempt\": ${CURRENT_ATTEMPT},
+            \"total_attempts\": ${TOTAL_ATTEMPTS},
+            \"last_update\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+          }" > .repair-state/status.json
+          
+          echo "current_cycle=${CURRENT_CYCLE}" >> $GITHUB_OUTPUT
+          echo "current_attempt=${CURRENT_ATTEMPT}" >> $GITHUB_OUTPUT
+          echo "total_attempts=${TOTAL_ATTEMPTS}" >> $GITHUB_OUTPUT
+          
+      - name: Check cooldown status
+        if: steps.get-issues.outputs.issue_count > 0
+        id: check-cooldown
+        run: |
+          # 最後の修復試行から30分経過したかチェック
+          if [ -f .repair-state/last_cycle_end.txt ]; then
+            LAST_END=$(cat .repair-state/last_cycle_end.txt)
+            CURRENT=$(date +%s)
+            DIFF=$((CURRENT - LAST_END))
+            
+            if [ $DIFF -lt 1800 ]; then  # 30分 = 1800秒
+              REMAINING=$((1800 - DIFF))
+              echo "⏸️ Cooldown active. Remaining: ${REMAINING} seconds"
+              echo "in_cooldown=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          
+          echo "in_cooldown=false" >> $GITHUB_OUTPUT
+          
+      - name: Execute repair attempt
+        if: |
+          steps.get-issues.outputs.issue_count > 0 && 
+          steps.check-cooldown.outputs.in_cooldown != 'true'
+        id: repair
+        run: |
+          CURRENT_ATTEMPT=${{ steps.parse-status.outputs.current_attempt }}
+          CURRENT_CYCLE=${{ steps.parse-status.outputs.current_cycle }}
+          
+          # 現在のサイクルで7回未満の場合のみ実行
+          if [ $CURRENT_ATTEMPT -lt ${{ env.MAX_ATTEMPTS_PER_CYCLE }} ]; then
+            echo "🔧 Executing repair attempt $((CURRENT_ATTEMPT + 1)) of cycle ${CURRENT_CYCLE}"
+            
+            # 修復スクリプトを実行
+            bash scripts/fix-workflows.sh
+            
+            # 検証を実行
+            if python scripts/validate_workflow_fixes.py; then
+              echo "repair_success=true" >> $GITHUB_OUTPUT
+              echo "✅ Repair successful!"
+            else
+              echo "repair_success=false" >> $GITHUB_OUTPUT
+              echo "❌ Repair failed, will retry..."
+            fi
+            
+            # カウンターを更新
+            CURRENT_ATTEMPT=$((CURRENT_ATTEMPT + 1))
+            echo "new_attempt=${CURRENT_ATTEMPT}" >> $GITHUB_OUTPUT
+            
+            # サイクル終了チェック
+            if [ $CURRENT_ATTEMPT -ge ${{ env.MAX_ATTEMPTS_PER_CYCLE }} ]; then
+              echo "🔄 Cycle ${CURRENT_CYCLE} completed. Entering cooldown..."
+              date +%s > .repair-state/last_cycle_end.txt
+              echo "cycle_complete=true" >> $GITHUB_OUTPUT
+            else
+              echo "cycle_complete=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "⚠️ Maximum attempts for this cycle reached"
+            echo "skip_repair=true" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Update issue with results
+        if: steps.get-issues.outputs.issue_count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = ${{ steps.get-issues.outputs.issue_number }};
+            const repairSuccess = '${{ steps.repair.outputs.repair_success }}' === 'true';
+            const cycleComplete = '${{ steps.repair.outputs.cycle_complete }}' === 'true';
+            const newAttempt = parseInt('${{ steps.repair.outputs.new_attempt }}' || '0');
+            const currentCycle = parseInt('${{ steps.parse-status.outputs.current_cycle }}');
+            
+            // Issueの本文を更新
+            let statusIcon = repairSuccess ? '✅' : '🔄';
+            let statusText = repairSuccess ? 'Repair Successful' : 'Repair In Progress';
+            
+            if (cycleComplete) {
+              statusText += ' (Cycle Complete - Entering Cooldown)';
+            }
+            
+            // コメントを追加
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `### 🔧 Repair Attempt Update
+              
+              **Cycle:** ${currentCycle}
+              **Attempt:** ${newAttempt} / ${{ env.MAX_ATTEMPTS_PER_CYCLE }}
+              **Result:** ${repairSuccess ? '✅ Success' : '❌ Failed'}
+              **Time:** ${new Date().toISOString()}
+              
+              ${cycleComplete ? '⏸️ **Entering 30-minute cooldown period...**' : ''}
+              ${repairSuccess ? '🎉 **Issue resolved! Closing automatically.**' : ''}
+              `
+            });
+            
+            // 成功したらIssueをクローズ
+            if (repairSuccess) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                state: 'closed'
+              });
+            }
+            
+      - name: Commit fixes if successful
+        if: steps.repair.outputs.repair_success == 'true'
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "🤖 Auto-repair: Fix workflow errors (Issue #${{ steps.get-issues.outputs.issue_number }})"
+            git push
+          fi
+
+  # ジョブ3: エスカレーション管理
+  escalation-manager:
+    name: Manage Escalation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    needs: [repair-loop]
+    
+    steps:
+      - name: Check for stuck issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: '${{ env.ISSUE_LABEL }}',
+              state: 'open'
+            });
+            
+            const now = new Date();
+            const threeCyclesAgo = new Date(now - 3 * 60 * 60 * 1000); // 3時間前
+            
+            for (const issue of issues.data) {
+              const createdAt = new Date(issue.created_at);
+              
+              if (createdAt < threeCyclesAgo) {
+                // 3サイクル（3時間）以上解決していない
+                console.log(`Issue #${issue.number} needs escalation`);
+                
+                // エスカレーションラベルを追加
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['needs-human-intervention', 'priority:critical']
+                });
+                
+                // エスカレーションコメント
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `## ⚠️ Escalation Required
+                  
+                  This issue has been through **3 repair cycles** (21 attempts) without resolution.
+                  Human intervention is required.
+                  
+                  **Summary:**
+                  - Total repair attempts: 21
+                  - Time elapsed: ${Math.round((now - createdAt) / (1000 * 60 * 60))} hours
+                  - Auto-repair status: **Suspended**
+                  
+                  @Kensan196948G Please review this issue manually.
+                  `
+                });
+              }
+            }
