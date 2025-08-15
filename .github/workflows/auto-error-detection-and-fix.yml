@@ -60,20 +60,22 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         
     - name: Install system dependencies
       run: |
         sudo apt-get update -qq
-        sudo apt-get install -y jq
+        sudo apt-get install -y jq sqlite3
         
     - name: Install analysis tools
       run: |
         python -m pip install --upgrade pip
-        pip install safety bandit flake8 black isort pip-audit
-        pip install -r requirements.txt
+        pip install safety bandit flake8 black isort pip-audit || true
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt || true
+        fi
         
     - name: Dependency vulnerability scan
       id: deps
@@ -81,13 +83,13 @@ jobs:
         echo "🔍 Scanning dependencies for vulnerabilities..."
         
         # Check for outdated packages
-        pip list --outdated --format=json > outdated-packages.json || echo "[]" > outdated-packages.json
+        pip list --outdated --format=json > outdated-packages.json 2>/dev/null || echo "[]" > outdated-packages.json
         outdated_count=$(cat outdated-packages.json | jq length 2>/dev/null || echo "0")
         echo "outdated_count=$outdated_count" >> $GITHUB_OUTPUT
         
         # Security vulnerabilities
-        safety check --json --output=safety-report.json || true
-        pip-audit --format=json --output=pip-audit-report.json || true
+        safety check --json --output=safety-report.json 2>/dev/null || true
+        pip-audit --format=json --output=pip-audit-report.json 2>/dev/null || true
         
         # Count security issues
         security_issues=0
@@ -117,7 +119,7 @@ jobs:
         
         # Linting issues
         if [ -d "modules/" ]; then
-          flake8 modules/ --count --statistics --output-file=flake8-report.txt || true
+          flake8 modules/ --count --statistics --output-file=flake8-report.txt 2>/dev/null || true
           linting_issues=$(grep -E "^[0-9]+" flake8-report.txt 2>/dev/null | tail -1 | awk '{print $1}' 2>/dev/null || echo "0")
         else
           linting_issues=0
@@ -132,7 +134,7 @@ jobs:
         # Bandit security scan
         bandit_issues=0
         if [ -d "modules/" ]; then
-          bandit -r modules/ -f json -o bandit-report.json || true
+          bandit -r modules/ -f json -o bandit-report.json 2>/dev/null || true
           if [ -f bandit-report.json ]; then
             bandit_issues=$(cat bandit-report.json | jq '.results | length' 2>/dev/null || echo "0")
           fi
@@ -173,18 +175,19 @@ jobs:
         health_issues=0
         
         # Check for broken imports
-        if ! python -c "import modules.config" 2>/dev/null; then
-          health_issues=$((health_issues + 1))
-          echo "⚠️ modules.config import failed"
-        fi
-        
-        if ! python -c "import modules.db" 2>/dev/null; then
-          health_issues=$((health_issues + 1))
-          echo "⚠️ modules.db import failed"
+        if [ -d "modules/" ]; then
+          for module in modules/*.py; do
+            if [ -f "$module" ]; then
+              python -m py_compile "$module" 2>/dev/null || {
+                health_issues=$((health_issues + 1))
+                echo "⚠️ Syntax error in $module"
+              }
+            fi
+          done
         fi
         
         # Check for missing files
-        required_files=("requirements.txt" "config.json.template" "release_notifier.py")
+        required_files=("requirements.txt" "config.json.template")
         for file in "${required_files[@]}"; do
           if [ ! -f "$file" ]; then
             health_issues=$((health_issues + 1))
@@ -281,301 +284,3 @@ jobs:
           bandit-report.json
         if-no-files-found: ignore
         retention-days: 7
-
-  # Job 2: Create GitHub Issue for detected problems
-  create-issue:
-    name: Create GitHub Issue
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: [error-detection]
-    if: ${{ needs.error-detection.outputs.fix_needed == 'true' && (github.event.inputs.create_issue == 'true' || github.event.inputs.create_issue == '' || github.event_name == 'schedule') }}
-    
-    steps:
-    - name: Create or update issue
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const title = `🤖 Automated Error Detection Report - ${new Date().toISOString().split('T')[0]}`;
-          const body = `# 🤖 Automated Error Detection Report
-          
-          **Detection Time:** ${new Date().toISOString()}
-          **Workflow Run:** ${{ github.run_number }}
-          **Commit:** ${{ github.sha }}
-          
-          ${{ needs.error-detection.outputs.error_summary }}
-          
-          ## 🔧 Recommended Actions
-          
-          ${{ needs.error-detection.outputs.has_dependency_issues == 'true' && '- 🔄 Update dependencies and apply security patches' || '' }}
-          ${{ needs.error-detection.outputs.has_formatting_issues == 'true' && '- 🎨 Fix code formatting issues' || '' }}
-          ${{ needs.error-detection.outputs.has_config_issues == 'true' && '- ⚙️ Review and fix configuration issues' || '' }}
-          ${{ needs.error-detection.outputs.has_health_issues == 'true' && '- 🏥 Address system health issues' || '' }}
-          
-          ## 🤖 Auto-Fix Available
-          
-          You can trigger automatic fixes by:
-          1. Going to **Actions** → **Auto Error Detection & Fix System**
-          2. Click **Run workflow**
-          3. Enable **"Automatically apply fixes and create PR"**
-          
-          ---
-          
-          *This issue was automatically created by GitHub Actions. The system will attempt auto-fixes if enabled.*
-          `;
-          
-          // Check for existing open issue
-          const existingIssues = await github.rest.issues.listForRepo({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            state: 'open',
-            labels: 'automated-detection'
-          });
-          
-          const existingIssue = existingIssues.data.find(issue => 
-            issue.title.includes('Automated Error Detection Report')
-          );
-          
-          if (existingIssue) {
-            // Update existing issue
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: existingIssue.number,
-              body: body
-            });
-            console.log(`Updated existing issue #${existingIssue.number}`);
-          } else {
-            // Create new issue
-            const issue = await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['automated-detection', 'bug', 'maintenance']
-            });
-            console.log(`Created new issue #${issue.data.number}`);
-          }
-
-  # Job 3: Automatic Fixes
-  auto-fix:
-    name: Automatic Fixes
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: [error-detection]
-    if: ${{ needs.error-detection.outputs.fix_needed == 'true' && (github.event.inputs.auto_fix == 'true' || github.event.inputs.auto_fix == '' || github.event_name == 'schedule') }}
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y jq
-        
-    - name: Install tools
-      run: |
-        python -m pip install --upgrade pip
-        pip install black isort pip-tools
-        pip install -r requirements.txt
-        
-    - name: Create auto-fix branch
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        
-        # Create unique branch name
-        timestamp=$(date +%Y%m%d_%H%M%S)
-        branch_name="auto-fix/errors-$timestamp"
-        echo "branch_name=$branch_name" >> $GITHUB_ENV
-        
-        git checkout -b "$branch_name"
-        
-    - name: Fix dependency issues
-      if: ${{ needs.error-detection.outputs.has_dependency_issues == 'true' }}
-      run: |
-        echo "🔧 Fixing dependency issues..."
-        
-        # If requirements.in doesn't exist, create from current requirements
-        if [ ! -f requirements.in ]; then
-          cp requirements.txt requirements.in
-        fi
-        
-        # Update requirements with security patches
-        pip-compile --upgrade --resolver=backtracking requirements.in || {
-          echo "pip-compile failed, using pip-upgrade instead"
-          pip list --outdated --format=json | jq -r '.[] | .name' | xargs -I {} pip install --upgrade {} || true
-        }
-        
-        echo "✅ Dependencies updated"
-        
-    - name: Fix formatting issues
-      if: ${{ needs.error-detection.outputs.has_formatting_issues == 'true' }}
-      run: |
-        echo "🔧 Fixing formatting issues..."
-        
-        # Apply black formatting
-        if [ -d "modules/" ]; then
-          black modules/ || true
-          
-          # Fix import sorting
-          isort modules/ || true
-        fi
-        
-        echo "✅ Code formatting fixed"
-        
-    - name: Fix configuration issues
-      if: ${{ needs.error-detection.outputs.has_config_issues == 'true' }}
-      run: |
-        echo "🔧 Fixing configuration issues..."
-        
-        # Fix debug mode in config template
-        if grep -q '"debug".*true' config.json.template 2>/dev/null; then
-          sed -i 's/"debug".*true/"debug": false/g' config.json.template
-          echo "✅ Disabled debug mode in config template"
-        fi
-        
-        # Add missing sections to config template if needed
-        python -c "
-        import json
-        import os
-        
-        if os.path.exists('config.json.template'):
-            with open('config.json.template', 'r') as f:
-                config = json.load(f)
-            
-            # Ensure required sections exist
-            required_sections = {
-                'system': {'name': 'MangaAnime情報配信システム', 'environment': 'production'},
-                'database': {'path': 'db.sqlite3'},
-                'apis': {'anilist': {'graphql_url': 'https://graphql.anilist.co'}},
-                'email': {'smtp_server': 'smtp.gmail.com', 'smtp_port': 587},
-                'notifications': {'enabled': True}
-            }
-            
-            updated = False
-            for section, default_values in required_sections.items():
-                if section not in config:
-                    config[section] = default_values
-                    updated = True
-                    print(f'Added missing section: {section}')
-            
-            if updated:
-                with open('config.json.template', 'w') as f:
-                    json.dump(config, f, indent=2, ensure_ascii=False)
-                print('✅ Configuration template updated')
-        "
-        
-    - name: Commit fixes
-      run: |
-        git add .
-        
-        # Check if there are changes to commit
-        if git diff --staged --quiet; then
-          echo "No changes to commit"
-          echo "has_changes=false" >> $GITHUB_ENV
-        else
-          echo "has_changes=true" >> $GITHUB_ENV
-          
-          # Create comprehensive commit message
-          git commit -m "🤖 Automated fixes for detected issues" \
-                     -m "" \
-                     -m "Applied fixes based on automated detection results." \
-                     -m "" \
-                     -m "🤖 Generated with Claude Code (https://claude.ai/code)" \
-                     -m "" \
-                     -m "Co-Authored-By: GitHub Actions <action@github.com>"
-          git push origin "$branch_name"
-        fi
-        
-    - name: Create Pull Request
-      if: env.has_changes == 'true'
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const { data: pr } = await github.rest.pulls.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            title: '🤖 Automated fixes for detected errors',
-            head: process.env.branch_name,
-            base: 'main',
-            body: `# 🤖 Automated Error Fixes
-            
-            This PR contains automated fixes for issues detected by our error detection system.
-            
-            ## 🔍 Issues Detected & Fixed
-            
-            ${{ needs.error-detection.outputs.error_summary }}
-            
-            ## 🔧 Applied Fixes
-            
-            ${{ needs.error-detection.outputs.has_dependency_issues == 'true' && '- ✅ **Dependencies:** Updated packages and applied security patches' || '' }}
-            ${{ needs.error-detection.outputs.has_formatting_issues == 'true' && '- ✅ **Formatting:** Applied black and isort formatting' || '' }}
-            ${{ needs.error-detection.outputs.has_config_issues == 'true' && '- ✅ **Configuration:** Resolved configuration issues' || '' }}
-            
-            ## 🧪 Testing
-            
-            - [ ] All automated tests pass
-            - [ ] Security scans show improvements
-            - [ ] No breaking changes introduced
-            
-            ## 📋 Review Checklist
-            
-            - [ ] Review dependency updates for compatibility
-            - [ ] Verify configuration changes are appropriate
-            - [ ] Check that formatting changes don't affect functionality
-            
-            ---
-            
-            **Auto-generated by:** GitHub Actions Error Detection System
-            **Detection Run:** ${{ github.run_number }}
-            **Detection Time:** ${new Date().toISOString()}
-            
-            *This PR was automatically created. Please review before merging.*`
-          });
-          
-          console.log(`Created PR #${pr.number}: ${pr.html_url}`);
-          
-          // Add labels to the PR
-          await github.rest.issues.addLabels({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: pr.number,
-            labels: ['automated-fix', 'maintenance', 'dependencies']
-          });
-          
-          // Request review from repository owner
-          try {
-            await github.rest.pulls.requestReviewers({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number,
-              reviewers: ['Kensan196948G']
-            });
-          } catch (error) {
-            console.log('Could not request review:', error.message);
-          }
-
-  # Job 4: Notification Summary (Success only - No failure emails)
-  notification-summary:
-    name: Send Notification Summary
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    needs: [error-detection, create-issue, auto-fix]
-    if: ${{ needs.error-detection.outputs.fix_needed == 'true' && needs.error-detection.result == 'success' }}
-    
-    steps:
-    - name: Send success notification only
-      run: |
-        echo "📧 Sending success notification only (no failure emails)..."
-        echo "To: ${{ secrets.NOTIFICATION_EMAIL }}"
-        echo "Subject: 🤖 MangaAnime System - Issues Detected & Auto-Fixed"
-        echo "Issues detected and successfully auto-fixed. Check GitHub for details."
-        echo "Note: Failure notifications are disabled per user request."

@@ -1,387 +1,235 @@
 name: MangaAnime Auto Deployment
-
-on:
+true:
   push:
-    branches: [ main ]
-    tags: [ 'v*' ]
+    branches:
+    - main
+    tags:
+    - v*
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Deployment environment'
+        description: Deployment environment
         required: true
-        default: 'staging'
+        default: staging
         type: choice
         options:
         - staging
         - production
       skip_tests:
-        description: 'Skip tests before deployment'
+        description: Skip tests before deployment
         required: false
         default: false
         type: boolean
-
 env:
   PYTHON_VERSION: '3.11'
-  PROJECT_NAME: 'MangaAnime-Info-delivery-system'
-
+  PROJECT_NAME: MangaAnime-Info-delivery-system
 jobs:
-  # Job 1: Pre-deployment Tests
   pre-deployment-tests:
     name: Pre-deployment Tests
     runs-on: ubuntu-latest
     if: ${{ !inputs.skip_tests }}
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-        
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov
-        
-    - name: Run quick tests
-      run: |
-        # Run essential tests before deployment
-        python -m pytest tests/test_config.py tests/test_database.py -v --tb=short
-        
-    - name: Validate configuration
-      run: |
-        python -c "
-        import json
-        
-        with open('config.json', 'r') as f:
-            config = json.load(f)
-            
-        # Validate essential deployment configuration
-        required_for_deployment = [
-            'email', 'notifications', 'system', 'error_notifications'
-        ]
-        
-        for section in required_for_deployment:
-            if section not in config:
-                print(f'❌ Missing required config section for deployment: {section}')
-                exit(1)
-                
-        print('✅ Configuration validation passed')
-        "
+      run: 'python -m pip install --upgrade pip
 
-  # Job 2: Build Deployment Package
+        pip install -r requirements.txt
+
+        pip install pytest pytest-cov
+
+        '
+    - name: Run quick tests
+      run: '# Run essential tests before deployment
+
+        python -m pytest tests/test_config.py tests/test_database.py -v --tb=short
+
+        '
+    - name: Validate configuration
+      run: "python -c \"\nimport json\n\nwith open('config.json', 'r') as f:\n   \
+        \ config = json.load(f)\n    \n# Validate essential deployment configuration\n\
+        required_for_deployment = [\n    'email', 'notifications', 'system', 'error_notifications'\n\
+        ]\n\nfor section in required_for_deployment:\n    if section not in config:\n\
+        \        print(f'\u274C Missing required config section for deployment: {section}')\n\
+        \        exit(1)\n        \nprint('\u2705 Configuration validation passed')\n\
+        \"\n"
   build-deployment-package:
     name: Build Deployment Package
     runs-on: ubuntu-latest
-    needs: [pre-deployment-tests]
+    needs:
+    - pre-deployment-tests
     if: always() && (needs.pre-deployment-tests.result == 'success' || inputs.skip_tests)
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-        
     - name: Create deployment package
-      run: |
-        # Create deployment directory
-        mkdir -p deployment-package
-        
-        # Copy essential files
-        cp -r modules/ deployment-package/
-        cp -r templates/ deployment-package/
-        cp -r static/ deployment-package/
-        cp -r scripts/ deployment-package/
-        cp -r .github/ deployment-package/
-        
-        # Copy configuration files
-        cp config.json deployment-package/
-        cp config.json.template deployment-package/
-        cp requirements.txt deployment-package/
-        cp requirements-dev.txt deployment-package/
-        
-        # Copy main scripts
-        cp release_notifier.py deployment-package/
-        cp web_app.py deployment-package/
-        cp backup_full.sh deployment-package/
-        cp setup.py deployment-package/
-        cp setup_system.py deployment-package/
-        
-        # Copy startup scripts
-        cp start_web_ui.py deployment-package/
-        cp start_webui_manual.sh deployment-package/
-        cp start_integrated_ai_development.sh deployment-package/
-        cp quick_start.sh deployment-package/
-        
-        # Copy service files
-        cp mangaanime-web.service deployment-package/
-        cp install_webui_autostart.sh deployment-package/
-        
-        # Copy documentation
-        cp README*.md deployment-package/
-        cp *.md deployment-package/
-        
-        # Create deployment metadata
-        cat > deployment-package/deployment-info.json << EOF
-        {
-          "deployment_timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-          "git_commit": "${{ github.sha }}",
-          "git_branch": "${{ github.ref_name }}",
-          "git_tag": "${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}",
-          "workflow_run": "${{ github.run_number }}",
-          "environment": "${{ inputs.environment || 'production' }}",
-          "python_version": "${{ env.PYTHON_VERSION }}",
-          "project_version": "$(cat setup.py | grep version | head -1 | cut -d'\"' -f2)"
-        }
-        EOF
-        
-        # Create deployment archive
-        tar -czf mangaanime-deployment-${{ github.sha }}.tar.gz -C deployment-package .
-        
+      run: "# Create deployment directory\nmkdir -p deployment-package\n\n# Copy essential\
+        \ files\ncp -r modules/ deployment-package/\ncp -r templates/ deployment-package/\n\
+        cp -r static/ deployment-package/\ncp -r scripts/ deployment-package/\ncp\
+        \ -r .github/ deployment-package/\n\n# Copy configuration files\ncp config.json\
+        \ deployment-package/\ncp config.json.template deployment-package/\ncp requirements.txt\
+        \ deployment-package/\ncp requirements-dev.txt deployment-package/\n\n# Copy\
+        \ main scripts\ncp release_notifier.py deployment-package/\ncp web_app.py\
+        \ deployment-package/\ncp backup_full.sh deployment-package/\ncp setup.py\
+        \ deployment-package/\ncp setup_system.py deployment-package/\n\n# Copy startup\
+        \ scripts\ncp start_web_ui.py deployment-package/\ncp start_webui_manual.sh\
+        \ deployment-package/\ncp start_integrated_ai_development.sh deployment-package/\n\
+        cp quick_start.sh deployment-package/\n\n# Copy service files\ncp mangaanime-web.service\
+        \ deployment-package/\ncp install_webui_autostart.sh deployment-package/\n\
+        \n# Copy documentation\ncp README*.md deployment-package/\ncp *.md deployment-package/\n\
+        \n# Create deployment metadata\ncat > deployment-package/deployment-info.json\
+        \ << EOF\n{\n  \"deployment_timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"\
+        ,\n  \"git_commit\": \"${{ github.sha }}\",\n  \"git_branch\": \"${{ github.ref_name\
+        \ }}\",\n  \"git_tag\": \"${{ github.ref_type == 'tag' && github.ref_name\
+        \ || 'latest' }}\",\n  \"workflow_run\": \"${{ github.run_number }}\",\n \
+        \ \"environment\": \"${{ inputs.environment || 'production' }}\",\n  \"python_version\"\
+        : \"${{ env.PYTHON_VERSION }}\",\n  \"project_version\": \"$(cat setup.py\
+        \ | grep version | head -1 | cut -d'\\\"' -f2)\"\n}\nEOF\n\n# Create deployment\
+        \ archive\ntar -czf mangaanime-deployment-${{ github.sha }}.tar.gz -C deployment-package\
+        \ .\n"
     - name: Upload deployment package
       uses: actions/upload-artifact@v4
       with:
         name: deployment-package
-        path: |
-          mangaanime-deployment-${{ github.sha }}.tar.gz
+        path: 'mangaanime-deployment-${{ github.sha }}.tar.gz
+
           deployment-package/
 
-  # Job 3: Deploy to Staging
+          '
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [build-deployment-package]
-    if: ${{ inputs.environment == 'staging' || (github.ref == 'refs/heads/main' && github.event_name == 'push') }}
-    
+    needs:
+    - build-deployment-package
+    if: ${{ inputs.environment == 'staging' || (github.ref == 'refs/heads/main' &&
+      github.event_name == 'push') }}
     environment:
       name: staging
       url: http://staging.mangaanime.local:3030
-      
     steps:
     - name: Download deployment package
       uses: actions/download-artifact@v3
       with:
         name: deployment-package
-        
     - name: Simulate staging deployment
-      run: |
-        echo "🚀 Deploying to staging environment..."
-        
-        # Extract deployment package
-        tar -xzf mangaanime-deployment-${{ github.sha }}.tar.gz -C staging-deploy || true
-        
-        echo "📦 Deployment package extracted"
-        echo "🔧 Configuring staging environment..."
-        
-        # Simulate staging configuration
-        if [ -f staging-deploy/config.json ]; then
-            echo "✅ Configuration file found"
-        fi
-        
-        if [ -f staging-deploy/requirements.txt ]; then
-            echo "✅ Requirements file found"
-        fi
-        
-        echo "🌐 Starting staging services..."
-        # In real deployment, this would start the actual services
-        echo "✅ Staging deployment completed successfully!"
-        
+      run: "echo \"\U0001F680 Deploying to staging environment...\"\n\n# Extract deployment\
+        \ package\ntar -xzf mangaanime-deployment-${{ github.sha }}.tar.gz -C staging-deploy\
+        \ || true\n\necho \"\U0001F4E6 Deployment package extracted\"\necho \"\U0001F527\
+        \ Configuring staging environment...\"\n\n# Simulate staging configuration\n\
+        if [ -f staging-deploy/config.json ]; then\n    echo \"\u2705 Configuration\
+        \ file found\"\nfi\n\nif [ -f staging-deploy/requirements.txt ]; then\n  \
+        \  echo \"\u2705 Requirements file found\"\nfi\n\necho \"\U0001F310 Starting\
+        \ staging services...\"\n# In real deployment, this would start the actual\
+        \ services\necho \"\u2705 Staging deployment completed successfully!\"\n"
     - name: Staging health check
-      run: |
-        echo "🔍 Running staging health check..."
-        
-        # Simulate health check
-        sleep 5
-        
-        # In real deployment, this would check actual endpoints
-        echo "✅ Staging health check passed"
-        
+      run: "echo \"\U0001F50D Running staging health check...\"\n\n# Simulate health\
+        \ check\nsleep 5\n\n# In real deployment, this would check actual endpoints\n\
+        echo \"\u2705 Staging health check passed\"\n"
     - name: Notify staging deployment
-      run: |
-        echo "📢 Staging deployment notification"
-        echo "Environment: Staging"
-        echo "Commit: ${{ github.sha }}"
-        echo "Status: Success"
-
-  # Job 4: Deploy to Production
+      run: "echo \"\U0001F4E2 Staging deployment notification\"\necho \"Environment:\
+        \ Staging\"\necho \"Commit: ${{ github.sha }}\"\necho \"Status: Success\"\n"
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [build-deployment-package, deploy-staging]
+    needs:
+    - build-deployment-package
+    - deploy-staging
     if: ${{ inputs.environment == 'production' || github.ref_type == 'tag' }}
-    
     environment:
       name: production
       url: http://192.168.3.135:3030
-      
     steps:
     - name: Download deployment package
       uses: actions/download-artifact@v3
       with:
         name: deployment-package
-        
     - name: Production deployment simulation
-      run: |
-        echo "🚀 Deploying to production environment..."
-        
-        # Extract deployment package
-        tar -xzf mangaanime-deployment-${{ github.sha }}.tar.gz -C production-deploy || true
-        
-        echo "📦 Production deployment package ready"
-        
-        # Simulate production deployment steps
-        echo "🔧 Updating production configuration..."
-        echo "📊 Backing up current deployment..."
-        echo "⚡ Installing new version..."
-        echo "🔄 Restarting services..."
-        
-        # In real deployment, these would be actual commands:
-        # sudo systemctl stop mangaanime-web
-        # sudo cp -r production-deploy/* /opt/mangaanime/
-        # sudo systemctl start mangaanime-web
-        
-        echo "✅ Production deployment completed!"
-        
+      run: "echo \"\U0001F680 Deploying to production environment...\"\n\n# Extract\
+        \ deployment package\ntar -xzf mangaanime-deployment-${{ github.sha }}.tar.gz\
+        \ -C production-deploy || true\n\necho \"\U0001F4E6 Production deployment\
+        \ package ready\"\n\n# Simulate production deployment steps\necho \"\U0001F527\
+        \ Updating production configuration...\"\necho \"\U0001F4CA Backing up current\
+        \ deployment...\"\necho \"\u26A1 Installing new version...\"\necho \"\U0001F504\
+        \ Restarting services...\"\n\n# In real deployment, these would be actual\
+        \ commands:\n# sudo systemctl stop mangaanime-web\n# sudo cp -r production-deploy/*\
+        \ /opt/mangaanime/\n# sudo systemctl start mangaanime-web\n\necho \"\u2705\
+        \ Production deployment completed!\"\n"
     - name: Post-deployment health check
-      run: |
-        echo "🔍 Running production health check..."
-        
-        # Simulate comprehensive health check
-        health_checks=(
-            "WebUI endpoint"
-            "Database connectivity"
-            "Email notification system"
-            "Backup system"
-            "Error monitoring"
-        )
-        
-        for check in "${health_checks[@]}"; do
-            echo "  Testing: $check"
-            sleep 1
-            echo "  ✅ $check: OK"
-        done
-        
-        echo "✅ All production health checks passed"
-        
+      run: "echo \"\U0001F50D Running production health check...\"\n\n# Simulate comprehensive\
+        \ health check\nhealth_checks=(\n    \"WebUI endpoint\"\n    \"Database connectivity\"\
+        \n    \"Email notification system\"\n    \"Backup system\"\n    \"Error monitoring\"\
+        \n)\n\nfor check in \"${health_checks[@]}\"; do\n    echo \"  Testing: $check\"\
+        \n    sleep 1\n    echo \"  \u2705 $check: OK\"\ndone\n\necho \"\u2705 All\
+        \ production health checks passed\"\n"
     - name: Create production deployment report
-      run: |
-        cat > production-deployment-report.md << EOF
-        # Production Deployment Report
-        
-        **Deployment Time:** $(date -u +%Y-%m-%dT%H:%M:%SZ)
-        **Git Commit:** ${{ github.sha }}
-        **Git Branch/Tag:** ${{ github.ref_name }}
-        **Workflow Run:** ${{ github.run_number }}
-        
-        ## Deployment Steps Completed
-        - ✅ Pre-deployment tests passed
-        - ✅ Deployment package created
-        - ✅ Staging deployment successful
-        - ✅ Production deployment successful
-        - ✅ Post-deployment health checks passed
-        
-        ## Services Status
-        - ✅ WebUI: Running on http://192.168.3.135:3030
-        - ✅ Email notifications: Active
-        - ✅ Error monitoring: Active
-        - ✅ Backup system: Active
-        - ✅ Cron jobs: Scheduled
-        
-        ## Next Steps
-        1. Monitor system logs for 24 hours
-        2. Verify scheduled email deliveries
-        3. Test error notification system
-        4. Confirm backup execution
-        
-        ---
-        Deployment completed successfully! 🎉
-        EOF
-        
+      run: "cat > production-deployment-report.md << EOF\n# Production Deployment\
+        \ Report\n\n**Deployment Time:** $(date -u +%Y-%m-%dT%H:%M:%SZ)\n**Git Commit:**\
+        \ ${{ github.sha }}\n**Git Branch/Tag:** ${{ github.ref_name }}\n**Workflow\
+        \ Run:** ${{ github.run_number }}\n\n## Deployment Steps Completed\n- \u2705\
+        \ Pre-deployment tests passed\n- \u2705 Deployment package created\n- \u2705\
+        \ Staging deployment successful\n- \u2705 Production deployment successful\n\
+        - \u2705 Post-deployment health checks passed\n\n## Services Status\n- \u2705\
+        \ WebUI: Running on http://192.168.3.135:3030\n- \u2705 Email notifications:\
+        \ Active\n- \u2705 Error monitoring: Active\n- \u2705 Backup system: Active\n\
+        - \u2705 Cron jobs: Scheduled\n\n## Next Steps\n1. Monitor system logs for\
+        \ 24 hours\n2. Verify scheduled email deliveries\n3. Test error notification\
+        \ system\n4. Confirm backup execution\n\n---\nDeployment completed successfully!\
+        \ \U0001F389\nEOF\n"
     - name: Upload production deployment report
       uses: actions/upload-artifact@v4
       with:
         name: production-deployment-report
         path: production-deployment-report.md
-        
     - name: Notify production deployment
-      run: |
-        echo "📢 Production deployment completed successfully!"
-        echo "🌐 WebUI available at: http://192.168.3.135:3030"
-        echo "📧 Error notifications: kensan1969@gmail.com"
-        echo "📊 Monitoring: Active"
-
-  # Job 5: Post-deployment monitoring
+      run: "echo \"\U0001F4E2 Production deployment completed successfully!\"\necho\
+        \ \"\U0001F310 WebUI available at: http://192.168.3.135:3030\"\necho \"\U0001F4E7\
+        \ Error notifications: kensan1969@gmail.com\"\necho \"\U0001F4CA Monitoring:\
+        \ Active\"\n"
   post-deployment-monitoring:
     name: Post-deployment Monitoring
     runs-on: ubuntu-latest
-    needs: [deploy-production]
+    needs:
+    - deploy-production
     if: always() && needs.deploy-production.result == 'success'
-    
     steps:
     - name: Wait for system stabilization
-      run: |
-        echo "⏳ Waiting for system stabilization..."
-        sleep 30
-        
+      run: "echo \"\u23F3 Waiting for system stabilization...\"\nsleep 30\n"
     - name: Extended health monitoring
-      run: |
-        echo "🔍 Starting extended health monitoring..."
-        
-        # Simulate extended monitoring
-        monitoring_duration=300  # 5 minutes
-        check_interval=60        # 1 minute
-        
-        end_time=$(($(date +%s) + monitoring_duration))
-        
-        while [ $(date +%s) -lt $end_time ]; do
-            current_time=$(date +%H:%M:%S)
-            echo "[$current_time] System monitoring check..."
-            
-            # Simulate health checks
-            echo "  📊 CPU: OK"
-            echo "  💾 Memory: OK" 
-            echo "  🌐 WebUI: Responding"
-            echo "  📧 Email system: OK"
-            
-            if [ $(date +%s) -lt $end_time ]; then
-                sleep $check_interval
-            fi
-        done
-        
-        echo "✅ Extended monitoring completed - System stable"
-        
+      run: "echo \"\U0001F50D Starting extended health monitoring...\"\n\n# Simulate\
+        \ extended monitoring\nmonitoring_duration=300  # 5 minutes\ncheck_interval=60\
+        \        # 1 minute\n\nend_time=$(($(date +%s) + monitoring_duration))\n\n\
+        while [ $(date +%s) -lt $end_time ]; do\n    current_time=$(date +%H:%M:%S)\n\
+        \    echo \"[$current_time] System monitoring check...\"\n    \n    # Simulate\
+        \ health checks\n    echo \"  \U0001F4CA CPU: OK\"\n    echo \"  \U0001F4BE\
+        \ Memory: OK\" \n    echo \"  \U0001F310 WebUI: Responding\"\n    echo \"\
+        \  \U0001F4E7 Email system: OK\"\n    \n    if [ $(date +%s) -lt $end_time\
+        \ ]; then\n        sleep $check_interval\n    fi\ndone\n\necho \"\u2705 Extended\
+        \ monitoring completed - System stable\"\n"
     - name: Generate monitoring report
-      run: |
-        cat > monitoring-report.md << EOF
-        # Post-deployment Monitoring Report
-        
-        **Monitoring Period:** 5 minutes
-        **Start Time:** $(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%SZ)
-        **End Time:** $(date -u +%Y-%m-%dT%H:%M:%SZ)
-        
-        ## System Health Summary
-        - ✅ All services responding normally
-        - ✅ No error spikes detected
-        - ✅ Memory usage within normal range
-        - ✅ WebUI accessible and responsive
-        
-        ## Recommendations
-        - Continue monitoring for next 24 hours
-        - Schedule next deployment during low-traffic window
-        - Review logs for any unusual patterns
-        
-        ---
-        System deployment and monitoring completed successfully! 🎉
-        EOF
-        
+      run: "cat > monitoring-report.md << EOF\n# Post-deployment Monitoring Report\n\
+        \n**Monitoring Period:** 5 minutes\n**Start Time:** $(date -u -d '5 minutes\
+        \ ago' +%Y-%m-%dT%H:%M:%SZ)\n**End Time:** $(date -u +%Y-%m-%dT%H:%M:%SZ)\n\
+        \n## System Health Summary\n- \u2705 All services responding normally\n- \u2705\
+        \ No error spikes detected\n- \u2705 Memory usage within normal range\n- \u2705\
+        \ WebUI accessible and responsive\n\n## Recommendations\n- Continue monitoring\
+        \ for next 24 hours\n- Schedule next deployment during low-traffic window\n\
+        - Review logs for any unusual patterns\n\n---\nSystem deployment and monitoring\
+        \ completed successfully! \U0001F389\nEOF\n"
     - name: Upload monitoring report
       uses: actions/upload-artifact@v4
       with:
         name: monitoring-report
         path: monitoring-report.md
+permissions:
+  contents: read
+  deployments: write
+  packages: write
+  actions: read
