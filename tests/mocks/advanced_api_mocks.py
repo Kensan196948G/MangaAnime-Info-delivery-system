@@ -6,7 +6,7 @@ Advanced API mocking strategies with realistic behavior simulation
 import asyncio
 import json
 import time
-import random
+import secrets
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional, Callable, Union
 from unittest.mock import Mock, AsyncMock, MagicMock, patch
@@ -233,15 +233,15 @@ class RealisticAniListMocker:
         
         # Simulate network delay
         base_delay = random.uniform(0.05, 0.2)  # 50-200ms base delay
-        if random.random() < 0.1:  # 10% chance of slow response
+        if secrets.SystemRandom().random() < 0.1:  # 10% chance of slow response
             base_delay += random.uniform(1.0, 3.0)
         
         await asyncio.sleep(base_delay)
         
         # Simulate server errors
-        if random.random() < 0.02:  # 2% chance of server error
+        if secrets.SystemRandom().random() < 0.02:  # 2% chance of server error
             response_time = time.time() - start_time
-            error_msg = random.choice([
+            error_msg = secrets.choice([
                 "Internal server error",
                 "Database connection timeout",
                 "Service temporarily unavailable"
@@ -431,13 +431,13 @@ class RealisticRSSMocker:
         
         # Simulate network delay
         delay = random.uniform(0.1, 0.5)  # 100-500ms
-        if random.random() < 0.05:  # 5% chance of slow response
+        if secrets.SystemRandom().random() < 0.05:  # 5% chance of slow response
             delay += random.uniform(2.0, 5.0)
         
         time.sleep(delay)
         
         # Simulate connection errors
-        if random.random() < 0.03:  # 3% chance of connection error
+        if secrets.SystemRandom().random() < 0.03:  # 3% chance of connection error
             response_time = time.time() - start_time
             error_msg = "Connection timeout"
             self.call_tracker.log_call(
@@ -566,8 +566,8 @@ class RealisticGoogleAPIsMocker:
         
         # Simulate token generation
         token_data = {
-            "access_token": f"mock_access_token_{random.randint(1000, 9999)}",
-            "refresh_token": f"mock_refresh_token_{random.randint(1000, 9999)}",
+            "access_token": f"mock_access_token_{secrets.randbelow(1000, 9999)}",
+            "refresh_token": f"mock_refresh_token_{secrets.randbelow(1000, 9999)}",
             "token_type": "Bearer",
             "expires_in": 3600,
             "expires_at": int((datetime.now() + timedelta(hours=1)).timestamp())
@@ -586,7 +586,7 @@ class RealisticGoogleAPIsMocker:
         time.sleep(delay)
         
         # Simulate occasional failures
-        if random.random() < 0.02:  # 2% chance of failure
+        if secrets.SystemRandom().random() < 0.02:  # 2% chance of failure
             response_time = time.time() - start_time
             error_msg = "Quota exceeded"
             self.call_tracker.log_call(
@@ -600,8 +600,8 @@ class RealisticGoogleAPIsMocker:
             raise Exception(f"Gmail API error: {error_msg}")
         
         # Generate response
-        message_id = f"mock_message_{random.randint(10000, 99999)}"
-        thread_id = f"mock_thread_{random.randint(10000, 99999)}"
+        message_id = f"mock_message_{secrets.randbelow(10000, 99999)}"
+        thread_id = f"mock_thread_{secrets.randbelow(10000, 99999)}"
         
         # Store sent message
         email_record = {
@@ -634,7 +634,7 @@ class RealisticGoogleAPIsMocker:
         time.sleep(delay)
         
         # Simulate occasional failures
-        if random.random() < 0.01:  # 1% chance of failure
+        if secrets.SystemRandom().random() < 0.01:  # 1% chance of failure
             response_time = time.time() - start_time
             error_msg = "Calendar not found"
             self.call_tracker.log_call(
@@ -648,7 +648,7 @@ class RealisticGoogleAPIsMocker:
             raise Exception(f"Calendar API error: {error_msg}")
         
         # Generate response
-        event_id = f"mock_event_{random.randint(10000, 99999)}"
+        event_id = f"mock_event_{secrets.randbelow(10000, 99999)}"
         html_link = f"https://calendar.google.com/event?eid={event_id}"
         
         # Store calendar event

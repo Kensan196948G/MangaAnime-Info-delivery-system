@@ -3,7 +3,7 @@
 Test utilities and helper functions for the anime/manga notification system tests
 """
 
-import random
+import secrets
 import json
 import tempfile
 import sqlite3
@@ -72,11 +72,11 @@ class TestDataFactory:
         
         for _ in range(count):
             if work_type is None:
-                work_type = random.choice(['anime', 'manga'])
+                work_type = secrets.choice(['anime', 'manga'])
             
             # Choose title from appropriate list
             title_pool = self.anime_titles if work_type == 'anime' else self.manga_titles
-            base_title = random.choice(title_pool)
+            base_title = secrets.choice(title_pool)
             
             # Generate variations
             title = base_title
@@ -84,8 +84,8 @@ class TestDataFactory:
             title_en = self._generate_english_title(base_title)
             
             # Add some variety with suffixes for sequels/seasons
-            if random.random() < 0.3:
-                season_num = random.randint(2, 4)
+            if secrets.SystemRandom().random() < 0.3:
+                season_num = secrets.randbelow(2, 4)
                 title += f" 第{season_num}期" if work_type == 'anime' else f" 続編"
                 title_en += f" Season {season_num}" if work_type == 'anime' else f" Sequel"
             
@@ -96,7 +96,7 @@ class TestDataFactory:
                 'type': work_type,
                 'official_url': f"https://example.com/{work_type}/{uuid.uuid4().hex[:8]}",
                 'description': self._generate_description(work_type),
-                'genres': random.sample(self.genres[work_type], k=random.randint(2, 5)),
+                'genres': random.sample(self.genres[work_type], k=secrets.randbelow(2, 5)),
                 'image_url': f"https://example.com/images/{uuid.uuid4().hex[:8]}.jpg",
                 'created_at': self.fake.date_time_between(start_date='-2y', end_date='now').isoformat()
             }
@@ -125,11 +125,11 @@ class TestDataFactory:
                 'work_id': work_id,
                 'release_type': release_type,
                 'number': str(i + 1),
-                'platform': random.choice(platform_pool),
+                'platform': secrets.choice(platform_pool),
                 'release_date': release_date.isoformat(),
-                'source': random.choice(self.sources),
+                'source': secrets.choice(self.sources),
                 'source_url': f"https://example.com/releases/{uuid.uuid4().hex[:8]}",
-                'notified': random.choice([0, 0, 0, 1]),  # 75% unnotified
+                'notified': secrets.choice([0, 0, 0, 1]),  # 75% unnotified
                 'created_at': self.fake.date_time_between(start_date='-1y', end_date='now').isoformat(),
                 'description': self._generate_release_description(work_type, i + 1)
             }
@@ -147,7 +147,7 @@ class TestDataFactory:
             
             # Convert to AniList format
             anilist_media = {
-                "id": random.randint(1000, 99999),
+                "id": secrets.randbelow(1000, 99999),
                 "title": {
                     "romaji": work['title'],
                     "english": work['title_en'],
@@ -159,16 +159,16 @@ class TestDataFactory:
                     {"name": genre, "description": f"{genre} genre", "isMediaSpoiler": False}
                     for genre in work['genres'][:3]
                 ],
-                "status": random.choice(["RELEASING", "FINISHED", "NOT_YET_RELEASED"]),
+                "status": secrets.choice(["RELEASING", "FINISHED", "NOT_YET_RELEASED"]),
                 "startDate": {
-                    "year": random.randint(2020, 2024),
-                    "month": random.randint(1, 12),
-                    "day": random.randint(1, 28)
+                    "year": secrets.randbelow(2020, 2024),
+                    "month": secrets.randbelow(1, 12),
+                    "day": secrets.randbelow(1, 28)
                 },
-                "endDate": None if random.random() < 0.5 else {
-                    "year": random.randint(2024, 2025),
-                    "month": random.randint(1, 12),
-                    "day": random.randint(1, 28)
+                "endDate": None if secrets.SystemRandom().random() < 0.5 else {
+                    "year": secrets.randbelow(2024, 2025),
+                    "month": secrets.randbelow(1, 12),
+                    "day": secrets.randbelow(1, 28)
                 },
                 "coverImage": {
                     "large": work['image_url'],
@@ -177,8 +177,8 @@ class TestDataFactory:
                 "bannerImage": work['image_url'].replace('.jpg', '_banner.jpg'),
                 "siteUrl": work['official_url'],
                 "streamingEpisodes": self._generate_streaming_episodes(),
-                "episodes": random.randint(12, 26),
-                "nextAiringEpisode": self._generate_next_airing_episode() if random.random() < 0.7 else None
+                "episodes": secrets.randbelow(12, 26),
+                "nextAiringEpisode": self._generate_next_airing_episode() if secrets.SystemRandom().random() < 0.7 else None
             }
             
             media_list.append(anilist_media)
@@ -203,19 +203,19 @@ class TestDataFactory:
         
         for i in range(entry_count):
             if feed_type == 'manga':
-                work = random.choice(self.manga_titles)
-                volume_num = random.randint(1, 30)
+                work = secrets.choice(self.manga_titles)
+                volume_num = secrets.randbelow(1, 30)
                 title = f"{work} 第{volume_num}巻"
                 description = f"{work}の第{volume_num}巻が発売されました！"
                 category = "manga"
             else:
-                work = random.choice(self.anime_titles)
-                episode_num = random.randint(1, 26)
+                work = secrets.choice(self.anime_titles)
+                episode_num = secrets.randbelow(1, 26)
                 title = f"{work} 第{episode_num}話"
                 description = f"{work}の第{episode_num}話が配信開始！"
                 category = "anime"
             
-            pub_date = (datetime.now() - timedelta(days=random.randint(0, 30))).strftime('%a, %d %b %Y %H:%M:%S %z')
+            pub_date = (datetime.now() - timedelta(days=secrets.randbelow(0, 30))).strftime('%a, %d %b %Y %H:%M:%S %z')
             link = f"https://example.com/{feed_type}/{uuid.uuid4().hex[:8]}"
             
             entries.append(f"""
@@ -351,7 +351,7 @@ class TestDataFactory:
                 "読者投票で人気急上昇中のマンガシリーズ。"
             ]
         
-        return random.choice(templates)
+        return secrets.choice(templates)
     
     def _generate_release_description(self, work_type: str, number: int) -> str:
         """Generate release-specific description."""
@@ -365,12 +365,12 @@ class TestDataFactory:
         episodes = []
         platforms = ['Netflix', 'Crunchyroll', 'Funimation']
         
-        for i in range(random.randint(0, 3)):
+        for i in range(secrets.randbelow(0, 3)):
             episode = {
                 "title": f"Episode {i + 1}",
                 "thumbnail": f"https://example.com/thumbnails/{uuid.uuid4().hex[:8]}.jpg",
                 "url": f"https://example.com/watch/{uuid.uuid4().hex[:8]}",
-                "site": random.choice(platforms)
+                "site": secrets.choice(platforms)
             }
             episodes.append(episode)
         
@@ -378,9 +378,9 @@ class TestDataFactory:
     
     def _generate_next_airing_episode(self) -> Dict[str, Any]:
         """Generate next airing episode data."""
-        next_date = datetime.now() + timedelta(days=random.randint(0, 7))
+        next_date = datetime.now() + timedelta(days=secrets.randbelow(0, 7))
         return {
-            "episode": random.randint(1, 26),
+            "episode": secrets.randbelow(1, 26),
             "airingAt": int(next_date.timestamp())
         }
     
@@ -494,7 +494,7 @@ class MockServiceFactory:
             {
                 'anilist_id': i,
                 'title': f'Test Anime {i}',
-                'episode_number': random.randint(1, 26),
+                'episode_number': secrets.randbelow(1, 26),
                 'airing_at': int((datetime.now() + timedelta(days=i)).timestamp()),
                 'airing_date': (datetime.now() + timedelta(days=i)).date(),
                 'site_url': f'https://anilist.co/anime/{i}',

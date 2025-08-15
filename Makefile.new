@@ -1,0 +1,171 @@
+# アニメ・マンガ情報配信システム - Makefile
+# 最終検証・運用性・パフォーマンステスト自動化
+
+.PHONY: help install test performance integration health-check final-validation clean logs setup
+
+# デフォルトターゲット
+help:
+	@echo "🎯 アニメ・マンガ情報配信システム - 検証・運用コマンド"
+	@echo "================================================================"
+	@echo "📋 利用可能なコマンド:"
+	@echo ""
+	@echo "  🔧 setup              - 初期セットアップ（依存関係インストール）"
+	@echo "  🧪 test               - 全体テストスイート実行"
+	@echo "  ⚡ performance        - パフォーマンス検証実行"
+	@echo "  🔗 integration        - 統合テスト実行"
+	@echo "  🏥 health-check       - システムヘルスチェック"
+	@echo "  🎯 final-validation   - 最終システム検証（包括的）"
+	@echo "  🧹 clean              - 一時ファイル・ログクリーンアップ"
+	@echo "  📄 logs               - ログファイル確認"
+	@echo "  🚀 quick-check        - 高速システム確認"
+	@echo "  📊 monitoring-start   - 継続監視開始"
+	@echo "  ⏹️  monitoring-stop    - 継続監視停止"
+	@echo ""
+	@echo "================================================================"
+	@echo "💡 推奨実行順序: setup -> final-validation -> monitoring-start"
+	@echo "================================================================"
+
+# 初期セットアップ
+setup:
+	@echo "🔧 システム初期セットアップ開始..."
+	@python3 -m pip install --upgrade pip
+	@pip3 install -r requirements.txt
+	@mkdir -p logs config templates static
+	@chmod +x scripts/*.py scripts/*.sh
+	@echo "✅ セットアップ完了"
+
+# 依存関係インストール確認
+install: setup
+	@echo "📦 依存関係インストール確認..."
+	@python3 -c "import requests, aiohttp, psutil, schedule, flask; print('✅ 主要パッケージ確認完了')"
+
+# パフォーマンス検証
+performance:
+	@echo "⚡ パフォーマンス検証実行中..."
+	@python3 scripts/performance_validation.py
+	@echo "✅ パフォーマンス検証完了"
+
+# 統合テスト
+integration:
+	@echo "🔗 統合テスト実行中..."
+	@python3 scripts/integration_test.py
+	@echo "✅ 統合テスト完了"
+
+# システムヘルスチェック
+health-check:
+	@echo "🏥 システムヘルスチェック実行中..."
+	@python3 scripts/operational_monitoring.py
+	@echo "✅ ヘルスチェック完了"
+
+# 最終システム検証（包括的）
+final-validation: install
+	@echo "🎯 最終システム検証実行中..."
+	@echo "⏱️ 検証には数分かかる場合があります..."
+	@python3 scripts/final_validation.py
+	@echo "✅ 最終検証完了"
+
+# 全体テストスイート
+test: performance integration health-check
+	@echo "🧪 全体テストスイート完了"
+
+# 高速システム確認
+quick-check:
+	@echo "🚀 高速システム確認実行中..."
+	@python3 -c "print('🐍 Python:', __import__('sys').version_info[:2])"
+	@python3 -c "import sqlite3; print('🗃️ SQLite:', sqlite3.sqlite_version)"
+	@python3 -c "import requests; r=requests.get('https://google.com', timeout=5); print('🌐 インターネット:', 'OK' if r.status_code==200 else 'NG')" 2>/dev/null || echo "🌐 インターネット: NG"
+	@ls -la db.sqlite3 2>/dev/null && echo "📊 データベース: 存在" || echo "📊 データベース: 未作成"
+	@ls -la config/config.json 2>/dev/null && echo "⚙️ 設定ファイル: 存在" || echo "⚙️ 設定ファイル: 未作成"
+	@echo "✅ 高速確認完了"
+
+# 継続監視開始
+monitoring-start:
+	@echo "📊 継続監視開始..."
+	@echo "⚠️ バックグラウンドで実行されます。停止するには 'make monitoring-stop' を実行してください"
+	@nohup python3 scripts/operational_monitoring.py --daemon > logs/monitoring.log 2>&1 &
+	@echo $$! > logs/monitoring.pid
+	@echo "✅ 継続監視開始（PID: $$(cat logs/monitoring.pid)）"
+
+# 継続監視停止
+monitoring-stop:
+	@if [ -f logs/monitoring.pid ]; then \
+		PID=$$(cat logs/monitoring.pid); \
+		kill $$PID 2>/dev/null && echo "⏹️ 継続監視停止（PID: $$PID）" || echo "❌ プロセスが見つかりません"; \
+		rm -f logs/monitoring.pid; \
+	else \
+		echo "⚠️ 監視プロセスが実行されていません"; \
+	fi
+
+# ログファイル確認
+logs:
+	@echo "📄 最新ログファイル一覧:"
+	@ls -la logs/ 2>/dev/null || echo "ログディレクトリが存在しません"
+	@echo ""
+	@echo "📋 最新エラーログ（直近10行）:"
+	@tail -n 10 logs/*.log 2>/dev/null || echo "ログファイルが存在しません"
+
+# クリーンアップ
+clean:
+	@echo "🧹 一時ファイルクリーンアップ中..."
+	@rm -f test_db.sqlite3
+	@rm -f logs/monitoring.pid
+	@find . -name "*.pyc" -delete
+	@find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+	@echo "✅ クリーンアップ完了"
+
+# 開発用 - 本番実行
+run-production:
+	@echo "🚀 本番環境での実行..."
+	@echo "⚠️ 本番環境用設定を確認してください"
+	@python3 release_notifier.py
+
+# 開発用 - Web UI起動
+run-webapp:
+	@echo "🌐 Web アプリケーション起動..."
+	@python3 app.py
+
+# 開発用 - データベース初期化
+init-database:
+	@echo "🗃️ データベース初期化..."
+	@python3 -c "from modules.db import init_database; init_database()" 2>/dev/null || echo "❌ データベース初期化に失敗しました"
+
+# システム情報表示
+system-info:
+	@echo "💻 システム情報:"
+	@echo "  OS: $$(uname -s) $$(uname -r)"
+	@echo "  Python: $$(python3 --version)"
+	@echo "  ディスク容量: $$(df -h . | tail -1 | awk '{print $$4}') 利用可能"
+	@echo "  メモリ: $$(free -h | grep '^Mem:' | awk '{print $$7}') 利用可能"
+	@echo "  CPU: $$(nproc) コア"
+
+# バックアップ作成
+backup:
+	@echo "💾 システムバックアップ作成中..."
+	@BACKUP_DIR="backup_$$(date +%Y%m%d_%H%M%S)"; \
+	mkdir -p $$BACKUP_DIR; \
+	cp -r config/ modules/ templates/ static/ *.py $$BACKUP_DIR/ 2>/dev/null; \
+	cp db.sqlite3 $$BACKUP_DIR/ 2>/dev/null || echo "⚠️ データベースファイルが見つかりません"; \
+	tar -czf $$BACKUP_DIR.tar.gz $$BACKUP_DIR/; \
+	rm -rf $$BACKUP_DIR/; \
+	echo "✅ バックアップ作成完了: $$BACKUP_DIR.tar.gz"
+
+# 全体実行フロー（推奨）
+full-validation: clean setup final-validation
+	@echo "🎉 全体検証フロー完了"
+	@echo "📊 結果を確認して、本番運用の準備を行ってください"
+
+# デバッグ用 - 詳細ログ出力
+debug:
+	@echo "🔍 デバッグ情報収集中..."
+	@echo "1. Python環境:"
+	@python3 -c "import sys; print(f'  Python: {sys.version}'); print(f'  実行可能ファイル: {sys.executable}'); print(f'  パス: {sys.path[:3]}...')"
+	@echo ""
+	@echo "2. インストール済みパッケージ（主要）:"
+	@python3 -c "import pkg_resources; [print(f'  {pkg.key}=={pkg.version}') for pkg in pkg_resources.working_set if pkg.key in ['requests', 'aiohttp', 'flask', 'psutil', 'schedule']]" 2>/dev/null || echo "  パッケージ情報取得に失敗"
+	@echo ""
+	@echo "3. ファイル構成:"
+	@find . -maxdepth 2 -name "*.py" | head -10
+	@echo ""
+	@echo "4. 設定ファイル:"
+	@ls -la config/ 2>/dev/null || echo "  設定ディレクトリなし"
+	@echo "✅ デバッグ情報収集完了"

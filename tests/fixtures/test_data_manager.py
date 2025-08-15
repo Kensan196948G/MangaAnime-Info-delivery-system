@@ -11,7 +11,7 @@ import shutil
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional, Generator, Union
 from dataclasses import dataclass, asdict
-import random
+import secrets
 import string
 from pathlib import Path
 import pytest
@@ -139,26 +139,26 @@ class TestDataGenerator:
         """Generate a single work with realistic data."""
         
         if work_type is None:
-            work_type = random.choice(['anime', 'manga'])
+            work_type = secrets.choice(['anime', 'manga'])
         
         if title_base is None:
             source_titles = self.ANIME_TITLES if work_type == 'anime' else self.MANGA_TITLES
-            title_base = random.choice(source_titles)
+            title_base = secrets.choice(source_titles)
         
         # Generate variations for testing
         title = title_base
-        if random.random() < 0.3:  # 30% chance of variation
-            suffix = random.choice(['2期', '劇場版', 'OVA', '完結編', 'THE FINAL'])
+        if secrets.SystemRandom().random() < 0.3:  # 30% chance of variation
+            suffix = secrets.choice(['2期', '劇場版', 'OVA', '完結編', 'THE FINAL'])
             title = f"{title_base} {suffix}"
         
         title_kana = self.TITLE_READINGS.get(title_base, self._generate_kana(title_base))
         title_en = self.ENGLISH_TITLES.get(title_base, self._romanize_title(title_base))
         
         # Generate realistic metadata
-        genres = random.sample(self.GENRES, random.randint(2, 5))
-        tags = random.sample(self.TAGS, random.randint(1, 3))
+        genres = random.sample(self.GENRES, secrets.randbelow(2, 5))
+        tags = random.sample(self.TAGS, secrets.randbelow(1, 3))
         
-        description = f"{title}の説明文です。{random.choice(self.GENRES)}作品として人気を博している。"
+        description = f"{title}の説明文です。{secrets.choice(self.GENRES)}作品として人気を博している。"
         
         official_url = f"https://example.com/{work_type}/{self._slugify(title_en)}"
         
@@ -178,24 +178,24 @@ class TestDataGenerator:
         
         if work_type == 'anime':
             release_type = 'episode'
-            number = str(episode_num or random.randint(1, 24))
+            number = str(episode_num or secrets.randbelow(1, 24))
             platforms = [p for p in self.PLATFORMS if any(x in p for x in ['アニメ', 'Netflix', 'Prime', 'Crunchyroll'])]
         else:
             release_type = 'volume'
-            number = str(episode_num or random.randint(1, 15))
+            number = str(episode_num or secrets.randbelow(1, 15))
             platforms = [p for p in self.PLATFORMS if any(x in p for x in ['Book', 'Kindle', 'コミック', 'まんが'])]
         
-        platform = random.choice(platforms)
+        platform = secrets.choice(platforms)
         
         # Generate realistic release date (recent past to near future)
         base_date = datetime.now()
-        days_offset = random.randint(-30, 30)
+        days_offset = secrets.randbelow(-30, 30)
         release_date = (base_date + timedelta(days=days_offset)).date().isoformat()
         
-        source = random.choice(['anilist', 'rss', 'official', 'manual'])
+        source = secrets.choice(['anilist', 'rss', 'official', 'manual'])
         source_url = f"https://example.com/source/{work_id}/{release_type}/{number}"
         
-        notified = random.choice([0, 0, 0, 1])  # 75% unnotified, 25% notified
+        notified = secrets.choice([0, 0, 0, 1])  # 75% unnotified, 25% notified
         
         return ReleaseTestData(
             work_id=work_id,
@@ -230,7 +230,7 @@ class TestDataGenerator:
         # Generate releases
         for i, work in enumerate(works):
             work_id = i + 1
-            for j in range(random.randint(1, releases_per_work)):
+            for j in range(secrets.randbelow(1, releases_per_work)):
                 release = self.generate_release(work_id, work.work_type, j + 1)
                 releases.append(release)
         
@@ -531,27 +531,27 @@ class MockAPIDataManager:
                     "native": work.title
                 },
                 "type": "ANIME",
-                "format": random.choice(["TV", "MOVIE", "OVA", "SPECIAL"]),
+                "format": secrets.choice(["TV", "MOVIE", "OVA", "SPECIAL"]),
                 "status": work.status,
-                "episodes": random.randint(12, 24),
+                "episodes": secrets.randbelow(12, 24),
                 "genres": work.genres,
                 "tags": [{"name": tag} for tag in work.tags],
                 "description": work.description,
                 "startDate": {
                     "year": 2024,
-                    "month": random.randint(1, 12),
-                    "day": random.randint(1, 28)
+                    "month": secrets.randbelow(1, 12),
+                    "day": secrets.randbelow(1, 28)
                 },
                 "nextAiringEpisode": {
-                    "episode": random.randint(1, 24),
-                    "airingAt": int((datetime.now() + timedelta(days=random.randint(0, 30))).timestamp())
-                } if random.random() < 0.7 else None,
+                    "episode": secrets.randbelow(1, 24),
+                    "airingAt": int((datetime.now() + timedelta(days=secrets.randbelow(0, 30))).timestamp())
+                } if secrets.SystemRandom().random() < 0.7 else None,
                 "streamingEpisodes": [
                     {
                         "title": f"Episode {j+1}",
                         "url": f"https://example.com/episode/{i+1}/{j+1}"
                     }
-                    for j in range(random.randint(1, 5))
+                    for j in range(secrets.randbelow(1, 5))
                 ],
                 "siteUrl": work.official_url
             }

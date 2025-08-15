@@ -226,7 +226,7 @@ class ContentFilter:
     @lru_cache(maxsize=1000)
     def _get_text_hash(self, text: str) -> str:
         """Generate hash for text caching."""
-        return hashlib.md5(text.encode('utf-8')).hexdigest()
+        return hashlib.sha256(text.encode('utf-8')).hexdigest()
     
     def _check_text_content_optimized(self, text: str, context: str) -> FilterResult:
         """

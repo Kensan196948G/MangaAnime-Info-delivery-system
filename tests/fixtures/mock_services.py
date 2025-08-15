@@ -9,7 +9,7 @@ import asyncio
 from typing import Dict, Any, List, Optional, Union
 from unittest.mock import Mock, MagicMock, AsyncMock
 from datetime import datetime, timedelta
-import random
+import secrets
 import time
 
 
@@ -62,27 +62,27 @@ class MockAniListService:
                     "native": f"テストアニメ{media_id}"
                 },
                 "type": "ANIME",
-                "format": random.choice(["TV", "OVA", "MOVIE", "SPECIAL"]),
-                "status": random.choice(["RELEASING", "FINISHED", "NOT_YET_RELEASED"]),
-                "episodes": random.randint(12, 24) if random.choice([True, False]) else None,
+                "format": secrets.choice(["TV", "OVA", "MOVIE", "SPECIAL"]),
+                "status": secrets.choice(["RELEASING", "FINISHED", "NOT_YET_RELEASED"]),
+                "episodes": secrets.randbelow(12, 24) if secrets.choice([True, False]) else None,
                 "genres": random.sample(["Action", "Adventure", "Comedy", "Drama", "Fantasy", "Romance", "Sci-Fi"], 2),
                 "tags": [{"name": "Shounen"}, {"name": "Action"}],
                 "description": f"This is test anime {media_id} description...",
                 "startDate": {
-                    "year": random.randint(2020, 2024),
-                    "month": random.randint(1, 12),
-                    "day": random.randint(1, 28)
+                    "year": secrets.randbelow(2020, 2024),
+                    "month": secrets.randbelow(1, 12),
+                    "day": secrets.randbelow(1, 28)
                 },
                 "nextAiringEpisode": {
-                    "episode": random.randint(1, 50),
-                    "airingAt": int((datetime.now() + timedelta(days=random.randint(0, 7))).timestamp())
-                } if random.choice([True, False]) else None,
+                    "episode": secrets.randbelow(1, 50),
+                    "airingAt": int((datetime.now() + timedelta(days=secrets.randbelow(0, 7))).timestamp())
+                } if secrets.choice([True, False]) else None,
                 "streamingEpisodes": [
                     {
                         "title": f"Episode {i+1}",
                         "url": f"https://example.com/anime/{media_id}/episode/{i+1}"
                     } for i in range(3)
-                ] if random.choice([True, False]) else [],
+                ] if secrets.choice([True, False]) else [],
                 "siteUrl": f"https://anilist.co/anime/{media_id}"
             })
         
@@ -266,7 +266,7 @@ class MockGoogleAPIService:
         
         # Mock message sending
         mock_send_response = {
-            'id': f'msg_{int(time.time())}_{random.randint(1000, 9999)}',
+            'id': f'msg_{int(time.time())}_{secrets.randbelow(1000, 9999)}',
             'threadId': f'thread_{int(time.time())}',
             'labelIds': ['SENT']
         }
@@ -294,7 +294,7 @@ class MockGoogleAPIService:
         
         # Mock event creation
         mock_event_response = {
-            'id': f'event_{int(time.time())}_{random.randint(1000, 9999)}',
+            'id': f'event_{int(time.time())}_{secrets.randbelow(1000, 9999)}',
             'htmlLink': f'https://calendar.google.com/event?eid=test_event_{int(time.time())}',
             'summary': 'Test Event',
             'start': {'dateTime': '2024-01-15T18:00:00+09:00'},
@@ -439,18 +439,18 @@ class TestDataFactory:
                 {
                     'id': i,
                     'title': f'Test Anime {i}',
-                    'episodes': random.randint(12, 50),
+                    'episodes': secrets.randbelow(12, 50),
                     'genres': random.sample(['Action', 'Comedy', 'Drama', 'Romance'], 2),
-                    'release_date': (datetime.now() - timedelta(days=random.randint(0, 365))).isoformat()
+                    'release_date': (datetime.now() - timedelta(days=secrets.randbelow(0, 365))).isoformat()
                 } for i in range(1, size + 1)
             ],
             'manga_data': [
                 {
                     'id': i,
                     'title': f'Test Manga {i}',
-                    'volumes': random.randint(1, 30),
+                    'volumes': secrets.randbelow(1, 30),
                     'genres': random.sample(['Action', 'Romance', 'Fantasy', 'Horror'], 2),
-                    'release_date': (datetime.now() - timedelta(days=random.randint(0, 365))).isoformat()
+                    'release_date': (datetime.now() - timedelta(days=secrets.randbelow(0, 365))).isoformat()
                 } for i in range(1, size + 1)
             ]
         }

@@ -7,7 +7,7 @@ This script creates sample data for testing the web interface.
 import sqlite3
 import json
 from datetime import datetime, timedelta
-import random
+import secrets
 
 def create_database():
     """Create the SQLite database with sample data"""
@@ -85,22 +85,22 @@ def create_database():
         platform_list = anime_platforms if work_type == 'anime' else manga_platforms
         
         # Generate releases for the past month and next month
-        for days_offset in range(-30, 31, random.randint(1, 7)):
+        for days_offset in range(-30, 31, secrets.randbelow(1, 7)):
             release_date = today + timedelta(days=days_offset)
             
             # Random chance of having a release on this day
-            if random.random() < 0.3:  # 30% chance
-                platform = random.choice(platform_list)
+            if secrets.SystemRandom().random() < 0.3:  # 30% chance
+                platform = secrets.choice(platform_list)
                 release_type = 'episode' if work_type == 'anime' else 'volume'
                 
                 # Generate episode/volume number
                 if release_type == 'episode':
-                    number = str(random.randint(1, 24))
+                    number = str(secrets.randbelow(1, 24))
                 else:
-                    number = str(random.randint(1, 30))
+                    number = str(secrets.randbelow(1, 30))
                 
                 # Notification status (70% notified for past releases)
-                notified = 1 if (days_offset < 0 and random.random() < 0.7) else 0
+                notified = 1 if (days_offset < 0 and secrets.SystemRandom().random() < 0.7) else 0
                 
                 releases.append((
                     work_id,

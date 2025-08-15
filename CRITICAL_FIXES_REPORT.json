@@ -1,0 +1,23 @@
+{
+  "fixes_applied": [
+    "File permission: config.json",
+    "File permission: credentials.json",
+    "File permission: token.json",
+    "Execute permission: scripts/error_monitor.sh",
+    "Execute permission: scripts/setup.sh",
+    "Execute permission: scripts/validate.sh",
+    "Execute permission: run_claude_autoloop.sh",
+    "Crypto fix: init_demo_db.py",
+    "Crypto fix: critical_fixes.py",
+    "Crypto fix: filter_logic.py",
+    "Crypto fix: test_utils.py",
+    "Crypto fix: test_data_manager.py",
+    "Crypto fix: mock_services.py",
+    "Crypto fix: advanced_api_mocks.py",
+    "SQL injection prevention verified"
+  ],
+  "errors": [
+    "依存関係インストール失敗: Command '['/usr/bin/python3', '-m', 'pip', 'install', '-r', '/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/requirements.txt']' returned non-zero exit status 1."
+  ],
+  "status": "PARTIAL_SUCCESS"
+}
