@@ -14,6 +14,13 @@ env:
   TEST_MODE: true
   LOG_LEVEL: DEBUG
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  checks: write
+  actions: read
+
 jobs:
   # Job 1: Code Quality and Linting
   quality:

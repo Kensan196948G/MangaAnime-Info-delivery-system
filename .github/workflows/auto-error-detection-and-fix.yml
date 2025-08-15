@@ -33,6 +33,13 @@ env:
   PYTHON_VERSION: '3.11'
   AUTO_FIX_BRANCH: 'auto-fix'
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  checks: read
+  actions: read
+
 jobs:
   # Job 1: Error Detection & Analysis
   error-detection:
