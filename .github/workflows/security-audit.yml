@@ -83,7 +83,7 @@ jobs:
         fi
         
     - name: Upload dependency scan results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: dependency-security-reports
@@ -256,7 +256,7 @@ jobs:
         EOF
         
     - name: Upload code quality reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: code-quality-reports
@@ -458,7 +458,7 @@ jobs:
         EOF
         
     - name: Upload comprehensive security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: comprehensive-security-report
         path: security-audit-report.md

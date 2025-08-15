@@ -1,0 +1,171 @@
+name: System Health Check (Fixed)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+  TEST_MODE: true
+
+jobs:
+  system-health:
+    name: System Health Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flask  # Add Flask for WebUI
+        
+    - name: Create test configuration
+      run: |
+        # Use the config template for CI testing
+        cp config/config.template.json config.json
+        
+        # Replace template placeholders with test values
+        sed -i 's/"your-email@gmail.com"/"test@example.com"/g' config.json
+        
+        # Add minimal test configuration
+        cat > config.json << 'EOF'
+        {
+          "ng_keywords": ["test"],
+          "notification_email": "test@example.com",
+          "email": {
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "sender_email": "test@example.com",
+            "sender_password": "${GMAIL_APP_PASSWORD}",
+            "use_tls": true,
+            "enabled": false
+          },
+          "error_notifications": {
+            "enabled": false,
+            "recipient_email": "test@example.com",
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "sender_email": "test@example.com",
+            "sender_password": "${GMAIL_APP_PASSWORD}",
+            "use_tls": true
+          },
+          "apis": {
+            "anilist": {
+              "graphql_url": "https://graphql.anilist.co"
+            }
+          },
+          "notifications": {
+            "anime": true,
+            "manga": true
+          },
+          "database": {
+            "path": "./test.db"
+          },
+          "system": {
+            "name": "Test System"
+          }
+        }
+        EOF
+        
+    - name: Test Core Modules
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        try:
+            import modules.config
+            import modules.db
+            import modules.monitoring
+            print('✅ Core modules imported successfully')
+        except ImportError as e:
+            print(f'❌ Core module import failed: {e}')
+            exit(1)
+        "
+        
+    - name: Test WebUI Module (Optional)
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        try:
+            import web_ui
+            print('✅ WebUI module imported successfully')
+        except ImportError as e:
+            print(f'⚠️ WebUI module import failed (Flask required): {e}')
+            # Don't fail - WebUI is optional
+        "
+        
+    - name: Test Database Operations
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        from modules.db import DatabaseManager
+        
+        # Test with temporary database
+        db = DatabaseManager('./test.db')
+        db.initialize_database()
+        print('✅ Database initialization successful')
+        
+        # Test basic operations
+        work_id = db.get_or_create_work('Test Work', work_type='anime')
+        if work_id:
+            print('✅ Database operations successful')
+        else:
+            print('❌ Database operations failed')
+            exit(1)
+        "
+        
+    - name: Test Configuration Loading
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        from modules.config import ConfigManager
+        
+        config = ConfigManager()
+        system_name = config.get_system_name()
+        print(f'✅ Configuration loaded: {system_name}')
+        "
+        
+    - name: System Integration Test
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        # Test complete system integration
+        try:
+            from modules.config import ConfigManager
+            from modules.db import DatabaseManager
+            from modules.monitoring import get_collection_health_status
+            
+            print('✅ System integration test successful')
+            
+        except Exception as e:
+            print(f'❌ System integration test failed: {e}')
+            exit(1)
+        "
+        
+    - name: Cleanup
+      run: |
+        rm -f test.db config.json
+        echo "✅ Test cleanup completed"

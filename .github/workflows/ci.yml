@@ -65,7 +65,7 @@ jobs:
         safety check --json --output safety-report.json
         
     - name: Upload quality reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: quality-reports
@@ -114,7 +114,7 @@ jobs:
           --junitxml=junit-unit-${{ matrix.python-version }}.xml
           
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: unit-test-results-py${{ matrix.python-version }}
@@ -185,7 +185,7 @@ jobs:
           --timeout=60
           
     - name: Upload integration test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: integration-test-results
@@ -241,7 +241,7 @@ jobs:
           --timeout=120
           
     - name: Upload E2E test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: e2e-test-results
@@ -306,7 +306,7 @@ jobs:
         "
         
     - name: Upload performance test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: performance-test-results
@@ -372,7 +372,7 @@ jobs:
         python -m twine check dist/*
         
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: python-package
         path: dist/
@@ -443,7 +443,7 @@ jobs:
           });
           
     - name: Upload test summary
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-summary
         path: test-summary.md
