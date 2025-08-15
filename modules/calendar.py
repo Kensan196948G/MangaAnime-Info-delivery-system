@@ -8,9 +8,13 @@ using the Google Calendar API with OAuth2 authentication.
 import os
 import json
 import logging
+import time
+import asyncio
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import threading
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +28,69 @@ try:
 except ImportError:
     logger.warning("Google API libraries not available. Install google-auth, google-auth-oauthlib, google-api-python-client")
     GOOGLE_AVAILABLE = False
+
+
+def calendar_retry_on_failure(max_retries: int = 3, delay: float = 1.0, exponential_backoff: bool = True):
+    """
+    Google Calendar API エラー時のリトライデコレータ
+    
+    Args:
+        max_retries: 最大リトライ回数
+        delay: 初期遅延時間（秒）
+        exponential_backoff: 指数バックオフを使用するか
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            current_delay = delay
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exception = e
+                    
+                    # 最後の試行の場合は例外を再発生
+                    if attempt == max_retries:
+                        logger.error(f"Function {func.__name__} failed after {max_retries} retries: {e}")
+                        raise
+                    
+                    # Calendar API 固有エラーの判定
+                    if hasattr(e, 'resp') and hasattr(e.resp, 'status'):
+                        status_code = e.resp.status
+                        # 4xx エラーはリトライしない（認証エラーなど）
+                        if 400 <= status_code < 500 and status_code != 429:  # 429 (Rate limit) はリトライ
+                            logger.error(f"Non-retryable Calendar error {status_code} in {func.__name__}: {e}")
+                            raise
+                    
+                    logger.warning(f"Attempt {attempt + 1} of {func.__name__} failed: {e}")
+                    logger.info(f"Retrying in {current_delay:.1f} seconds...")
+                    
+                    time.sleep(current_delay)
+                    
+                    if exponential_backoff:
+                        current_delay *= 2
+            
+            # Should never reach here, but just in case
+            raise last_exception
+        
+        return wrapper
+    return decorator
+
+
+@dataclass
+class CalendarAuthState:
+    """Google Calendar認証状態の管理"""
+    is_authenticated: bool = False
+    last_auth_time: Optional[datetime] = None
+    token_expires_at: Optional[datetime] = None
+    auth_lock: threading.Lock = field(default_factory=threading.Lock)
+    consecutive_auth_failures: int = 0
+    last_auth_error: Optional[str] = None
+    refresh_in_progress: bool = False
+    token_refresh_count: int = 0
+    last_refresh_time: Optional[datetime] = None
 
 
 @dataclass
@@ -47,7 +114,7 @@ class GoogleCalendarManager:
     
     def __init__(self, config: Dict[str, Any]):
         """
-        Initialize Google Calendar manager.
+        Initialize Google Calendar manager with enhanced error handling and monitoring.
         
         Args:
             config: Configuration dictionary with calendar settings
@@ -61,19 +128,110 @@ class GoogleCalendarManager:
         ])
         
         self.service = None
-        self._authenticated = False
+        self.auth_state = CalendarAuthState()
         self.calendar_id = self.calendar_config.get('calendar_id', 'primary')
+        
+        # Performance monitoring
+        self.total_events_created = 0
+        self.total_events_updated = 0
+        self.total_events_deleted = 0
+        self.total_operation_failures = 0
+        self.total_auth_attempts = 0
+        self.start_time = datetime.now()
+        
+        # Rate limiting for Calendar API
+        self.rate_limit_requests = []
+        self.rate_limit_window = 60  # seconds
+        self.max_requests_per_minute = 300  # Calendar API limit (conservative)
         
         # Color mapping for different content types
         self.color_mapping = {
             'anime': '7',    # Blue
             'manga': '2',    # Green
+            'episode': '9',  # Purple for episodes
+            'volume': '10',  # Orange for volumes
             'default': '1'   # Light purple
         }
         
+        # Event type mapping
+        self.event_type_mapping = {
+            'anime_episode': {'color': '7', 'icon': '📺'},
+            'anime_season': {'color': '4', 'icon': '🎬'},
+            'manga_volume': {'color': '2', 'icon': '📚'},
+            'manga_chapter': {'color': '10', 'icon': '📖'},
+            'default': {'color': '1', 'icon': '📅'}
+        }
+    
+    def _is_token_near_expiry(self, minutes_ahead: int = 10) -> bool:
+        """Check if token will expire soon."""
+        if not self.auth_state.token_expires_at:
+            return True
+        
+        expiry_threshold = datetime.now() + timedelta(minutes=minutes_ahead)
+        return self.auth_state.token_expires_at <= expiry_threshold
+    
+    def _refresh_token_proactively(self) -> bool:
+        """Proactively refresh token if it's near expiry."""
+        if self.auth_state.refresh_in_progress:
+            logger.debug("Calendar token refresh already in progress")
+            return True
+            
+        if not self._is_token_near_expiry():
+            return True
+            
+        logger.info("Calendar token is near expiry, attempting proactive refresh")
+        return self._refresh_token()
+    
+    def _refresh_token(self) -> bool:
+        """Refresh OAuth2 token for Calendar API."""
+        with self.auth_state.auth_lock:
+            if self.auth_state.refresh_in_progress:
+                return True
+                
+            self.auth_state.refresh_in_progress = True
+            
+            try:
+                if not os.path.exists(self.token_file):
+                    logger.warning("Calendar token file not found for refresh")
+                    return False
+                
+                creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
+                
+                if not creds.refresh_token:
+                    logger.warning("No refresh token available for Calendar")
+                    return False
+                
+                # Attempt refresh
+                creds.refresh(Request())
+                
+                # Save refreshed token with secure permissions
+                old_umask = os.umask(0o077)
+                try:
+                    with open(self.token_file, 'w') as token:
+                        token.write(creds.to_json())
+                finally:
+                    os.umask(old_umask)
+                
+                # Update service with new credentials
+                self.service = build('calendar', 'v3', credentials=creds, cache_discovery=False)
+                
+                # Update auth state
+                self.auth_state.token_expires_at = creds.expiry or (datetime.now() + timedelta(hours=1))
+                self.auth_state.last_refresh_time = datetime.now()
+                self.auth_state.token_refresh_count += 1
+                
+                logger.info(f"Calendar token refreshed successfully (refresh count: {self.auth_state.token_refresh_count})")
+                return True
+                
+            except Exception as e:
+                logger.error(f"Calendar token refresh failed: {e}")
+                return False
+            finally:
+                self.auth_state.refresh_in_progress = False
+        
     def authenticate(self) -> bool:
         """
-        Authenticate with Google Calendar API using OAuth2.
+        Authenticate with Google Calendar API using OAuth2 with enhanced error handling and proactive token refresh.
         
         Returns:
             bool: True if authentication successful, False otherwise

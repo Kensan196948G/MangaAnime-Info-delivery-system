@@ -1,6 +1,6 @@
 """
-Monitoring and alerting module for the Anime/Manga Information Delivery System.
-Provides system health monitoring, performance tracking, and security incident alerting.
+Enhanced Monitoring and alerting module for the Anime/Manga Information Delivery System.
+Provides system health monitoring, performance tracking, security incident alerting, and integrated error recovery.
 """
 
 import os
@@ -12,11 +12,14 @@ import sqlite3
 from collections import deque
 import threading
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any, Tuple, Callable
 from dataclasses import dataclass, asdict
 from collections import defaultdict, deque
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import psutil
+import asyncio
+from pathlib import Path
 
 try:
     import psutil

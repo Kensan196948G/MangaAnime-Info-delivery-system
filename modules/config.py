@@ -12,10 +12,15 @@ This module provides:
 import json
 import os
 import logging
+import base64
+import hashlib
 from typing import Dict, Any, Optional, List
 from pathlib import Path
 from dataclasses import dataclass, field
 import copy
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
 @dataclass
@@ -186,6 +191,69 @@ class SystemConfig:
     log_level: str = "INFO"
 
 
+class SecureConfigManager:
+    """Secure configuration manager with encryption support."""
+    
+    def __init__(self, password: Optional[str] = None):
+        """
+        Initialize secure configuration manager.
+        
+        Args:
+            password: Password for encrypting sensitive data
+        """
+        self.logger = logging.getLogger(__name__)
+        self._encryption_key = None
+        
+        if password:
+            self._setup_encryption(password)
+    
+    def _setup_encryption(self, password: str) -> None:
+        """Setup encryption key from password."""
+        try:
+            # Generate salt for key derivation
+            salt = os.environ.get('MANGA_ANIME_SALT', 'manga_anime_salt_2025').encode()
+            
+            # Derive key from password
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=salt,
+                iterations=100000,
+            )
+            key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
+            self._encryption_key = Fernet(key)
+            
+            self.logger.debug("Encryption key setup completed")
+        except Exception as e:
+            self.logger.error(f"Failed to setup encryption: {e}")
+            raise
+    
+    def encrypt_value(self, value: str) -> str:
+        """Encrypt a sensitive value."""
+        if not self._encryption_key:
+            return value
+        
+        try:
+            encrypted = self._encryption_key.encrypt(value.encode())
+            return base64.urlsafe_b64encode(encrypted).decode()
+        except Exception as e:
+            self.logger.error(f"Failed to encrypt value: {e}")
+            return value
+    
+    def decrypt_value(self, encrypted_value: str) -> str:
+        """Decrypt a sensitive value."""
+        if not self._encryption_key:
+            return encrypted_value
+        
+        try:
+            encrypted_data = base64.urlsafe_b64decode(encrypted_value.encode())
+            decrypted = self._encryption_key.decrypt(encrypted_data)
+            return decrypted.decode()
+        except Exception as e:
+            self.logger.error(f"Failed to decrypt value: {e}")
+            return encrypted_value
+
+
 class ConfigManager:
     """
     Configuration manager for the anime/manga information system.
@@ -200,17 +268,29 @@ class ConfigManager:
         os.path.expanduser("~/.manga-anime-notifier/config.json")
     ]
     
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None, enable_encryption: bool = False):
         """
         Initialize configuration manager.
         
         Args:
             config_path: Custom configuration file path (optional)
+            enable_encryption: Enable encryption for sensitive data
         """
         self.config_path = config_path
         self.logger = logging.getLogger(__name__)
         self._config_data = {}
         self._loaded_from = None
+        self._enable_encryption = enable_encryption
+        self._secure_manager = None
+        
+        # Setup encryption if enabled
+        if enable_encryption:
+            password = os.environ.get('MANGA_ANIME_MASTER_PASSWORD')
+            if password:
+                self._secure_manager = SecureConfigManager(password)
+                self.logger.info("Encryption enabled for sensitive configuration data")
+            else:
+                self.logger.warning("Encryption requested but MANGA_ANIME_MASTER_PASSWORD not set")
         
         # Load configuration
         self.load_config()
@@ -399,23 +479,65 @@ class ConfigManager:
     
     def _apply_env_overrides(self) -> None:
         """Apply environment variable overrides to configuration."""
-        # Define environment variable mappings
+        # Define environment variable mappings with enhanced security support
         env_mappings = {
+            # Database configuration
             'MANGA_ANIME_DB_PATH': ['database', 'path'],
+            
+            # System configuration
             'MANGA_ANIME_LOG_LEVEL': ['system', 'log_level'],
             'MANGA_ANIME_LOG_PATH': ['logging', 'file_path'],
+            'MANGA_ANIME_ENVIRONMENT': ['system', 'environment'],
+            
+            # Gmail configuration with OAuth2 support
             'MANGA_ANIME_GMAIL_FROM': ['google', 'gmail', 'from_email'],
             'MANGA_ANIME_GMAIL_TO': ['google', 'gmail', 'to_email'],
+            'GMAIL_APP_PASSWORD': ['google', 'gmail', 'app_password'],
+            'GMAIL_CLIENT_ID': ['google', 'gmail', 'client_id'],
+            'GMAIL_CLIENT_SECRET': ['google', 'gmail', 'client_secret'],
+            
+            # Google API credentials
             'MANGA_ANIME_CREDENTIALS_FILE': ['google', 'credentials_file'],
             'MANGA_ANIME_TOKEN_FILE': ['google', 'token_file'],
+            'GOOGLE_APPLICATION_CREDENTIALS': ['google', 'service_account_file'],
+            
+            # Calendar configuration
             'MANGA_ANIME_CALENDAR_ID': ['google', 'calendar', 'calendar_id'],
+            'CALENDAR_CLIENT_ID': ['google', 'calendar', 'client_id'],
+            'CALENDAR_CLIENT_SECRET': ['google', 'calendar', 'client_secret'],
+            
+            # API Keys with enhanced security
+            'ANILIST_API_KEY': ['apis', 'anilist', 'api_key'],
+            'SYOBOI_API_KEY': ['apis', 'syoboi', 'api_key'],
+            
+            # Security settings
+            'MANGA_ANIME_SECRET_KEY': ['security', 'secret_key'],
+            'MANGA_ANIME_ENCRYPTION_KEY': ['security', 'encryption_key'],
+            
+            # Rate limiting
+            'MANGA_ANIME_RATE_LIMIT_RPM': ['apis', 'rate_limit', 'requests_per_minute'],
+            'MANGA_ANIME_RETRY_DELAY': ['apis', 'rate_limit', 'retry_delay_seconds'],
         }
         
         for env_var, config_path in env_mappings.items():
             value = os.getenv(env_var)
             if value:
+                # Special handling for sensitive values
+                if any(sensitive in env_var.lower() for sensitive in ['password', 'secret', 'key', 'token']):
+                    # Don't log sensitive values
+                    self.logger.debug(f"Applied secure environment override: {env_var} -> {'.'.join(config_path)} [REDACTED]")
+                else:
+                    self.logger.debug(f"Applied environment override: {env_var} -> {'.'.join(config_path)} = {value}")
+                
+                # Type conversion for numeric values
+                if env_var.endswith('_RPM') or env_var.endswith('_DELAY'):
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        self.logger.warning(f"Invalid numeric value for {env_var}: {value}")
+                        continue
+                
                 self._set_nested_value(self._config_data, config_path, value)
-                self.logger.debug(f"Applied environment override: {env_var} -> {'.'.join(config_path)}")
     
     def _set_nested_value(self, data: Dict, path: List[str], value: Any) -> None:
         """Set nested dictionary value using path list."""
@@ -452,7 +574,7 @@ class ConfigManager:
             default: Default value if key not found
             
         Returns:
-            Configuration value
+            Configuration value (automatically decrypted if encrypted)
         """
         keys = key.split('.')
         value = self._config_data
@@ -463,7 +585,46 @@ class ConfigManager:
             else:
                 return default
         
+        # Auto-decrypt encrypted values
+        if isinstance(value, str) and self._secure_manager:
+            # Check if this is a sensitive key that might be encrypted
+            sensitive_keywords = ['password', 'secret', 'key', 'token', 'credentials']
+            if any(keyword in key.lower() for keyword in sensitive_keywords):
+                return self._secure_manager.decrypt_value(value)
+        
         return value
+    
+    def get_secure(self, key: str, default: Any = None) -> Any:
+        """
+        Get encrypted configuration value with explicit decryption.
+        
+        Args:
+            key: Dot-separated key (e.g., 'google.gmail.app_password')
+            default: Default value if key not found
+            
+        Returns:
+            Decrypted configuration value
+        """
+        value = self.get(key, default)
+        
+        if isinstance(value, str) and self._secure_manager:
+            return self._secure_manager.decrypt_value(value)
+        
+        return value
+    
+    def set_secure(self, key: str, value: str) -> None:
+        """
+        Set encrypted configuration value.
+        
+        Args:
+            key: Dot-separated key
+            value: Value to encrypt and store
+        """
+        if self._secure_manager:
+            encrypted_value = self._secure_manager.encrypt_value(value)
+            self.set(key, encrypted_value)
+        else:
+            self.set(key, value)
     
     def get_section(self, section: str) -> Dict[str, Any]:
         """

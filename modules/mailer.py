@@ -9,12 +9,16 @@ import os
 import json
 import base64
 import logging
+import time
+import asyncio
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 from datetime import datetime
 from typing import List, Dict, Optional, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import threading
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
@@ -30,17 +34,83 @@ except ImportError:
     GOOGLE_AVAILABLE = False
 
 
+def retry_on_failure(max_retries: int = 3, delay: float = 1.0, exponential_backoff: bool = True):
+    """
+    Gmail API エラー時のリトライデコレータ
+    
+    Args:
+        max_retries: 最大リトライ回数
+        delay: 初期遅延時間（秒）
+        exponential_backoff: 指数バックオフを使用するか
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            current_delay = delay
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exception = e
+                    
+                    # 最後の試行の場合は例外を再発生
+                    if attempt == max_retries:
+                        logger.error(f"Function {func.__name__} failed after {max_retries} retries: {e}")
+                        raise
+                    
+                    # Gmail API 固有エラーの判定
+                    if hasattr(e, 'resp') and hasattr(e.resp, 'status'):
+                        status_code = e.resp.status
+                        # 4xx エラーはリトライしない（認証エラーなど）
+                        if 400 <= status_code < 500 and status_code != 429:  # 429 (Rate limit) はリトライ
+                            logger.error(f"Non-retryable error {status_code} in {func.__name__}: {e}")
+                            raise
+                    
+                    logger.warning(f"Attempt {attempt + 1} of {func.__name__} failed: {e}")
+                    logger.info(f"Retrying in {current_delay:.1f} seconds...")
+                    
+                    time.sleep(current_delay)
+                    
+                    if exponential_backoff:
+                        current_delay *= 2
+            
+            # Should never reach here, but just in case
+            raise last_exception
+        
+        return wrapper
+    return decorator
+
+
 @dataclass
 class EmailNotification:
     """Data class for email notification content."""
     subject: str
     html_content: str
     text_content: str
-    attachments: List[Dict[str, Any]] = None
+    attachments: List[Dict[str, Any]] = field(default_factory=list)
+    priority: str = 'normal'  # 'low', 'normal', 'high'
+    retry_count: int = 0
+    created_at: datetime = field(default_factory=datetime.now)
     
     def __post_init__(self):
         if self.attachments is None:
             self.attachments = []
+
+
+@dataclass 
+class AuthenticationState:
+    """Gmail認証状態の管理"""
+    is_authenticated: bool = False
+    last_auth_time: Optional[datetime] = None
+    token_expires_at: Optional[datetime] = None
+    auth_lock: threading.Lock = field(default_factory=threading.Lock)
+    consecutive_auth_failures: int = 0
+    last_auth_error: Optional[str] = None
+    refresh_in_progress: bool = False
+    token_refresh_count: int = 0
+    last_refresh_time: Optional[datetime] = None
 
 
 class GmailNotifier:
@@ -48,7 +118,7 @@ class GmailNotifier:
     
     def __init__(self, config: Dict[str, Any]):
         """
-        Initialize Gmail notifier.
+        Initialize Gmail notifier with enhanced error handling and monitoring.
         
         Args:
             config: Configuration dictionary with Gmail settings
@@ -62,55 +132,274 @@ class GmailNotifier:
         ])
         
         self.service = None
-        self._authenticated = False
+        self.auth_state = AuthenticationState()
         
+        # Performance monitoring
+        self.total_emails_sent = 0
+        self.total_send_failures = 0
+        self.total_auth_attempts = 0
+        self.start_time = datetime.now()
+        
+        # Rate limiting for Gmail API
+        self.rate_limit_requests = []
+        self.rate_limit_window = 60  # seconds
+        self.max_requests_per_minute = 250  # Gmail API limit
+        
+    def _is_token_near_expiry(self, minutes_ahead: int = 10) -> bool:
+        """Check if token will expire soon."""
+        if not self.auth_state.token_expires_at:
+            return True
+        
+        expiry_threshold = datetime.now() + timedelta(minutes=minutes_ahead)
+        return self.auth_state.token_expires_at <= expiry_threshold
+    
+    def _refresh_token_proactively(self) -> bool:
+        """Proactively refresh token if it's near expiry."""
+        if self.auth_state.refresh_in_progress:
+            logger.debug("Token refresh already in progress")
+            return True
+            
+        if not self._is_token_near_expiry():
+            return True
+            
+        logger.info("Token is near expiry, attempting proactive refresh")
+        return self._refresh_token()
+    
+    def _refresh_token(self) -> bool:
+        """Refresh OAuth2 token."""
+        with self.auth_state.auth_lock:
+            if self.auth_state.refresh_in_progress:
+                return True
+                
+            self.auth_state.refresh_in_progress = True
+            
+            try:
+                if not os.path.exists(self.token_file):
+                    logger.warning("Token file not found for refresh")
+                    return False
+                
+                creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
+                
+                if not creds.refresh_token:
+                    logger.warning("No refresh token available")
+                    return False
+                
+                # Attempt refresh
+                creds.refresh(Request())
+                
+                # Save refreshed token
+                with open(self.token_file, 'w') as token:
+                    token.write(creds.to_json())
+                
+                # Update service with new credentials
+                self.service = build('gmail', 'v1', credentials=creds, cache_discovery=False)
+                
+                # Update auth state
+                self.auth_state.token_expires_at = creds.expiry or (datetime.now() + timedelta(hours=1))
+                self.auth_state.last_refresh_time = datetime.now()
+                self.auth_state.token_refresh_count += 1
+                
+                logger.info(f"Token refreshed successfully (refresh count: {self.auth_state.token_refresh_count})")
+                return True
+                
+            except Exception as e:
+                logger.error(f"Token refresh failed: {e}")
+                return False
+            finally:
+                self.auth_state.refresh_in_progress = False
+    
+    @retry_on_failure(max_retries=3, delay=2.0)
     def authenticate(self) -> bool:
         """
-        Authenticate with Gmail API using OAuth2.
+        Authenticate with Gmail API using OAuth2 with enhanced error handling and proactive token refresh.
         
         Returns:
             bool: True if authentication successful, False otherwise
         """
-        if not GOOGLE_AVAILABLE:
-            logger.error("Google API libraries not available")
-            return False
+        with self.auth_state.auth_lock:
+            self.total_auth_attempts += 1
             
-        try:
-            creds = None
+            if not GOOGLE_AVAILABLE:
+                error_msg = "Google API libraries not available"
+                logger.error(error_msg)
+                self.auth_state.last_auth_error = error_msg
+                return False
             
-            # Load existing token
-            if os.path.exists(self.token_file):
-                creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
-            
-            # If no valid credentials, authorize user
-            if not creds or not creds.valid:
-                if creds and creds.expired and creds.refresh_token:
-                    logger.info("Refreshing expired Gmail credentials")
-                    creds.refresh(Request())
-                else:
-                    if not os.path.exists(self.credentials_file):
-                        logger.error(f"Credentials file not found: {self.credentials_file}")
-                        return False
-                    
-                    logger.info("Initiating Gmail OAuth2 flow")
-                    flow = InstalledAppFlow.from_client_secrets_file(
-                        self.credentials_file, self.scopes)
-                    creds = flow.run_local_server(port=0)
+            try:
+                # Check if already authenticated and valid (with proactive refresh)
+                if self.auth_state.is_authenticated and self.auth_state.token_expires_at:
+                    if self._is_token_near_expiry():
+                        logger.info("Token near expiry, attempting refresh")
+                        if self._refresh_token():
+                            return True
+                        # If refresh failed, continue with full re-authentication
+                    else:
+                        logger.debug("Using existing valid authentication")
+                        return True
                 
-                # Save credentials for next run
-                with open(self.token_file, 'w') as token:
-                    token.write(creds.to_json())
-                logger.info("Gmail credentials saved successfully")
+                creds = None
+                
+                # Load existing token with validation
+                if os.path.exists(self.token_file):
+                    try:
+                        creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
+                        logger.debug("Loaded existing credentials from token file")
+                    except Exception as e:
+                        logger.warning(f"Failed to load existing token: {e}")
+                        # Remove invalid token file
+                        try:
+                            os.remove(self.token_file)
+                            logger.info("Removed invalid token file")
+                        except OSError:
+                            pass
+                
+                # If no valid credentials, handle refresh or re-authorization
+                if not creds or not creds.valid:
+                    if creds and creds.expired and creds.refresh_token:
+                        logger.info("Refreshing expired Gmail credentials")
+                        try:
+                            creds.refresh(Request())
+                            self.auth_state.token_refresh_count += 1
+                            self.auth_state.last_refresh_time = datetime.now()
+                            logger.info(f"Successfully refreshed credentials (count: {self.auth_state.token_refresh_count})")
+                        except Exception as refresh_error:
+                            logger.warning(f"Token refresh failed: {refresh_error}")
+                            # Try full re-authentication
+                            creds = None
+                    
+                    if not creds or not creds.valid:
+                        if not os.path.exists(self.credentials_file):
+                            error_msg = f"Credentials file not found: {self.credentials_file}"
+                            logger.error(error_msg)
+                            self.auth_state.last_auth_error = error_msg
+                            self.auth_state.consecutive_auth_failures += 1
+                            return False
+                        
+                        logger.info("Initiating Gmail OAuth2 flow")
+                        try:
+                            flow = InstalledAppFlow.from_client_secrets_file(
+                                self.credentials_file, self.scopes)
+                            creds = flow.run_local_server(
+                                port=0, 
+                                timeout_seconds=300,  # 5分タイムアウト
+                                access_type='offline',
+                                prompt='consent'
+                            )
+                            logger.info("OAuth2 flow completed successfully")
+                        except Exception as oauth_error:
+                            error_msg = f"OAuth2 flow failed: {oauth_error}"
+                            logger.error(error_msg)
+                            self.auth_state.last_auth_error = error_msg
+                            self.auth_state.consecutive_auth_failures += 1
+                            raise
+                    
+                    # Save credentials for next run with secure permissions
+                    try:
+                        # Set secure file permissions (owner read/write only)
+                        old_umask = os.umask(0o077)
+                        try:
+                            with open(self.token_file, 'w') as token:
+                                token.write(creds.to_json())
+                        finally:
+                            os.umask(old_umask)
+                        logger.info("Gmail credentials saved securely")
+                    except Exception as save_error:
+                        logger.warning(f"Failed to save credentials: {save_error}")
+                        # Continue anyway if we have valid creds in memory
+                
+                # Build Gmail service with timeout
+                try:
+                    self.service = build('gmail', 'v1', credentials=creds, cache_discovery=False)
+                    logger.info("Gmail service built successfully")
+                except Exception as service_error:
+                    error_msg = f"Failed to build Gmail service: {service_error}"
+                    logger.error(error_msg)
+                    self.auth_state.last_auth_error = error_msg
+                    raise
+                
+                # Test the service
+                try:
+                    profile = self.service.users().getProfile(userId='me').execute()
+                    email_address = profile.get('emailAddress', 'unknown')
+                    logger.info(f"Gmail API authentication successful for: {email_address}")
+                except Exception as test_error:
+                    error_msg = f"Gmail service test failed: {test_error}"
+                    logger.error(error_msg)
+                    self.auth_state.last_auth_error = error_msg
+                    raise
+                
+                # Update authentication state
+                self.auth_state.is_authenticated = True
+                self.auth_state.last_auth_time = datetime.now()
+                self.auth_state.consecutive_auth_failures = 0
+                self.auth_state.last_auth_error = None
+                
+                # Calculate token expiration with buffer for proactive refresh
+                if creds.expiry:
+                    self.auth_state.token_expires_at = creds.expiry
+                else:
+                    # Default to 1 hour if no expiry info
+                    self.auth_state.token_expires_at = datetime.now() + timedelta(hours=1)
+                
+                return True
+                
+            except Exception as e:
+                error_msg = f"Gmail authentication failed: {str(e)}"
+                logger.error(error_msg)
+                self.auth_state.last_auth_error = error_msg
+                self.auth_state.consecutive_auth_failures += 1
+                self.auth_state.is_authenticated = False
+                
+                # Reset service on failure
+                self.service = None
+                
+                raise
+    
+    def _enforce_rate_limit(self):
+        """Gmail API レート制限を強制"""
+        now = time.time()
+        
+        # 古いリクエストタイムスタンプを削除
+        self.rate_limit_requests = [
+            req_time for req_time in self.rate_limit_requests 
+            if now - req_time < self.rate_limit_window
+        ]
+        
+        # レート制限チェック
+        if len(self.rate_limit_requests) >= self.max_requests_per_minute:
+            sleep_time = self.rate_limit_window - (now - self.rate_limit_requests[0]) + 1
+            logger.info(f"Gmail API rate limit reached, sleeping for {sleep_time:.1f} seconds")
+            time.sleep(sleep_time)
             
-            # Build Gmail service
-            self.service = build('gmail', 'v1', credentials=creds)
-            self._authenticated = True
-            logger.info("Gmail API authentication successful")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Gmail authentication failed: {str(e)}")
-            return False
+            # タイムスタンプを再度クリーンアップ
+            now = time.time()
+            self.rate_limit_requests = [
+                req_time for req_time in self.rate_limit_requests 
+                if now - req_time < self.rate_limit_window
+            ]
+        
+        # このリクエストを記録
+        self.rate_limit_requests.append(now)
+    
+    def get_performance_stats(self) -> Dict[str, Any]:
+        """パフォーマンス統計情報を取得"""
+        uptime = datetime.now() - self.start_time
+        
+        return {
+            'total_emails_sent': self.total_emails_sent,
+            'total_send_failures': self.total_send_failures,
+            'total_auth_attempts': self.total_auth_attempts,
+            'success_rate': (
+                self.total_emails_sent / (self.total_emails_sent + self.total_send_failures)
+                if (self.total_emails_sent + self.total_send_failures) > 0 else 1.0
+            ),
+            'uptime_seconds': uptime.total_seconds(),
+            'is_authenticated': self.auth_state.is_authenticated,
+            'consecutive_auth_failures': self.auth_state.consecutive_auth_failures,
+            'last_auth_error': self.auth_state.last_auth_error,
+            'rate_limit_requests_count': len(self.rate_limit_requests),
+            'rate_limit_utilization': len(self.rate_limit_requests) / self.max_requests_per_minute
+        }
     
     def create_message(self, to: str, subject: str, html_content: str, 
                       text_content: str = None, attachments: List[Dict] = None) -> Dict[str, Any]:
@@ -171,9 +460,10 @@ class GmailNotifier:
         except Exception as e:
             logger.warning(f"Failed to add attachment {filename}: {str(e)}")
     
+    @retry_on_failure(max_retries=3, delay=1.0)
     def send_message(self, message: Dict[str, Any]) -> bool:
         """
-        Send email message.
+        Send email message with enhanced error handling, rate limiting, and proactive token refresh.
         
         Args:
             message: Gmail message object
@@ -181,24 +471,95 @@ class GmailNotifier:
         Returns:
             bool: True if sent successfully, False otherwise
         """
-        if not self._authenticated:
-            logger.error("Gmail not authenticated. Call authenticate() first.")
+        # Check authentication status and proactively refresh if needed
+        if not self.auth_state.is_authenticated:
+            logger.info("Not authenticated, attempting authentication...")
+            if not self.authenticate():
+                logger.error("Authentication failed, cannot send email")
+                self.total_send_failures += 1
+                return False
+        elif self._is_token_near_expiry():
+            logger.info("Token near expiry, attempting proactive refresh before sending")
+            if not self._refresh_token_proactively():
+                logger.warning("Proactive token refresh failed, will try to send anyway")
+        
+        # Double-check authentication after potential refresh
+        if not self.auth_state.is_authenticated:
+            logger.error("Authentication lost, cannot send email")
+            self.total_send_failures += 1
             return False
         
+        # Enforce rate limiting
+        self._enforce_rate_limit()
+        
         try:
+            start_time = time.time()
+            
+            # Validate message structure
+            if not message or 'raw' not in message:
+                raise ValueError("Invalid message format: missing 'raw' field")
+            
+            # Send message
             result = self.service.users().messages().send(
                 userId='me', body=message).execute()
             
+            send_time = time.time() - start_time
             message_id = result.get('id')
-            logger.info(f"Email sent successfully. Message ID: {message_id}")
+            
+            # Success metrics
+            self.total_emails_sent += 1
+            
+            logger.info(f"Email sent successfully in {send_time:.2f}s. Message ID: {message_id}")
+            
+            # Log slow sends
+            if send_time > 5.0:
+                logger.warning(f"Slow email send: {send_time:.2f}s")
+            
             return True
             
         except HttpError as error:
-            logger.error(f"Gmail API error: {error}")
-            return False
+            self.total_send_failures += 1
+            
+            # Handle specific Gmail API errors
+            status_code = error.resp.status if hasattr(error, 'resp') else 'unknown'
+            error_details = error.error_details if hasattr(error, 'error_details') else []
+            
+            if status_code == 401:  # Unauthorized
+                logger.warning("Gmail API unauthorized error, attempting re-authentication")
+                self.auth_state.is_authenticated = False
+                self.service = None
+                # Re-authenticate will be attempted on retry
+                raise  # Trigger retry
+            elif status_code == 403:  # Forbidden
+                if any('rate' in str(detail).lower() for detail in error_details):
+                    logger.warning("Gmail API rate limit error, will retry with backoff")
+                    time.sleep(2)  # Additional delay
+                    raise  # Trigger retry
+                else:
+                    logger.error(f"Gmail API forbidden error (non-retryable): {error}")
+                    return False
+            elif status_code == 429:  # Too Many Requests
+                logger.warning("Gmail API rate limit exceeded, backing off")
+                time.sleep(5)  # Longer delay for rate limit
+                raise  # Trigger retry
+            elif 500 <= status_code < 600:  # Server errors
+                logger.warning(f"Gmail API server error {status_code}, retrying")
+                raise  # Trigger retry
+            else:
+                logger.error(f"Gmail API error {status_code}: {error}")
+                return False
+                
         except Exception as e:
-            logger.error(f"Failed to send email: {str(e)}")
-            return False
+            self.total_send_failures += 1
+            
+            # Check for network-related errors that should trigger retry
+            error_str = str(e).lower()
+            if any(keyword in error_str for keyword in ['timeout', 'connection', 'network']):
+                logger.warning(f"Network-related error, retrying: {e}")
+                raise  # Trigger retry
+            else:
+                logger.error(f"Failed to send email (non-retryable): {e}")
+                return False
     
     def send_notification(self, notification: EmailNotification, 
                          recipient: str = None) -> bool:

@@ -53,6 +53,18 @@ class DatabaseManager:
         self._query_count = 0
         self._error_count = 0
         self._start_time = time.time()
+        self._slow_query_threshold = 1.0  # Log queries taking > 1 second
+        self._transaction_count = 0
+        self._rollback_count = 0
+        
+        # Connection pool health monitoring
+        self._pool_hits = 0  # Connections reused from pool
+        self._pool_misses = 0  # New connections created
+        self._pool_evictions = 0  # Connections removed from pool
+        
+        # Connection quality tracking
+        self._connection_ages = {}  # Track connection creation times
+        self._max_connection_age = 3600  # 1 hour max connection age
         
         # Ensure database directory exists
         db_dir = os.path.dirname(os.path.abspath(db_path))
@@ -99,34 +111,38 @@ class DatabaseManager:
         """
         connection = None
         start_time = time.time()
+        pool_hit = False
         
         try:
             # Try to get connection from thread-local storage first
             if not hasattr(self._local, 'connection') or self._local.connection is None:
-                with self._pool_lock:
-                    if self._connection_pool:
-                        connection = self._connection_pool.pop()
-                        self._local.connection = connection
-                    else:
-                        connection = self._create_connection()
-                        self._local.connection = connection
+                connection = self._get_pooled_connection()
+                self._local.connection = connection
             else:
                 connection = self._local.connection
+                pool_hit = True
             
-            # Test connection validity
-            try:
-                connection.execute("SELECT 1").fetchone()
-            except sqlite3.Error:
-                # Connection is stale, create new one
-                connection.close()
+            # Test connection validity and age
+            if not self._is_connection_valid(connection):
+                self.logger.debug("Invalid connection detected, creating new one")
+                if connection:
+                    self._close_connection_safely(connection)
                 connection = self._create_connection()
                 self._local.connection = connection
+                pool_hit = False
+            
+            # Update statistics
+            if pool_hit:
+                self._pool_hits += 1
+            else:
+                self._pool_misses += 1
             
             self._query_count += 1
             yield connection
             
         except sqlite3.Error as e:
             self._error_count += 1
+            self._rollback_count += 1
             if connection:
                 try:
                     connection.rollback()
@@ -145,8 +161,116 @@ class DatabaseManager:
             raise
         finally:
             query_time = time.time() - start_time
-            if query_time > 1.0:  # Log slow queries
+            if query_time > self._slow_query_threshold:
                 self.logger.warning(f"Slow database query: {query_time:.2f}s")
+    
+    def _get_pooled_connection(self) -> sqlite3.Connection:
+        """Get connection from pool or create new one."""
+        with self._pool_lock:
+            # Clean up old connections first
+            self._cleanup_old_connections()
+            
+            # Try to get from pool
+            while self._connection_pool:
+                connection = self._connection_pool.pop()
+                if self._is_connection_valid(connection):
+                    self._pool_hits += 1
+                    return connection
+                else:
+                    self._close_connection_safely(connection)
+                    self._pool_evictions += 1
+            
+            # Create new connection
+            self._pool_misses += 1
+            connection = self._create_connection()
+            self._connection_ages[id(connection)] = time.time()
+            return connection
+    
+    def _is_connection_valid(self, connection: sqlite3.Connection) -> bool:
+        """Check if connection is valid and not too old."""
+        if not connection:
+            return False
+        
+        try:
+            # Test basic functionality
+            connection.execute("SELECT 1").fetchone()
+            
+            # Check age
+            conn_id = id(connection)
+            if conn_id in self._connection_ages:
+                age = time.time() - self._connection_ages[conn_id]
+                if age > self._max_connection_age:
+                    self.logger.debug(f"Connection too old: {age:.1f}s")
+                    return False
+            
+            return True
+            
+        except sqlite3.Error:
+            return False
+    
+    def _cleanup_old_connections(self):
+        """Remove old connections from pool."""
+        current_time = time.time()
+        valid_connections = []
+        
+        for connection in self._connection_pool:
+            conn_id = id(connection)
+            if (conn_id in self._connection_ages and 
+                current_time - self._connection_ages[conn_id] < self._max_connection_age):
+                if self._is_connection_valid(connection):
+                    valid_connections.append(connection)
+                    continue
+            
+            # Close invalid/old connection
+            self._close_connection_safely(connection)
+            if conn_id in self._connection_ages:
+                del self._connection_ages[conn_id]
+            self._pool_evictions += 1
+        
+        self._connection_pool = valid_connections
+    
+    def _close_connection_safely(self, connection: sqlite3.Connection):
+        """Safely close a connection."""
+        try:
+            conn_id = id(connection)
+            if conn_id in self._connection_ages:
+                del self._connection_ages[conn_id]
+            connection.close()
+        except Exception as e:
+            self.logger.debug(f"Error closing connection: {e}")
+    
+    @contextmanager
+    def get_transaction(self):
+        """
+        Get database connection with explicit transaction management.
+        
+        Provides ACID transaction guarantees with automatic rollback on failure.
+        """
+        start_time = time.time()
+        
+        with self.get_connection() as conn:
+            try:
+                # Begin transaction explicitly
+                conn.execute("BEGIN")
+                self._transaction_count += 1
+                
+                yield conn
+                
+                # Commit if successful
+                conn.commit()
+                
+                transaction_time = time.time() - start_time
+                if transaction_time > self._slow_query_threshold:
+                    self.logger.warning(f"Slow transaction: {transaction_time:.2f}s")
+                    
+            except Exception:
+                # Rollback on any error
+                try:
+                    conn.rollback()
+                    self._rollback_count += 1
+                except Exception as rollback_error:
+                    self.logger.error(f"Rollback failed: {rollback_error}")
+                raise
     
     def initialize_database(self):
         """
@@ -474,18 +598,83 @@ class DatabaseManager:
         Get database performance statistics.
         
         Returns:
-            Dictionary with performance metrics
+            Dictionary with comprehensive performance metrics
         """
         uptime = time.time() - self._start_time
+        
+        # Calculate connection pool efficiency
+        total_connection_requests = self._pool_hits + self._pool_misses
+        pool_hit_rate = self._pool_hits / total_connection_requests if total_connection_requests > 0 else 0
+        
         return {
+            # Basic metrics
             'uptime_seconds': uptime,
             'total_queries': self._query_count,
             'total_errors': self._error_count,
+            'total_transactions': self._transaction_count,
+            'total_rollbacks': self._rollback_count,
+            
+            # Performance ratios
             'queries_per_second': self._query_count / uptime if uptime > 0 else 0,
             'error_rate': self._error_count / self._query_count if self._query_count > 0 else 0,
+            'rollback_rate': self._rollback_count / self._transaction_count if self._transaction_count > 0 else 0,
+            
+            # Connection pool metrics
             'active_connections': 1 if hasattr(self._local, 'connection') else 0,
-            'pool_size': len(self._connection_pool)
+            'pool_size': len(self._connection_pool),
+            'max_pool_size': self.max_connections,
+            'pool_hit_rate': pool_hit_rate,
+            'pool_hits': self._pool_hits,
+            'pool_misses': self._pool_misses,
+            'pool_evictions': self._pool_evictions,
+            
+            # Health indicators
+            'health_score': self._calculate_health_score(),
+            'performance_grade': self._calculate_performance_grade(),
+            'connection_ages_tracked': len(self._connection_ages),
+            'slow_query_threshold': self._slow_query_threshold
         }
+    
+    def _calculate_health_score(self) -> float:
+        """
+        Calculate overall database health score (0.0 to 1.0).
+        
+        Returns:
+            Health score from 0.0 (unhealthy) to 1.0 (perfect health)
+        """
+        if self._query_count == 0:
+            return 1.0  # Perfect score for new database
+        
+        # Base score calculation
+        error_penalty = min(self._error_count / self._query_count, 0.5)  # Max 50% penalty
+        rollback_penalty = min(self._rollback_count / max(self._transaction_count, 1), 0.3)  # Max 30% penalty
+        
+        # Connection pool efficiency bonus
+        total_requests = self._pool_hits + self._pool_misses
+        pool_bonus = (self._pool_hits / max(total_requests, 1)) * 0.1  # Up to 10% bonus
+        
+        health_score = 1.0 - error_penalty - rollback_penalty + pool_bonus
+        return max(0.0, min(1.0, health_score))
+    
+    def _calculate_performance_grade(self) -> str:
+        """
+        Calculate performance grade based on metrics.
+        
+        Returns:
+            Performance grade: 'A', 'B', 'C', 'D', or 'F'
+        """
+        health_score = self._calculate_health_score()
+        
+        if health_score >= 0.9:
+            return 'A'  # Excellent
+        elif health_score >= 0.8:
+            return 'B'  # Good
+        elif health_score >= 0.7:
+            return 'C'  # Fair
+        elif health_score >= 0.6:
+            return 'D'  # Poor
+        else:
+            return 'F'  # Failing
     
     def optimize_database(self):
         """

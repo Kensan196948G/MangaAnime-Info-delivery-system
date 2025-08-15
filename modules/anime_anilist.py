@@ -136,6 +136,12 @@ class AniListClient:
     HEALTH_RECOVERY_THRESHOLD = 3  # Successful requests needed for recovery
     PERFORMANCE_OPTIMIZATION_WINDOW = 300  # 5-minute performance analysis window
     
+    # Enhanced rate limiting constants
+    ADAPTIVE_RATE_LIMIT_FACTOR = 0.8  # Reduce rate by 20% when errors detected
+    RATE_LIMIT_RECOVERY_FACTOR = 1.05  # Gradually increase rate by 5% when stable
+    MIN_RATE_LIMIT = 30  # Minimum requests per minute during throttling
+    MAX_BURST_SIZE = 10  # Maximum burst requests allowed
+    
     def __init__(self, timeout: int = 30, retry_attempts: int = 3, retry_delay: int = 5):
         """
         Initialize AniList client with enhanced reliability features.
@@ -154,6 +160,13 @@ class AniListClient:
         self.request_timestamps = []
         self.rate_limit_lock = asyncio.Lock()
         
+        # Adaptive rate limiting
+        self.current_rate_limit = self.RATE_LIMIT
+        self.consecutive_errors = 0
+        self.consecutive_successes = 0
+        self.last_rate_adjustment = time.time()
+        self.rate_adjustment_cooldown = 60  # seconds
+        
         # Circuit breaker
         circuit_config = CircuitBreakerConfig(
             failure_threshold=5,
@@ -169,9 +182,12 @@ class AniListClient:
         self.last_request_time = None
         
     async def _enforce_rate_limit(self):
-        """Enforce enhanced rate limiting with adaptive delays."""
+        """Enforce enhanced rate limiting with adaptive delays and dynamic adjustment."""
         async with self.rate_limit_lock:
             now = time.time()
+            
+            # Adaptive rate limit adjustment
+            self._adjust_rate_limit_if_needed()
             
             # Remove timestamps older than rate window
             self.request_timestamps = [
@@ -179,34 +195,80 @@ class AniListClient:
                 if now - ts < self.RATE_WINDOW
             ]
             
-            # Check if we're approaching the rate limit
+            # Check if we're approaching the current rate limit
             current_requests = len(self.request_timestamps)
+            effective_limit = min(self.current_rate_limit, self.RATE_LIMIT)
+            
+            # Burst protection: detect rapid requests
+            recent_requests = [ts for ts in self.request_timestamps if now - ts < 10]  # Last 10 seconds
+            if len(recent_requests) >= self.MAX_BURST_SIZE:
+                burst_delay = 2.0  # 2 second cooldown for burst protection
+                self.logger.debug(f"Burst protection: sleeping {burst_delay}s")
+                await asyncio.sleep(burst_delay)
+                now = time.time()
             
             # Adaptive throttling: slow down as we approach the limit
-            if current_requests >= self.RATE_LIMIT * 0.8:  # At 80% capacity
-                adaptive_delay = (current_requests - self.RATE_LIMIT * 0.8) / (self.RATE_LIMIT * 0.2)
-                adaptive_delay = min(adaptive_delay * 2, 5)  # Max 5 second delay
+            if current_requests >= effective_limit * self.BURST_THRESHOLD:
+                throttle_factor = (current_requests - effective_limit * self.BURST_THRESHOLD) / (effective_limit * (1 - self.BURST_THRESHOLD))
+                adaptive_delay = min(throttle_factor * 3, 5)  # Max 5 second delay
                 if adaptive_delay > 0:
-                    self.logger.debug(f"Adaptive rate limiting: sleeping {adaptive_delay:.1f}s")
+                    self.logger.debug(f"Adaptive throttling: sleeping {adaptive_delay:.1f}s (current limit: {effective_limit})")
                     await asyncio.sleep(adaptive_delay)
                     now = time.time()
             
             # Hard limit enforcement
-            if current_requests >= self.RATE_LIMIT:
-                sleep_time = self.RATE_WINDOW - (now - self.request_timestamps[0]) + 1
-                self.logger.info(f"Rate limit reached, sleeping for {sleep_time:.1f} seconds")
-                await asyncio.sleep(sleep_time)
-                
-                # Clean up old timestamps again
-                now = time.time()
-                self.request_timestamps = [
-                    ts for ts in self.request_timestamps 
-                    if now - ts < self.RATE_WINDOW
-                ]
+            if current_requests >= effective_limit:
+                if self.request_timestamps:
+                    sleep_time = self.RATE_WINDOW - (now - self.request_timestamps[0]) + 1
+                    self.logger.info(f"Rate limit reached ({effective_limit}/min), sleeping for {sleep_time:.1f} seconds")
+                    await asyncio.sleep(sleep_time)
+                    
+                    # Clean up old timestamps again
+                    now = time.time()
+                    self.request_timestamps = [
+                        ts for ts in self.request_timestamps 
+                        if now - ts < self.RATE_WINDOW
+                    ]
             
             # Record this request
             self.request_timestamps.append(now)
             self.last_request_time = now
+    
+    def _adjust_rate_limit_if_needed(self):
+        """Dynamically adjust rate limit based on error patterns."""
+        now = time.time()
+        
+        # Only adjust if cooldown period has passed
+        if now - self.last_rate_adjustment < self.rate_adjustment_cooldown:
+            return
+        
+        # Decrease rate limit if consecutive errors detected
+        if self.consecutive_errors >= 3:
+            new_limit = max(
+                self.current_rate_limit * self.ADAPTIVE_RATE_LIMIT_FACTOR,
+                self.MIN_RATE_LIMIT
+            )
+            if new_limit != self.current_rate_limit:
+                self.logger.warning(
+                    f"Reducing rate limit due to errors: {self.current_rate_limit} -> {new_limit:.1f}"
+                )
+                self.current_rate_limit = new_limit
+                self.last_rate_adjustment = now
+                self.consecutive_errors = 0
+        
+        # Increase rate limit if stable performance
+        elif self.consecutive_successes >= 10:
+            new_limit = min(
+                self.current_rate_limit * self.RATE_LIMIT_RECOVERY_FACTOR,
+                self.RATE_LIMIT
+            )
+            if new_limit != self.current_rate_limit:
+                self.logger.info(
+                    f"Increasing rate limit due to stable performance: {self.current_rate_limit} -> {new_limit:.1f}"
+                )
+                self.current_rate_limit = new_limit
+                self.last_rate_adjustment = now
+                self.consecutive_successes = 0
     
     async def _make_request(self, query: str, variables: Optional[Dict] = None) -> Dict[str, Any]:
         """
@@ -281,6 +343,8 @@ class AniListClient:
                         
                         # Success - record it
                         self.circuit_breaker.record_success()
+                        self.consecutive_errors = 0
+                        self.consecutive_successes += 1
                         
                         if response_time > 5.0:
                             self.logger.warning(f"Slow AniList API response: {response_time:.2f}s")
@@ -290,6 +354,8 @@ class AniListClient:
             except (aiohttp.ClientError, asyncio.TimeoutError) as e:
                 last_exception = e
                 self.error_count += 1
+                self.consecutive_errors += 1
+                self.consecutive_successes = 0
                 self.logger.warning(f"Request attempt {attempt + 1} failed: {e}")
                 
                 if attempt < self.retry_attempts - 1:
@@ -342,6 +408,9 @@ class AniListClient:
             'rate_limit_queue_size': len(self.request_timestamps),
             'recent_request_count': len(recent_timestamps),
             'rate_limit_utilization': len(recent_timestamps) / (self.RATE_LIMIT * self.PERFORMANCE_OPTIMIZATION_WINDOW / self.RATE_WINDOW),
+            'current_rate_limit': self.current_rate_limit,
+            'consecutive_errors': self.consecutive_errors,
+            'consecutive_successes': self.consecutive_successes,
             
             # Performance optimization metrics
             'burst_mode_active': len(self.request_timestamps) >= self.RATE_LIMIT * self.BURST_THRESHOLD,

@@ -18,6 +18,162 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from enum import Enum
+import asyncio
+import aiohttp
+from typing import Set
+import json
+
+
+@dataclass
+class FeedHealth:
+    """RSS フィードの健全性を追跡するクラス"""
+    url: str
+    success_count: int = 0
+    failure_count: int = 0
+    last_success: Optional[datetime] = None
+    last_failure: Optional[datetime] = None
+    last_response_time: float = 0.0
+    average_response_time: float = 0.0
+    consecutive_failures: int = 0
+    is_healthy: bool = True
+    
+    def record_success(self, response_time: float):
+        """成功を記録"""
+        self.success_count += 1
+        self.consecutive_failures = 0
+        self.last_success = datetime.now()
+        self.last_response_time = response_time
+        
+        # 平均応答時間を更新
+        if self.average_response_time == 0:
+            self.average_response_time = response_time
+        else:
+            self.average_response_time = (self.average_response_time + response_time) / 2
+        
+        self.is_healthy = True
+    
+    def record_failure(self):
+        """失敗を記録"""
+        self.failure_count += 1
+        self.consecutive_failures += 1
+        self.last_failure = datetime.now()
+        
+        # 連続失敗が3回以上で不健全とみなす
+        if self.consecutive_failures >= 3:
+            self.is_healthy = False
+    
+    def get_success_rate(self) -> float:
+        """成功率を取得"""
+        total = self.success_count + self.failure_count
+        if total == 0:
+            return 1.0
+        return self.success_count / total
+    
+    def get_health_score(self) -> float:
+        """ヘルススコアを計算 (0.0-1.0)"""
+        if not self.is_healthy:
+            return 0.0
+        
+        success_rate = self.get_success_rate()
+        response_penalty = min(self.average_response_time / 10.0, 0.5)  # 10秒で50%ペナルティ
+        consecutive_failure_penalty = min(self.consecutive_failures * 0.1, 0.3)
+        
+        score = success_rate - response_penalty - consecutive_failure_penalty
+        return max(0.0, min(1.0, score))
+
+
+class EnhancedRSSParser:
+    """強化版RSSパーサー"""
+    
+    def __init__(self):
+        self.title_patterns = [
+            r'^(.+?)\s*[第#]?\s*(\d+)\s*[話巻]\s*(.*)$',  # タイトル + 話/巻番号
+            r'^(.+?)\s*(\d+)\s*巻?\s*(.*)$',  # タイトル + 数字 + 巻
+            r'^(.+?)\s*vol\.?\s*(\d+)\s*(.*)$',  # タイトル + vol + 数字
+        ]
+        
+        self.date_patterns = [
+            r'(\d{4})-(\d{2})-(\d{2})',  # YYYY-MM-DD
+            r'(\d{4})/(\d{2})/(\d{2})',  # YYYY/MM/DD
+            r'(\d{2})/(\d{2})/(\d{4})',  # MM/DD/YYYY
+        ]
+    
+    def extract_title(self, raw_title: str) -> str:
+        """タイトルを抽出・クリーンアップ"""
+        if not raw_title:
+            return ""
+        
+        # HTMLタグ除去
+        clean_title = re.sub(r'<[^>]+>', '', raw_title)
+        
+        # 余分な空白除去
+        clean_title = re.sub(r'\s+', ' ', clean_title).strip()
+        
+        # 番号部分を除去してメインタイトルを抽出
+        for pattern in self.title_patterns:
+            match = re.match(pattern, clean_title, re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+        
+        return clean_title
+    
+    def extract_number_and_type(self, raw_title: str) -> Tuple[Optional[str], Optional[ReleaseType]]:
+        """タイトルから番号とリリースタイプを抽出"""
+        if not raw_title:
+            return None, None
+        
+        # 話数パターン
+        episode_patterns = [
+            r'第(\d+)話',
+            r'#(\d+)',
+            r'ep\.?(\d+)',
+            r'episode\s*(\d+)',
+        ]
+        
+        # 巻数パターン
+        volume_patterns = [
+            r'第(\d+)巻',
+            r'(\d+)巻',
+            r'vol\.?\s*(\d+)',
+            r'volume\s*(\d+)',
+        ]
+        
+        # 話数チェック
+        for pattern in episode_patterns:
+            match = re.search(pattern, raw_title, re.IGNORECASE)
+            if match:
+                return match.group(1), ReleaseType.EPISODE
+        
+        # 巻数チェック
+        for pattern in volume_patterns:
+            match = re.search(pattern, raw_title, re.IGNORECASE)
+            if match:
+                return match.group(1), ReleaseType.VOLUME
+        
+        return None, None
+    
+    def extract_date(self, date_str: str) -> Optional[datetime]:
+        """日時文字列から datetime オブジェクトを抽出"""
+        if not date_str:
+            return None
+        
+        # 日付パターンマッチング
+        for pattern in self.date_patterns:
+            match = re.search(pattern, date_str)
+            if match:
+                try:
+                    groups = match.groups()
+                    if len(groups) == 3:
+                        if len(groups[0]) == 4:  # YYYY-MM-DD or YYYY/MM/DD
+                            year, month, day = groups
+                        else:  # MM/DD/YYYY
+                            month, day, year = groups
+                        
+                        return datetime(int(year), int(month), int(day))
+                except ValueError:
+                    continue
+        
+        return None
 
 
 class MangaRSSCollector:
@@ -132,7 +288,7 @@ class MangaRSSCollector:
     
     def collect(self) -> List[Dict[str, Any]]:
         """
-        RSSフィードから並列で情報を収集
+        RSSフィードから並列で情報を収集（強化版）
         
         Returns:
             List[Dict[str, Any]]: 収集した情報のリスト
@@ -146,6 +302,80 @@ class MangaRSSCollector:
             self.logger.warning("有効なマンガRSSフィードが見つかりません")
             return []
         
+        # ヘルシーなフィードを優先
+        healthy_feeds = [feed for feed in manga_feeds 
+                        if self.feed_health.get(feed.get('url', ''), FeedHealth(url='')).is_healthy]
+        
+        if len(healthy_feeds) < len(manga_feeds):
+            self.logger.info(f"健全なフィード: {len(healthy_feeds)}/{len(manga_feeds)}")
+        
+        # 非同期処理でより効率的に収集
+        try:
+            all_items = asyncio.run(self._collect_async(manga_feeds))
+        except Exception as e:
+            self.logger.error(f"非同期収集でエラー、同期処理にフォールバック: {e}")
+            all_items = self._collect_sync(manga_feeds)
+        
+        # 重複除去
+        duplicate_detector = DuplicateDetector()
+        unique_items = duplicate_detector.remove_duplicates(all_items)
+        
+        # 統計情報をログ出力
+        stats = duplicate_detector.get_statistics()
+        self.logger.info(
+            f"マンガRSS収集完了: {len(all_items)} 件取得, {len(unique_items)} 件（重複除去後）, "
+            f"重複検出統計: {stats}"
+        )
+        
+        return unique_items
+    
+    async def _collect_async(self, manga_feeds: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """非同期並列収集"""
+        connector = aiohttp.TCPConnector(
+            limit=20,  # 全体での同時接続数制限
+            limit_per_host=5,  # ホストごとの同時接続数制限
+            ttl_dns_cache=300,  # DNS キャッシュ
+            use_dns_cache=True,
+            keepalive_timeout=30,
+            enable_cleanup_closed=True
+        )
+        
+        timeout = aiohttp.ClientTimeout(
+            total=60,  # 全体タイムアウト
+            connect=10,  # 接続タイムアウト
+            sock_read=30  # 読み取りタイムアウト
+        )
+        
+        async with aiohttp.ClientSession(
+            connector=connector,
+            timeout=timeout,
+            headers={'User-Agent': self.user_agent}
+        ) as session:
+            tasks = []
+            for feed in manga_feeds:
+                task = self._collect_from_feed_async(session, feed)
+                tasks.append(task)
+            
+            # 並列実行（一部失敗しても続行）
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            all_items = []
+            for i, result in enumerate(results):
+                feed_name = manga_feeds[i].get('name', 'Unknown')
+                if isinstance(result, Exception):
+                    self.logger.error(f"  {feed_name} で非同期処理エラー: {result}")
+                    continue
+                
+                if result:
+                    self.logger.info(f"  {feed_name}: {len(result)} 件取得")
+                    all_items.extend(result)
+                else:
+                    self.logger.info(f"  {feed_name}: データなし")
+            
+            return all_items
+    
+    def _collect_sync(self, manga_feeds: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """同期並列収集（フォールバック）"""
         all_items = []
         
         # 並列処理でRSS収集を実行
@@ -160,7 +390,7 @@ class MangaRSSCollector:
                 feed_name = feed.get('name', 'Unknown')
                 
                 try:
-                    items = future.result(timeout=30)  # 30秒タイムアウト
+                    items = future.result(timeout=45)  # 45秒タイムアウト
                     if items:
                         self.logger.info(f"  {feed_name}: {len(items)} 件取得")
                         all_items.extend(items)
@@ -171,11 +401,69 @@ class MangaRSSCollector:
                     self.logger.error(f"  {feed_name} で並列処理エラー: {e}")
                     continue
         
-        # 重複除去
-        unique_items = self._deduplicate_items(all_items)
+        return all_items
+    
+    async def _collect_from_feed_async(self, session: aiohttp.ClientSession, 
+                                     feed_info: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """非同期フィード収集"""
+        feed_name = feed_info.get('name', 'Unknown')
+        feed_url = feed_info.get('url')
         
-        self.logger.info(f"マンガRSS収集完了: {len(all_items)} 件取得, {len(unique_items)} 件（重複除去後）")
-        return unique_items
+        if not feed_url:
+            self.logger.warning(f"フィードURL未設定: {feed_name}")
+            return []
+        
+        try:
+            start_time = time.time()
+            
+            # フィード固有設定を取得
+            feed_config = self._get_feed_config(feed_name)
+            timeout = feed_config.get('timeout', self.timeout)
+            retry_count = feed_config.get('retry_count', 3)
+            retry_delay = feed_config.get('retry_delay', 2)
+            
+            for attempt in range(retry_count):
+                try:
+                    self.logger.debug(f"{feed_name}から非同期収集中... (試行 {attempt + 1}/{retry_count})")
+                    
+                    async with session.get(feed_url) as response:
+                        response.raise_for_status()
+                        
+                        content = await response.read()
+                        response_time = time.time() - start_time
+                        
+                        # RSS解析
+                        feed_data = feedparser.parse(content)
+                        
+                        if feed_data.bozo:
+                            self.logger.warning(f"{feed_name}RSSフィードの解析に問題があります: {feed_data.bozo_exception}")
+                        
+                        # 成功時の処理
+                        items = self._process_feed_entries(feed_data, feed_name)
+                        
+                        # フィードヘルス更新
+                        if feed_url in self.feed_health:
+                            self.feed_health[feed_url].record_success(response_time)
+                        
+                        self.logger.debug(f"{feed_name}から{len(items)}件のアイテムを非同期収集 ({response_time:.1f}s)")
+                        return items
+                
+                except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+                    self.logger.warning(f"{feed_name} 非同期収集試行 {attempt + 1} 失敗: {e}")
+                    if attempt < retry_count - 1:
+                        await asyncio.sleep(retry_delay)
+                        continue
+                    else:
+                        raise
+            
+            return []
+            
+        except Exception as e:
+            self.logger.error(f"非同期フィード収集エラー ({feed_name}): {e}")
+            # Feed health記録
+            if feed_url in self.feed_health:
+                self.feed_health[feed_url].record_failure()
+            return []
     
     def _collect_from_feed_safe(self, feed_info: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
