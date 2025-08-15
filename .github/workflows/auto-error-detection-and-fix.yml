@@ -38,6 +38,7 @@ jobs:
   error-detection:
     name: Error Detection & Analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       has_dependency_issues: ${{ steps.analyze.outputs.has_dependency_issues }}
       has_security_issues: ${{ steps.analyze.outputs.has_security_issues }}
@@ -56,6 +57,11 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y jq
+        
     - name: Install analysis tools
       run: |
         python -m pip install --upgrade pip
@@ -68,8 +74,8 @@ jobs:
         echo "🔍 Scanning dependencies for vulnerabilities..."
         
         # Check for outdated packages
-        pip list --outdated --format=json > outdated-packages.json
-        outdated_count=$(cat outdated-packages.json | jq length)
+        pip list --outdated --format=json > outdated-packages.json || echo "[]" > outdated-packages.json
+        outdated_count=$(cat outdated-packages.json | jq length 2>/dev/null || echo "0")
         echo "outdated_count=$outdated_count" >> $GITHUB_OUTPUT
         
         # Security vulnerabilities
@@ -90,19 +96,25 @@ jobs:
         
         # Code formatting issues
         formatting_issues=0
-        if ! black --check modules/ 2>/dev/null; then
-          formatting_issues=$((formatting_issues + 1))
-        fi
-        
-        if ! isort --check-only modules/ 2>/dev/null; then
-          formatting_issues=$((formatting_issues + 1))
+        if [ -d "modules/" ]; then
+          if ! black --check modules/ 2>/dev/null; then
+            formatting_issues=$((formatting_issues + 1))
+          fi
+          
+          if ! isort --check-only modules/ 2>/dev/null; then
+            formatting_issues=$((formatting_issues + 1))
+          fi
         fi
         
         echo "formatting_issues=$formatting_issues" >> $GITHUB_OUTPUT
         
         # Linting issues
-        flake8 modules/ --count --statistics --output-file=flake8-report.txt || true
-        linting_issues=$(grep -E "^[0-9]+" flake8-report.txt | tail -1 | awk '{print $1}' || echo "0")
+        if [ -d "modules/" ]; then
+          flake8 modules/ --count --statistics --output-file=flake8-report.txt || true
+          linting_issues=$(grep -E "^[0-9]+" flake8-report.txt 2>/dev/null | tail -1 | awk '{print $1}' 2>/dev/null || echo "0")
+        else
+          linting_issues=0
+        fi
         echo "linting_issues=$linting_issues" >> $GITHUB_OUTPUT
         
     - name: Security scan
@@ -111,10 +123,12 @@ jobs:
         echo "🔍 Running security analysis..."
         
         # Bandit security scan
-        bandit -r modules/ -f json -o bandit-report.json || true
         bandit_issues=0
-        if [ -f bandit-report.json ]; then
-          bandit_issues=$(cat bandit-report.json | jq '.results | length' 2>/dev/null || echo "0")
+        if [ -d "modules/" ]; then
+          bandit -r modules/ -f json -o bandit-report.json || true
+          if [ -f bandit-report.json ]; then
+            bandit_issues=$(cat bandit-report.json | jq '.results | length' 2>/dev/null || echo "0")
+          fi
         fi
         echo "bandit_issues=$bandit_issues" >> $GITHUB_OUTPUT
         
@@ -258,13 +272,16 @@ jobs:
           pip-audit-report.json
           flake8-report.txt
           bandit-report.json
+        if-no-files-found: ignore
+        retention-days: 7
 
   # Job 2: Create GitHub Issue for detected problems
   create-issue:
     name: Create GitHub Issue
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [error-detection]
-    if: ${{ needs.error-detection.outputs.fix_needed == 'true' && (inputs.create_issue == true || inputs.create_issue == '') }}
+    if: ${{ needs.error-detection.outputs.fix_needed == 'true' && (github.event.inputs.create_issue == 'true' || github.event.inputs.create_issue == '' || github.event_name == 'schedule') }}
     
     steps:
     - name: Create or update issue
@@ -336,8 +353,9 @@ jobs:
   auto-fix:
     name: Automatic Fixes
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [error-detection]
-    if: ${{ needs.error-detection.outputs.fix_needed == 'true' && (inputs.auto_fix == true || inputs.auto_fix == '') }}
+    if: ${{ needs.error-detection.outputs.fix_needed == 'true' && (github.event.inputs.auto_fix == 'true' || github.event.inputs.auto_fix == '' || github.event_name == 'schedule') }}
     
     steps:
     - name: Checkout code
@@ -349,6 +367,11 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y jq
         
     - name: Install tools
       run: |
@@ -373,14 +396,16 @@ jobs:
       run: |
         echo "🔧 Fixing dependency issues..."
         
-        # Update requirements with security patches
-        pip-compile --upgrade --resolver=backtracking requirements.in || true
-        
         # If requirements.in doesn't exist, create from current requirements
         if [ ! -f requirements.in ]; then
           cp requirements.txt requirements.in
-          pip-compile --upgrade --resolver=backtracking requirements.in
         fi
+        
+        # Update requirements with security patches
+        pip-compile --upgrade --resolver=backtracking requirements.in || {
+          echo "pip-compile failed, using pip-upgrade instead"
+          pip list --outdated --format=json | jq -r '.[] | .name' | xargs -I {} pip install --upgrade {} || true
+        }
         
         echo "✅ Dependencies updated"
         
@@ -390,10 +415,12 @@ jobs:
         echo "🔧 Fixing formatting issues..."
         
         # Apply black formatting
-        black modules/ || true
-        
-        # Fix import sorting
-        isort modules/ || true
+        if [ -d "modules/" ]; then
+          black modules/ || true
+          
+          # Fix import sorting
+          isort modules/ || true
+        fi
         
         echo "✅ Code formatting fixed"
         
@@ -451,21 +478,13 @@ jobs:
           echo "has_changes=true" >> $GITHUB_ENV
           
           # Create comprehensive commit message
-          commit_msg="🤖 Automated fixes for detected issues
-
-🔧 Applied Fixes:
-${{ needs.error-detection.outputs.has_dependency_issues == 'true' && '- Updated dependencies and security patches' || '' }}
-${{ needs.error-detection.outputs.has_formatting_issues == 'true' && '- Fixed code formatting with black and isort' || '' }}
-${{ needs.error-detection.outputs.has_config_issues == 'true' && '- Resolved configuration issues' || '' }}
-
-📊 Detection Results:
-${{ needs.error-detection.outputs.error_summary }}
-
-🤖 Generated with Claude Code (https://claude.ai/code)
-
-Co-Authored-By: GitHub Actions <action@github.com>"
-
-          git commit -m "$commit_msg"
+          git commit -m "🤖 Automated fixes for detected issues" \
+                     -m "" \
+                     -m "Applied fixes based on automated detection results." \
+                     -m "" \
+                     -m "🤖 Generated with Claude Code (https://claude.ai/code)" \
+                     -m "" \
+                     -m "Co-Authored-By: GitHub Actions <action@github.com>"
           git push origin "$branch_name"
         fi
         
@@ -541,6 +560,7 @@ Co-Authored-By: GitHub Actions <action@github.com>"
   notification-summary:
     name: Send Notification Summary
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     needs: [error-detection, create-issue, auto-fix]
     if: ${{ needs.error-detection.outputs.fix_needed == 'true' && needs.error-detection.result == 'success' }}
     
