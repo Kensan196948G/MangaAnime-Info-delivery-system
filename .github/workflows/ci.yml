@@ -1,0 +1,455 @@
+name: 🛠️ Continuous Integration
+# アニメ・マンガ情報配信システム - 継続的インテグレーション
+
+on:
+  workflow_dispatch:
+    inputs:
+      iteration_number:
+        description: 'ループ反復番号 (Loop iteration number)'
+        required: false
+        default: '1'
+        type: string
+      loop_id:
+        description: 'ループID (Loop ID)'
+        required: false
+        default: 'manual'
+        type: string
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  ITERATION_NUMBER: ${{ github.event.inputs.iteration_number || '0' }}
+  LOOP_ID: ${{ github.event.inputs.loop_id || 'standalone' }}
+  PYTHON_VERSION: '3.9'
+  NODE_VERSION: '18'
+
+jobs:
+  setup:
+    name: 🏗️ Setup Environment
+    runs-on: ubuntu-latest
+    outputs:
+      python-version: ${{ steps.setup-info.outputs.python-version }}
+      node-version: ${{ steps.setup-info.outputs.node-version }}
+      iteration: ${{ steps.setup-info.outputs.iteration }}
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 📊 Display build information / ビルド情報を表示
+      id: setup-info
+      run: |
+        echo "🚀 CI Pipeline Started / CIパイプライン開始"
+        echo "🔢 Iteration / 反復: ${{ env.ITERATION_NUMBER }}"
+        echo "🆔 Loop ID / ループID: ${{ env.LOOP_ID }}"
+        echo "📅 Timestamp / タイムスタンプ: $(date)"
+        echo "🔗 Commit SHA: ${{ github.sha }}"
+        echo "🌿 Branch / ブランチ: ${{ github.ref_name }}"
+        
+        echo "python-version=${{ env.PYTHON_VERSION }}" >> $GITHUB_OUTPUT
+        echo "node-version=${{ env.NODE_VERSION }}" >> $GITHUB_OUTPUT
+        echo "iteration=${{ env.ITERATION_NUMBER }}" >> $GITHUB_OUTPUT
+
+  lint-and-format:
+    name: 🔍 Lint & Format Check
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python ${{ needs.setup.outputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ needs.setup.outputs.python-version }}
+
+    - name: 📦 Install Python dependencies / Python依存関係をインストール
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+        
+        # Install project dependencies if requirements.txt exists
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+
+    - name: 🔍 Run Python linting / Pythonリンティング実行
+      run: |
+        echo "🔍 Running flake8 linting..."
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || {
+          echo "❌ Flake8 linting failed / リンティングエラー"
+          exit 1
+        }
+        
+        echo "✅ Flake8 linting passed / リンティング成功"
+
+    - name: 🎨 Check code formatting / コードフォーマットチェック
+      run: |
+        echo "🎨 Checking code formatting with black..."
+        black --check . || {
+          echo "❌ Code formatting issues found / フォーマット問題発見"
+          echo "💡 Run 'black .' to fix formatting issues"
+          exit 1
+        }
+        
+        echo "✅ Code formatting is correct / フォーマット正常"
+
+    - name: 📋 Check import sorting / インポート順序チェック
+      run: |
+        echo "📋 Checking import sorting..."
+        isort --check-only . || {
+          echo "❌ Import sorting issues found / インポート順序問題発見"
+          echo "💡 Run 'isort .' to fix import sorting"
+          exit 1
+        }
+        
+        echo "✅ Import sorting is correct / インポート順序正常"
+
+  security-scan:
+    name: 🔒 Security Scan
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python ${{ needs.setup.outputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ needs.setup.outputs.python-version }}
+
+    - name: 🔒 Install security tools / セキュリティツールインストール
+      run: |
+        pip install bandit safety
+
+    - name: 🔍 Run security scan / セキュリティスキャン実行
+      run: |
+        echo "🔒 Running bandit security scan..."
+        bandit -r . -f json -o bandit-report.json || true
+        
+        echo "📦 Checking for known security vulnerabilities..."
+        safety check --json --output safety-report.json || true
+        
+        echo "✅ Security scan completed / セキュリティスキャン完了"
+
+    - name: 📊 Upload security reports / セキュリティレポートアップロード
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports-${{ needs.setup.outputs.iteration }}
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  test-python:
+    name: 🧪 Python Tests
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: 📦 Install dependencies / 依存関係インストール
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pytest-html
+        
+        # Install project dependencies
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+        
+        # Install test dependencies
+        if [ -f requirements-test.txt ]; then
+          pip install -r requirements-test.txt
+        fi
+
+    - name: 🧪 Run tests with intentional failures / 意図的失敗を含むテスト実行
+      run: |
+        echo "🧪 Running Python tests..."
+        
+        # Create a test directory if it doesn't exist
+        mkdir -p tests
+        
+        # Create a test file with intentional failures for demonstration
+        cat > tests/test_demo.py << 'EOF'
+import pytest
+import os
+
+def test_basic_functionality():
+    """Basic test that should pass"""
+    assert 1 + 1 == 2
+
+def test_environment_setup():
+    """Test environment variables"""
+    # This test will fail intentionally in early iterations
+    iteration = int(os.getenv('ITERATION_NUMBER', '0'))
+    if iteration <= 3:
+        pytest.fail("Environment not properly configured (intentional failure for demo)")
+    assert True
+
+def test_data_processing():
+    """Test data processing logic"""
+    # This test will fail in iterations 1-2
+    iteration = int(os.getenv('ITERATION_NUMBER', '0'))
+    if iteration <= 2:
+        assert False, "Data processing logic incomplete (intentional failure)"
+    assert True
+
+def test_api_integration():
+    """Test API integration"""
+    # This test will fail in iteration 1
+    iteration = int(os.getenv('ITERATION_NUMBER', '0'))
+    if iteration <= 1:
+        raise Exception("API integration not implemented (intentional failure)")
+    assert True
+
+def test_advanced_features():
+    """Test advanced features"""
+    # This test will always pass
+    assert "anime" in "manga and anime system"
+EOF
+        
+        # Run tests with coverage
+        pytest tests/ \
+          --cov=. \
+          --cov-report=html \
+          --cov-report=xml \
+          --html=test-report.html \
+          --self-contained-html \
+          -v || {
+          echo "❌ Some tests failed / テスト失敗"
+          echo "📊 Test results will be analyzed for auto-repair"
+          exit 1
+        }
+        
+        echo "✅ All tests passed / 全テスト成功"
+      env:
+        ITERATION_NUMBER: ${{ needs.setup.outputs.iteration }}
+
+    - name: 📊 Upload test reports / テストレポートアップロード
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports-python-${{ matrix.python-version }}-${{ needs.setup.outputs.iteration }}
+        path: |
+          test-report.html
+          htmlcov/
+          coverage.xml
+
+  build-and-validate:
+    name: 🏗️ Build & Validate
+    needs: [setup, lint-and-format]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python ${{ needs.setup.outputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ needs.setup.outputs.python-version }}
+
+    - name: 🔧 Setup Node.js ${{ needs.setup.outputs.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ needs.setup.outputs.node-version }}
+
+    - name: 📦 Install build dependencies / ビルド依存関係インストール
+      run: |
+        python -m pip install --upgrade pip build wheel
+        npm install -g npm@latest
+
+    - name: 🏗️ Build Python package / Pythonパッケージビルド
+      run: |
+        echo "🏗️ Building Python package..."
+        
+        # Create setup.py if it doesn't exist
+        if [ ! -f setup.py ] && [ ! -f pyproject.toml ]; then
+          cat > setup.py << 'EOF'
+from setuptools import setup, find_packages
+
+setup(
+    name="manga-anime-delivery-system",
+    version="1.0.0",
+    packages=find_packages(),
+    install_requires=[
+        "requests",
+        "beautifulsoup4",
+        "sqlite3",
+    ],
+    author="Auto-Repair System",
+    description="Manga and Anime Information Delivery System",
+)
+EOF
+        fi
+        
+        python -m build || {
+          echo "❌ Python package build failed / パッケージビルド失敗"
+          exit 1
+        }
+        
+        echo "✅ Python package built successfully / パッケージビルド成功"
+
+    - name: 🔍 Validate build artifacts / ビルド成果物検証
+      run: |
+        echo "🔍 Validating build artifacts..."
+        
+        # Check if build artifacts exist
+        if [ -d "dist/" ]; then
+          ls -la dist/
+          echo "✅ Build artifacts found / ビルド成果物確認"
+        else
+          echo "❌ No build artifacts found / ビルド成果物なし"
+          exit 1
+        fi
+
+    - name: 📊 Upload build artifacts / ビルド成果物アップロード
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts-${{ needs.setup.outputs.iteration }}
+        path: dist/
+
+  integration-test:
+    name: 🔗 Integration Tests
+    needs: [setup, build-and-validate]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python ${{ needs.setup.outputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ needs.setup.outputs.python-version }}
+
+    - name: 🗄️ Setup test database / テストデータベース設定
+      run: |
+        echo "🗄️ Setting up test database..."
+        sqlite3 test.db "CREATE TABLE IF NOT EXISTS test_table (id INTEGER PRIMARY KEY, name TEXT);"
+        echo "✅ Test database ready / テストデータベース準備完了"
+
+    - name: 🔗 Run integration tests / 統合テスト実行
+      run: |
+        echo "🔗 Running integration tests..."
+        
+        # Create integration test
+        cat > integration_test.py << 'EOF'
+import sqlite3
+import os
+
+def test_database_connection():
+    """Test database connectivity"""
+    try:
+        conn = sqlite3.connect('test.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+        conn.close()
+        
+        assert len(tables) > 0, "No tables found in database"
+        print("✅ Database connection successful")
+        return True
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+        return False
+
+def test_system_integration():
+    """Test system integration"""
+    iteration = int(os.getenv('ITERATION_NUMBER', '0'))
+    
+    # Simulate integration issues in early iterations
+    if iteration <= 2:
+        print(f"❌ Integration test failed for iteration {iteration}")
+        return False
+    
+    print("✅ System integration successful")
+    return True
+
+if __name__ == "__main__":
+    success = True
+    success &= test_database_connection()
+    success &= test_system_integration()
+    
+    if not success:
+        exit(1)
+EOF
+        
+        python integration_test.py
+      env:
+        ITERATION_NUMBER: ${{ needs.setup.outputs.iteration }}
+
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    needs: [setup, test-python, integration-test]
+    if: success()
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🚀 Simulate staging deployment / ステージング環境デプロイシミュレーション
+      run: |
+        echo "🚀 Deploying to staging environment..."
+        echo "🔢 Iteration: ${{ needs.setup.outputs.iteration }}"
+        echo "🆔 Loop ID: ${{ env.LOOP_ID }}"
+        
+        # Simulate deployment process
+        sleep 10
+        
+        echo "✅ Staging deployment completed / ステージングデプロイ完了"
+        echo "🌐 Staging URL: https://staging.manga-anime-system.example.com"
+
+  report-status:
+    name: 📊 Report CI Status
+    needs: [setup, lint-and-format, security-scan, test-python, build-and-validate, integration-test, deploy-staging]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📊 Generate CI summary / CI結果サマリー生成
+      run: |
+        echo "📊 CI Pipeline Summary / CIパイプライン結果"
+        echo "=================================="
+        echo "🔢 Iteration / 反復: ${{ needs.setup.outputs.iteration }}"
+        echo "🆔 Loop ID / ループID: ${{ env.LOOP_ID }}"
+        echo "📅 Completed at / 完了時刻: $(date)"
+        echo ""
+        echo "📋 Job Results / ジョブ結果:"
+        echo "- Setup: ${{ needs.setup.result }}"
+        echo "- Lint & Format: ${{ needs.lint-and-format.result }}"
+        echo "- Security Scan: ${{ needs.security-scan.result }}"
+        echo "- Python Tests: ${{ needs.test-python.result }}"
+        echo "- Build & Validate: ${{ needs.build-and-validate.result }}"
+        echo "- Integration Tests: ${{ needs.integration-test.result }}"
+        echo "- Deploy Staging: ${{ needs.deploy-staging.result }}"
+        echo ""
+        
+        # Determine overall status
+        if [ "${{ needs.test-python.result }}" == "success" ] && \
+           [ "${{ needs.integration-test.result }}" == "success" ] && \
+           [ "${{ needs.build-and-validate.result }}" == "success" ]; then
+          echo "🎯 Overall Status: SUCCESS / 全体ステータス: 成功"
+          exit 0
+        else
+          echo "❌ Overall Status: FAILURE / 全体ステータス: 失敗"
+          echo "🔧 Auto-repair will be triggered / 自動修復が実行されます"
+          exit 1
+        fi

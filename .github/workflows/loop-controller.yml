@@ -1,0 +1,274 @@
+name: 🔄 Auto-Repair Loop Controller
+# アニメ・マンガ情報配信システム - 自動修復ループコントローラー
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_iterations:
+        description: '最大反復回数 (Maximum iterations)'
+        required: false
+        default: '10'
+        type: string
+      force_restart:
+        description: '強制リスタート (Force restart)'
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    # 毎日午前8時（JST）に自動実行 - Daily at 8:00 AM JST
+    - cron: '0 23 * * *'  # 23:00 UTC = 08:00 JST
+  repository_dispatch:
+    types: [start-auto-repair]
+
+env:
+  MAX_ITERATIONS: ${{ github.event.inputs.max_iterations || '10' }}
+  FORCE_RESTART: ${{ github.event.inputs.force_restart || 'false' }}
+  LOOP_STATE_FILE: '.github/state/loop-state.json'
+
+jobs:
+  initialize-loop:
+    name: 🏁 Initialize Loop State
+    runs-on: ubuntu-latest
+    outputs:
+      current_iteration: ${{ steps.get-state.outputs.current_iteration }}
+      should_continue: ${{ steps.get-state.outputs.should_continue }}
+      loop_id: ${{ steps.get-state.outputs.loop_id }}
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: 🔍 Get current loop state / 現在のループ状態を取得
+      id: get-state
+      run: |
+        mkdir -p .github/state
+        
+        # Force restart if requested
+        if [ "${{ env.FORCE_RESTART }}" == "true" ]; then
+          echo "🔄 Force restart requested - clearing state"
+          rm -f ${{ env.LOOP_STATE_FILE }}
+        fi
+        
+        # Initialize state file if it doesn't exist
+        if [ ! -f "${{ env.LOOP_STATE_FILE }}" ]; then
+          cat > ${{ env.LOOP_STATE_FILE }} << EOF
+        {
+          "loop_id": "$(date +%Y%m%d_%H%M%S)",
+          "current_iteration": 1,
+          "max_iterations": ${{ env.MAX_ITERATIONS }},
+          "start_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "status": "running",
+          "errors_resolved": [],
+          "errors_remaining": [],
+          "total_fixes_applied": 0
+        }
+        EOF
+        fi
+        
+        # Read current state
+        CURRENT_ITERATION=$(jq -r '.current_iteration' ${{ env.LOOP_STATE_FILE }})
+        MAX_ITER=$(jq -r '.max_iterations' ${{ env.LOOP_STATE_FILE }})
+        LOOP_ID=$(jq -r '.loop_id' ${{ env.LOOP_STATE_FILE }})
+        
+        echo "current_iteration=$CURRENT_ITERATION" >> $GITHUB_OUTPUT
+        echo "loop_id=$LOOP_ID" >> $GITHUB_OUTPUT
+        
+        if [ "$CURRENT_ITERATION" -le "$MAX_ITER" ]; then
+          echo "should_continue=true" >> $GITHUB_OUTPUT
+          echo "✅ Loop will continue - Iteration $CURRENT_ITERATION/$MAX_ITER"
+        else
+          echo "should_continue=false" >> $GITHUB_OUTPUT
+          echo "⛔ Loop completed - Maximum iterations reached"
+        fi
+
+    - name: 📊 Display loop status / ループ状態を表示
+      run: |
+        echo "🔄 ループコントローラー開始 - Loop Controller Started"
+        echo "📅 実行日時 / Execution Time: $(date)"
+        echo "🔢 現在の反復 / Current Iteration: ${{ steps.get-state.outputs.current_iteration }}"
+        echo "🎯 最大反復数 / Max Iterations: ${{ env.MAX_ITERATIONS }}"
+        echo "🆔 ループID / Loop ID: ${{ steps.get-state.outputs.loop_id }}"
+        echo "▶️ 継続判定 / Should Continue: ${{ steps.get-state.outputs.should_continue }}"
+
+  run-ci-workflow:
+    name: 🛠️ Run CI Workflow
+    needs: initialize-loop
+    if: needs.initialize-loop.outputs.should_continue == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      ci_status: ${{ steps.trigger-ci.outputs.status }}
+      workflow_run_id: ${{ steps.trigger-ci.outputs.run_id }}
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🚀 Trigger CI workflow / CIワークフローを実行
+      id: trigger-ci
+      run: |
+        echo "🔧 Starting CI workflow for iteration ${{ needs.initialize-loop.outputs.current_iteration }}"
+        
+        # Trigger the CI workflow
+        gh workflow run ci.yml \
+          --field iteration_number="${{ needs.initialize-loop.outputs.current_iteration }}" \
+          --field loop_id="${{ needs.initialize-loop.outputs.loop_id }}"
+        
+        # Wait a moment for the workflow to start
+        sleep 10
+        
+        # Get the latest run ID
+        RUN_ID=$(gh run list --workflow=ci.yml --limit=1 --json databaseId --jq '.[0].databaseId')
+        echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+        
+        echo "📝 CI workflow triggered with run ID: $RUN_ID"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: ⏳ Wait for CI completion / CI完了を待機
+      id: wait-ci
+      run: |
+        echo "⏳ Waiting for CI workflow to complete..."
+        RUN_ID="${{ steps.trigger-ci.outputs.run_id }}"
+        
+        # Wait for completion (max 30 minutes)
+        timeout 1800 bash -c '
+          while true; do
+            STATUS=$(gh run view $1 --json status --jq .status)
+            echo "Current status: $STATUS"
+            
+            if [ "$STATUS" = "completed" ]; then
+              CONCLUSION=$(gh run view $1 --json conclusion --jq .conclusion)
+              echo "Final conclusion: $CONCLUSION"
+              echo "status=$CONCLUSION" >> $GITHUB_OUTPUT
+              break
+            fi
+            
+            sleep 30
+          done
+        ' -- "$RUN_ID"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  analyze-results:
+    name: 📊 Analyze Results & Update State
+    needs: [initialize-loop, run-ci-workflow]
+    if: always() && needs.initialize-loop.outputs.should_continue == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      next_iteration: ${{ steps.update-state.outputs.next_iteration }}
+      should_continue_next: ${{ steps.update-state.outputs.should_continue_next }}
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 🔧 Setup Node.js for analysis
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: 📊 Generate performance report / パフォーマンスレポート生成
+      run: |
+        chmod +x .github/scripts/performance-report.js
+        node .github/scripts/performance-report.js \
+          --iteration "${{ needs.initialize-loop.outputs.current_iteration }}" \
+          --loop-id "${{ needs.initialize-loop.outputs.loop_id }}" \
+          --ci-status "${{ needs.run-ci-workflow.outputs.ci_status || 'failure' }}" \
+          --run-id "${{ needs.run-ci-workflow.outputs.workflow_run_id || 'unknown' }}"
+
+    - name: 🔄 Update loop state / ループ状態を更新
+      id: update-state
+      run: |
+        # Make the script executable
+        chmod +x .github/scripts/loop-status.sh
+        
+        # Update state
+        ./.github/scripts/loop-status.sh \
+          --iteration "${{ needs.initialize-loop.outputs.current_iteration }}" \
+          --status "${{ needs.run-ci-workflow.outputs.ci_status || 'failure' }}" \
+          --loop-id "${{ needs.initialize-loop.outputs.loop_id }}"
+        
+        # Get next iteration info
+        NEXT_ITERATION=$(jq -r '.current_iteration' ${{ env.LOOP_STATE_FILE }})
+        MAX_ITER=$(jq -r '.max_iterations' ${{ env.LOOP_STATE_FILE }})
+        
+        echo "next_iteration=$NEXT_ITERATION" >> $GITHUB_OUTPUT
+        
+        if [ "$NEXT_ITERATION" -le "$MAX_ITER" ] && [ "${{ needs.run-ci-workflow.outputs.ci_status || 'failure' }}" != "success" ]; then
+          echo "should_continue_next=true" >> $GITHUB_OUTPUT
+          echo "🔄 Will continue to next iteration"
+        else
+          echo "should_continue_next=false" >> $GITHUB_OUTPUT
+          echo "✅ Loop completed or all issues resolved"
+        fi
+
+    - name: 📝 Commit state updates / 状態更新をコミット
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        git add .github/state/
+        git add reports/
+        
+        if ! git diff --staged --quiet; then
+          git commit -m "🔄 Update loop state - iteration ${{ needs.initialize-loop.outputs.current_iteration }}"
+          git push
+        else
+          echo "No changes to commit"
+        fi
+
+  schedule-next-iteration:
+    name: 🔄 Schedule Next Iteration
+    needs: [analyze-results]
+    if: needs.analyze-results.outputs.should_continue_next == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: ⏰ Schedule next iteration / 次の反復をスケジュール
+      run: |
+        echo "🔄 Scheduling next iteration..."
+        echo "Next iteration will be: ${{ needs.analyze-results.outputs.next_iteration }}"
+        
+        # Trigger the next iteration after a 5-minute delay
+        sleep 300
+        
+        gh workflow run loop-controller.yml
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  final-report:
+    name: 📋 Generate Final Report
+    needs: [initialize-loop, analyze-results]
+    if: always() && (needs.analyze-results.outputs.should_continue_next == 'false' || needs.initialize-loop.outputs.should_continue == 'false')
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 📊 Generate final summary / 最終サマリーを生成
+      run: |
+        echo "🎯 Auto-Repair Loop Completed / 自動修復ループ完了"
+        echo "=================================="
+        
+        if [ -f "${{ env.LOOP_STATE_FILE }}" ]; then
+          echo "📊 Final Statistics / 最終統計:"
+          jq -r '
+            "🔢 Total Iterations / 総反復数: " + (.current_iteration - 1 | tostring),
+            "✅ Fixes Applied / 適用された修正: " + (.total_fixes_applied | tostring),
+            "⏰ Total Duration / 総実行時間: " + (now - (.start_time | fromdateiso8601) | . / 3600 | floor | tostring) + " hours",
+            "🎯 Final Status / 最終状態: " + .status
+          ' ${{ env.LOOP_STATE_FILE }}
+        fi
+        
+        echo ""
+        echo "📝 See detailed reports in the reports/ directory"
+        echo "📁 詳細レポートは reports/ ディレクトリを参照してください"

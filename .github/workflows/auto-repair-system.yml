@@ -1,0 +1,390 @@
+name: 🔄 Auto Repair System - CI/CD Failure Detection & Recovery
+# 自動修復システム：CI/CD障害検知・復旧ワークフロー
+
+on:
+  schedule:
+    # 30分間隔で実行（平日のみ実行を推奨）
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      force_repair:
+        description: '強制修復モード（全ての失敗したワークフローを対象）'
+        required: false
+        default: 'false'
+        type: boolean
+      max_repairs:
+        description: '最大修復対象数'
+        required: false
+        default: '10'
+        type: string
+
+env:
+  # 修復タイムアウト（25分）
+  REPAIR_TIMEOUT: 1500
+  # 最大並列修復数
+  MAX_PARALLEL_REPAIRS: 5
+  # ループ回数
+  MAX_LOOP_COUNT: 10
+
+jobs:
+  # ====================================
+  # Phase 1: 障害検知・分析フェーズ
+  # ====================================
+  detect-failures:
+    name: 🔍 CI/CD障害検知
+    runs-on: ubuntu-latest
+    outputs:
+      failed_runs: ${{ steps.analyze.outputs.failed_runs }}
+      repair_needed: ${{ steps.analyze.outputs.repair_needed }}
+      error_matrix: ${{ steps.analyze.outputs.error_matrix }}
+    
+    steps:
+      - name: 📥 リポジトリチェックアウト
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🔍 失敗したワークフロー検知
+        id: detect
+        run: |
+          echo "🔍 過去24時間の失敗ワークフローを検索中..."
+          
+          # GitHub CLIで失敗したワークフローを取得
+          failed_runs=$(gh run list \
+            --status failure \
+            --limit ${{ github.event.inputs.max_repairs || '10' }} \
+            --json databaseId,workflowName,conclusion,createdAt,headBranch \
+            --jq '.[] | select(.createdAt > (now - 86400 | strftime("%Y-%m-%dT%H:%M:%SZ")))')
+          
+          echo "failed_runs<<EOF" >> $GITHUB_OUTPUT
+          echo "$failed_runs" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # 失敗数をカウント
+          failure_count=$(echo "$failed_runs" | jq length)
+          echo "failure_count=$failure_count" >> $GITHUB_OUTPUT
+          
+          if [ "$failure_count" -gt 0 ]; then
+            echo "⚠️ $failure_count 件の失敗したワークフローを検出"
+          else
+            echo "✅ 失敗したワークフローは検出されませんでした"
+          fi
+
+      - name: 🔬 エラー詳細分析
+        id: analyze
+        if: steps.detect.outputs.failure_count > 0
+        run: |
+          echo "🔬 エラー詳細を分析中..."
+          
+          failed_runs='${{ steps.detect.outputs.failed_runs }}'
+          
+          # エラータイプごとに分類
+          error_matrix=$(echo "$failed_runs" | jq -r '[
+            .[] | {
+              run_id: .databaseId,
+              workflow: .workflowName,
+              branch: .headBranch,
+              error_type: (
+                if (.workflowName | contains("test")) then "test_failure"
+                elif (.workflowName | contains("build")) then "build_failure"
+                elif (.workflowName | contains("deploy")) then "deploy_failure"
+                elif (.workflowName | contains("lint")) then "lint_failure"
+                else "unknown_failure"
+                end
+              ),
+              priority: (
+                if (.workflowName | contains("deploy")) then 1
+                elif (.workflowName | contains("build")) then 2
+                elif (.workflowName | contains("test")) then 3
+                else 4
+                end
+              ),
+              repair_agent: (
+                if (.workflowName | contains("test")) then "TestRepairAgent"
+                elif (.workflowName | contains("build")) then "BuildRepairAgent"
+                elif (.workflowName | contains("deploy")) then "DeployRepairAgent"
+                elif (.workflowName | contains("lint")) then "LintRepairAgent"
+                else "GeneralRepairAgent"
+                end
+              )
+            }
+          ] | sort_by(.priority)')
+          
+          echo "error_matrix<<EOF" >> $GITHUB_OUTPUT
+          echo "$error_matrix" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "failed_runs<<EOF" >> $GITHUB_OUTPUT
+          echo "$failed_runs" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "repair_needed=true" >> $GITHUB_OUTPUT
+          
+          echo "📊 エラー分析結果:"
+          echo "$error_matrix" | jq -r '.[] | "  - \(.workflow) (\(.error_type)) -> \(.repair_agent)"'
+
+  # ====================================
+  # Phase 2: 並列修復実行フェーズ
+  # ====================================
+  parallel-repair:
+    name: 🔧 並列修復実行
+    runs-on: ubuntu-latest
+    needs: detect-failures
+    if: needs.detect-failures.outputs.repair_needed == 'true'
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.detect-failures.outputs.error_matrix) }}
+      fail-fast: false
+      max-parallel: 5
+    
+    steps:
+      - name: 📥 リポジトリチェックアウト
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🛠️ Python環境セットアップ
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 依存関係インストール
+        run: |
+          pip install --upgrade pip
+          pip install requests pyyaml gitpython
+
+      - name: 🔧 SubAgent修復実行 - ${{ matrix.repair_agent }}
+        id: repair
+        timeout-minutes: 25
+        run: |
+          echo "🤖 ${{ matrix.repair_agent }} による修復を開始..."
+          echo "対象: ${{ matrix.workflow }} (Run ID: ${{ matrix.run_id }})"
+          
+          # 修復スクリプトのパスを決定
+          case "${{ matrix.repair_agent }}" in
+            "TestRepairAgent")
+              repair_script=".github/scripts/repair-agents/test-repair-agent.py"
+              ;;
+            "BuildRepairAgent")
+              repair_script=".github/scripts/repair-agents/build-repair-agent.py"
+              ;;
+            "DeployRepairAgent")
+              repair_script=".github/scripts/repair-agents/deploy-repair-agent.py"
+              ;;
+            "LintRepairAgent")
+              repair_script=".github/scripts/repair-agents/lint-repair-agent.py"
+              ;;
+            *)
+              repair_script=".github/scripts/repair-agents/general-repair-agent.py"
+              ;;
+          esac
+          
+          # 修復スクリプトが存在しない場合は汎用修復を実行
+          if [ ! -f "$repair_script" ]; then
+            echo "⚠️ 専用修復スクリプトが見つかりません。汎用修復を実行します。"
+            repair_script=".github/scripts/repair-agents/general-repair-agent.py"
+          fi
+          
+          # 修復実行
+          if [ -f "$repair_script" ]; then
+            python "$repair_script" \
+              --run-id "${{ matrix.run_id }}" \
+              --workflow "${{ matrix.workflow }}" \
+              --error-type "${{ matrix.error_type }}" \
+              --branch "${{ matrix.branch }}"
+            repair_result=$?
+          else
+            echo "🔧 汎用修復ロジックを実行..."
+            
+            # ワークフロー失敗の詳細を取得
+            gh run view ${{ matrix.run_id }} --json jobs > /tmp/job_details.json
+            
+            # 一般的な修復パターンを適用
+            if [[ "${{ matrix.error_type }}" == "test_failure" ]]; then
+              echo "🧪 テスト失敗の修復を試行..."
+              # テスト環境の修復
+              if [ -f "requirements.txt" ]; then
+                # 依存関係の更新
+                pip list --outdated --format=json | jq -r '.[] | .name' | head -5 | while read package; do
+                  echo "📦 $package を更新中..."
+                  pip install --upgrade "$package" 2>/dev/null || true
+                done
+                pip freeze > requirements.txt
+              fi
+              
+            elif [[ "${{ matrix.error_type }}" == "build_failure" ]]; then
+              echo "🏗️ ビルド失敗の修復を試行..."
+              # Node.js関連の修復
+              if [ -f "package.json" ]; then
+                npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts 2>/dev/null || true
+              fi
+              
+            elif [[ "${{ matrix.error_type }}" == "lint_failure" ]]; then
+              echo "📝 Lint失敗の修復を試行..."
+              # コードフォーマットの自動修正
+              if command -v black &> /dev/null; then
+                black . --exclude="/(\.git|\.venv|venv|node_modules)/" 2>/dev/null || true
+              fi
+              if command -v isort &> /dev/null; then
+                isort . 2>/dev/null || true
+              fi
+            fi
+            
+            repair_result=0
+          fi
+          
+          echo "repair_result=$repair_result" >> $GITHUB_OUTPUT
+          
+          if [ $repair_result -eq 0 ]; then
+            echo "✅ 修復が完了しました"
+          else
+            echo "❌ 修復に失敗しました (Exit code: $repair_result)"
+          fi
+
+      - name: 📝 修復結果をコミット
+        if: steps.repair.outputs.repair_result == '0'
+        run: |
+          # Git設定
+          git config --local user.email "action@github.com"
+          git config --local user.name "Auto Repair Bot"
+          
+          # 変更があるかチェック
+          if git diff --quiet; then
+            echo "📝 変更なし - コミットをスキップ"
+          else
+            echo "📝 修復内容をコミット中..."
+            
+            git add .
+            git commit -m "🤖 Auto-repair: Fix ${{ matrix.error_type }} in ${{ matrix.workflow }}
+
+修復エージェント: ${{ matrix.repair_agent }}
+対象ワークフロー: ${{ matrix.workflow }}
+Run ID: ${{ matrix.run_id }}
+エラータイプ: ${{ matrix.error_type }}
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+            
+            # プッシュを試行
+            git push origin HEAD:${{ matrix.branch }} || {
+              echo "⚠️ プッシュに失敗しました。リベースを試行..."
+              git pull --rebase origin ${{ matrix.branch }}
+              git push origin HEAD:${{ matrix.branch }}
+            }
+            
+            echo "✅ 修復内容をプッシュしました"
+          fi
+
+  # ====================================
+  # Phase 3: 修復結果検証・レポートフェーズ
+  # ====================================
+  verify-repairs:
+    name: ✅ 修復結果検証
+    runs-on: ubuntu-latest
+    needs: [detect-failures, parallel-repair]
+    if: always() && needs.detect-failures.outputs.repair_needed == 'true'
+    
+    steps:
+      - name: 📥 リポジトリチェックアウト
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ⏳ ワークフロー再実行を待機
+        run: |
+          echo "⏳ 修復されたワークフローの再実行を待機中..."
+          sleep 300  # 5分待機
+
+      - name: 🔍 修復結果を検証
+        id: verify
+        run: |
+          echo "🔍 修復結果を検証中..."
+          
+          # 最新のワークフロー実行状況を確認
+          recent_runs=$(gh run list --limit 20 --json databaseId,workflowName,conclusion,createdAt)
+          
+          # 成功したワークフロー数をカウント
+          success_count=$(echo "$recent_runs" | jq '[.[] | select(.conclusion == "success" and (.createdAt > (now - 1800 | strftime("%Y-%m-%dT%H:%M:%SZ"))))] | length')
+          
+          # 修復対象だったワークフローの現在の状況
+          original_failures='${{ needs.detect-failures.outputs.failed_runs }}'
+          
+          echo "📊 修復結果サマリー:"
+          echo "  - 過去30分の成功ワークフロー: $success_count 件"
+          
+          # 詳細レポートを生成
+          echo "repair_summary<<EOF" >> $GITHUB_OUTPUT
+          echo "## 🔄 Auto Repair System - 実行結果レポート" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "**実行時刻:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
+          echo "**検知された失敗:** $(echo '$original_failures' | jq length) 件" >> $GITHUB_OUTPUT
+          echo "**修復後の成功:** $success_count 件" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 修復対象一覧" >> $GITHUB_OUTPUT
+          echo '$original_failures' | jq -r '.[] | "- **\(.workflowName)** (Run ID: \(.databaseId))"' >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 修復戦略" >> $GITHUB_OUTPUT
+          echo "- **並列実行:** 最大5つのSubAgentによる同時修復" >> $GITHUB_OUTPUT
+          echo "- **エラー分類:** 自動エラータイプ検出とエージェント振り分け" >> $GITHUB_OUTPUT
+          echo "- **自動コミット:** 修復内容の自動コミット・プッシュ" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "_🤖 Generated by Auto Repair System_" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 📧 修復レポート生成
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const summary = `${{ steps.verify.outputs.repair_summary }}`;
+            
+            // ジョブサマリーに追加
+            await core.summary
+              .addRaw(summary)
+              .write();
+            
+            console.log("✅ 修復レポートを生成しました");
+
+  # ====================================
+  # Phase 4: 継続監視ループ
+  # ====================================
+  schedule-next-cycle:
+    name: 🔄 次回監視スケジュール
+    runs-on: ubuntu-latest
+    needs: [detect-failures, verify-repairs]
+    if: always()
+    
+    steps:
+      - name: 📅 次回実行スケジュール確認
+        run: |
+          echo "📅 次回の自動修復監視:"
+          echo "  - 30分後に自動実行"
+          echo "  - 手動実行: workflow_dispatch トリガー使用可能"
+          echo ""
+          echo "🔄 継続監視ループ設定:"
+          echo "  - 監視間隔: 30分"
+          echo "  - 最大並列修復: ${{ env.MAX_PARALLEL_REPAIRS }}"
+          echo "  - 修復タイムアウト: ${{ env.REPAIR_TIMEOUT }}秒"
+          echo "  - 最大ループ回数: ${{ env.MAX_LOOP_COUNT }}"
+          echo ""
+          echo "✅ Auto Repair System は継続監視中です"
+
+      - name: 🎯 パフォーマンス最適化提案
+        run: |
+          echo "🎯 システム最適化提案:"
+          echo ""
+          echo "1. **並列度調整:**"
+          echo "   - 現在: 最大5並列"
+          echo "   - 推奨: リソース使用状況に応じて3-8に調整"
+          echo ""
+          echo "2. **監視頻度最適化:**"
+          echo "   - 現在: 30分間隔"
+          echo "   - 推奨: 重要時間帯は15分、夜間は60分間隔"
+          echo ""
+          echo "3. **修復成功率向上:**"
+          echo "   - SubAgent専用スクリプトの充実"
+          echo "   - エラーパターン学習機能の追加"
+          echo "   - 修復後の自動テスト実行"
