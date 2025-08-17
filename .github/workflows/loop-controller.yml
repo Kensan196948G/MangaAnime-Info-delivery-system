@@ -26,7 +26,6 @@ permissions:
   pull-requests: write   # Pull request creation and management
   issues: write          # Issue creation and management
   checks: write          # Status checks
-  metadata: read         # Repository metadata access
 
 env:
   MAX_ITERATIONS: ${{ github.event.inputs.max_iterations || '10' }}
@@ -48,8 +47,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         persist-credentials: true
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
     - name: 🔍 Get current loop state / 現在のループ状態を取得
@@ -191,8 +188,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         persist-credentials: true
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: 🔧 Setup Node.js for analysis
       uses: actions/setup-node@v4
