@@ -48,10 +48,10 @@ class TestAniListAPI:
         with patch("aiohttp.ClientSession.post") as mock_post:
             mock_response = MagicMock()
             mock_response.status = 200
-            
+
             async def mock_json():
                 return mock_response_data
-            
+
             mock_response.json = mock_json
             mock_post.return_value.__aenter__.return_value = mock_response
 

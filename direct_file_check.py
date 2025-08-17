@@ -2,7 +2,7 @@
 import os
 import glob
 
-base_path = '/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system'
+base_path = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
 
 print("=== Direct File System Check ===")
 print(f"Base path: {base_path}")
@@ -22,7 +22,7 @@ except Exception as e:
     print(f"Error listing base directory: {e}")
 
 # Check specifically for tests
-tests_path = os.path.join(base_path, 'tests')
+tests_path = os.path.join(base_path, "tests")
 print(f"\n=== Tests directory check ===")
 print(f"Tests path: {tests_path}")
 print(f"Tests exists: {os.path.exists(tests_path)}")
@@ -48,9 +48,9 @@ if os.path.exists(tests_path):
 # Look for any Python test files anywhere
 print(f"\n=== Searching for test files ===")
 test_patterns = [
-    os.path.join(base_path, '**/test_*.py'),
-    os.path.join(base_path, '**/*_test.py'),
-    os.path.join(base_path, 'tests/**/*.py')
+    os.path.join(base_path, "**/test_*.py"),
+    os.path.join(base_path, "**/*_test.py"),
+    os.path.join(base_path, "tests/**/*.py"),
 ]
 
 all_test_files = []
@@ -69,10 +69,12 @@ for f in sorted(all_test_files):
 # Check if pytest is installed
 print(f"\n=== Python and pytest check ===")
 import sys
+
 print(f"Python version: {sys.version}")
 
 try:
     import pytest
+
     print(f"Pytest version: {pytest.__version__}")
 except ImportError:
     print("Pytest not installed")
@@ -81,15 +83,19 @@ except ImportError:
 if all_test_files:
     print(f"\n=== Attempting to run first test file ===")
     import subprocess
+
     first_test = all_test_files[0]
     print(f"Testing: {first_test}")
-    
+
     try:
         os.chdir(base_path)
-        result = subprocess.run([
-            sys.executable, "-m", "pytest", first_test, "-v", "--tb=short"
-        ], capture_output=True, text=True, timeout=30)
-        
+        result = subprocess.run(
+            [sys.executable, "-m", "pytest", first_test, "-v", "--tb=short"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+
         print(f"Return code: {result.returncode}")
         if result.stdout:
             print("STDOUT:")
@@ -97,8 +103,8 @@ if all_test_files:
         if result.stderr:
             print("STDERR:")
             print(result.stderr[:1000])  # First 1000 chars
-            
+
     except Exception as e:
         print(f"Error running test: {e}")
-        
+
 print("\n=== Check complete ===")

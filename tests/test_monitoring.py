@@ -157,7 +157,9 @@ class TestSystemMonitoring:
 
         # Check error patterns
         assert "Rate limit exceeded" in analysis["error_patterns"]
-        assert any("RSS feed timeout" in pattern for pattern in analysis["warning_patterns"])
+        assert any(
+            "RSS feed timeout" in pattern for pattern in analysis["warning_patterns"]
+        )
 
     @pytest.mark.integration
     def test_alert_system(self):
@@ -654,7 +656,9 @@ class TestErrorMonitoring:
             if "API timeout" in key and "burst" in key:
                 api_timeout_pattern = pattern
                 break
-        assert api_timeout_pattern is not None, f"API timeout burst pattern not found in {list(patterns.keys())}"
+        assert (
+            api_timeout_pattern is not None
+        ), f"API timeout burst pattern not found in {list(patterns.keys())}"
         assert api_timeout_pattern["count"] == 3
         assert api_timeout_pattern["timespan"] == "10 minutes"
 
@@ -664,7 +668,9 @@ class TestErrorMonitoring:
             if "Database lock" in key and "repeat" in key:
                 db_lock_pattern = pattern
                 break
-        assert db_lock_pattern is not None, f"Database lock repeat pattern not found in {list(patterns.keys())}"
+        assert (
+            db_lock_pattern is not None
+        ), f"Database lock repeat pattern not found in {list(patterns.keys())}"
         assert db_lock_pattern["count"] == 2
 
         # Check if pattern triggers alert

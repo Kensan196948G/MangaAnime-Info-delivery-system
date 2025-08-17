@@ -1339,11 +1339,13 @@ class AniListCollector:
 
         return asyncio.run(_run())
 
-    async def fetch_seasonal_anime(self, year: int, season: str) -> List[Dict[str, Any]]:
+    async def fetch_seasonal_anime(
+        self, year: int, season: str
+    ) -> List[Dict[str, Any]]:
         """Fetch seasonal anime from AniList."""
         if season not in ["WINTER", "SPRING", "SUMMER", "FALL"]:
             return []
-        
+
         try:
             works = await self.client.search_anime(season=season, year=year, limit=50)
             result = []
@@ -1353,15 +1355,17 @@ class AniListCollector:
                     "title": {
                         "romaji": work.title_romaji,
                         "english": work.title_english,
-                        "native": work.title_native
+                        "native": work.title_native,
                     },
                     "genres": work.genres,
                     "tags": [{"name": tag} for tag in work.tags],
                     "description": work.description,
                     "startDate": work.start_date,
-                    "episodes": work.metadata.get("total_episodes") if hasattr(work, "metadata") else None,
+                    "episodes": work.metadata.get("total_episodes")
+                    if hasattr(work, "metadata")
+                    else None,
                     "streamingEpisodes": work.streaming_episodes,
-                    "siteUrl": work.site_url
+                    "siteUrl": work.site_url,
                 }
                 result.append(anime_data)
             return result
@@ -1369,53 +1373,54 @@ class AniListCollector:
             self.logger.error(f"Failed to fetch seasonal anime: {e}")
             return []
 
-    def _filter_ng_content(self, anime_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _filter_ng_content(
+        self, anime_list: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Filter out NG content from anime list."""
         ng_genres = ["Hentai", "Ecchi"]
         ng_tags = ["Adult Cast", "Explicit Sex"]
-        
+
         filtered = []
         for anime in anime_list:
             # Check genres
             genres = anime.get("genres", [])
             if any(genre in ng_genres for genre in genres):
                 continue
-                
+
             # Check tags
             tags = anime.get("tags", [])
             tag_names = [tag.get("name", "") for tag in tags if isinstance(tag, dict)]
             if any(tag in ng_tags for tag in tag_names):
                 continue
-                
+
             filtered.append(anime)
-        
+
         return filtered
 
     def _parse_anime_data(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
         """Parse raw anime data into normalized format."""
         import hashlib
-        
+
         # Generate work_id from title
         title = raw_data.get("title", {}).get("romaji", "Unknown")
         work_id = hashlib.sha256(title.encode()).hexdigest()[:16]
-        
+
         # Parse release date
         start_date = raw_data.get("startDate", {})
         if start_date:
             release_date = f"{start_date.get('year', 2024):04d}-{start_date.get('month', 1):02d}-{start_date.get('day', 1):02d}"
         else:
             release_date = "2024-01-01"
-        
+
         # Parse streaming platforms
         streaming_episodes = raw_data.get("streamingEpisodes", [])
         streaming_platforms = []
         for ep in streaming_episodes:
             if isinstance(ep, dict) and "url" in ep:
-                streaming_platforms.append({
-                    "title": ep.get("title", ""),
-                    "url": ep.get("url", "")
-                })
-        
+                streaming_platforms.append(
+                    {"title": ep.get("title", ""), "url": ep.get("url", "")}
+                )
+
         return {
             "work_id": work_id,
             "title": title,
@@ -1423,7 +1428,7 @@ class AniListCollector:
             "release_date": release_date,
             "streaming_platforms": streaming_platforms,
             "genres": raw_data.get("genres", []),
-            "site_url": raw_data.get("siteUrl", "")
+            "site_url": raw_data.get("siteUrl", ""),
         }
 
     async def _wait_for_rate_limit(self):

@@ -27,29 +27,18 @@ sys_path = os.path.join(os.path.dirname(__file__), "..")
 if sys_path not in sys.path:
     sys.path.insert(0, sys_path)
 
+
 # Test fixtures
 @pytest.fixture
 def test_config():
     """Test configuration fixture"""
-    return {
-        "apis": {
-            "anilist": {
-                "rate_limit": {
-                    "requests_per_minute": 90
-                }
-            }
-        }
-    }
+    return {"apis": {"anilist": {"rate_limit": {"requests_per_minute": 90}}}}
+
 
 @pytest.fixture
 def performance_test_config():
     """Performance test configuration fixture"""
-    return {
-        "performance": {
-            "max_response_time": 5.0,
-            "concurrent_requests": 10
-        }
-    }
+    return {"performance": {"max_response_time": 5.0, "concurrent_requests": 10}}
 
 
 class TestAniListIntegrationComprehensive:
@@ -376,9 +365,7 @@ class TestRSSProcessingComprehensive:
 
             # 解析成功の確認
             assert parsed_feed.bozo == 0, f"{format_name} の解析に失敗"
-            assert (
-                len(parsed_feed.entries) > 0
-            ), f"{format_name} にエントリが見つからない"
+            assert len(parsed_feed.entries) > 0, f"{format_name} にエントリが見つからない"
 
             # エントリの基本情報確認
             entry = parsed_feed.entries[0]
@@ -450,9 +437,7 @@ class TestDataQualityAndDeduplication:
         duplicates = detect_duplicates(test_works)
 
         # 重複検出の精度確認
-        assert (
-            len(duplicates) == 2
-        ), f"2つの重複が検出されるべき、実際: {len(duplicates)}"
+        assert len(duplicates) == 2, f"2つの重複が検出されるべき、実際: {len(duplicates)}"
 
         # 検出された重複の詳細確認
         duplicate_titles = [dup[1]["title"] for dup in duplicates]

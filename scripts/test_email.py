@@ -57,9 +57,9 @@ def test_email_sending():
     msg = MIMEMultipart()
     msg["From"] = sender_email
     msg["To"] = recipient_email
-    msg["Subject"] = (
-        f"[テスト] MangaAnime配信システム - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-    )
+    msg[
+        "Subject"
+    ] = f"[テスト] MangaAnime配信システム - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
 
     body = f"""
     🎉 メール配信テスト成功！

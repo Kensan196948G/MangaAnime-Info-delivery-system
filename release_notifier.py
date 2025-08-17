@@ -183,9 +183,7 @@ class ReleaseNotifierSystem:
 
                 # Adaptive rate limiting based on performance
                 if source_duration > 5.0:
-                    self.logger.info(
-                        f"  {source_name} のレスポンスが遅いため、長めの待機時間を設定"
-                    )
+                    self.logger.info(f"  {source_name} のレスポンスが遅いため、長めの待機時間を設定")
                     time.sleep(3)  # Longer wait for slow services
                 else:
                     time.sleep(1)  # Normal rate limiting
@@ -213,9 +211,7 @@ class ReleaseNotifierSystem:
 
         # Performance analysis and alerting
         if total_collection_time > 60:  # More than 1 minute
-            add_monitoring_alert(
-                f"情報収集が遅い: {total_collection_time:.1f}秒", "WARNING"
-            )
+            add_monitoring_alert(f"情報収集が遅い: {total_collection_time:.1f}秒", "WARNING")
 
         if len(all_items) == 0:
             add_monitoring_alert("情報収集でデータが0件", "WARNING")
@@ -243,9 +239,7 @@ class ReleaseNotifierSystem:
             try:
                 # NGキーワードフィルタリング
                 if self._filter.should_filter(item):
-                    self.logger.debug(
-                        f"フィルタリング除外: {item.get('title', '不明')}"
-                    )
+                    self.logger.debug(f"フィルタリング除外: {item.get('title', '不明')}")
                     self.statistics["filtered_items"] += 1
                     continue
 
@@ -315,9 +309,7 @@ class ReleaseNotifierSystem:
                 self.logger.error(f"データベース保存エラー: {e}")
                 self.statistics["errors"] += 1
 
-        self.logger.info(
-            f"💾 データベース保存完了: {len(new_releases)} 件の新しいリリース"
-        )
+        self.logger.info(f"💾 データベース保存完了: {len(new_releases)} 件の新しいリリース")
         return new_releases
 
     def send_notifications(
@@ -389,8 +381,7 @@ class ReleaseNotifierSystem:
                     )
                 else:
                     self.logger.error(
-                        f"❌ バッチ {batch.current_batch}/{batch.total_batches} "
-                        f"配信失敗"
+                        f"❌ バッチ {batch.current_batch}/{batch.total_batches} " f"配信失敗"
                     )
                     success = False
 
@@ -398,9 +389,7 @@ class ReleaseNotifierSystem:
             self.statistics["notifications_sent"] += sent_batches
 
             if sent_batches > 0:
-                self.logger.info(
-                    f"📧 分散配信完了: {sent_batches}/{len(batches)} バッチ送信"
-                )
+                self.logger.info(f"📧 分散配信完了: {sent_batches}/{len(batches)} バッチ送信")
             else:
                 self.logger.info("📧 配信時刻ではないため、バッチ送信をスキップ")
 
@@ -473,9 +462,7 @@ class ReleaseNotifierSystem:
 
             cleaned_count = self.db.cleanup_old_releases(cutoff_date)
             if cleaned_count > 0:
-                self.logger.info(
-                    f"🧹 {cleaned_count} 件の古いリリース情報を削除しました"
-                )
+                self.logger.info(f"🧹 {cleaned_count} 件の古いリリース情報を削除しました")
 
         except Exception as e:
             self.logger.error(f"データクリーンアップエラー: {e}")
@@ -613,9 +600,7 @@ class ReleaseNotifierSystem:
             self.logger.info(report)
 
             if self.statistics["errors"] > 0:
-                self.logger.warning(
-                    f"⚠️ {self.statistics['errors']} 件のエラーが発生しました"
-                )
+                self.logger.warning(f"⚠️ {self.statistics['errors']} 件のエラーが発生しました")
 
             success = notification_success and self.statistics["errors"] == 0
 
@@ -683,18 +668,14 @@ def main():
   ・日本時間（Asia/Tokyo）で配信""",
     )
 
-    parser.add_argument(
-        "--config", type=str, help="設定ファイルのパス (デフォルト: config.json)"
-    )
+    parser.add_argument("--config", type=str, help="設定ファイルのパス (デフォルト: config.json)")
     parser.add_argument(
         "--dry-run",
         action="store_true",
         help="ドライランモード（実際の通知は送信しない）",
     )
     parser.add_argument("--verbose", action="store_true", help="詳細ログを出力")
-    parser.add_argument(
-        "--force-send", action="store_true", help="時刻に関係なく強制的に通知を送信"
-    )
+    parser.add_argument("--force-send", action="store_true", help="時刻に関係なく強制的に通知を送信")
 
     args = parser.parse_args()
 

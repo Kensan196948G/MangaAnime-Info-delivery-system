@@ -269,9 +269,7 @@ class TestBasicFunctionality:
         duplicates = detect_duplicates(works_data)
 
         # 検証
-        assert (
-            len(duplicates) == 2
-        ), f"2つの重複が検出されるべき、実際: {len(duplicates)}"
+        assert len(duplicates) == 2, f"2つの重複が検出されるべき、実際: {len(duplicates)}"
 
         duplicate_indices = [dup[0] for dup in duplicates]
         duplicate_titles = [dup[1]["title"] for dup in duplicates]
@@ -385,11 +383,7 @@ class TestBasicFunctionality:
                         "title": f"テスト作品{i}",
                         "title_kana": f"てすとさくひん{i}",
                         "type": "anime" if i % 2 == 0 else "manga",
-                        "genres": (
-                            ["アクション", "冒険"]
-                            if i % 3 == 0
-                            else ["コメディ", "日常"]
-                        ),
+                        "genres": (["アクション", "冒険"] if i % 3 == 0 else ["コメディ", "日常"]),
                     }
                 )
 
@@ -543,9 +537,7 @@ class TestQualityMetrics:
 
         # 品質指標の検証
         assert average_coverage >= 80, f"平均カバレッジが低い: {average_coverage:.1f}%"
-        assert (
-            high_coverage_count >= 3
-        ), f"高カバレッジ関数が少ない: {high_coverage_count}"
+        assert high_coverage_count >= 3, f"高カバレッジ関数が少ない: {high_coverage_count}"
         assert low_coverage_count <= 2, f"低カバレッジ関数が多い: {low_coverage_count}"
 
     def test_error_handling_coverage(self):

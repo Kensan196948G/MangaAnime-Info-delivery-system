@@ -147,17 +147,13 @@ class ContentFilter:
 
         # 英語タイトルチェック
         if work.title_en:
-            en_result = self._check_text_content_optimized(
-                work.title_en, "英語タイトル"
-            )
+            en_result = self._check_text_content_optimized(work.title_en, "英語タイトル")
             if en_result.is_filtered:
                 return en_result
 
         # カナタイトルチェック
         if work.title_kana:
-            kana_result = self._check_text_content_optimized(
-                work.title_kana, "カナタイトル"
-            )
+            kana_result = self._check_text_content_optimized(work.title_kana, "カナタイトル")
             if kana_result.is_filtered:
                 return kana_result
 
@@ -228,9 +224,7 @@ class ContentFilter:
         """
         # タイトルチェック (using optimized method)
         if rss_item.title:
-            title_result = self._check_text_content_optimized(
-                rss_item.title, "RSSタイトル"
-            )
+            title_result = self._check_text_content_optimized(rss_item.title, "RSSタイトル")
             if title_result.is_filtered:
                 return title_result
 
@@ -437,9 +431,7 @@ class ContentFilter:
         """
         # 説明文チェック
         if "description" in metadata and metadata["description"]:
-            desc_result = self._check_text_content(
-                metadata["description"], "メタデータ説明文"
-            )
+            desc_result = self._check_text_content(metadata["description"], "メタデータ説明文")
             if desc_result.is_filtered:
                 return desc_result
 
