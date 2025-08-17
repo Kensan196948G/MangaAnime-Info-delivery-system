@@ -1,0 +1,17 @@
+name: Test Simple Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Echo Test
+        run: echo "Hello World"
+      
+      - name: Show Environment
+        run: |
+          echo "Runner: $RUNNER_NAME"
+          echo "OS: $RUNNER_OS"
+          echo "Workspace: $GITHUB_WORKSPACE"
