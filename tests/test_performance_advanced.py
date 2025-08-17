@@ -634,7 +634,9 @@ class TestAdvancedAPIPerformance:
             min_throughput = (
                 10
                 if pattern_name == "light_load"
-                else 20 if pattern_name == "medium_load" else 30
+                else 20
+                if pattern_name == "medium_load"
+                else 30
             )
             assert (
                 result["throughput"] > min_throughput
@@ -665,7 +667,6 @@ class TestSystemResourceOptimization:
         """Test memory usage optimization patterns."""
 
         with performance_monitor.monitor_test("memory_optimization") as monitor:
-
             # Test 1: Memory-efficient data processing
             conn = sqlite3.connect(temp_db)
             cursor = conn.cursor()
@@ -758,7 +759,6 @@ class TestSystemResourceOptimization:
         """Test CPU utilization efficiency patterns."""
 
         with performance_monitor.monitor_test("cpu_efficiency") as monitor:
-
             # CPU-intensive task simulation
             conn = sqlite3.connect(temp_db)
             cursor = conn.cursor()

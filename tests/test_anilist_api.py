@@ -104,7 +104,6 @@ class TestAniListAPI:
         with patch("gql.Client") as mock_client_class, patch(
             "gql.transport.aiohttp.AIOHTTPTransport"
         ) as mock_transport_class:
-
             mock_transport = Mock()
             mock_transport_class.return_value = mock_transport
 

@@ -259,9 +259,9 @@ class IntegrationTestSuite:
 
                             # データ品質チェック
                             if i == 0:  # 最初のレスポンスでデータ品質を確認
-                                test_result["data_quality"] = (
-                                    self.validate_anilist_data(data)
-                                )
+                                test_result[
+                                    "data_quality"
+                                ] = self.validate_anilist_data(data)
                         else:
                             test_result["errors"].append(
                                 f"HTTP {response.status}: {await response.text()}"
@@ -276,9 +276,7 @@ class IntegrationTestSuite:
             )
             if avg_response_time > 5000:
                 test_result["status"] = "warning"
-                test_result["errors"].append(
-                    f"平均応答時間が遅い: {avg_response_time:.1f}ms"
-                )
+                test_result["errors"].append(f"平均応答時間が遅い: {avg_response_time:.1f}ms")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -451,9 +449,7 @@ class IntegrationTestSuite:
             # 性能基準チェック
             for operation, time_ms in test_result["operation_times"].items():
                 if time_ms > 1000:  # 1秒以上なら警告
-                    test_result["errors"].append(
-                        f"{operation}操作が遅い: {time_ms:.1f}ms"
-                    )
+                    test_result["errors"].append(f"{operation}操作が遅い: {time_ms:.1f}ms")
                     test_result["status"] = "warning"
 
         except Exception as e:
@@ -497,9 +493,7 @@ class IntegrationTestSuite:
             # 認証情報が不足している場合は警告
             if not (credentials_path.exists() and token_path.exists()):
                 test_result["status"] = "warning"
-                test_result["errors"].append(
-                    "Gmail/Calendar API認証情報が不足しています"
-                )
+                test_result["errors"].append("Gmail/Calendar API認証情報が不足しています")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -594,9 +588,7 @@ class IntegrationTestSuite:
                 }
 
                 if not exists and file_key in ["app.py", "dashboard.py"]:
-                    test_result["errors"].append(
-                        f"必須ファイルが見つかりません: {file_path}"
-                    )
+                    test_result["errors"].append(f"必須ファイルが見つかりません: {file_path}")
                     test_result["status"] = "failed"
 
             # Flask アプリケーションの基本的な構文チェック
@@ -655,9 +647,7 @@ class IntegrationTestSuite:
 
                 if len(anime_jobs) == 0:
                     test_result["status"] = "warning"
-                    test_result["errors"].append(
-                        "アニメ関連のcronジョブが設定されていません"
-                    )
+                    test_result["errors"].append("アニメ関連のcronジョブが設定されていません")
 
             else:
                 test_result["cron_checks"]["crontab_accessible"] = False
@@ -773,9 +763,7 @@ class IntegrationTestSuite:
                 )
 
         if not recommendations:
-            recommendations.append(
-                "✅ すべてのテストが正常に完了しました。本番環境での運用準備が整っています。"
-            )
+            recommendations.append("✅ すべてのテストが正常に完了しました。本番環境での運用準備が整っています。")
 
         return recommendations
 

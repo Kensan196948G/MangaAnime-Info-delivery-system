@@ -335,9 +335,7 @@ class TestRSSProcessingComprehensive:
 
             # 解析成功の確認
             assert parsed_feed.bozo == 0, f"{format_name} の解析に失敗"
-            assert (
-                len(parsed_feed.entries) > 0
-            ), f"{format_name} にエントリが見つからない"
+            assert len(parsed_feed.entries) > 0, f"{format_name} にエントリが見つからない"
 
             # エントリの基本情報確認
             entry = parsed_feed.entries[0]
@@ -409,9 +407,7 @@ class TestDataQualityAndDeduplication:
         duplicates = detect_duplicates(test_works)
 
         # 重複検出の精度確認
-        assert (
-            len(duplicates) == 2
-        ), f"2つの重複が検出されるべき、実際: {len(duplicates)}"
+        assert len(duplicates) == 2, f"2つの重複が検出されるべき、実際: {len(duplicates)}"
 
         # 検出された重複の詳細確認
         duplicate_titles = [dup[1]["title"] for dup in duplicates]

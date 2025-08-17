@@ -335,8 +335,7 @@ class FinalSystemValidator:
                 timeout=10,
             )
             dependencies["anilist_api"] = {
-                "available": response.status_code
-                in [200, 401],  # 401 = 未認証だが接続OK
+                "available": response.status_code in [200, 401],  # 401 = 未認証だが接続OK
                 "status_code": response.status_code,
             }
         except Exception as e:
@@ -386,9 +385,9 @@ class FinalSystemValidator:
             logger.info("⚡ パフォーマンス検証実行中...")
             try:
                 performance_validator = PerformanceValidator()
-                validation_results["performance"] = (
-                    performance_validator.generate_performance_report()
-                )
+                validation_results[
+                    "performance"
+                ] = performance_validator.generate_performance_report()
             except Exception as e:
                 logger.error(f"パフォーマンス検証エラー: {e}")
                 validation_results["performance"] = {
@@ -402,9 +401,9 @@ class FinalSystemValidator:
                 from scripts.integration_test import IntegrationTestSuite
 
                 integration_tester = IntegrationTestSuite()
-                validation_results["integration"] = (
-                    await integration_tester.run_full_integration_test()
-                )
+                validation_results[
+                    "integration"
+                ] = await integration_tester.run_full_integration_test()
             except Exception as e:
                 logger.error(f"統合テスト実行エラー: {e}")
                 validation_results["integration"] = {
@@ -524,29 +523,21 @@ class FinalSystemValidator:
         recommendations = []
 
         if final_score < 60:
-            recommendations.append(
-                "🚨 システムに重大な問題があります。本番運用前に必須修正が必要です。"
-            )
+            recommendations.append("🚨 システムに重大な問題があります。本番運用前に必須修正が必要です。")
         elif final_score < 80:
-            recommendations.append(
-                "⚠️ システムの安定性向上が必要です。推奨修正を適用してください。"
-            )
+            recommendations.append("⚠️ システムの安定性向上が必要です。推奨修正を適用してください。")
         else:
             recommendations.append("✅ システムは本番運用準備が整っています。")
 
         # 個別推奨事項
         if score_components.get("prerequisites", 0) < 20:
-            recommendations.append(
-                "📋 システム前提条件を満たしてください（Python版本、必要パッケージなど）"
-            )
+            recommendations.append("📋 システム前提条件を満たしてください（Python版本、必要パッケージなど）")
 
         if score_components.get("performance", 0) < 15:
             recommendations.append("⚡ システムパフォーマンスの最適化が必要です")
 
         if score_components.get("integration", 0) < 15:
-            recommendations.append(
-                "🔗 統合テストで問題が検出されました。API連携や機能統合を確認してください"
-            )
+            recommendations.append("🔗 統合テストで問題が検出されました。API連携や機能統合を確認してください")
 
         if score_components.get("operational", 0) < 15:
             recommendations.append("🔧 運用監視体制の強化が必要です")
@@ -577,18 +568,14 @@ class FinalSystemValidator:
             if "python_version" in failed_checks:
                 critical_issues.append("Python バージョンが要件を満たしていません")
             if "required_packages" in failed_checks:
-                critical_issues.append(
-                    "必要なPythonパッケージがインストールされていません"
-                )
+                critical_issues.append("必要なPythonパッケージがインストールされていません")
             if "database_setup" in failed_checks:
                 critical_issues.append("データベースの設定が完了していません")
 
         # パフォーマンスの重要問題
         performance = results.get("performance", {})
         if performance.get("overall_performance_score", 0) < 50:
-            critical_issues.append(
-                "システムパフォーマンスが基準値を大幅に下回っています"
-            )
+            critical_issues.append("システムパフォーマンスが基準値を大幅に下回っています")
 
         # 統合テストの重要問題
         integration = results.get("integration", {})
@@ -613,9 +600,7 @@ class FinalSystemValidator:
         prerequisites = results.get("prerequisites", {})
         config_details = prerequisites.get("configuration_files", {}).get("details", {})
         if not config_details.get("google_auth", {}).get("ready", False):
-            warnings.append(
-                "Google API認証設定が未完了です（Gmail/Calendar機能が利用できません）"
-            )
+            warnings.append("Google API認証設定が未完了です（Gmail/Calendar機能が利用できません）")
 
         # パフォーマンス警告
         performance = results.get("performance", {})
@@ -764,9 +749,7 @@ def generate_comprehensive_report(results: Dict[str, Any]) -> str:
     )
     report_lines.append(f"  {status_emoji} 運用準備: {op_status}")
 
-    report_lines.extend(
-        ["", "=" * 100, "🎉 検証完了 - システムの準備状況を確認してください", "=" * 100]
-    )
+    report_lines.extend(["", "=" * 100, "🎉 検証完了 - システムの準備状況を確認してください", "=" * 100])
 
     return "\n".join(report_lines)
 

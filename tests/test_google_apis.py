@@ -25,7 +25,6 @@ class TestGmailAPI:
         with patch("google.auth.load_credentials_from_file") as mock_load_creds, patch(
             "googleapiclient.discovery.build"
         ) as mock_build:
-
             # Mock credentials
             mock_credentials = Mock()
             mock_load_creds.return_value = (mock_credentials, None)
@@ -296,7 +295,6 @@ class TestCalendarAPI:
         with patch("google.auth.load_credentials_from_file") as mock_load_creds, patch(
             "googleapiclient.discovery.build"
         ) as mock_build:
-
             # Mock credentials
             mock_credentials = Mock()
             mock_load_creds.return_value = (mock_credentials, None)

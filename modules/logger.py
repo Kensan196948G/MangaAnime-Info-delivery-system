@@ -171,9 +171,7 @@ def setup_logging(config_manager, force_reload: bool = False) -> logging.Logger:
 
     # 初期ログメッセージ
     logger = logging.getLogger(__name__)
-    logger.info(
-        f"ログシステムが初期化されました (レベル: {config_manager.get_log_level()})"
-    )
+    logger.info(f"ログシステムが初期化されました (レベル: {config_manager.get_log_level()})")
     logger.info(f"ログファイル: {log_file_path}")
 
     return root_logger
@@ -229,9 +227,7 @@ def log_execution_time(logger: logging.Logger):
                 return result
             except Exception as e:
                 execution_time = datetime.now() - start_time
-                logger.error(
-                    f"❌ {func.__name__} エラー (実行時間: {execution_time}): {e}"
-                )
+                logger.error(f"❌ {func.__name__} エラー (実行時間: {execution_time}): {e}")
                 raise
 
         return wrapper
@@ -257,9 +253,7 @@ def log_rate_limit(logger: logging.Logger, max_calls: int, time_window: int):
         else:
             # レート制限に達した場合は、最初の制限メッセージのみログ出力
             if len(call_times) == max_calls:
-                logger.warning(
-                    f"ログレート制限に達しました (最大 {max_calls} 回/{time_window}秒)"
-                )
+                logger.warning(f"ログレート制限に達しました (最大 {max_calls} 回/{time_window}秒)")
 
     return rate_limited_log
 
@@ -381,9 +375,7 @@ class StructuredLogger:
         if error:
             self.logger.error(f"API呼び出し失敗: {source} - {error}", extra=log_data)
         else:
-            self.logger.info(
-                f"API呼び出し成功: {source} ({status_code})", extra=log_data
-            )
+            self.logger.info(f"API呼び出し成功: {source} ({status_code})", extra=log_data)
 
     def log_data_processing(
         self,
@@ -431,9 +423,7 @@ class StructuredLogger:
                 f"通知送信成功: {notification_type} ({item_count}件)", extra=log_data
             )
         else:
-            self.logger.error(
-                f"通知送信失敗: {notification_type} - {error}", extra=log_data
-            )
+            self.logger.error(f"通知送信失敗: {notification_type} - {error}", extra=log_data)
 
     def log_system_event(self, event_type: str, message: str, **metadata):
         """システムイベントログ"""

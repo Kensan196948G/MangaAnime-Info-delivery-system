@@ -484,7 +484,7 @@ class PerformanceSimulator:
         return min(25 * self.load_factor + random.uniform(0, 15), 95)
 
 
-class TestDataFactory:
+class MockDataFactory:
     """Factory for generating test data sets"""
 
     @staticmethod
@@ -553,5 +553,5 @@ def create_mock_services() -> Dict[str, Any]:
         "google": MockGoogleAPIService(),
         "database": MockDatabaseService(),
         "performance": PerformanceSimulator(),
-        "data_factory": TestDataFactory(),
+        "data_factory": MockDataFactory(),
     }

@@ -54,7 +54,7 @@ class ReleaseTestData:
 
 
 @dataclass
-class TestDataSet:
+class DataSet:
     """Complete test dataset."""
 
     name: str
@@ -72,7 +72,7 @@ class TestDataSet:
             }
 
 
-class TestDataGenerator:
+class DataGenerator:
     """Advanced test data generator with realistic patterns."""
 
     # Japanese anime/manga title patterns
@@ -296,7 +296,7 @@ class TestDataGenerator:
         work_count: int = 50,
         releases_per_work: int = 3,
         work_type_ratio: float = 0.6,
-    ) -> TestDataSet:
+    ) -> DataSet:
         """Generate a complete test dataset."""
 
         works = []
@@ -321,7 +321,7 @@ class TestDataGenerator:
                 release = self.generate_release(work_id, work.work_type, j + 1)
                 releases.append(release)
 
-        return TestDataSet(
+        return DataSet(
             name=name,
             description=f"Generated dataset with {work_count} works and {len(releases)} releases",
             works=works,
@@ -406,7 +406,7 @@ class TestDataGenerator:
         return text.lower().replace(" ", "-").replace("×", "x")
 
 
-class TestDataManager:
+class DataManager:
     """Manage test data lifecycle and persistence."""
 
     def __init__(self, data_dir: str = None):
@@ -416,9 +416,9 @@ class TestDataManager:
 
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(exist_ok=True)
-        self.generator = TestDataGenerator()
+        self.generator = DataGenerator()
 
-    def save_dataset(self, dataset: TestDataSet, filename: str = None) -> str:
+    def save_dataset(self, dataset: DataSet, filename: str = None) -> str:
         """Save dataset to file."""
         if filename is None:
             filename = f"{dataset.name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
@@ -439,7 +439,7 @@ class TestDataManager:
 
         return str(filepath)
 
-    def load_dataset(self, filename: str) -> TestDataSet:
+    def load_dataset(self, filename: str) -> DataSet:
         """Load dataset from file."""
         filepath = self.data_dir / filename
 
@@ -451,7 +451,7 @@ class TestDataManager:
             ReleaseTestData(**release_data) for release_data in data["releases"]
         ]
 
-        return TestDataSet(
+        return DataSet(
             name=data["name"],
             description=data["description"],
             works=works,
@@ -460,7 +460,7 @@ class TestDataManager:
         )
 
     def create_database_from_dataset(
-        self, dataset: TestDataSet, db_path: str = None
+        self, dataset: DataSet, db_path: str = None
     ) -> str:
         """Create SQLite database from dataset."""
         if db_path is None:
@@ -675,7 +675,7 @@ class MockAPIDataManager:
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(exist_ok=True)
 
-    def create_anilist_mock_responses(self, dataset: TestDataSet) -> Dict[str, Any]:
+    def create_anilist_mock_responses(self, dataset: DataSet) -> Dict[str, Any]:
         """Create realistic AniList API mock responses based on dataset."""
 
         mock_responses = {}
@@ -747,7 +747,7 @@ class MockAPIDataManager:
 
         return mock_responses
 
-    def create_rss_mock_responses(self, dataset: TestDataSet) -> Dict[str, str]:
+    def create_rss_mock_responses(self, dataset: DataSet) -> Dict[str, str]:
         """Create realistic RSS feed mock responses based on dataset."""
 
         manga_works = [work for work in dataset.works if work.work_type == "manga"]
@@ -858,7 +858,7 @@ class MockAPIDataManager:
 @pytest.fixture(scope="session")
 def test_data_manager():
     """Provide test data manager instance."""
-    return TestDataManager()
+    return DataManager()
 
 
 @pytest.fixture(scope="session")
@@ -870,14 +870,14 @@ def mock_api_data_manager():
 @pytest.fixture(scope="function")
 def small_test_dataset(test_data_manager):
     """Provide small test dataset for unit tests."""
-    generator = TestDataGenerator(seed=42)  # Reproducible data
+    generator = DataGenerator(seed=42)  # Reproducible data
     return generator.generate_dataset("unit_test", work_count=10, releases_per_work=2)
 
 
 @pytest.fixture(scope="function")
 def medium_test_dataset(test_data_manager):
     """Provide medium test dataset for integration tests."""
-    generator = TestDataGenerator(seed=123)
+    generator = DataGenerator(seed=123)
     return generator.generate_dataset(
         "integration_test", work_count=50, releases_per_work=3
     )
@@ -886,7 +886,7 @@ def medium_test_dataset(test_data_manager):
 @pytest.fixture(scope="session")
 def large_test_dataset(test_data_manager):
     """Provide large test dataset for performance tests."""
-    generator = TestDataGenerator(seed=456)
+    generator = DataGenerator(seed=456)
     return generator.generate_dataset(
         "performance_test", work_count=1000, releases_per_work=5
     )
@@ -896,7 +896,7 @@ def large_test_dataset(test_data_manager):
 def test_database_from_dataset(test_data_manager):
     """Create temporary database from test dataset."""
 
-    def _create_db(dataset: TestDataSet) -> str:
+    def _create_db(dataset: DataSet) -> str:
         db_path = test_data_manager.create_database_from_dataset(dataset)
         return db_path
 
@@ -916,11 +916,11 @@ def realistic_mock_responses(mock_api_data_manager, small_test_dataset):
 
 if __name__ == "__main__":
     # Generate preset datasets when run directly
-    manager = TestDataManager()
+    manager = DataManager()
     manager.generate_and_save_preset_datasets()
 
     mock_manager = MockAPIDataManager()
-    generator = TestDataGenerator(seed=42)
+    generator = DataGenerator(seed=42)
 
     # Generate mock data for each preset
     for preset_name in ["small_test", "medium_test", "large_test"]:

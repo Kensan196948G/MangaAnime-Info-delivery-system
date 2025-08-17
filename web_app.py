@@ -996,9 +996,7 @@ def api_test_notification():
         from email_sender import EmailSender
 
         data = request.get_json() or {}
-        message = data.get(
-            "message", "テスト通知です。システムが正常に動作しています。"
-        )
+        message = data.get("message", "テスト通知です。システムが正常に動作しています。")
 
         logger.info(f"Test notification requested: {message}")
 
@@ -1018,9 +1016,7 @@ def api_test_notification():
             )
         else:
             return (
-                jsonify(
-                    {"success": False, "error": result.get("error", "不明なエラー")}
-                ),
+                jsonify({"success": False, "error": result.get("error", "不明なエラー")}),
                 400,
             )
 
@@ -1064,9 +1060,7 @@ def api_test_configuration():
             config = json.load(f)
     except Exception as e:
         return (
-            jsonify(
-                {"success": False, "error": f"設定ファイルの読み込みに失敗: {str(e)}"}
-            ),
+            jsonify({"success": False, "error": f"設定ファイルの読み込みに失敗: {str(e)}"}),
             500,
         )
 

@@ -15,7 +15,7 @@ import uuid
 import faker
 
 
-class TestDataFactory:
+class DataFactory:
     """Factory class for generating test data with realistic content."""
 
     def __init__(self):
@@ -607,14 +607,14 @@ class MockServiceFactory:
         mock_client = AsyncMock()
 
         # Mock successful API responses
-        mock_client.search_anime.return_value = TestDataFactory().generate_work_data(
+        mock_client.search_anime.return_value = DataFactory().generate_work_data(
             "anime", 5
         )
-        mock_client.get_anime_by_id.return_value = TestDataFactory().generate_work_data(
+        mock_client.get_anime_by_id.return_value = DataFactory().generate_work_data(
             "anime", 1
         )[0]
         mock_client.get_current_season_anime.return_value = (
-            TestDataFactory().generate_work_data("anime", 10)
+            DataFactory().generate_work_data("anime", 10)
         )
         mock_client.get_upcoming_releases.return_value = [
             {
@@ -640,10 +640,8 @@ class MockServiceFactory:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.headers = {"Content-Type": "application/xml"}
-        mock_response.content = (
-            TestDataFactory().generate_rss_feed_data().encode("utf-8")
-        )
-        mock_response.text = TestDataFactory().generate_rss_feed_data()
+        mock_response.content = DataFactory().generate_rss_feed_data().encode("utf-8")
+        mock_response.text = DataFactory().generate_rss_feed_data()
         mock_response.raise_for_status.return_value = None
 
         mock_session.get.return_value = mock_response
@@ -706,7 +704,7 @@ class DatabaseTestHelper:
         db_path: str, work_count: int = 10, releases_per_work: int = 3
     ) -> None:
         """Populate test database with realistic data."""
-        factory = TestDataFactory()
+        factory = DataFactory()
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
@@ -931,7 +929,7 @@ class AssertionHelpers:
             ), f"Too many requests in 60s window: {max_requests_per_minute} requests in {window_duration:.1f}s"
 
 
-class TestEnvironmentManager:
+class EnvironmentManager:
     """Manager for test environment setup and cleanup."""
 
     def __init__(self):
@@ -960,7 +958,7 @@ class TestEnvironmentManager:
     def create_temp_config_file(self, config_data: Dict[str, Any] = None) -> str:
         """Create a temporary configuration file."""
         if config_data is None:
-            config_data = TestDataFactory().generate_config_data()
+            config_data = DataFactory().generate_config_data()
 
         temp_file = tempfile.NamedTemporaryFile(
             mode="w", suffix=".json", delete=False, encoding="utf-8"

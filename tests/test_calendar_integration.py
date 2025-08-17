@@ -19,7 +19,6 @@ class TestCalendarIntegration:
         with patch("google.auth.default") as mock_auth, patch(
             "googleapiclient.discovery.build"
         ) as mock_build:
-
             # Mock credentials
             mock_credentials = Mock()
             mock_auth.return_value = (mock_credentials, "project-id")

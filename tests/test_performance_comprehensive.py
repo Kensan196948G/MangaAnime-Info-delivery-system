@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from unittest.mock import patch, MagicMock
 
 # Import test utilities
-from fixtures.mock_services import create_mock_services, PerformanceSimulator
+from tests.fixtures.mock_services import create_mock_services, PerformanceSimulator
 
 # System imports
 import sys

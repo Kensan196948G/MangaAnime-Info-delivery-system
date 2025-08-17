@@ -1,0 +1,137 @@
+{
+  "report_metadata": {
+    "generated_at": "2025-08-17T21:31:01.679629",
+    "total_tests": 3,
+    "test_environment": {
+      "cpu_count": 4,
+      "memory_total_gb": 7.6709136962890625,
+      "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]"
+    }
+  },
+  "performance_summary": {
+    "total_execution_time": 14.376646757125854,
+    "avg_execution_time": 4.792215585708618,
+    "peak_memory_usage": 0.3864297866821289,
+    "avg_memory_usage": 0.2583913803100586,
+    "avg_cpu_usage": 0.0
+  },
+  "test_details": [
+    {
+      "test_name": "regression_db_baseline",
+      "execution_time": 0.1241157054901123,
+      "memory_peak_mb": 0.3864297866821289,
+      "memory_avg_mb": 0.3861360549926758,
+      "cpu_usage_percent": 0.0,
+      "throughput": null,
+      "error_rate": null,
+      "p95_latency": null,
+      "p99_latency": null,
+      "timestamp": "2025-08-17T21:30:47.450018"
+    },
+    {
+      "test_name": "regression_db_baseline",
+      "execution_time": 0.1241157054901123,
+      "memory_peak_mb": 0.3864297866821289,
+      "memory_avg_mb": 0.3861360549926758,
+      "cpu_usage_percent": 0.0,
+      "throughput": null,
+      "error_rate": null,
+      "p95_latency": null,
+      "p99_latency": null,
+      "timestamp": "2025-08-17T21:30:47.450018"
+    },
+    {
+      "test_name": "regression_db_degraded",
+      "execution_time": 14.12841534614563,
+      "memory_peak_mb": 0.0023145675659179688,
+      "memory_avg_mb": 0.0019054412841796875,
+      "cpu_usage_percent": 0.0,
+      "throughput": null,
+      "error_rate": null,
+      "p95_latency": null,
+      "p99_latency": null,
+      "timestamp": "2025-08-17T21:31:01.679575"
+    }
+  ],
+  "performance_analysis": {
+    "slowest_tests": [
+      {
+        "test_name": "regression_db_degraded",
+        "execution_time": 14.12841534614563,
+        "memory_peak_mb": 0.0023145675659179688,
+        "memory_avg_mb": 0.0019054412841796875,
+        "cpu_usage_percent": 0.0,
+        "throughput": null,
+        "error_rate": null,
+        "p95_latency": null,
+        "p99_latency": null,
+        "timestamp": "2025-08-17T21:31:01.679575"
+      },
+      {
+        "test_name": "regression_db_baseline",
+        "execution_time": 0.1241157054901123,
+        "memory_peak_mb": 0.3864297866821289,
+        "memory_avg_mb": 0.3861360549926758,
+        "cpu_usage_percent": 0.0,
+        "throughput": null,
+        "error_rate": null,
+        "p95_latency": null,
+        "p99_latency": null,
+        "timestamp": "2025-08-17T21:30:47.450018"
+      },
+      {
+        "test_name": "regression_db_baseline",
+        "execution_time": 0.1241157054901123,
+        "memory_peak_mb": 0.3864297866821289,
+        "memory_avg_mb": 0.3861360549926758,
+        "cpu_usage_percent": 0.0,
+        "throughput": null,
+        "error_rate": null,
+        "p95_latency": null,
+        "p99_latency": null,
+        "timestamp": "2025-08-17T21:30:47.450018"
+      }
+    ],
+    "memory_intensive_tests": [
+      {
+        "test_name": "regression_db_baseline",
+        "execution_time": 0.1241157054901123,
+        "memory_peak_mb": 0.3864297866821289,
+        "memory_avg_mb": 0.3861360549926758,
+        "cpu_usage_percent": 0.0,
+        "throughput": null,
+        "error_rate": null,
+        "p95_latency": null,
+        "p99_latency": null,
+        "timestamp": "2025-08-17T21:30:47.450018"
+      },
+      {
+        "test_name": "regression_db_baseline",
+        "execution_time": 0.1241157054901123,
+        "memory_peak_mb": 0.3864297866821289,
+        "memory_avg_mb": 0.3861360549926758,
+        "cpu_usage_percent": 0.0,
+        "throughput": null,
+        "error_rate": null,
+        "p95_latency": null,
+        "p99_latency": null,
+        "timestamp": "2025-08-17T21:30:47.450018"
+      },
+      {
+        "test_name": "regression_db_degraded",
+        "execution_time": 14.12841534614563,
+        "memory_peak_mb": 0.0023145675659179688,
+        "memory_avg_mb": 0.0019054412841796875,
+        "cpu_usage_percent": 0.0,
+        "throughput": null,
+        "error_rate": null,
+        "p95_latency": null,
+        "p99_latency": null,
+        "timestamp": "2025-08-17T21:31:01.679575"
+      }
+    ],
+    "recommendations": [
+      "Optimize 1 slow tests with execution time > 10s"
+    ]
+  }
+}

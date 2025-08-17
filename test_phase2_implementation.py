@@ -203,9 +203,7 @@ class Phase2TestSuite:
 
         # Test 6: dアニメストア specific collector
         danime_collector = DAnimeRSSCollector(self.config)
-        assert (
-            danime_collector is not None
-        ), "dアニメストア collector initialization failed"
+        assert danime_collector is not None, "dアニメストア collector initialization failed"
         print("    ✓ dアニメストア collector initialized")
 
         # Test 7: Health reporting

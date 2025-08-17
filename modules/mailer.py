@@ -713,9 +713,7 @@ class EmailTemplateGenerator:
 
             # Generate subject
             if subject_prefix is None:
-                subject_prefix = self.gmail_config.get(
-                    "subject_prefix", "[アニメ・マンガ情報]"
-                )
+                subject_prefix = self.gmail_config.get("subject_prefix", "[アニメ・マンガ情報]")
             anime_count = len([r for r in releases if r.get("type") == "anime"])
             manga_count = len([r for r in releases if r.get("type") == "manga"])
 

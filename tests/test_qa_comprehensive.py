@@ -759,7 +759,6 @@ class TestPerformanceValidation:
         ) as mock_mem, patch.object(
             validator, "_test_api_performance_simulation"
         ) as mock_api:
-
             mock_db.return_value = {
                 "test_name": "database_performance",
                 "passed": True,

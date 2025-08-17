@@ -29,6 +29,9 @@ safety>=2.3.0
 # パフォーマンス
 memory-profiler>=0.61.0
 
+# テストデータ生成
+faker>=19.0.0
+
 # ドキュメント生成
 sphinx>=5.0.0
 sphinx-rtd-theme>=1.2.0

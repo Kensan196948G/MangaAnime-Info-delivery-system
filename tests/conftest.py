@@ -262,7 +262,7 @@ def setup_test_environment(monkeypatch):
     monkeypatch.setenv("GOOGLE_TOKEN_PATH", "/fake/path/token.json")
 
 
-class TestDataGenerator:
+class DataGeneratorUtil:
     """Test data generator utility class."""
 
     @staticmethod
@@ -343,7 +343,7 @@ class TestDataGenerator:
 @pytest.fixture
 def test_data_generator():
     """Provide test data generator instance."""
-    return TestDataGenerator()
+    return DataGeneratorUtil()
 
 
 # Performance testing fixtures
