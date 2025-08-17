@@ -1,6 +1,7 @@
 name: 🛠️ Continuous Integration
 # アニメ・マンガ情報配信システム - 継続的インテグレーション
 # Updated: 2025-08-17 15:40 - Force workflow_dispatch refresh
+# GitHub API Sync: 2025-08-17 16:00 - Force workflow_dispatch recognition
 
 on:
   workflow_dispatch:
