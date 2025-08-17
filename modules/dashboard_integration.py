@@ -14,20 +14,21 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class DashboardIntegration:
     """ダッシュボード統合クラス - 既存のモジュールにメトリクス収集機能を追加"""
-    
+
     def __init__(self, db_path: str = "db.sqlite3"):
         self.db_path = db_path
         self.performance_monitor = PerformanceMonitor()
-    
+
     @contextmanager
     def track_operation(self, operation_name: str, component: str = "system"):
         """操作の実行時間を追跡し、ダッシュボードに記録"""
         start_time = time.time()
         success = False
         error_message = None
-        
+
         try:
             yield
             success = True
@@ -38,106 +39,113 @@ class DashboardIntegration:
         finally:
             end_time = time.time()
             duration_ms = (end_time - start_time) * 1000
-            
+
             # パフォーマンスメトリクスを記録
             dashboard_service.record_metric(
-                f"{operation_name}_duration", 
-                duration_ms, 
+                f"{operation_name}_duration",
+                duration_ms,
                 "timer",
                 source=component,
                 metadata={
                     "success": success,
                     "error_message": error_message,
-                    "timestamp": datetime.now().isoformat()
-                }
+                    "timestamp": datetime.now().isoformat(),
+                },
             )
-            
+
             # システムヘルス状態を更新
             status = "healthy" if success else "error"
             dashboard_service.update_system_health(
-                component, status, error_message, 
-                performance_score=1.0 if success else 0.0
+                component,
+                status,
+                error_message,
+                performance_score=1.0 if success else 0.0,
             )
-    
+
     def track_api_request(self, api_name: str, response_time_ms: float, success: bool):
         """API リクエストを追跡"""
         dashboard_service.record_metric(
-            f"{api_name}_response_time", 
-            response_time_ms, 
+            f"{api_name}_response_time",
+            response_time_ms,
             "timer",
             source=f"{api_name}_api",
-            metadata={
-                "success": success,
-                "timestamp": datetime.now().isoformat()
-            }
+            metadata={"success": success, "timestamp": datetime.now().isoformat()},
         )
-        
+
         # 成功/失敗カウンターも更新
         metric_name = f"{api_name}_{'success' if success else 'error'}"
         dashboard_service.record_metric(
-            metric_name, 1, "counter", 
-            source=f"{api_name}_api"
+            metric_name, 1, "counter", source=f"{api_name}_api"
         )
-    
+
     def track_rss_collection(self, source: str, success: bool, items_count: int = 0):
         """RSS収集結果を追跡"""
         # 成功/失敗を記録
         metric_name = f"rss_{'success' if success else 'error'}"
         dashboard_service.record_metric(
-            metric_name, 1, "counter",
+            metric_name,
+            1,
+            "counter",
             source=source,
             metadata={
                 "items_collected": items_count,
-                "timestamp": datetime.now().isoformat()
-            }
+                "timestamp": datetime.now().isoformat(),
+            },
         )
-        
+
         # アイテム数も記録
         if success and items_count > 0:
             dashboard_service.record_metric(
-                "rss_items_collected", items_count, "counter",
-                source=source
+                "rss_items_collected", items_count, "counter", source=source
             )
-    
-    def track_database_operation(self, operation: str, duration_ms: float, rows_affected: int = 0):
+
+    def track_database_operation(
+        self, operation: str, duration_ms: float, rows_affected: int = 0
+    ):
         """データベース操作を追跡"""
         dashboard_service.record_metric(
-            "db_query_time", duration_ms, "timer",
+            "db_query_time",
+            duration_ms,
+            "timer",
             source="database",
             metadata={
                 "operation": operation,
                 "rows_affected": rows_affected,
-                "timestamp": datetime.now().isoformat()
-            }
+                "timestamp": datetime.now().isoformat(),
+            },
         )
-        
+
         dashboard_service.record_metric(
-            f"db_{operation}_count", 1, "counter",
-            source="database"
+            f"db_{operation}_count", 1, "counter", source="database"
         )
-    
-    def track_notification_sent(self, notification_type: str, success: bool, recipient_count: int = 1):
+
+    def track_notification_sent(
+        self, notification_type: str, success: bool, recipient_count: int = 1
+    ):
         """通知送信結果を追跡"""
         metric_name = f"notification_{'success' if success else 'error'}"
         dashboard_service.record_metric(
-            metric_name, recipient_count, "counter",
+            metric_name,
+            recipient_count,
+            "counter",
             source=notification_type,
             metadata={
                 "type": notification_type,
-                "timestamp": datetime.now().isoformat()
-            }
+                "timestamp": datetime.now().isoformat(),
+            },
         )
-    
+
     def get_performance_summary(self, hours: int = 24) -> Dict[str, Any]:
         """パフォーマンス要約を取得"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
-                
+
                 since = datetime.now() - timedelta(hours=hours)
-                
+
                 # API パフォーマンス
-                cursor = conn.execute("""
+                cursor = conn.execute(
+                    """
                     SELECT 
                         source,
                         AVG(metric_value) as avg_response_time,
@@ -147,82 +155,99 @@ class DashboardIntegration:
                     WHERE metric_name LIKE '%_response_time' 
                     AND timestamp > ?
                     GROUP BY source
-                """, (since,))
+                """,
+                    (since,),
+                )
                 api_performance = [dict(row) for row in cursor.fetchall()]
-                
+
                 # RSS収集統計
-                cursor = conn.execute("""
+                cursor = conn.execute(
+                    """
                     SELECT 
                         SUM(CASE WHEN metric_name = 'rss_success' THEN metric_value ELSE 0 END) as successes,
                         SUM(CASE WHEN metric_name = 'rss_error' THEN metric_value ELSE 0 END) as errors
                     FROM dashboard_stats 
                     WHERE metric_name IN ('rss_success', 'rss_error')
                     AND timestamp > ?
-                """, (since,))
+                """,
+                    (since,),
+                )
                 rss_stats = dict(cursor.fetchone() or {})
-                
+
                 # データベース統計
-                cursor = conn.execute("""
+                cursor = conn.execute(
+                    """
                     SELECT 
                         AVG(metric_value) as avg_query_time,
                         COUNT(*) as total_queries
                     FROM dashboard_stats 
                     WHERE metric_name = 'db_query_time'
                     AND timestamp > ?
-                """, (since,))
+                """,
+                    (since,),
+                )
                 db_stats = dict(cursor.fetchone() or {})
-                
+
                 # 通知統計
-                cursor = conn.execute("""
+                cursor = conn.execute(
+                    """
                     SELECT 
                         SUM(CASE WHEN metric_name = 'notification_success' THEN metric_value ELSE 0 END) as successful_notifications,
                         SUM(CASE WHEN metric_name = 'notification_error' THEN metric_value ELSE 0 END) as failed_notifications
                     FROM dashboard_stats 
                     WHERE metric_name IN ('notification_success', 'notification_error')
                     AND timestamp > ?
-                """, (since,))
+                """,
+                    (since,),
+                )
                 notification_stats = dict(cursor.fetchone() or {})
-                
+
                 return {
-                    'api_performance': api_performance,
-                    'rss_stats': rss_stats,
-                    'database_stats': db_stats,
-                    'notification_stats': notification_stats,
-                    'period_hours': hours,
-                    'generated_at': datetime.now().isoformat()
+                    "api_performance": api_performance,
+                    "rss_stats": rss_stats,
+                    "database_stats": db_stats,
+                    "notification_stats": notification_stats,
+                    "period_hours": hours,
+                    "generated_at": datetime.now().isoformat(),
                 }
-                
+
         except Exception as e:
             logger.error(f"Failed to get performance summary: {e}")
             return {}
-    
+
     def cleanup_old_metrics(self, days: int = 30):
         """古いメトリクスデータをクリーンアップ"""
         try:
             cutoff_date = datetime.now() - timedelta(days=days)
             with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.execute("""
+                cursor = conn.execute(
+                    """
                     DELETE FROM dashboard_stats 
                     WHERE timestamp < ?
-                """, (cutoff_date,))
-                
+                """,
+                    (cutoff_date,),
+                )
+
                 deleted_count = cursor.rowcount
                 logger.info(f"Cleaned up {deleted_count} old metric records")
-                
+
                 # システムヘルスの古いレコードもクリーンアップ
-                cursor = conn.execute("""
+                cursor = conn.execute(
+                    """
                     DELETE FROM system_health 
                     WHERE last_check < ?
-                """, (cutoff_date,))
-                
+                """,
+                    (cutoff_date,),
+                )
+
                 deleted_health_count = cursor.rowcount
                 logger.info(f"Cleaned up {deleted_health_count} old health records")
-                
+
                 return {
-                    'metrics_deleted': deleted_count,
-                    'health_deleted': deleted_health_count
+                    "metrics_deleted": deleted_count,
+                    "health_deleted": deleted_health_count,
                 }
-                
+
         except Exception as e:
             logger.error(f"Failed to cleanup old metrics: {e}")
             return {}
@@ -231,12 +256,16 @@ class DashboardIntegration:
 # グローバルインスタンス
 dashboard_integration = DashboardIntegration()
 
+
 # デコレータ関数
 def track_performance(operation_name: str, component: str = "system"):
     """パフォーマンス追跡デコレータ"""
+
     def decorator(func):
         def wrapper(*args, **kwargs):
             with dashboard_integration.track_operation(operation_name, component):
                 return func(*args, **kwargs)
+
         return wrapper
+
     return decorator

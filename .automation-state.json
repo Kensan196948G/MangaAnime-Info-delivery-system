@@ -1,10 +1,10 @@
 {
-    "last_test_run": "",
-    "last_lint_run": "",
-    "last_build_run": "",
-    "last_deploy_run": "",
-    "test_results": "pending",
-    "lint_results": "pending",
-    "build_results": "pending",
-    "created_at": "2025-08-17T21:04:47+09:00"
+  "last_test_run": 1755432397.828936,
+  "last_lint_run": "",
+  "last_build_run": "",
+  "last_deploy_run": "",
+  "test_results": "failure",
+  "lint_results": "pending",
+  "build_results": "pending",
+  "created_at": "2025-08-17T21:04:47+09:00"
 }

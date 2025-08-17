@@ -21,8 +21,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
 # ===== 設定ここから =====
-CREDENTIALS_FILE = "credentials.json"     # GCPの「デスクトップアプリ」用クライアントを配置
-TOKEN_FILE = "token.json"                 # 生成・更新されるトークン
+CREDENTIALS_FILE = "credentials.json"  # GCPの「デスクトップアプリ」用クライアントを配置
+TOKEN_FILE = "token.json"  # 生成・更新されるトークン
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.send",
     "https://www.googleapis.com/auth/calendar.events",
@@ -67,31 +67,30 @@ def _obtain_new_creds(port: int) -> Credentials:
     try:
         log("🌐 手動認証モードを開始します。")
         log(f"   ※ SSHトンネル例:  ssh -L {port}:localhost:{port} <USER>@<HOST>")
-        
+
         # 手動認証URLの生成
-        flow.redirect_uri = f'http://localhost:{port}/'
+        flow.redirect_uri = f"http://localhost:{port}/"
         auth_url, state = flow.authorization_url(
-            access_type='offline',
-            include_granted_scopes='true'
+            access_type="offline", include_granted_scopes="true"
         )
-        
+
         log(f"\n📋 以下のURLをブラウザで開いて認証してください:")
         log(f"{auth_url}")
         log(f"\n許可後、認証コードが表示されます。そのコードを入力してください。")
-        
+
         # 認証コードの手動入力
         try:
             auth_code = input("\n🔑 認証コードを入力してください: ").strip()
         except (EOFError, KeyboardInterrupt):
             raise Exception("認証がキャンセルされました")
-        
+
         if not auth_code:
             raise Exception("認証コードが入力されませんでした")
-        
+
         # トークンの取得
         flow.fetch_token(code=auth_code)
         creds = flow.credentials
-        
+
     except OSError as e:
         # ポート衝突の場合は別ポートで再試行
         log(f"ℹ️ 指定ポート {port} が使用中です: {e}")
@@ -101,15 +100,14 @@ def _obtain_new_creds(port: int) -> Credentials:
             log("⚠️ CSRF状態不一致エラー。再度認証を試行します...")
             # 新しいフローを作成して再試行
             flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
-            flow.redirect_uri = f'http://localhost:{port}/'
+            flow.redirect_uri = f"http://localhost:{port}/"
             auth_url, state = flow.authorization_url(
-                access_type='offline',
-                include_granted_scopes='true'
+                access_type="offline", include_granted_scopes="true"
             )
-            
+
             log(f"\n📋 新しい認証URLです:")
             log(f"{auth_url}")
-            
+
             try:
                 auth_code = input("\n🔑 新しい認証コードを入力してください: ").strip()
                 flow.fetch_token(code=auth_code)
@@ -153,8 +151,10 @@ def main() -> int:
         description="Create/refresh Google OAuth token.json (SSH tunnel friendly)"
     )
     parser.add_argument(
-        "--port", type=int, default=DEFAULT_PORT,
-        help=f"ループバック用ポート番号（既定: {DEFAULT_PORT}）"
+        "--port",
+        type=int,
+        default=DEFAULT_PORT,
+        help=f"ループバック用ポート番号（既定: {DEFAULT_PORT}）",
     )
     args = parser.parse_args()
 
@@ -166,10 +166,10 @@ def main() -> int:
     except Exception as e:
         log(f"❌ エラー: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

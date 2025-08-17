@@ -19,32 +19,27 @@ TEST_CONFIG = {
         "name": "Test_MangaAnime情報配信システム",
         "environment": "test",
         "timezone": "Asia/Tokyo",
-        "log_level": "DEBUG"
+        "log_level": "DEBUG",
     },
     "database": {
         "path": ":memory:",  # In-memory database for tests
-        "backup_enabled": False
+        "backup_enabled": False,
     },
     "apis": {
         "anilist": {
             "graphql_url": "https://graphql.anilist.co",
             "rate_limit": {"requests_per_minute": 90},
-            "timeout_seconds": 5
-        },
-        "rss_feeds": {
             "timeout_seconds": 5,
-            "user_agent": "TestAgent/1.0"
-        }
+        },
+        "rss_feeds": {"timeout_seconds": 5, "user_agent": "TestAgent/1.0"},
     },
     "filtering": {
         "ng_keywords": ["エロ", "R18", "成人向け", "BL"],
-        "ng_genres": ["Hentai", "Ecchi"]
+        "ng_genres": ["Hentai", "Ecchi"],
     },
-    "notification": {
-        "email": {"enabled": False},
-        "calendar": {"enabled": False}
-    }
+    "notification": {"email": {"enabled": False}, "calendar": {"enabled": False}},
 }
+
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -53,21 +48,24 @@ def event_loop():
     yield loop
     loop.close()
 
+
 @pytest.fixture
 def test_config() -> Dict[str, Any]:
     """Provide test configuration."""
     return TEST_CONFIG.copy()
 
+
 @pytest.fixture
 def temp_db() -> Generator[str, None, None]:
     """Create a temporary SQLite database for testing."""
-    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as temp_file:
         db_path = temp_file.name
-    
+
     try:
         # Initialize test database structure
         conn = sqlite3.connect(db_path)
-        conn.executescript("""
+        conn.executescript(
+            """
             CREATE TABLE works (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
@@ -91,14 +89,16 @@ def temp_db() -> Generator[str, None, None]:
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(work_id, release_type, number, platform, release_date)
             );
-        """)
+        """
+        )
         conn.commit()
         conn.close()
-        
+
         yield db_path
     finally:
         if os.path.exists(db_path):
             os.unlink(db_path)
+
 
 @pytest.fixture
 def mock_anilist_response():
@@ -112,7 +112,7 @@ def mock_anilist_response():
                         "title": {
                             "romaji": "One Piece",
                             "english": "One Piece",
-                            "native": "ワンピース"
+                            "native": "ワンピース",
                         },
                         "type": "ANIME",
                         "format": "TV",
@@ -122,19 +122,17 @@ def mock_anilist_response():
                         "tags": [{"name": "Pirates"}, {"name": "Shounen"}],
                         "description": "Gol D. Roger was known as the Pirate King...",
                         "startDate": {"year": 1999, "month": 10, "day": 20},
-                        "nextAiringEpisode": {
-                            "episode": 1050,
-                            "airingAt": 1640995200
-                        },
+                        "nextAiringEpisode": {"episode": 1050, "airingAt": 1640995200},
                         "streamingEpisodes": [
                             {"title": "Episode 1049", "url": "https://example.com/1049"}
                         ],
-                        "siteUrl": "https://anilist.co/anime/21"
+                        "siteUrl": "https://anilist.co/anime/21",
                     }
                 ]
             }
         }
     }
+
 
 @pytest.fixture
 def mock_rss_feed_data():
@@ -161,90 +159,96 @@ def mock_rss_feed_data():
         </channel>
     </rss>"""
 
+
 @pytest.fixture
 def mock_gmail_service():
     """Mock Gmail API service for testing."""
     mock_service = MagicMock()
     mock_service.users().messages().send().execute.return_value = {
-        'id': 'test_message_id',
-        'threadId': 'test_thread_id'
+        "id": "test_message_id",
+        "threadId": "test_thread_id",
     }
     return mock_service
+
 
 @pytest.fixture
 def mock_calendar_service():
     """Mock Google Calendar API service for testing."""
     mock_service = MagicMock()
     mock_service.events().insert().execute.return_value = {
-        'id': 'test_event_id',
-        'htmlLink': 'https://calendar.google.com/event?eid=test_event_id'
+        "id": "test_event_id",
+        "htmlLink": "https://calendar.google.com/event?eid=test_event_id",
     }
     return mock_service
+
 
 @pytest.fixture
 def sample_work_data():
     """Sample work data for testing."""
     return [
         {
-            'id': 1,
-            'title': 'ワンピース',
-            'title_kana': 'わんぴーす',
-            'title_en': 'One Piece',
-            'type': 'anime',
-            'official_url': 'https://one-piece.com'
+            "id": 1,
+            "title": "ワンピース",
+            "title_kana": "わんぴーす",
+            "title_en": "One Piece",
+            "type": "anime",
+            "official_url": "https://one-piece.com",
         },
         {
-            'id': 2,
-            'title': '進撃の巨人',
-            'title_kana': 'しんげきのきょじん',
-            'title_en': 'Attack on Titan',
-            'type': 'manga',
-            'official_url': 'https://shingeki.tv'
-        }
+            "id": 2,
+            "title": "進撃の巨人",
+            "title_kana": "しんげきのきょじん",
+            "title_en": "Attack on Titan",
+            "type": "manga",
+            "official_url": "https://shingeki.tv",
+        },
     ]
+
 
 @pytest.fixture
 def sample_release_data():
     """Sample release data for testing."""
     return [
         {
-            'work_id': 1,
-            'release_type': 'episode',
-            'number': '1050',
-            'platform': 'dアニメストア',
-            'release_date': '2024-01-15',
-            'source': 'anilist',
-            'source_url': 'https://anilist.co/anime/21',
-            'notified': 0
+            "work_id": 1,
+            "release_type": "episode",
+            "number": "1050",
+            "platform": "dアニメストア",
+            "release_date": "2024-01-15",
+            "source": "anilist",
+            "source_url": "https://anilist.co/anime/21",
+            "notified": 0,
         },
         {
-            'work_id': 2,
-            'release_type': 'volume',
-            'number': '34',
-            'platform': 'BookWalker',
-            'release_date': '2024-01-20',
-            'source': 'rss',
-            'source_url': 'https://bookwalker.jp/manga/attack-titan-34',
-            'notified': 0
-        }
+            "work_id": 2,
+            "release_type": "volume",
+            "number": "34",
+            "platform": "BookWalker",
+            "release_date": "2024-01-20",
+            "source": "rss",
+            "source_url": "https://bookwalker.jp/manga/attack-titan-34",
+            "notified": 0,
+        },
     ]
+
 
 @pytest.fixture
 def mock_requests_session():
     """Mock requests session for HTTP testing."""
     mock_session = Mock()
-    
+
     # Mock successful response
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = {"data": "test_response"}
     mock_response.text = "test response text"
     mock_response.raise_for_status.return_value = None
-    
+
     mock_session.get.return_value = mock_response
     mock_session.post.return_value = mock_response
-    
+
     return mock_session
+
 
 @pytest.fixture(autouse=True)
 def setup_test_environment(monkeypatch):
@@ -252,62 +256,81 @@ def setup_test_environment(monkeypatch):
     # Set test mode environment variable
     monkeypatch.setenv("TEST_MODE", "true")
     monkeypatch.setenv("LOG_LEVEL", "DEBUG")
-    
+
     # Mock sensitive credentials for testing
     monkeypatch.setenv("GOOGLE_CREDENTIALS_PATH", "/fake/path/credentials.json")
     monkeypatch.setenv("GOOGLE_TOKEN_PATH", "/fake/path/token.json")
 
+
 class TestDataGenerator:
     """Test data generator utility class."""
-    
+
     @staticmethod
     def generate_anime_data(count: int = 5) -> List[Dict[str, Any]]:
         """Generate test anime data."""
         anime_titles = [
-            "ワンピース", "進撃の巨人", "鬼滅の刃", "呪術廻戦", "僕のヒーローアカデミア",
-            "ドラゴンボール超", "ナルト", "ブリーチ", "ハンターxハンター", "フェアリーテイル"
+            "ワンピース",
+            "進撃の巨人",
+            "鬼滅の刃",
+            "呪術廻戦",
+            "僕のヒーローアカデミア",
+            "ドラゴンボール超",
+            "ナルト",
+            "ブリーチ",
+            "ハンターxハンター",
+            "フェアリーテイル",
         ]
-        
+
         results = []
         for i in range(min(count, len(anime_titles))):
-            results.append({
-                "id": i + 1,
-                "title": {
-                    "romaji": anime_titles[i],
-                    "english": f"Test Anime {i+1}",
-                    "native": anime_titles[i]
-                },
-                "type": "ANIME",
-                "status": "RELEASING",
-                "episodes": 24,
-                "genres": ["Action", "Adventure"],
-                "tags": [{"name": "Shounen"}],
-                "nextAiringEpisode": {
-                    "episode": i + 100,
-                    "airingAt": int((datetime.now() + timedelta(days=i)).timestamp())
+            results.append(
+                {
+                    "id": i + 1,
+                    "title": {
+                        "romaji": anime_titles[i],
+                        "english": f"Test Anime {i+1}",
+                        "native": anime_titles[i],
+                    },
+                    "type": "ANIME",
+                    "status": "RELEASING",
+                    "episodes": 24,
+                    "genres": ["Action", "Adventure"],
+                    "tags": [{"name": "Shounen"}],
+                    "nextAiringEpisode": {
+                        "episode": i + 100,
+                        "airingAt": int(
+                            (datetime.now() + timedelta(days=i)).timestamp()
+                        ),
+                    },
                 }
-            })
-        
+            )
+
         return results
-    
+
     @staticmethod
     def generate_manga_data(count: int = 5) -> List[str]:
         """Generate test manga RSS data."""
         manga_titles = [
-            "進撃の巨人", "鬼滅の刃", "呪術廻戦", "チェンソーマン", "東京リベンジャーズ"
+            "進撃の巨人",
+            "鬼滅の刃",
+            "呪術廻戦",
+            "チェンソーマン",
+            "東京リベンジャーズ",
         ]
-        
+
         items = []
         for i, title in enumerate(manga_titles[:count]):
-            items.append(f"""
+            items.append(
+                f"""
                 <item>
                     <title>{title} 第{i+20}巻</title>
                     <link>https://example.com/manga/{i+1}</link>
                     <description>第{i+20}巻発売</description>
                     <pubDate>{(datetime.now() + timedelta(days=i)).strftime('%a, %d %b %Y %H:%M:%S %z')}</pubDate>
                 </item>
-            """)
-        
+            """
+            )
+
         return f"""<?xml version="1.0" encoding="UTF-8"?>
         <rss version="2.0">
             <channel>
@@ -316,10 +339,12 @@ class TestDataGenerator:
             </channel>
         </rss>"""
 
+
 @pytest.fixture
 def test_data_generator():
     """Provide test data generator instance."""
     return TestDataGenerator()
+
 
 # Performance testing fixtures
 @pytest.fixture
@@ -330,8 +355,9 @@ def performance_test_config():
         "request_timeout": 30,
         "max_response_time": 5.0,  # seconds
         "memory_limit_mb": 100,
-        "cpu_usage_limit": 80.0  # percentage
+        "cpu_usage_limit": 80.0,  # percentage
     }
+
 
 @pytest.fixture
 def sample_config_data():
@@ -341,60 +367,51 @@ def sample_config_data():
             "name": "MangaAnime情報配信システム",
             "environment": "production",
             "timezone": "Asia/Tokyo",
-            "log_level": "INFO"
+            "log_level": "INFO",
         },
-        "database": {
-            "path": "db.sqlite3",
-            "backup_enabled": True
-        },
+        "database": {"path": "db.sqlite3", "backup_enabled": True},
         "apis": {
             "anilist": {
                 "graphql_url": "https://graphql.anilist.co",
                 "rate_limit": {"requests_per_minute": 90},
-                "timeout_seconds": 30
+                "timeout_seconds": 30,
             },
             "rss_feeds": {
                 "timeout_seconds": 30,
-                "user_agent": "MangaAnime-Info-System/1.0"
-            }
+                "user_agent": "MangaAnime-Info-System/1.0",
+            },
         },
         "email": {
             "smtp_server": "smtp.gmail.com",
             "smtp_port": 587,
             "username": "test@gmail.com",
-            "use_tls": True
+            "use_tls": True,
         },
         "notifications": {
             "enabled": True,
             "email_enabled": True,
-            "calendar_enabled": True
+            "calendar_enabled": True,
         },
-        "error_notifications": {
-            "enabled": True,
-            "recipient": "error@example.com"
-        },
+        "error_notifications": {"enabled": True, "recipient": "error@example.com"},
         "filtering": {
             "ng_keywords": ["エロ", "R18", "成人向け"],
-            "ng_genres": ["Hentai", "Ecchi"]
-        }
+            "ng_genres": ["Hentai", "Ecchi"],
+        },
     }
+
 
 @pytest.fixture
 def temp_config_file(tmp_path):
     """Create a temporary config file for testing."""
     config_data = {
-        "system": {
-            "name": "Test System",
-            "environment": "test"
-        },
-        "database": {
-            "path": ":memory:"
-        }
+        "system": {"name": "Test System", "environment": "test"},
+        "database": {"path": ":memory:"},
     }
-    
+
     config_file = tmp_path / "test_config.json"
     config_file.write_text(json.dumps(config_data, indent=2))
     return str(config_file)
+
 
 # Test markers configuration
 def pytest_configure(config):

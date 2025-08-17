@@ -64,13 +64,14 @@ MOCK_API_DIR = Path(__file__).parent / "fixtures" / "mock_api_data"
 # Logging configuration for tests
 logging.basicConfig(
     level=logging.WARNING,  # Reduce noise during testing
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
 # Disable logging for external libraries during tests
-logging.getLogger('urllib3').setLevel(logging.CRITICAL)
-logging.getLogger('requests').setLevel(logging.CRITICAL)
-logging.getLogger('google').setLevel(logging.CRITICAL)
+logging.getLogger("urllib3").setLevel(logging.CRITICAL)
+logging.getLogger("requests").setLevel(logging.CRITICAL)
+logging.getLogger("google").setLevel(logging.CRITICAL)
+
 
 def pytest_configure(config):
     """Configure pytest with custom markers and settings."""
@@ -96,21 +97,26 @@ def pytest_configure(config):
         "markers", "slow: marks tests as slow running (> 5 seconds)"
     )
 
+
 def get_test_database_path():
     """Get the test database path."""
     return TEST_DB_PATH
+
 
 def get_test_config_path():
     """Get the test configuration file path."""
     return TEST_CONFIG_PATH
 
+
 def get_test_data_dir():
     """Get the test data directory path."""
     return TEST_DATA_DIR
 
+
 def get_mock_api_dir():
     """Get the mock API data directory path."""
     return MOCK_API_DIR
+
 
 # Test utility functions
 def setup_test_environment():
@@ -118,30 +124,32 @@ def setup_test_environment():
     # Ensure test directories exist
     TEST_DATA_DIR.mkdir(parents=True, exist_ok=True)
     MOCK_API_DIR.mkdir(parents=True, exist_ok=True)
-    
+
     # Set environment variables for testing
-    os.environ['TESTING'] = 'true'
-    os.environ['DATABASE_PATH'] = TEST_DB_PATH
-    
+    os.environ["TESTING"] = "true"
+    os.environ["DATABASE_PATH"] = TEST_DB_PATH
+
+
 def cleanup_test_environment():
     """Clean up the test environment after tests."""
     # Remove test environment variables
-    if 'TESTING' in os.environ:
-        del os.environ['TESTING']
-    if 'DATABASE_PATH' in os.environ:
-        del os.environ['DATABASE_PATH']
+    if "TESTING" in os.environ:
+        del os.environ["TESTING"]
+    if "DATABASE_PATH" in os.environ:
+        del os.environ["DATABASE_PATH"]
+
 
 # Export commonly used test utilities
 __all__ = [
-    'TEST_DB_PATH',
-    'TEST_CONFIG_PATH', 
-    'TEST_DATA_DIR',
-    'MOCK_API_DIR',
-    'get_test_database_path',
-    'get_test_config_path',
-    'get_test_data_dir',
-    'get_mock_api_dir',
-    'setup_test_environment',
-    'cleanup_test_environment',
-    'pytest_configure'
+    "TEST_DB_PATH",
+    "TEST_CONFIG_PATH",
+    "TEST_DATA_DIR",
+    "MOCK_API_DIR",
+    "get_test_database_path",
+    "get_test_config_path",
+    "get_test_data_dir",
+    "get_mock_api_dir",
+    "setup_test_environment",
+    "cleanup_test_environment",
+    "pytest_configure",
 ]

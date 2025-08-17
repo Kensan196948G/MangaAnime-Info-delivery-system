@@ -4,10 +4,13 @@ import json
 # 取得した認証コード
 AUTH_CODE = "4/0AVMBsJiawd1QdBJFJvsOS8FzDTcA6orSztPGgHKAfg5P6O3QI43fnJGiru3i6whqIreCPQ"
 
-flow = InstalledAppFlow.from_client_secrets_file("credentials.json", [
-    "https://www.googleapis.com/auth/gmail.send",
-    "https://www.googleapis.com/auth/calendar.events"
-])
+flow = InstalledAppFlow.from_client_secrets_file(
+    "credentials.json",
+    [
+        "https://www.googleapis.com/auth/gmail.send",
+        "https://www.googleapis.com/auth/calendar.events",
+    ],
+)
 flow.redirect_uri = "http://localhost:8080/"
 flow.fetch_token(code=AUTH_CODE)
 
