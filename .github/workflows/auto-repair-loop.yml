@@ -22,7 +22,6 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
   MAX_ITERATIONS: ${{ inputs.max_iterations || '10' }}
 
 permissions:
@@ -50,8 +49,11 @@ jobs:
       - name: Setup GitHub CLI
         run: |
           gh --version
-          echo "${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}" | gh auth login --with-token || true
-          gh auth status || echo "Using GITHUB_TOKEN"
+          gh auth status || echo "GitHub CLI authentication will use GITHUB_TOKEN"
+
+      - name: Create repair state directory
+        run: |
+          mkdir -p .github/repair-state
 
       - name: Load loop state
         id: state
@@ -62,7 +64,10 @@ jobs:
           fi
           
           # Load current state
-          CURRENT_ITERATION=$(jq -r '.iteration // 0' .github/repair-state/loop-state.json)
+          CURRENT_ITERATION=$(jq -r '.iteration' .github/repair-state/loop-state.json)
+          if [[ "$CURRENT_ITERATION" == "null" ]] || [[ -z "$CURRENT_ITERATION" ]]; then
+            CURRENT_ITERATION=0
+          fi
           
           # Reset if requested
           if [[ "${{ inputs.force_reset }}" == "true" ]]; then
@@ -85,19 +90,24 @@ jobs:
       - name: Detect failed workflows
         id: detect
         if: steps.state.outputs.should_continue == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Detecting failed workflows..."
           
           # Get failed workflow runs from the last 24 hours
+          echo "Fetching workflow runs..."
           FAILED_RUNS=$(gh run list \
             --status failure \
             --limit 10 \
             --json databaseId,workflowName,headBranch,conclusion,createdAt \
-            --jq '.[] | select(.conclusion == "failure") | .databaseId')
+            --jq '.[] | select(.conclusion == "failure") | .databaseId' || echo "")
+          
+          echo "Raw failed runs: $FAILED_RUNS"
           
           # Convert to JSON array
-          if [[ -n "$FAILED_RUNS" ]]; then
-            FAILED_ARRAY=$(echo "$FAILED_RUNS" | jq -R . | jq -s .)
+          if [[ -n "$FAILED_RUNS" ]] && [[ "$FAILED_RUNS" != "" ]]; then
+            FAILED_ARRAY=$(echo "$FAILED_RUNS" | jq -R . | jq -s . || echo '[]')
             echo "failed_runs=$FAILED_ARRAY" >> $GITHUB_OUTPUT
             echo "Found $(echo "$FAILED_RUNS" | wc -l) failed workflows"
             echo "$FAILED_RUNS"
@@ -113,10 +123,11 @@ jobs:
           NEW_ITERATION=$((CURRENT_ITERATION + 1))
           
           # Update state file
+          TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           jq --arg iter "$NEW_ITERATION" \
-             --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-             --arg last "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-             '.iteration = ($iter | tonumber) | .last_run = $last | .start_time = (if .start_time == "" then $time else .start_time end)' \
+             --arg time "$TIMESTAMP" \
+             --arg last "$TIMESTAMP" \
+             '.iteration = ($iter | tonumber) | .last_run = $last | .start_time = (if (.start_time // "") == "" then $time else .start_time)' \
              .github/repair-state/loop-state.json > .github/repair-state/loop-state.json.tmp
           
           mv .github/repair-state/loop-state.json.tmp .github/repair-state/loop-state.json
@@ -145,6 +156,8 @@ jobs:
     
     steps:
       - name: Trigger repair workflow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh workflow run parallel-repair.yml \
             --repo ${{ github.repository }} \
@@ -161,6 +174,8 @@ jobs:
     
     steps:
       - name: Wait and trigger verification
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Scheduling verification workflow in 35 minutes..."
           # The verification workflow runs on its own cron, but we can also trigger it
