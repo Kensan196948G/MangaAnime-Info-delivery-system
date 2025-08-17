@@ -1,0 +1,44 @@
+name: 'Repair Validator'
+description: 'Validates repair effectiveness and determines loop continuation'
+author: 'Claude Code SubAgent System'
+
+inputs:
+  repair-results:
+    description: 'JSON array of repair execution results'
+    required: true
+  previous-errors:
+    description: 'JSON array of errors that were attempted to be fixed'
+    required: true
+  validation-mode:
+    description: 'Validation mode: quick, thorough, or comprehensive'
+    required: false
+    default: 'thorough'
+  success-threshold:
+    description: 'Success rate threshold for continuing (0.0-1.0)'
+    required: false
+    default: '0.7'
+  github-token:
+    description: 'GitHub token for API operations'
+    required: true
+
+outputs:
+  validation-results:
+    description: 'Detailed validation results for each repair'
+  overall-success-rate:
+    description: 'Overall success rate of repairs'
+  effectiveness-score:
+    description: 'Calculated effectiveness score (0-100)'
+  continue-loop:
+    description: 'Whether to continue the repair loop (true/false)'
+  failed-repairs:
+    description: 'List of repairs that failed validation'
+  recommendations:
+    description: 'Recommendations for next iteration'
+
+runs:
+  using: 'node20'
+  main: 'index.js'
+
+branding:
+  icon: 'check-circle'
+  color: 'green'

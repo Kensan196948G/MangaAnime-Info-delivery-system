@@ -1,0 +1,41 @@
+name: 'Repair State Manager'
+description: 'Manages repair state, loop iteration tracking, and pattern learning'
+author: 'Claude Code SubAgent System'
+
+inputs:
+  operation:
+    description: 'Operation to perform: save, load, update, or analyze'
+    required: true
+  state-data:
+    description: 'JSON state data for save/update operations'
+    required: false
+  iteration-number:
+    description: 'Current loop iteration number'
+    required: false
+  repair-results:
+    description: 'JSON array of repair results for learning'
+    required: false
+  state-file-path:
+    description: 'Path to state file (default: .github/repair-state.json)'
+    required: false
+    default: '.github/repair-state.json'
+
+outputs:
+  current-state:
+    description: 'Current repair state as JSON'
+  iteration-count:
+    description: 'Current iteration count'
+  repair-history:
+    description: 'Historical repair data'
+  pattern-updates:
+    description: 'Updated error patterns based on learning'
+  recommendations:
+    description: 'Recommendations for next iteration'
+
+runs:
+  using: 'node20'
+  main: 'index.js'
+
+branding:
+  icon: 'database'
+  color: 'purple'

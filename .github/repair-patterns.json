@@ -1,0 +1,257 @@
+{
+  "workflow_syntax": {
+    "patterns": [
+      "Invalid workflow file",
+      "syntax error",
+      "unexpected token",
+      "invalid YAML",
+      "mapping values are not allowed",
+      "could not find expected",
+      "found character that cannot start any token"
+    ],
+    "repairs": [
+      "Fix YAML syntax errors",
+      "Validate workflow structure",
+      "Check indentation and formatting",
+      "Remove invalid characters",
+      "Correct mapping structure"
+    ],
+    "confidence": 0.9,
+    "category": "syntax",
+    "severity": "high"
+  },
+  "dependency_error": {
+    "patterns": [
+      "module not found",
+      "package not installed",
+      "import error",
+      "cannot resolve",
+      "npm ERR!",
+      "yarn error",
+      "ENOENT",
+      "No such file or directory"
+    ],
+    "repairs": [
+      "Install missing dependencies",
+      "Update package.json",
+      "Fix import paths",
+      "Run npm install",
+      "Check node_modules directory"
+    ],
+    "confidence": 0.85,
+    "category": "dependency",
+    "severity": "medium"
+  },
+  "permission_error": {
+    "patterns": [
+      "permission denied",
+      "access forbidden",
+      "unauthorized",
+      "token expired",
+      "403",
+      "insufficient permissions",
+      "bad credentials",
+      "authentication failed"
+    ],
+    "repairs": [
+      "Update GitHub token permissions",
+      "Check repository access rights",
+      "Refresh authentication tokens",
+      "Verify token scope",
+      "Update repository secrets"
+    ],
+    "confidence": 0.8,
+    "category": "permission",
+    "severity": "high"
+  },
+  "timeout_error": {
+    "patterns": [
+      "timeout exceeded",
+      "operation timed out",
+      "job cancelled",
+      "runner timeout",
+      "deadline exceeded",
+      "context deadline exceeded",
+      "request timeout"
+    ],
+    "repairs": [
+      "Increase timeout values",
+      "Optimize long-running operations",
+      "Split into smaller jobs",
+      "Add timeout configuration",
+      "Reduce operation complexity"
+    ],
+    "confidence": 0.75,
+    "category": "timeout",
+    "severity": "medium"
+  },
+  "resource_limit": {
+    "patterns": [
+      "out of memory",
+      "disk space",
+      "resource limit",
+      "quota exceeded",
+      "OOMKilled",
+      "no space left",
+      "memory limit exceeded",
+      "CPU limit exceeded"
+    ],
+    "repairs": [
+      "Optimize memory usage",
+      "Clean up disk space",
+      "Use smaller datasets",
+      "Increase resource limits",
+      "Implement memory-efficient algorithms"
+    ],
+    "confidence": 0.7,
+    "category": "resource",
+    "severity": "medium"
+  },
+  "network_error": {
+    "patterns": [
+      "network error",
+      "connection refused",
+      "host unreachable",
+      "DNS resolution failed",
+      "connection timeout",
+      "certificate error",
+      "SSL handshake failed"
+    ],
+    "repairs": [
+      "Check network connectivity",
+      "Verify DNS settings",
+      "Update SSL certificates",
+      "Configure proxy settings",
+      "Retry with exponential backoff"
+    ],
+    "confidence": 0.65,
+    "category": "network",
+    "severity": "low"
+  },
+  "api_rate_limit": {
+    "patterns": [
+      "rate limit exceeded",
+      "too many requests",
+      "API rate limit",
+      "429",
+      "quota exhausted",
+      "throttled",
+      "rate limited"
+    ],
+    "repairs": [
+      "Implement rate limiting",
+      "Add exponential backoff",
+      "Use authentication tokens",
+      "Reduce API call frequency",
+      "Cache API responses"
+    ],
+    "confidence": 0.9,
+    "category": "api",
+    "severity": "medium"
+  },
+  "docker_error": {
+    "patterns": [
+      "docker build failed",
+      "image not found",
+      "container failed",
+      "dockerfile error",
+      "layer failed",
+      "pull access denied",
+      "manifest unknown"
+    ],
+    "repairs": [
+      "Fix Dockerfile syntax",
+      "Update base image",
+      "Check image availability",
+      "Configure registry access",
+      "Optimize build layers"
+    ],
+    "confidence": 0.8,
+    "category": "docker",
+    "severity": "medium"
+  },
+  "git_error": {
+    "patterns": [
+      "git clone failed",
+      "repository not found",
+      "branch not found",
+      "merge conflict",
+      "push rejected",
+      "authentication failed",
+      "remote rejected"
+    ],
+    "repairs": [
+      "Check repository permissions",
+      "Verify branch existence",
+      "Resolve merge conflicts",
+      "Update git credentials",
+      "Force push if necessary"
+    ],
+    "confidence": 0.75,
+    "category": "git",
+    "severity": "medium"
+  },
+  "test_failure": {
+    "patterns": [
+      "test failed",
+      "assertion error",
+      "test suite failed",
+      "tests failing",
+      "spec failed",
+      "expect failed",
+      "jest failed"
+    ],
+    "repairs": [
+      "Fix failing test cases",
+      "Update test expectations",
+      "Mock external dependencies",
+      "Fix test data setup",
+      "Update test configuration"
+    ],
+    "confidence": 0.7,
+    "category": "testing",
+    "severity": "low"
+  },
+  "build_error": {
+    "patterns": [
+      "build failed",
+      "compilation error",
+      "webpack error",
+      "babel error",
+      "typescript error",
+      "missing module",
+      "parse error"
+    ],
+    "repairs": [
+      "Fix compilation errors",
+      "Update build configuration",
+      "Install missing modules",
+      "Fix import statements",
+      "Update build dependencies"
+    ],
+    "confidence": 0.8,
+    "category": "build",
+    "severity": "high"
+  },
+  "deployment_error": {
+    "patterns": [
+      "deployment failed",
+      "rollback failed",
+      "service unavailable",
+      "health check failed",
+      "startup failed",
+      "port binding failed",
+      "configuration error"
+    ],
+    "repairs": [
+      "Fix deployment configuration",
+      "Update health check settings",
+      "Verify port availability",
+      "Check service dependencies",
+      "Update environment variables"
+    ],
+    "confidence": 0.75,
+    "category": "deployment",
+    "severity": "high"
+  }
+}

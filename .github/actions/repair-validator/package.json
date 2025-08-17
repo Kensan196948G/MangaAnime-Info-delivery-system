@@ -1,0 +1,16 @@
+{
+  "name": "repair-validator",
+  "version": "1.0.0",
+  "description": "Repair validation and effectiveness testing for SubAgent system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1"
+  },
+  "keywords": ["github-actions", "validation", "effectiveness-testing"],
+  "author": "Claude Code SubAgent System",
+  "license": "MIT"
+}

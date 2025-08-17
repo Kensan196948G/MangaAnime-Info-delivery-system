@@ -1,0 +1,184 @@
+name: Auto Repair Loop Controller
+
+on:
+  schedule:
+    # Run every 30 minutes
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      force_reset:
+        description: 'Force reset loop iteration counter'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      max_iterations:
+        description: 'Maximum iterations for this run'
+        required: false
+        default: '10'
+        type: string
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MAX_ITERATIONS: ${{ inputs.max_iterations || '10' }}
+
+jobs:
+  detect-failures:
+    name: Detect Failed Workflows
+    runs-on: ubuntu-latest
+    outputs:
+      failed_runs: ${{ steps.detect.outputs.failed_runs }}
+      current_iteration: ${{ steps.state.outputs.current_iteration }}
+      should_continue: ${{ steps.state.outputs.should_continue }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: Setup GitHub CLI
+        run: |
+          gh --version
+          gh auth status
+
+      - name: Load loop state
+        id: state
+        run: |
+          # Create state file if it doesn't exist
+          if [[ ! -f .github/repair-state/loop-state.json ]]; then
+            echo '{"iteration": 0, "start_time": "", "last_run": "", "total_repairs": 0}' > .github/repair-state/loop-state.json
+          fi
+          
+          # Load current state
+          CURRENT_ITERATION=$(jq -r '.iteration // 0' .github/repair-state/loop-state.json)
+          
+          # Reset if requested
+          if [[ "${{ inputs.force_reset }}" == "true" ]]; then
+            CURRENT_ITERATION=0
+            echo "Force reset requested, setting iteration to 0"
+          fi
+          
+          # Check if we should continue
+          if [[ $CURRENT_ITERATION -ge $MAX_ITERATIONS ]]; then
+            echo "should_continue=false" >> $GITHUB_OUTPUT
+            echo "Maximum iterations ($MAX_ITERATIONS) reached. Stopping loop."
+            exit 0
+          else
+            echo "should_continue=true" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "current_iteration=$CURRENT_ITERATION" >> $GITHUB_OUTPUT
+          echo "Current iteration: $CURRENT_ITERATION"
+
+      - name: Detect failed workflows
+        id: detect
+        if: steps.state.outputs.should_continue == 'true'
+        run: |
+          echo "Detecting failed workflows..."
+          
+          # Get failed workflow runs from the last 24 hours
+          FAILED_RUNS=$(gh run list \
+            --status failure \
+            --limit 10 \
+            --json databaseId,workflowName,headBranch,conclusion,createdAt \
+            --jq '.[] | select(.conclusion == "failure") | .databaseId')
+          
+          # Convert to JSON array
+          if [[ -n "$FAILED_RUNS" ]]; then
+            FAILED_ARRAY=$(echo "$FAILED_RUNS" | jq -R . | jq -s .)
+            echo "failed_runs=$FAILED_ARRAY" >> $GITHUB_OUTPUT
+            echo "Found $(echo "$FAILED_RUNS" | wc -l) failed workflows"
+            echo "$FAILED_RUNS"
+          else
+            echo "failed_runs=[]" >> $GITHUB_OUTPUT
+            echo "No failed workflows found"
+          fi
+
+      - name: Update loop state
+        if: steps.state.outputs.should_continue == 'true'
+        run: |
+          CURRENT_ITERATION=${{ steps.state.outputs.current_iteration }}
+          NEW_ITERATION=$((CURRENT_ITERATION + 1))
+          
+          # Update state file
+          jq --arg iter "$NEW_ITERATION" \
+             --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             --arg last "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             '.iteration = ($iter | tonumber) | .last_run = $last | .start_time = (if .start_time == "" then $time else .start_time end)' \
+             .github/repair-state/loop-state.json > .github/repair-state/loop-state.json.tmp
+          
+          mv .github/repair-state/loop-state.json.tmp .github/repair-state/loop-state.json
+          
+          echo "Updated to iteration $NEW_ITERATION"
+
+      - name: Store state artifact
+        if: steps.state.outputs.should_continue == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: repair-loop-state-${{ github.run_number }}
+          path: .github/repair-state/
+          retention-days: 7
+
+  trigger-repairs:
+    name: Trigger Parallel Repairs
+    needs: detect-failures
+    if: needs.detect-failures.outputs.should_continue == 'true' && needs.detect-failures.outputs.failed_runs != '[]'
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        run_id: ${{ fromJson(needs.detect-failures.outputs.failed_runs) }}
+      max-parallel: 5
+      fail-fast: false
+    
+    steps:
+      - name: Trigger repair workflow
+        run: |
+          gh workflow run parallel-repair.yml \
+            --repo ${{ github.repository }} \
+            --field run_id=${{ matrix.run_id }} \
+            --field iteration=${{ needs.detect-failures.outputs.current_iteration }}
+          
+          echo "Triggered repair for run ID: ${{ matrix.run_id }}"
+
+  schedule-verification:
+    name: Schedule Verification
+    needs: [detect-failures, trigger-repairs]
+    if: always() && needs.detect-failures.outputs.should_continue == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Wait and trigger verification
+        run: |
+          echo "Scheduling verification workflow in 35 minutes..."
+          # The verification workflow runs on its own cron, but we can also trigger it
+          sleep 10 # Brief pause to ensure repairs are triggered
+          
+          gh workflow run verify-repair.yml \
+            --repo ${{ github.repository }} \
+            --field triggered_by="auto-repair-loop" \
+            --field iteration=${{ needs.detect-failures.outputs.current_iteration }}
+
+  status-report:
+    name: Status Report
+    needs: [detect-failures, trigger-repairs]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Generate status report
+        run: |
+          echo "=== Auto Repair Loop Status ==="
+          echo "Iteration: ${{ needs.detect-failures.outputs.current_iteration }}"
+          echo "Should Continue: ${{ needs.detect-failures.outputs.should_continue }}"
+          echo "Failed Runs Found: ${{ needs.detect-failures.outputs.failed_runs }}"
+          echo "Repairs Triggered: ${{ needs.trigger-repairs.result }}"
+          echo "Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          
+          if [[ "${{ needs.detect-failures.outputs.should_continue }}" == "false" ]]; then
+            echo "⚠️  Maximum iterations reached. Manual intervention may be required."
+          fi

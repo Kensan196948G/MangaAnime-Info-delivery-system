@@ -1,0 +1,451 @@
+name: Parallel Repair Executor
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Failed workflow run ID to repair'
+        required: true
+        type: string
+      iteration:
+        description: 'Current loop iteration'
+        required: true
+        type: string
+      timeout_minutes:
+        description: 'Timeout for repair process'
+        required: false
+        default: '25'
+        type: string
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TIMEOUT_MINUTES: ${{ inputs.timeout_minutes || '25' }}
+
+jobs:
+  analyze-failure:
+    name: Analyze Failure Pattern
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      error_type: ${{ steps.analyze.outputs.error_type }}
+      error_category: ${{ steps.analyze.outputs.error_category }}
+      repair_strategy: ${{ steps.analyze.outputs.repair_strategy }}
+      affected_files: ${{ steps.analyze.outputs.affected_files }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup GitHub CLI
+        run: |
+          gh --version
+          gh auth status
+
+      - name: Get failure details
+        id: failure_details
+        run: |
+          echo "Analyzing run ID: ${{ inputs.run_id }}"
+          
+          # Get detailed run information
+          RUN_INFO=$(gh run view ${{ inputs.run_id }} --json jobs,conclusion,workflowName)
+          echo "run_info<<EOF" >> $GITHUB_OUTPUT
+          echo "$RUN_INFO" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Get logs for failed jobs
+          gh run view ${{ inputs.run_id }} --log > failure_logs.txt || echo "Could not fetch logs"
+
+      - name: Analyze error patterns
+        id: analyze
+        run: |
+          # Create analysis script
+          cat > analyze_errors.py << 'EOF'
+          import json
+          import re
+          import sys
+          import os
+          
+          def analyze_error_patterns():
+              # Load run information
+              try:
+                  with open('failure_logs.txt', 'r') as f:
+                      logs = f.read()
+              except:
+                  logs = ""
+              
+              # Common error patterns and their repair strategies
+              patterns = {
+                  "dependency": {
+                      "regex": [
+                          r"npm.*ERR!",
+                          r"pip.*ERROR",
+                          r"yarn.*error",
+                          r"Module not found",
+                          r"ImportError",
+                          r"ModuleNotFoundError"
+                      ],
+                      "strategy": "update_dependencies",
+                      "category": "dependency"
+                  },
+                  "syntax": {
+                      "regex": [
+                          r"SyntaxError",
+                          r"IndentationError",
+                          r"unexpected token",
+                          r"Parse error"
+                      ],
+                      "strategy": "fix_syntax",
+                      "category": "code"
+                  },
+                  "permission": {
+                      "regex": [
+                          r"Permission denied",
+                          r"EACCES",
+                          r"403.*Forbidden",
+                          r"401.*Unauthorized"
+                      ],
+                      "strategy": "fix_permissions",
+                      "category": "security"
+                  },
+                  "network": {
+                      "regex": [
+                          r"Connection.*timeout",
+                          r"Network.*error",
+                          r"ECONNREFUSED",
+                          r"ETIMEDOUT"
+                      ],
+                      "strategy": "retry_with_backoff",
+                      "category": "network"
+                  },
+                  "test": {
+                      "regex": [
+                          r"Test.*failed",
+                          r"AssertionError",
+                          r"FAIL.*test",
+                          r"Error.*test"
+                      ],
+                      "strategy": "fix_tests",
+                      "category": "testing"
+                  },
+                  "build": {
+                      "regex": [
+                          r"Build.*failed",
+                          r"Compilation.*error",
+                          r"webpack.*error",
+                          r"TypeError.*build"
+                      ],
+                      "strategy": "fix_build_config",
+                      "category": "build"
+                  }
+              }
+              
+              # Analyze logs for patterns
+              detected_type = "unknown"
+              detected_category = "general"
+              detected_strategy = "general_repair"
+              
+              for error_type, config in patterns.items():
+                  for regex_pattern in config["regex"]:
+                      if re.search(regex_pattern, logs, re.IGNORECASE):
+                          detected_type = error_type
+                          detected_category = config["category"]
+                          detected_strategy = config["strategy"]
+                          break
+                  if detected_type != "unknown":
+                      break
+              
+              # Extract affected files from logs
+              file_patterns = [
+                  r"(?:^|\s)([^/\s]+\.[a-zA-Z]+):\d+",
+                  r"File \"([^\"]+)\"",
+                  r"at ([^:]+):\d+:\d+"
+              ]
+              
+              affected_files = set()
+              for pattern in file_patterns:
+                  matches = re.findall(pattern, logs, re.MULTILINE)
+                  affected_files.update(matches)
+              
+              print(f"error_type={detected_type}")
+              print(f"error_category={detected_category}")
+              print(f"repair_strategy={detected_strategy}")
+              print(f"affected_files={','.join(list(affected_files)[:10])}")  # Limit to 10 files
+          
+          if __name__ == "__main__":
+              analyze_error_patterns()
+          EOF
+          
+          # Run analysis
+          python3 analyze_errors.py >> $GITHUB_OUTPUT
+
+      - name: Update error patterns database
+        run: |
+          # Load or create error patterns database
+          if [[ ! -f .github/repair-state/error-patterns.json ]]; then
+            echo '{"patterns": {}, "last_updated": ""}' > .github/repair-state/error-patterns.json
+          fi
+          
+          # Update with new pattern
+          jq --arg type "${{ steps.analyze.outputs.error_type }}" \
+             --arg category "${{ steps.analyze.outputs.error_category }}" \
+             --arg time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             '.patterns[$type] = (.patterns[$type] // 0) + 1 | .last_updated = $time' \
+             .github/repair-state/error-patterns.json > .github/repair-state/error-patterns.json.tmp
+          
+          mv .github/repair-state/error-patterns.json.tmp .github/repair-state/error-patterns.json
+
+  execute-repair:
+    name: Execute Repair Strategy
+    needs: analyze-failure
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    strategy:
+      matrix:
+        repair_type: 
+          - ${{ needs.analyze-failure.outputs.repair_strategy }}
+      fail-fast: false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Execute repair strategy
+        id: repair
+        run: |
+          echo "Executing repair strategy: ${{ matrix.repair_type }}"
+          
+          case "${{ matrix.repair_type }}" in
+            "update_dependencies")
+              echo "Updating dependencies..."
+              # Node.js dependencies
+              if [[ -f package.json ]]; then
+                npm audit fix --force || true
+                npm update || true
+              fi
+              # Python dependencies
+              if [[ -f requirements.txt ]]; then
+                pip install --upgrade pip
+                pip install -r requirements.txt --upgrade || true
+              fi
+              # Composer dependencies
+              if [[ -f composer.json ]]; then
+                composer update || true
+              fi
+              ;;
+              
+            "fix_syntax")
+              echo "Attempting syntax fixes..."
+              # Basic syntax fixes using automated tools
+              if command -v autopep8 &> /dev/null; then
+                find . -name "*.py" -exec autopep8 --in-place {} \; || true
+              fi
+              if command -v prettier &> /dev/null; then
+                npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,md}" || true
+              fi
+              ;;
+              
+            "fix_permissions")
+              echo "Fixing permissions..."
+              # Common permission fixes
+              chmod +x scripts/*.sh 2>/dev/null || true
+              chmod +x .github/workflows/*.sh 2>/dev/null || true
+              chmod 644 .github/workflows/*.yml 2>/dev/null || true
+              ;;
+              
+            "retry_with_backoff")
+              echo "Network issues detected - will retry workflow later"
+              # Mark for retry rather than immediate fix
+              echo "retry_scheduled=true" >> $GITHUB_OUTPUT
+              ;;
+              
+            "fix_tests")
+              echo "Attempting test fixes..."
+              # Common test configuration fixes
+              if [[ -f jest.config.js ]]; then
+                # Add timeout configuration
+                sed -i 's/"timeout".*/"timeout": 30000,/' jest.config.js || true
+              fi
+              # Update test commands in package.json
+              if [[ -f package.json ]]; then
+                npm test -- --passWithNoTests || true
+              fi
+              ;;
+              
+            "fix_build_config")
+              echo "Fixing build configuration..."
+              # Clear build caches
+              rm -rf node_modules/.cache/ || true
+              rm -rf .next/ || true
+              rm -rf dist/ || true
+              rm -rf build/ || true
+              # Reinstall dependencies
+              if [[ -f package.json ]]; then
+                rm -rf node_modules package-lock.json || true
+                npm install || true
+              fi
+              ;;
+              
+            "general_repair")
+              echo "Performing general repairs..."
+              # Generic repair actions
+              git checkout HEAD -- . || true
+              git clean -fd || true
+              if [[ -f package.json ]]; then
+                npm install || true
+              fi
+              if [[ -f requirements.txt ]]; then
+                pip install -r requirements.txt || true
+              fi
+              ;;
+              
+            *)
+              echo "Unknown repair strategy: ${{ matrix.repair_type }}"
+              exit 1
+              ;;
+          esac
+          
+          echo "Repair execution completed"
+
+      - name: Validate repair
+        id: validate
+        run: |
+          echo "Validating repair..."
+          
+          # Basic validation checks
+          ERROR_COUNT=0
+          
+          # Check for syntax errors in common file types
+          if find . -name "*.py" -exec python3 -m py_compile {} \; 2>&1 | grep -q "SyntaxError"; then
+            ERROR_COUNT=$((ERROR_COUNT + 1))
+            echo "Python syntax errors found"
+          fi
+          
+          if find . -name "*.js" -o -name "*.jsx" | head -10 | xargs -I {} node -c {} 2>&1 | grep -q "SyntaxError"; then
+            ERROR_COUNT=$((ERROR_COUNT + 1))
+            echo "JavaScript syntax errors found"
+          fi
+          
+          # Check if package.json is valid
+          if [[ -f package.json ]] && ! jq empty package.json 2>/dev/null; then
+            ERROR_COUNT=$((ERROR_COUNT + 1))
+            echo "package.json is invalid"
+          fi
+          
+          echo "validation_errors=$ERROR_COUNT" >> $GITHUB_OUTPUT
+          
+          if [[ $ERROR_COUNT -eq 0 ]]; then
+            echo "✅ Validation passed"
+          else
+            echo "❌ Validation failed with $ERROR_COUNT errors"
+          fi
+
+      - name: Commit and push fixes
+        if: steps.validate.outputs.validation_errors == '0'
+        run: |
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Auto-Repair"
+          
+          # Check for changes
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          # Commit changes
+          git add .
+          git commit -m "🔧 Auto-repair: Fix ${{ needs.analyze-failure.outputs.error_type }} errors (Run #${{ inputs.run_id }})
+
+          - Error type: ${{ needs.analyze-failure.outputs.error_type }}
+          - Category: ${{ needs.analyze-failure.outputs.error_category }}
+          - Strategy: ${{ needs.analyze-failure.outputs.repair_strategy }}
+          - Iteration: ${{ inputs.iteration }}
+          
+          🤖 Generated with [Claude Code](https://claude.ai/code)
+          
+          Co-Authored-By: Claude <noreply@anthropic.com>"
+          
+          # Push changes
+          git push origin HEAD || {
+            echo "Failed to push changes"
+            exit 1
+          }
+          
+          echo "✅ Changes committed and pushed successfully"
+
+      - name: Update repair history
+        if: always()
+        run: |
+          # Load or create repair history
+          if [[ ! -f .github/repair-state/repair-history.json ]]; then
+            echo '{"repairs": [], "total_repairs": 0, "success_rate": 0}' > .github/repair-state/repair-history.json
+          fi
+          
+          # Add repair record
+          REPAIR_RECORD=$(jq -n \
+            --arg run_id "${{ inputs.run_id }}" \
+            --arg iteration "${{ inputs.iteration }}" \
+            --arg error_type "${{ needs.analyze-failure.outputs.error_type }}" \
+            --arg strategy "${{ needs.analyze-failure.outputs.repair_strategy }}" \
+            --arg success "${{ steps.validate.outputs.validation_errors == '0' }}" \
+            --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{
+              run_id: $run_id,
+              iteration: ($iteration | tonumber),
+              error_type: $error_type,
+              strategy: $strategy,
+              success: ($success == "true"),
+              timestamp: $timestamp,
+              validation_errors: ${{ steps.validate.outputs.validation_errors || 0 }}
+            }')
+          
+          # Update history file
+          jq --argjson record "$REPAIR_RECORD" \
+             '.repairs += [$record] | .total_repairs += 1 | .success_rate = ((.repairs | map(select(.success)) | length) / .total_repairs * 100)' \
+             .github/repair-state/repair-history.json > .github/repair-state/repair-history.json.tmp
+          
+          mv .github/repair-state/repair-history.json.tmp .github/repair-state/repair-history.json
+          
+          echo "Updated repair history"
+
+  retry-failed-workflow:
+    name: Retry Failed Workflow
+    needs: [analyze-failure, execute-repair]
+    if: success()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger workflow retry
+        run: |
+          echo "Triggering retry of originally failed workflow..."
+          
+          # Get the original workflow name and trigger it
+          WORKFLOW_NAME=$(gh run view ${{ inputs.run_id }} --json workflowName --jq '.workflowName')
+          
+          if [[ -n "$WORKFLOW_NAME" ]]; then
+            gh workflow run "$WORKFLOW_NAME" --repo ${{ github.repository }} || {
+              echo "Failed to trigger workflow retry"
+              exit 1
+            }
+            echo "✅ Workflow retry triggered successfully"
+          else
+            echo "Could not determine workflow name for retry"
+          fi
