@@ -198,42 +198,42 @@ jobs:
         
         # Create a test file with intentional failures for demonstration
         cat > tests/test_demo.py << 'EOF'
-import pytest
-import os
-
-def test_basic_functionality():
-    """Basic test that should pass"""
-    assert 1 + 1 == 2
-
-def test_environment_setup():
-    """Test environment variables"""
-    # This test will fail intentionally in early iterations
-    iteration = int(os.getenv('ITERATION_NUMBER', '0'))
-    if iteration <= 3:
-        pytest.fail("Environment not properly configured (intentional failure for demo)")
-    assert True
-
-def test_data_processing():
-    """Test data processing logic"""
-    # This test will fail in iterations 1-2
-    iteration = int(os.getenv('ITERATION_NUMBER', '0'))
-    if iteration <= 2:
-        assert False, "Data processing logic incomplete (intentional failure)"
-    assert True
-
-def test_api_integration():
-    """Test API integration"""
-    # This test will fail in iteration 1
-    iteration = int(os.getenv('ITERATION_NUMBER', '0'))
-    if iteration <= 1:
-        raise Exception("API integration not implemented (intentional failure)")
-    assert True
-
-def test_advanced_features():
-    """Test advanced features"""
-    # This test will always pass
-    assert "anime" in "manga and anime system"
-EOF
+        import pytest
+        import os
+        
+        def test_basic_functionality():
+            """Basic test that should pass"""
+            assert 1 + 1 == 2
+        
+        def test_environment_setup():
+            """Test environment variables"""
+            # This test will fail intentionally in early iterations
+            iteration = int(os.getenv('ITERATION_NUMBER', '0'))
+            if iteration <= 3:
+                pytest.fail("Environment not properly configured (intentional failure for demo)")
+            assert True
+        
+        def test_data_processing():
+            """Test data processing logic"""
+            # This test will fail in iterations 1-2
+            iteration = int(os.getenv('ITERATION_NUMBER', '0'))
+            if iteration <= 2:
+                assert False, "Data processing logic incomplete (intentional failure)"
+            assert True
+        
+        def test_api_integration():
+            """Test API integration"""
+            # This test will fail in iteration 1
+            iteration = int(os.getenv('ITERATION_NUMBER', '0'))
+            if iteration <= 1:
+                raise Exception("API integration not implemented (intentional failure)")
+            assert True
+        
+        def test_advanced_features():
+            """Test advanced features"""
+            # This test will always pass
+            assert "anime" in "manga and anime system"
+        EOF
         
         # Run tests with coverage
         pytest tests/ \
@@ -293,21 +293,21 @@ EOF
         # Create setup.py if it doesn't exist
         if [ ! -f setup.py ] && [ ! -f pyproject.toml ]; then
           cat > setup.py << 'EOF'
-from setuptools import setup, find_packages
-
-setup(
-    name="manga-anime-delivery-system",
-    version="1.0.0",
-    packages=find_packages(),
-    install_requires=[
-        "requests",
-        "beautifulsoup4",
-        "sqlite3",
-    ],
-    author="Auto-Repair System",
-    description="Manga and Anime Information Delivery System",
-)
-EOF
+        from setuptools import setup, find_packages
+        
+        setup(
+            name="manga-anime-delivery-system",
+            version="1.0.0",
+            packages=find_packages(),
+            install_requires=[
+                "requests",
+                "beautifulsoup4",
+                "sqlite3",
+            ],
+            author="Auto-Repair System",
+            description="Manga and Anime Information Delivery System",
+        )
+        EOF
         fi
         
         python -m build || {
@@ -362,45 +362,45 @@ EOF
         
         # Create integration test
         cat > integration_test.py << 'EOF'
-import sqlite3
-import os
-
-def test_database_connection():
-    """Test database connectivity"""
-    try:
-        conn = sqlite3.connect('test.db')
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
-        conn.close()
+        import sqlite3
+        import os
         
-        assert len(tables) > 0, "No tables found in database"
-        print("✅ Database connection successful")
-        return True
-    except Exception as e:
-        print(f"❌ Database connection failed: {e}")
-        return False
-
-def test_system_integration():
-    """Test system integration"""
-    iteration = int(os.getenv('ITERATION_NUMBER', '0'))
-    
-    # Simulate integration issues in early iterations
-    if iteration <= 2:
-        print(f"❌ Integration test failed for iteration {iteration}")
-        return False
-    
-    print("✅ System integration successful")
-    return True
-
-if __name__ == "__main__":
-    success = True
-    success &= test_database_connection()
-    success &= test_system_integration()
-    
-    if not success:
-        exit(1)
-EOF
+        def test_database_connection():
+            """Test database connectivity"""
+            try:
+                conn = sqlite3.connect('test.db')
+                cursor = conn.cursor()
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+                tables = cursor.fetchall()
+                conn.close()
+                
+                assert len(tables) > 0, "No tables found in database"
+                print("✅ Database connection successful")
+                return True
+            except Exception as e:
+                print(f"❌ Database connection failed: {e}")
+                return False
+        
+        def test_system_integration():
+            """Test system integration"""
+            iteration = int(os.getenv('ITERATION_NUMBER', '0'))
+            
+            # Simulate integration issues in early iterations
+            if iteration <= 2:
+                print(f"❌ Integration test failed for iteration {iteration}")
+                return False
+            
+            print("✅ System integration successful")
+            return True
+        
+        if __name__ == "__main__":
+            success = True
+            success &= test_database_connection()
+            success &= test_system_integration()
+            
+            if not success:
+                exit(1)
+        EOF
         
         python integration_test.py
       env:
