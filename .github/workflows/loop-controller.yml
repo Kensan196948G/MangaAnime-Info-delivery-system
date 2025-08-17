@@ -20,6 +20,14 @@ on:
   repository_dispatch:
     types: [start-auto-repair]
 
+permissions:
+  contents: write        # Repository write access for commits
+  actions: write         # GitHub Actions workflow execution
+  pull-requests: write   # Pull request creation and management
+  issues: write          # Issue creation and management
+  checks: write          # Status checks
+  metadata: read         # Repository metadata access
+
 env:
   MAX_ITERATIONS: ${{ github.event.inputs.max_iterations || '10' }}
   FORCE_RESTART: ${{ github.event.inputs.force_restart || 'false' }}

@@ -20,6 +20,14 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write        # Repository write access for commits
+  actions: read          # GitHub Actions read access
+  pull-requests: write   # Pull request creation and management
+  issues: write          # Issue creation and management
+  checks: write          # Status checks and reports
+  metadata: read         # Repository metadata access
+
 env:
   ITERATION_NUMBER: ${{ github.event.inputs.iteration_number || '0' }}
   LOOP_ID: ${{ github.event.inputs.loop_id || 'standalone' }}
