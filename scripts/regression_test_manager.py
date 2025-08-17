@@ -740,7 +740,9 @@ def main():
                 print(f"Recommendation: {comparison.recommendation}")
 
                 if comparison.test_regressions:
-                    print(f"\n🚨 Test Regressions ({len(comparison.test_regressions)}):")
+                    print(
+                        f"\n🚨 Test Regressions ({len(comparison.test_regressions)}):"
+                    )
                     for reg in comparison.test_regressions[:5]:  # Show top 5
                         print(f"  - {reg['description']}")
 

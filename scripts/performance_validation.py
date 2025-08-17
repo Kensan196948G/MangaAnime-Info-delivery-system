@@ -279,7 +279,8 @@ class PerformanceValidator:
                         "title": f"アニメ作品{i}",
                         "release_date": datetime.now() + timedelta(days=i),
                         "genres": ["アクション", "アドベンチャー", "コメディ"],
-                        "description": "これは大量データ処理テスト用のダミー説明文です。" * 10,
+                        "description": "これは大量データ処理テスト用のダミー説明文です。"
+                        * 10,
                     }
                 )
 
@@ -525,24 +526,38 @@ class PerformanceValidator:
         recommendations = []
 
         if total_score < 70:
-            recommendations.append("🚨 総合スコアが70点未満です。システムの最適化が必要です。")
+            recommendations.append(
+                "🚨 総合スコアが70点未満です。システムの最適化が必要です。"
+            )
 
         if score_components["api_performance"] < 20:
-            recommendations.append("🌐 API応答時間が遅いです。キャッシュ機能の導入を検討してください。")
+            recommendations.append(
+                "🌐 API応答時間が遅いです。キャッシュ機能の導入を検討してください。"
+            )
 
         if score_components["database_performance"] < 20:
-            recommendations.append("🗃️ データベース性能が低いです。インデックスの最適化を行ってください。")
+            recommendations.append(
+                "🗃️ データベース性能が低いです。インデックスの最適化を行ってください。"
+            )
 
         if score_components["resource_efficiency"] < 20:
-            recommendations.append("💻 システムリソース使用率が高いです。メモリ・CPU最適化が必要です。")
+            recommendations.append(
+                "💻 システムリソース使用率が高いです。メモリ・CPU最適化が必要です。"
+            )
 
         if score_components["operational_readiness"] < 20:
-            recommendations.append("🔧 運用自動化が不十分です。監視・バックアップ体制を強化してください。")
+            recommendations.append(
+                "🔧 運用自動化が不十分です。監視・バックアップ体制を強化してください。"
+            )
 
         if total_score >= 90:
-            recommendations.append("✅ 優秀なパフォーマンスです。本番環境での運用準備が整っています。")
+            recommendations.append(
+                "✅ 優秀なパフォーマンスです。本番環境での運用準備が整っています。"
+            )
         elif total_score >= 80:
-            recommendations.append("👍 良好なパフォーマンスです。軽微な調整で本番運用可能です。")
+            recommendations.append(
+                "👍 良好なパフォーマンスです。軽微な調整で本番運用可能です。"
+            )
 
         return recommendations
 
@@ -591,7 +606,9 @@ class PerformanceValidator:
 
 def main():
     """メイン実行関数"""
-    logger.info("🚀 アニメ・マンガ情報配信システム - パフォーマンス・運用性最終検証開始")
+    logger.info(
+        "🚀 アニメ・マンガ情報配信システム - パフォーマンス・運用性最終検証開始"
+    )
 
     validator = PerformanceValidator()
 
@@ -608,8 +625,12 @@ def main():
         print("\n" + "=" * 80)
         print("🎯 アニメ・マンガ情報配信システム - 最終検証レポート")
         print("=" * 80)
-        print(f"📊 総合パフォーマンススコア: {final_report['overall_performance_score']:.1f}/100")
-        print(f"⚡ API性能: {final_report['score_breakdown']['api_performance']:.1f}/25")
+        print(
+            f"📊 総合パフォーマンススコア: {final_report['overall_performance_score']:.1f}/100"
+        )
+        print(
+            f"⚡ API性能: {final_report['score_breakdown']['api_performance']:.1f}/25"
+        )
         print(
             f"🗃️ DB性能: {final_report['score_breakdown']['database_performance']:.1f}/25"
         )

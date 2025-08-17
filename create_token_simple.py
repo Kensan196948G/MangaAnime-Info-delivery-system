@@ -39,7 +39,9 @@ def main():
         print("\n📋 以下のURLをブラウザで開いてください:")
         print(f"{auth_url}")
         print("\n✅ 許可すると、ブラウザに認証コードが表示されます。")
-        print("⚠️ エラーページが表示されても、URLに含まれる 'code=' パラメーターの値をコピーしてください。")
+        print(
+            "⚠️ エラーページが表示されても、URLに含まれる 'code=' パラメーターの値をコピーしてください。"
+        )
         print("\n🔑 取得したコードで以下のPythonコードを実行してください:")
         print("```python")
         print("from google_auth_oauthlib.flow import InstalledAppFlow")

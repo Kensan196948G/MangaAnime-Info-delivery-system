@@ -226,9 +226,7 @@ class TestEmailNotificationIntegration:
         # Render template
         source_url_section = ""
         if release.get("source_url"):
-            source_url_section = (
-                f'<p><strong>詳細:</strong> <a href="{release["source_url"]}">こちら</a></p>'
-            )
+            source_url_section = f'<p><strong>詳細:</strong> <a href="{release["source_url"]}">こちら</a></p>'
 
         rendered_html = template.format(
             title=work["title"],

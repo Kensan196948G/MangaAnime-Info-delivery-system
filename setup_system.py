@@ -109,7 +109,9 @@ class SystemSetup:
                             capture_output=True,
                         )
                     except subprocess.CalledProcessError:
-                        self.logger.warning(f"⚠️ オプションパッケージのインストールに失敗: {package}")
+                        self.logger.warning(
+                            f"⚠️ オプションパッケージのインストールに失敗: {package}"
+                        )
 
             self.logger.info("✅ 依存関係のインストールが完了しました")
             return True
@@ -343,7 +345,9 @@ def main():
         action="store_true",
         help="フルセットアップ（オプション依存関係も含む）",
     )
-    parser.add_argument("--test-run", action="store_true", help="セットアップ後にテスト実行")
+    parser.add_argument(
+        "--test-run", action="store_true", help="セットアップ後にテスト実行"
+    )
 
     args = parser.parse_args()
 

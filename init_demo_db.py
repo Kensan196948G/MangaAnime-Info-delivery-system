@@ -196,7 +196,9 @@ def create_database():
     conn.commit()
     conn.close()
 
-    print(f"✅ データベース作成完了: {len(sample_works)}作品、{len(releases)}リリースを追加しました")
+    print(
+        f"✅ データベース作成完了: {len(sample_works)}作品、{len(releases)}リリースを追加しました"
+    )
 
 
 def create_sample_config():

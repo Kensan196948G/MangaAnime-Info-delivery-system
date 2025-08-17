@@ -134,9 +134,9 @@ def send_notification_email(releases, config):
     msg = MIMEMultipart()
     msg["From"] = sender_email
     msg["To"] = recipient_email
-    msg[
-        "Subject"
-    ] = f"[MangaAnime] 新着 {len(releases)}件 - {datetime.now().strftime('%m/%d')}"
+    msg["Subject"] = (
+        f"[MangaAnime] 新着 {len(releases)}件 - {datetime.now().strftime('%m/%d')}"
+    )
     msg.attach(MIMEText(body, "plain", "utf-8"))
 
     try:
@@ -214,7 +214,9 @@ def main():
     print(f"   残り: {total_pending - sent_count} 件")
 
     if total_pending - sent_count > 0:
-        print(f"\n💡 ヒント: 残りの通知を送信するには、再度このスクリプトを実行してください")
+        print(
+            f"\n💡 ヒント: 残りの通知を送信するには、再度このスクリプトを実行してください"
+        )
     else:
         print("\n✅ すべての通知を送信しました！")
 

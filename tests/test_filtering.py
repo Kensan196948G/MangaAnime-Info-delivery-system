@@ -467,7 +467,8 @@ class TestFilteringEdgeCases:
 
             # For hiragana/katakana conversion, we might need additional logic
             if not is_filtered and any(
-                char in "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん"
+                char
+                in "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん"
                 for char in text
             ):
                 # Convert hiragana to katakana for comparison

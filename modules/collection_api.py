@@ -3,7 +3,7 @@ Collection API management module for Anime/Manga information system.
 
 This module provides:
 - Manual collection trigger API
-- Collection status monitoring API  
+- Collection status monitoring API
 - Data quality report API
 - Collection history management
 - Performance metrics and analytics

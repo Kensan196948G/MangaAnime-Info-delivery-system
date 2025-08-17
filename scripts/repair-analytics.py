@@ -339,9 +339,7 @@ class RepairAnalytics:
                 severity = (
                     "high"
                     if success_rate < 50
-                    else "medium"
-                    if success_rate < 80
-                    else "low"
+                    else "medium" if success_rate < 80 else "low"
                 )
 
                 # Generate recommendations
@@ -718,9 +716,7 @@ class RepairAnalytics:
                 trend_direction = (
                     "↗️ improving"
                     if success_trend > 0
-                    else "↘️ declining"
-                    if success_trend < 0
-                    else "→ stable"
+                    else "↘️ declining" if success_trend < 0 else "→ stable"
                 )
                 print(
                     f"   Success Rate Trend: {Colors.CYAN}{trend_direction} ({success_trend:.2f}%/day){Colors.END}"
@@ -731,9 +727,7 @@ class RepairAnalytics:
                 duration_direction = (
                     "↗️ increasing"
                     if duration_trend > 0
-                    else "↘️ decreasing"
-                    if duration_trend < 0
-                    else "→ stable"
+                    else "↘️ decreasing" if duration_trend < 0 else "→ stable"
                 )
                 print(
                     f"   Duration Trend:     {Colors.CYAN}{duration_direction} ({duration_trend:.2f}s/day){Colors.END}"
@@ -744,9 +738,7 @@ class RepairAnalytics:
                 volume_direction = (
                     "↗️ increasing"
                     if volume_trend > 0
-                    else "↘️ decreasing"
-                    if volume_trend < 0
-                    else "→ stable"
+                    else "↘️ decreasing" if volume_trend < 0 else "→ stable"
                 )
                 print(
                     f"   Repair Volume:      {Colors.CYAN}{volume_direction} ({volume_trend:.2f}/day){Colors.END}"
@@ -957,9 +949,7 @@ class RepairAnalytics:
                 severity_color = (
                     Colors.RED
                     if pattern.severity == "high"
-                    else Colors.YELLOW
-                    if pattern.severity == "medium"
-                    else Colors.GREEN
+                    else Colors.YELLOW if pattern.severity == "medium" else Colors.GREEN
                 )
                 print(
                     f"   {severity_color}[{pattern.severity.upper()}]{Colors.END} {pattern.pattern_type}"
@@ -981,9 +971,7 @@ class RepairAnalytics:
                 priority_color = (
                     Colors.RED
                     if rec.priority == "high"
-                    else Colors.YELLOW
-                    if rec.priority == "medium"
-                    else Colors.GREEN
+                    else Colors.YELLOW if rec.priority == "medium" else Colors.GREEN
                 )
                 print(
                     f"   {priority_color}[{rec.priority.upper()}]{Colors.END} {rec.category}: {rec.description}"

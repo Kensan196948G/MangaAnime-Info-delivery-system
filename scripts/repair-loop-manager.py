@@ -147,9 +147,9 @@ class RepairLoopManager:
         # 成功率を計算
         if state["repair_history"]:
             successful = sum(1 for h in state["repair_history"] if h["success"])
-            summary[
-                "success_rate"
-            ] = f"{(successful / len(state['repair_history']) * 100):.1f}%"
+            summary["success_rate"] = (
+                f"{(successful / len(state['repair_history']) * 100):.1f}%"
+            )
 
         return summary
 

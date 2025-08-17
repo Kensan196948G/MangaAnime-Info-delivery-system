@@ -163,11 +163,13 @@ class ErrorNotifier:
             msg = MIMEMultipart()
 
             # ヘッダー設定
-            subject_prefix = self.error_config.get("subject_prefix", "🚨 システムエラー")
+            subject_prefix = self.error_config.get(
+                "subject_prefix", "🚨 システムエラー"
+            )
             msg["Subject"] = f"{subject_prefix} - {error_type}"
-            msg[
-                "From"
-            ] = f"{self.error_config.get('sender_name', 'MangaAnime監視システム')} <{self.error_config.get('sender_email')}>"
+            msg["From"] = (
+                f"{self.error_config.get('sender_name', 'MangaAnime監視システム')} <{self.error_config.get('sender_email')}>"
+            )
             msg["To"] = self.error_config.get("recipient_email")
 
             # メール本文作成

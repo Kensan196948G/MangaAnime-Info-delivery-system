@@ -267,7 +267,9 @@ class TestIntegratedEndToEndWorkflow:
 
         # 検証
         assert total_inserted == len(large_dataset), "全データが挿入されるべき"
-        assert actual_count == len(large_dataset), f"データベースレコード数が不一致: {actual_count}"
+        assert actual_count == len(
+            large_dataset
+        ), f"データベースレコード数が不一致: {actual_count}"
         assert len(duplicates) == 0, f"重複データが検出: {duplicates}"
         assert integrity_result == "ok", f"データベース整合性エラー: {integrity_result}"
         assert processing_time < 30.0, f"処理時間が長すぎる: {processing_time:.2f}秒"
@@ -345,7 +347,9 @@ class TestIntegratedEndToEndWorkflow:
         max_memory = max(memory_snapshots)
 
         # メモリ使用量の検証
-        assert memory_growth < 200, f"メモリ使用量増加が大きすぎる: {memory_growth:.1f}MB"
+        assert (
+            memory_growth < 200
+        ), f"メモリ使用量増加が大きすぎる: {memory_growth:.1f}MB"
         assert (
             max_memory - initial_memory < 300
         ), f"ピークメモリ使用量が高すぎる: {max_memory - initial_memory:.1f}MB"
@@ -354,7 +358,9 @@ class TestIntegratedEndToEndWorkflow:
         recent_memory = memory_snapshots[-3:]
         if len(recent_memory) > 1:
             memory_variance = statistics.variance(recent_memory)
-            assert memory_variance < 100, f"メモリ使用量が不安定: 分散 {memory_variance:.1f}"
+            assert (
+                memory_variance < 100
+            ), f"メモリ使用量が不安定: 分散 {memory_variance:.1f}"
 
 
 class TestTestSuiteEnhancement:
@@ -493,7 +499,9 @@ class TestTestSuiteEnhancement:
 
         for fixture_path in expected_fixtures:
             full_path = os.path.join(fixtures_dir, fixture_path)
-            assert os.path.exists(full_path), f"テストデータファイルが不足: {fixture_path}"
+            assert os.path.exists(
+                full_path
+            ), f"テストデータファイルが不足: {fixture_path}"
 
         # テストデータの整合性確認
         small_test_path = os.path.join(fixtures_dir, "data/small_test.json")
@@ -514,7 +522,9 @@ class TestTestSuiteEnhancement:
             anime_sample = small_test_data["anime_data"][0]
             anime_required_fields = ["title", "type", "status"]
             for field in anime_required_fields:
-                assert field in anime_sample, f"アニメデータに必要なフィールド {field} が不足"
+                assert (
+                    field in anime_sample
+                ), f"アニメデータに必要なフィールド {field} が不足"
 
 
 # テスト実行用のユーティリティクラス
@@ -628,9 +638,13 @@ class ComprehensiveTestRunner:
         if "performance" in results:
             perf = results["performance"]
             if perf.get("avg_response_time", 0) > 1.0:
-                recommendations.append("レスポンス時間が長すぎます。パフォーマンス最適化を検討してください")
+                recommendations.append(
+                    "レスポンス時間が長すぎます。パフォーマンス最適化を検討してください"
+                )
             if perf.get("memory_usage_mb", 0) > 200:
-                recommendations.append("メモリ使用量が多すぎます。メモリ最適化を検討してください")
+                recommendations.append(
+                    "メモリ使用量が多すぎます。メモリ最適化を検討してください"
+                )
 
         return recommendations
 

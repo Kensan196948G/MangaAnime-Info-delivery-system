@@ -96,7 +96,9 @@ class OperationalMonitor:
             )
 
             if memory.percent >= self.alert_thresholds["memory_usage_max"]:
-                health_status["alerts"].append(f"メモリ使用率が高い: {memory.percent:.1f}%")
+                health_status["alerts"].append(
+                    f"メモリ使用率が高い: {memory.percent:.1f}%"
+                )
 
             # ディスク使用率チェック
             disk = psutil.disk_usage("/")
@@ -109,7 +111,9 @@ class OperationalMonitor:
             )
 
             if disk_percent >= self.alert_thresholds["disk_usage_max"]:
-                health_status["alerts"].append(f"ディスク使用率が高い: {disk_percent:.1f}%")
+                health_status["alerts"].append(
+                    f"ディスク使用率が高い: {disk_percent:.1f}%"
+                )
 
             # データベース接続チェック
             db_status = self.check_database_health()
@@ -237,9 +241,7 @@ class OperationalMonitor:
         overall_status = (
             "healthy"
             if healthy_count == len(apis_to_check)
-            else "warning"
-            if healthy_count > 0
-            else "error"
+            else "warning" if healthy_count > 0 else "error"
         )
 
         return {
@@ -372,7 +374,9 @@ class OperationalMonitor:
             message_parts.append("🔍 コンポーネント状況:")
             for component, status in health_status["components"].items():
                 status_emoji = (
-                    "✅" if status == "healthy" else "⚠️" if status == "warning" else "❌"
+                    "✅"
+                    if status == "healthy"
+                    else "⚠️" if status == "warning" else "❌"
                 )
                 message_parts.append(f"  {status_emoji} {component}: {status}")
 
@@ -409,10 +413,14 @@ class OperationalMonitor:
             report["recommendations"].append("システムの詳細確認と対処が必要です")
 
         if latest_health["metrics"].get("cpu_usage", 0) > 70:
-            report["recommendations"].append("CPU使用率が高いです。プロセスの最適化を検討してください")
+            report["recommendations"].append(
+                "CPU使用率が高いです。プロセスの最適化を検討してください"
+            )
 
         if latest_health["metrics"].get("memory_usage", 0) > 80:
-            report["recommendations"].append("メモリ使用率が高いです。メモリ不足の対処が必要です")
+            report["recommendations"].append(
+                "メモリ使用率が高いです。メモリ不足の対処が必要です"
+            )
 
         return report
 
