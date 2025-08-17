@@ -461,6 +461,7 @@ class TestAdvancedAPIPerformance:
 
     @pytest.mark.performance
     @pytest.mark.api
+    @pytest.mark.asyncio
     async def test_api_load_simulation(self, performance_monitor, benchmark_config):
         """Simulate realistic API load patterns."""
 

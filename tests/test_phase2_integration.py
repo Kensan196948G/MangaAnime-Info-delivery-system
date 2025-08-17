@@ -31,6 +31,7 @@ class TestAniListIntegrationComprehensive:
 
     @pytest.mark.integration
     @pytest.mark.api
+    @pytest.mark.asyncio
     async def test_anilist_graphql_query_accuracy(self, test_config):
         """GraphQLクエリの正確性とデータ形式変換テスト"""
 
@@ -130,6 +131,7 @@ class TestAniListIntegrationComprehensive:
 
     @pytest.mark.integration
     @pytest.mark.api
+    @pytest.mark.asyncio
     async def test_anilist_rate_limiting_compliance(self, test_config):
         """レート制限遵守テスト"""
 
@@ -159,6 +161,7 @@ class TestAniListIntegrationComprehensive:
 
     @pytest.mark.performance
     @pytest.mark.api
+    @pytest.mark.asyncio
     async def test_anilist_performance_benchmarks(self, performance_test_config):
         """パフォーマンステストとベンチマーク"""
 

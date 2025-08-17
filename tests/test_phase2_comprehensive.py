@@ -30,6 +30,7 @@ class TestIntegratedEndToEndWorkflow:
 
     @pytest.mark.integration
     @pytest.mark.e2e
+    @pytest.mark.asyncio
     async def test_complete_information_collection_workflow(self, temp_db, test_config):
         """全収集プロセスの統合テスト"""
 

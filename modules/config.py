@@ -653,6 +653,26 @@ class ConfigManager:
 
         return value
 
+    def set(self, key: str, value: Any) -> None:
+        """
+        Set configuration value by dot-separated key.
+
+        Args:
+            key: Dot-separated key (e.g., 'database.path')
+            value: Value to set
+        """
+        keys = key.split(".")
+        config_section = self._config_data
+
+        # Navigate to the parent section
+        for k in keys[:-1]:
+            if k not in config_section:
+                config_section[k] = {}
+            config_section = config_section[k]
+
+        # Set the final value
+        config_section[keys[-1]] = value
+
     def set_secure(self, key: str, value: str) -> None:
         """
         Set encrypted configuration value.

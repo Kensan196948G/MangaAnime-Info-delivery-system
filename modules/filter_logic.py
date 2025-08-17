@@ -554,6 +554,141 @@ class ContentFilter:
 
             self.logger.info(f"Removed dynamic NG keyword: '{keyword}'")
 
+    # Legacy methods for backward compatibility with tests
+    def set_ng_keywords(self, keywords: List[str]):
+        """
+        Legacy method: Set NG keywords for backward compatibility
+
+        Args:
+            keywords: List of NG keywords
+        """
+        self.ng_keywords = self._normalize_keywords(keywords)
+        self.compiled_keyword_patterns = self._compile_keyword_patterns()
+
+        # Clear cache to ensure new keywords take effect
+        if hasattr(self, "_filter_cache"):
+            self._filter_cache.clear()
+
+        self.logger.info(f"Set NG keywords: {keywords}")
+
+    def filter_anime(self, anime_data: Dict[str, Any]) -> bool:
+        """
+        Legacy method: Filter anime data for backward compatibility
+
+        Args:
+            anime_data: Anime data dictionary
+
+        Returns:
+            bool: True if should be filtered (blocked), False if allowed
+        """
+        if not anime_data:
+            return False
+
+        try:
+            # Check isAdult flag first
+            if anime_data.get("isAdult", False):
+                return True
+
+            # Check title
+            title = anime_data.get("title", {})
+            if isinstance(title, dict):
+                for title_key in ["romaji", "english", "native"]:
+                    title_text = title.get(title_key)
+                    if title_text:
+                        result = self._check_text_content_optimized(
+                            title_text, f"anime_{title_key}"
+                        )
+                        if result.is_filtered:
+                            return True
+            elif isinstance(title, str):
+                result = self._check_text_content_optimized(title, "anime_title")
+                if result.is_filtered:
+                    return True
+
+            # Check description
+            description = anime_data.get("description")
+            if description:
+                result = self._check_text_content_optimized(
+                    description, "anime_description"
+                )
+                if result.is_filtered:
+                    return True
+
+            # Check genres
+            genres = anime_data.get("genres", [])
+            if genres:
+                genre_result = self._check_genres_optimized(genres)
+                if genre_result.is_filtered:
+                    return True
+
+            # Check tags
+            tags = anime_data.get("tags", [])
+            if tags:
+                # Handle both string tags and dict tags
+                tag_names = []
+                for tag in tags:
+                    if isinstance(tag, dict) and "name" in tag:
+                        tag_names.append(tag["name"])
+                    elif isinstance(tag, str):
+                        tag_names.append(tag)
+
+                if tag_names:
+                    # Check tags using the tag-specific method
+                    tag_result = self._check_tags_optimized(tag_names)
+                    if tag_result.is_filtered:
+                        return True
+
+                    # Also check tag names against NG keywords
+                    for tag_name in tag_names:
+                        if tag_name:
+                            tag_text_result = self._check_text_content_optimized(
+                                tag_name, "tag_name"
+                            )
+                            if tag_text_result.is_filtered:
+                                return True
+
+            return False
+
+        except Exception as e:
+            self.logger.error(f"Error filtering anime data: {e}")
+            return False
+
+    def filter_manga(self, manga_data: Dict[str, Any]) -> bool:
+        """
+        Legacy method: Filter manga data for backward compatibility
+
+        Args:
+            manga_data: Manga data dictionary
+
+        Returns:
+            bool: True if should be filtered (blocked), False if allowed
+        """
+        if not manga_data:
+            return False
+
+        try:
+            # Check title
+            title = manga_data.get("title")
+            if title:
+                result = self._check_text_content_optimized(title, "manga_title")
+                if result.is_filtered:
+                    return True
+
+            # Check description
+            description = manga_data.get("description")
+            if description:
+                result = self._check_text_content_optimized(
+                    description, "manga_description"
+                )
+                if result.is_filtered:
+                    return True
+
+            return False
+
+        except Exception as e:
+            self.logger.error(f"Error filtering manga data: {e}")
+            return False
+
 
 class FilterCollection:
     """複数のフィルターを管理するコレクション"""

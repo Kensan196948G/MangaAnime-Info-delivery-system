@@ -409,6 +409,7 @@ class TestAPIPerformance:
 
     @pytest.mark.performance
     @pytest.mark.api
+    @pytest.mark.asyncio
     async def test_anilist_api_rate_limiting_compliance(self):
         """Test AniList API rate limiting compliance under load."""
 
@@ -533,6 +534,7 @@ class TestAPIPerformance:
 
     @pytest.mark.performance
     @pytest.mark.api
+    @pytest.mark.asyncio
     async def test_concurrent_api_requests_performance(self):
         """Test performance of concurrent API requests."""
 
