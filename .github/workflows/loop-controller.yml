@@ -47,6 +47,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        persist-credentials: true
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
     - name: 🔍 Get current loop state / 現在のループ状態を取得
@@ -113,16 +116,29 @@ jobs:
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        persist-credentials: true
 
     - name: 🚀 Trigger CI workflow / CIワークフローを実行
       id: trigger-ci
       run: |
         echo "🔧 Starting CI workflow for iteration ${{ needs.initialize-loop.outputs.current_iteration }}"
         
-        # Trigger the CI workflow
-        gh workflow run ci.yml \
-          --field iteration_number="${{ needs.initialize-loop.outputs.current_iteration }}" \
-          --field loop_id="${{ needs.initialize-loop.outputs.loop_id }}"
+        # Use push-based trigger instead of workflow_dispatch due to API limitations
+        echo "📝 Using push-based trigger for reliable CI execution"
+        echo "CI iteration: ${{ needs.initialize-loop.outputs.current_iteration }}" >> .ci-test-trigger
+        echo "Loop ID: ${{ needs.initialize-loop.outputs.loop_id }}" >> .ci-test-trigger
+        echo "Timestamp: $(date)" >> .ci-test-trigger
+        
+        # Configure git
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Commit and push to trigger CI
+        git add .ci-test-trigger
+        git commit -m "🔄 Auto-trigger CI - Iteration ${{ needs.initialize-loop.outputs.current_iteration }}"
+        git push
         
         # Wait a moment for the workflow to start
         sleep 10
@@ -172,6 +188,9 @@ jobs:
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        persist-credentials: true
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -239,6 +258,9 @@ jobs:
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        persist-credentials: true
 
     - name: ⏰ Schedule next iteration / 次の反復をスケジュール
       run: |
@@ -261,6 +283,9 @@ jobs:
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        persist-credentials: true
 
     - name: 📊 Generate final summary / 最終サマリーを生成
       run: |
