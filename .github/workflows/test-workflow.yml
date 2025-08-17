@@ -1,0 +1,16 @@
+name: Test Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test step
+        run: |
+          echo "Testing basic workflow functionality"
+          echo "GitHub CLI version:"
+          gh --version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
