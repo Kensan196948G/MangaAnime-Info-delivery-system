@@ -8,10 +8,20 @@ import sqlite3
 import tempfile
 import os
 import json
+import sys
+from pathlib import Path
 from unittest.mock import Mock, MagicMock
 from datetime import datetime, timedelta
 import asyncio
 from typing import Dict, Any, List, Generator
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+# Import test utilities
+from tests.fixtures.test_config import get_test_config, reset_test_config
+from tests.fixtures.mock_services import create_mock_services
 
 # Test configuration
 TEST_CONFIG = {
@@ -52,7 +62,10 @@ def event_loop():
 @pytest.fixture
 def test_config() -> Dict[str, Any]:
     """Provide test configuration."""
-    return TEST_CONFIG.copy()
+    config = get_test_config()
+    yield config.to_dict()
+    # Reset configuration after each test
+    reset_test_config()
 
 
 @pytest.fixture
@@ -168,7 +181,9 @@ def mock_gmail_service():
         "id": "test_message_id",
         "threadId": "test_thread_id",
     }
-    return mock_service
+    yield mock_service
+    # Reset mock after test
+    mock_service.reset_mock()
 
 
 @pytest.fixture
@@ -179,7 +194,9 @@ def mock_calendar_service():
         "id": "test_event_id",
         "htmlLink": "https://calendar.google.com/event?eid=test_event_id",
     }
-    return mock_service
+    yield mock_service
+    # Reset mock after test
+    mock_service.reset_mock()
 
 
 @pytest.fixture
@@ -413,6 +430,63 @@ def temp_config_file(tmp_path):
     return str(config_file)
 
 
+# Mock services fixture with automatic reset
+@pytest.fixture
+def mock_services():
+    """Provide mock services with automatic reset."""
+    services = create_mock_services()
+    yield services
+    # Reset all mocks after each test
+    _reset_all_mocks(services)
+
+
+def _reset_all_mocks(services: Dict[str, Any]):
+    """Reset all mock services."""
+    # Reset AniList service
+    if "anilist" in services:
+        services["anilist"].rate_limit_remaining = 90
+        services["anilist"].request_count = 0
+
+    # Reset RSS service
+    if "rss" in services:
+        services["rss"].network_delay_ms = 100
+
+    # Reset Google services
+    if "google" in services:
+        google = services["google"]
+        if hasattr(google, "gmail_service"):
+            _reset_mock_recursively(google.gmail_service)
+        if hasattr(google, "calendar_service"):
+            _reset_mock_recursively(google.calendar_service)
+        if hasattr(google, "auth_service"):
+            _reset_mock_recursively(google.auth_service)
+
+    # Reset Database service
+    if "database" in services:
+        services["database"].data = {"works": [], "releases": []}
+        services["database"].next_id = 1
+
+    # Reset Performance simulator
+    if "performance" in services:
+        services["performance"].load_factor = 1.0
+        services["performance"].memory_usage_mb = 10
+
+
+def _reset_mock_recursively(mock_obj):
+    """Recursively reset mock objects."""
+    if isinstance(mock_obj, (Mock, MagicMock)):
+        mock_obj.reset_mock()
+        # Reset all child mocks
+        for attr_name in dir(mock_obj):
+            if not attr_name.startswith("_"):
+                try:
+                    attr = getattr(mock_obj, attr_name)
+                    if isinstance(attr, (Mock, MagicMock)):
+                        _reset_mock_recursively(attr)
+                except (AttributeError, TypeError):
+                    pass
+
+
 # Test markers configuration
 def pytest_configure(config):
     """Configure pytest markers."""
@@ -424,3 +498,4 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "api: Tests that call external APIs")
     config.addinivalue_line("markers", "auth: Authentication related tests")
     config.addinivalue_line("markers", "db: Database related tests")
+    config.addinivalue_line("markers", "asyncio: Asynchronous tests using asyncio")

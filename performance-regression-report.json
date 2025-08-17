@@ -1,6 +1,6 @@
 {
   "report_metadata": {
-    "generated_at": "2025-08-17T21:34:04.027780",
+    "generated_at": "2025-08-17T21:50:12.161538",
     "total_tests": 3,
     "test_environment": {
       "cpu_count": 4,
@@ -9,8 +9,8 @@
     }
   },
   "performance_summary": {
-    "total_execution_time": 13.210918664932251,
-    "avg_execution_time": 4.403639554977417,
+    "total_execution_time": 14.418919324874878,
+    "avg_execution_time": 4.806306441624959,
     "peak_memory_usage": 0.3864297866821289,
     "avg_memory_usage": 0.2583913803100586,
     "avg_cpu_usage": 0.0
@@ -18,7 +18,7 @@
   "test_details": [
     {
       "test_name": "regression_db_baseline",
-      "execution_time": 0.10300254821777344,
+      "execution_time": 0.10459470748901367,
       "memory_peak_mb": 0.3864297866821289,
       "memory_avg_mb": 0.3861360549926758,
       "cpu_usage_percent": 0.0,
@@ -26,11 +26,11 @@
       "error_rate": null,
       "p95_latency": null,
       "p99_latency": null,
-      "timestamp": "2025-08-17T21:33:50.921676"
+      "timestamp": "2025-08-17T21:49:57.850623"
     },
     {
       "test_name": "regression_db_baseline",
-      "execution_time": 0.10300254821777344,
+      "execution_time": 0.10459470748901367,
       "memory_peak_mb": 0.3864297866821289,
       "memory_avg_mb": 0.3861360549926758,
       "cpu_usage_percent": 0.0,
@@ -38,11 +38,11 @@
       "error_rate": null,
       "p95_latency": null,
       "p99_latency": null,
-      "timestamp": "2025-08-17T21:33:50.921676"
+      "timestamp": "2025-08-17T21:49:57.850623"
     },
     {
       "test_name": "regression_db_degraded",
-      "execution_time": 13.004913568496704,
+      "execution_time": 14.20972990989685,
       "memory_peak_mb": 0.0023145675659179688,
       "memory_avg_mb": 0.0019054412841796875,
       "cpu_usage_percent": 0.0,
@@ -50,14 +50,14 @@
       "error_rate": null,
       "p95_latency": null,
       "p99_latency": null,
-      "timestamp": "2025-08-17T21:34:04.027726"
+      "timestamp": "2025-08-17T21:50:12.161486"
     }
   ],
   "performance_analysis": {
     "slowest_tests": [
       {
         "test_name": "regression_db_degraded",
-        "execution_time": 13.004913568496704,
+        "execution_time": 14.20972990989685,
         "memory_peak_mb": 0.0023145675659179688,
         "memory_avg_mb": 0.0019054412841796875,
         "cpu_usage_percent": 0.0,
@@ -65,11 +65,11 @@
         "error_rate": null,
         "p95_latency": null,
         "p99_latency": null,
-        "timestamp": "2025-08-17T21:34:04.027726"
+        "timestamp": "2025-08-17T21:50:12.161486"
       },
       {
         "test_name": "regression_db_baseline",
-        "execution_time": 0.10300254821777344,
+        "execution_time": 0.10459470748901367,
         "memory_peak_mb": 0.3864297866821289,
         "memory_avg_mb": 0.3861360549926758,
         "cpu_usage_percent": 0.0,
@@ -77,11 +77,11 @@
         "error_rate": null,
         "p95_latency": null,
         "p99_latency": null,
-        "timestamp": "2025-08-17T21:33:50.921676"
+        "timestamp": "2025-08-17T21:49:57.850623"
       },
       {
         "test_name": "regression_db_baseline",
-        "execution_time": 0.10300254821777344,
+        "execution_time": 0.10459470748901367,
         "memory_peak_mb": 0.3864297866821289,
         "memory_avg_mb": 0.3861360549926758,
         "cpu_usage_percent": 0.0,
@@ -89,13 +89,13 @@
         "error_rate": null,
         "p95_latency": null,
         "p99_latency": null,
-        "timestamp": "2025-08-17T21:33:50.921676"
+        "timestamp": "2025-08-17T21:49:57.850623"
       }
     ],
     "memory_intensive_tests": [
       {
         "test_name": "regression_db_baseline",
-        "execution_time": 0.10300254821777344,
+        "execution_time": 0.10459470748901367,
         "memory_peak_mb": 0.3864297866821289,
         "memory_avg_mb": 0.3861360549926758,
         "cpu_usage_percent": 0.0,
@@ -103,11 +103,11 @@
         "error_rate": null,
         "p95_latency": null,
         "p99_latency": null,
-        "timestamp": "2025-08-17T21:33:50.921676"
+        "timestamp": "2025-08-17T21:49:57.850623"
       },
       {
         "test_name": "regression_db_baseline",
-        "execution_time": 0.10300254821777344,
+        "execution_time": 0.10459470748901367,
         "memory_peak_mb": 0.3864297866821289,
         "memory_avg_mb": 0.3861360549926758,
         "cpu_usage_percent": 0.0,
@@ -115,11 +115,11 @@
         "error_rate": null,
         "p95_latency": null,
         "p99_latency": null,
-        "timestamp": "2025-08-17T21:33:50.921676"
+        "timestamp": "2025-08-17T21:49:57.850623"
       },
       {
         "test_name": "regression_db_degraded",
-        "execution_time": 13.004913568496704,
+        "execution_time": 14.20972990989685,
         "memory_peak_mb": 0.0023145675659179688,
         "memory_avg_mb": 0.0019054412841796875,
         "cpu_usage_percent": 0.0,
@@ -127,7 +127,7 @@
         "error_rate": null,
         "p95_latency": null,
         "p99_latency": null,
-        "timestamp": "2025-08-17T21:34:04.027726"
+        "timestamp": "2025-08-17T21:50:12.161486"
       }
     ],
     "recommendations": [
