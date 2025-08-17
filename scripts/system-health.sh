@@ -142,15 +142,25 @@ check_dependencies() {
     
     # Python packages
     echo "   Checking Python packages..."
-    local python_packages=("requests" "PyYAML" "gitpython")
-    for package in "${python_packages[@]}"; do
-        if python3 -c "import $package" 2>/dev/null; then
-            echo -e "${GREEN}     ✅ Python $package available${NC}"
+    # Format: (import_name display_name pip_name)
+    local python_packages=(
+        "requests:requests:requests"
+        "yaml:PyYAML:PyYAML"
+        "git:gitpython:gitpython"
+    )
+    for package_info in "${python_packages[@]}"; do
+        IFS=':' read -r import_name display_name pip_name <<< "$package_info"
+        # Check in virtual environment first, then system Python
+        if [[ -n "${VIRTUAL_ENV:-}" ]] && $VIRTUAL_ENV/bin/python3 -c "import $import_name" 2>/dev/null; then
+            echo -e "     ${GREEN}✅ Python $display_name available (venv)${NC}"
+            dep_score=$((dep_score + 3))
+        elif python3 -c "import $import_name" 2>/dev/null; then
+            echo -e "     ${GREEN}✅ Python $display_name available${NC}"
             dep_score=$((dep_score + 3))
         else
-            echo -e "${YELLOW}     ⚠️  Python $package missing${NC}"
-            add_warning "Python package $package not found"
-            add_recommendation "Install with: pip3 install $package"
+            echo -e "${YELLOW}     ⚠️  Python $display_name missing${NC}"
+            add_warning "Python package $display_name not found"
+            add_recommendation "Install with: pip3 install $pip_name"
         fi
     done
     
