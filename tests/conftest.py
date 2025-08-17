@@ -1,501 +1,318 @@
-#!/usr/bin/env python3
 """
-pytest configuration and shared fixtures for the Manga/Anime info delivery system tests
+Common test fixtures and configuration for the MangaAnime Info Delivery System
 """
-
 import pytest
-import sqlite3
 import tempfile
 import os
-import json
 import sys
-from pathlib import Path
-from unittest.mock import Mock, MagicMock
-from datetime import datetime, timedelta
-import asyncio
-from typing import Dict, Any, List, Generator
+import sqlite3
+from unittest.mock import Mock, patch, MagicMock
 
-# Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
-# Import test utilities
-from tests.fixtures.test_config import get_test_config, reset_test_config
-from tests.fixtures.mock_services import create_mock_services
-
-# Test configuration
-TEST_CONFIG = {
-    "system": {
-        "name": "Test_MangaAnime情報配信システム",
-        "environment": "test",
-        "timezone": "Asia/Tokyo",
-        "log_level": "DEBUG",
-    },
-    "database": {
-        "path": ":memory:",  # In-memory database for tests
-        "backup_enabled": False,
-    },
-    "apis": {
-        "anilist": {
-            "graphql_url": "https://graphql.anilist.co",
-            "rate_limit": {"requests_per_minute": 90},
-            "timeout_seconds": 5,
-        },
-        "rss_feeds": {"timeout_seconds": 5, "user_agent": "TestAgent/1.0"},
-    },
-    "filtering": {
-        "ng_keywords": ["エロ", "R18", "成人向け", "BL"],
-        "ng_genres": ["Hentai", "Ecchi"],
-    },
-    "notification": {"email": {"enabled": False}, "calendar": {"enabled": False}},
-}
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
+# Add project root to Python path
+project_root = os.path.dirname(os.path.dirname(__file__))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 @pytest.fixture
-def test_config() -> Dict[str, Any]:
-    """Provide test configuration."""
-    config = get_test_config()
-    yield config.to_dict()
-    # Reset configuration after each test
-    reset_test_config()
-
-
-@pytest.fixture
-def temp_db() -> Generator[str, None, None]:
-    """Create a temporary SQLite database for testing."""
-    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as temp_file:
-        db_path = temp_file.name
-
-    try:
-        # Initialize test database structure
-        conn = sqlite3.connect(db_path)
-        conn.executescript(
-            """
-            CREATE TABLE works (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                title_kana TEXT,
-                title_en TEXT,
-                type TEXT CHECK(type IN ('anime','manga')),
-                official_url TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-            
-            CREATE TABLE releases (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                work_id INTEGER NOT NULL,
-                release_type TEXT CHECK(release_type IN ('episode','volume')),
-                number TEXT,
-                platform TEXT,
-                release_date DATE,
-                source TEXT,
-                source_url TEXT,
-                notified INTEGER DEFAULT 0,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(work_id, release_type, number, platform, release_date)
-            );
-        """
-        )
-        conn.commit()
-        conn.close()
-
-        yield db_path
-    finally:
-        if os.path.exists(db_path):
-            os.unlink(db_path)
-
-
-@pytest.fixture
-def mock_anilist_response():
-    """Mock AniList GraphQL API responses."""
+def mock_config():
+    """Mock configuration for tests"""
     return {
-        "data": {
-            "Page": {
-                "media": [
-                    {
-                        "id": 21,
-                        "title": {
-                            "romaji": "One Piece",
-                            "english": "One Piece",
-                            "native": "ワンピース",
-                        },
-                        "type": "ANIME",
-                        "format": "TV",
-                        "status": "RELEASING",
-                        "episodes": None,
-                        "genres": ["Action", "Adventure", "Comedy"],
-                        "tags": [{"name": "Pirates"}, {"name": "Shounen"}],
-                        "description": "Gol D. Roger was known as the Pirate King...",
-                        "startDate": {"year": 1999, "month": 10, "day": 20},
-                        "nextAiringEpisode": {"episode": 1050, "airingAt": 1640995200},
-                        "streamingEpisodes": [
-                            {"title": "Episode 1049", "url": "https://example.com/1049"}
-                        ],
-                        "siteUrl": "https://anilist.co/anime/21",
-                    }
-                ]
+        "database": {
+            "path": ":memory:"
+        },
+        "email": {
+            "enabled": False,
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "username": "test@example.com",
+            "password": "test_password"
+        },
+        "api": {
+            "enabled": False,
+            "anilist": {
+                "base_url": "https://graphql.anilist.co",
+                "rate_limit": 90
+            },
+            "shoboical": {
+                "base_url": "https://cal.syoboi.jp",
+                "tid": "12345"
             }
+        },
+        "calendar": {
+            "enabled": False,
+            "calendar_id": "primary",
+            "service_account_file": "test_service_account.json"
+        },
+        "notification": {
+            "enabled": False,
+            "check_interval": 3600
         }
     }
 
+@pytest.fixture
+def temp_db():
+    """Create a temporary in-memory database for testing"""
+    conn = sqlite3.connect(":memory:")
+    
+    # Create tables
+    conn.execute('''
+        CREATE TABLE works (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            title_kana TEXT,
+            title_en TEXT,
+            type TEXT CHECK(type IN ('anime','manga')),
+            official_url TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    conn.execute('''
+        CREATE TABLE releases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            work_id INTEGER NOT NULL,
+            release_type TEXT CHECK(release_type IN ('episode','volume')),
+            number TEXT,
+            platform TEXT,
+            release_date DATE,
+            source TEXT,
+            source_url TEXT,
+            notified INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(work_id, release_type, number, platform, release_date)
+        )
+    ''')
+    
+    conn.commit()
+    yield conn
+    conn.close()
 
 @pytest.fixture
-def mock_rss_feed_data():
-    """Mock RSS feed data for testing."""
-    return """<?xml version="1.0" encoding="UTF-8"?>
-    <rss version="2.0">
-        <channel>
-            <title>Test Manga RSS Feed</title>
-            <description>Test manga releases</description>
-            <item>
-                <title>進撃の巨人 第34巻</title>
-                <link>https://example.com/manga/attack-titan-34</link>
-                <description>待望の最終巻がついに発売！</description>
-                <pubDate>Wed, 09 Jun 2021 00:00:00 +0900</pubDate>
-                <category>manga</category>
-            </item>
-            <item>
-                <title>鬼滅の刃 第23巻</title>
-                <link>https://example.com/manga/demon-slayer-23</link>
-                <description>完結記念特装版</description>
-                <pubDate>Fri, 04 Dec 2020 00:00:00 +0900</pubDate>
-                <category>manga</category>
-            </item>
-        </channel>
-    </rss>"""
-
+def mock_requests():
+    """Mock requests for API calls"""
+    with patch('requests.get') as mock_get, \
+         patch('requests.post') as mock_post:
+        
+        # AniList API mock response
+        anilist_response = {
+            "data": {
+                "Page": {
+                    "media": [
+                        {
+                            "id": 1,
+                            "title": {
+                                "romaji": "Test Anime",
+                                "english": "Test Anime",
+                                "native": "テストアニメ"
+                            },
+                            "type": "ANIME",
+                            "status": "RELEASING",
+                            "episodes": 12,
+                            "startDate": {"year": 2024, "month": 1, "day": 1},
+                            "streamingEpisodes": [
+                                {
+                                    "title": "Episode 1",
+                                    "url": "https://example.com/ep1",
+                                    "site": "Crunchyroll"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+        
+        # Shoboical API mock response
+        shoboical_response = [
+            {
+                "TID": "12345",
+                "Title": "テストアニメ",
+                "TitleEN": "Test Anime",
+                "Cat": "アニメ",
+                "FirstCh": "テレビ東京",
+                "FirstYear": "2024",
+                "FirstMonth": "1",
+                "FirstEndYear": "2024",
+                "FirstEndMonth": "3"
+            }
+        ]
+        
+        # Default responses
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = anilist_response
+        
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = anilist_response
+        
+        # Handle different URLs
+        def side_effect(url, **kwargs):
+            mock_response = Mock()
+            mock_response.status_code = 200
+            
+            if 'anilist.co' in url:
+                mock_response.json.return_value = anilist_response
+            elif 'syoboi.jp' in url or 'cal.syoboi.jp' in url:
+                mock_response.json.return_value = shoboical_response
+            else:
+                mock_response.json.return_value = {"status": "ok", "data": []}
+            
+            return mock_response
+        
+        mock_get.side_effect = side_effect
+        mock_post.side_effect = side_effect
+        
+        yield {
+            "get": mock_get,
+            "post": mock_post
+        }
 
 @pytest.fixture
-def mock_gmail_service():
-    """Mock Gmail API service for testing."""
-    mock_service = MagicMock()
-    mock_service.users().messages().send().execute.return_value = {
-        "id": "test_message_id",
-        "threadId": "test_thread_id",
-    }
-    yield mock_service
-    # Reset mock after test
-    mock_service.reset_mock()
-
-
-@pytest.fixture
-def mock_calendar_service():
-    """Mock Google Calendar API service for testing."""
-    mock_service = MagicMock()
-    mock_service.events().insert().execute.return_value = {
-        "id": "test_event_id",
-        "htmlLink": "https://calendar.google.com/event?eid=test_event_id",
-    }
-    yield mock_service
-    # Reset mock after test
-    mock_service.reset_mock()
-
+def mock_email():
+    """Mock email functionality"""
+    with patch('smtplib.SMTP') as mock_smtp, \
+         patch('smtplib.SMTP_SSL') as mock_smtp_ssl:
+        
+        mock_server = Mock()
+        mock_smtp.return_value.__enter__.return_value = mock_server
+        mock_smtp_ssl.return_value.__enter__.return_value = mock_server
+        
+        # Mock successful email operations
+        mock_server.login.return_value = None
+        mock_server.send_message.return_value = {}
+        mock_server.quit.return_value = None
+        
+        yield mock_server
 
 @pytest.fixture
-def sample_work_data():
-    """Sample work data for testing."""
+def mock_gmail_api():
+    """Mock Gmail API"""
+    with patch('googleapiclient.discovery.build') as mock_build:
+        mock_service = Mock()
+        mock_build.return_value = mock_service
+        
+        # Mock successful email send
+        mock_service.users().messages().send().execute.return_value = {
+            'id': 'test_message_id',
+            'threadId': 'test_thread_id'
+        }
+        
+        yield mock_service
+
+@pytest.fixture
+def mock_calendar():
+    """Mock Google Calendar API"""
+    with patch('googleapiclient.discovery.build') as mock_build:
+        mock_service = Mock()
+        mock_build.return_value = mock_service
+        
+        # Mock successful event creation
+        mock_service.events().insert().execute.return_value = {
+            'id': 'test_event_id',
+            'status': 'confirmed',
+            'htmlLink': 'https://calendar.google.com/test'
+        }
+        
+        # Mock event list
+        mock_service.events().list().execute.return_value = {
+            'items': []
+        }
+        
+        yield mock_service
+
+@pytest.fixture
+def mock_file_system():
+    """Mock file system operations"""
+    with patch('builtins.open', create=True) as mock_open, \
+         patch('os.path.exists') as mock_exists, \
+         patch('os.makedirs') as mock_makedirs:
+        
+        # Mock config file content
+        mock_config_content = '''
+{
+    "database": {"path": "test.db"},
+    "email": {"enabled": false},
+    "api": {"enabled": false},
+    "calendar": {"enabled": false}
+}
+'''
+        
+        mock_open.return_value.__enter__.return_value.read.return_value = mock_config_content
+        mock_exists.return_value = True
+        
+        yield {
+            "open": mock_open,
+            "exists": mock_exists,
+            "makedirs": mock_makedirs
+        }
+
+@pytest.fixture
+def sample_anime_data():
+    """Sample anime data for testing"""
     return [
         {
             "id": 1,
-            "title": "ワンピース",
-            "title_kana": "わんぴーす",
-            "title_en": "One Piece",
+            "title": "Attack on Titan",
+            "title_en": "Attack on Titan",
+            "title_jp": "進撃の巨人",
             "type": "anime",
-            "official_url": "https://one-piece.com",
+            "episodes": [
+                {
+                    "number": 1,
+                    "title": "To You, 2000 Years From Now",
+                    "air_date": "2024-01-07",
+                    "platform": "Crunchyroll"
+                }
+            ]
         },
         {
             "id": 2,
-            "title": "進撃の巨人",
-            "title_kana": "しんげきのきょじん",
-            "title_en": "Attack on Titan",
+            "title": "One Piece",
+            "title_en": "One Piece",
+            "title_jp": "ワンピース",
             "type": "manga",
-            "official_url": "https://shingeki.tv",
-        },
+            "volumes": [
+                {
+                    "number": 108,
+                    "title": "Volume 108",
+                    "release_date": "2024-02-02",
+                    "platform": "Viz Media"
+                }
+            ]
+        }
     ]
 
-
 @pytest.fixture
-def sample_release_data():
-    """Sample release data for testing."""
-    return [
-        {
-            "work_id": 1,
-            "release_type": "episode",
-            "number": "1050",
-            "platform": "dアニメストア",
-            "release_date": "2024-01-15",
-            "source": "anilist",
-            "source_url": "https://anilist.co/anime/21",
-            "notified": 0,
-        },
-        {
-            "work_id": 2,
-            "release_type": "volume",
-            "number": "34",
-            "platform": "BookWalker",
-            "release_date": "2024-01-20",
-            "source": "rss",
-            "source_url": "https://bookwalker.jp/manga/attack-titan-34",
-            "notified": 0,
-        },
-    ]
-
-
-@pytest.fixture
-def mock_requests_session():
-    """Mock requests session for HTTP testing."""
-    mock_session = Mock()
-
-    # Mock successful response
-    mock_response = Mock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {"data": "test_response"}
-    mock_response.text = "test response text"
-    mock_response.raise_for_status.return_value = None
-
-    mock_session.get.return_value = mock_response
-    mock_session.post.return_value = mock_response
-
-    return mock_session
-
+def sample_rss_data():
+    """Sample RSS feed data for testing"""
+    return '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Test Manga Feed</title>
+        <description>Test RSS feed for manga releases</description>
+        <item>
+            <title>One Piece Vol. 108</title>
+            <description>New volume of One Piece manga</description>
+            <link>https://example.com/one-piece-108</link>
+            <pubDate>Fri, 02 Feb 2024 00:00:00 GMT</pubDate>
+        </item>
+    </channel>
+</rss>'''
 
 @pytest.fixture(autouse=True)
-def setup_test_environment(monkeypatch):
-    """Setup test environment variables and configurations."""
-    # Set test mode environment variable
-    monkeypatch.setenv("TEST_MODE", "true")
-    monkeypatch.setenv("LOG_LEVEL", "DEBUG")
-
-    # Mock sensitive credentials for testing
-    monkeypatch.setenv("GOOGLE_CREDENTIALS_PATH", "/fake/path/credentials.json")
-    monkeypatch.setenv("GOOGLE_TOKEN_PATH", "/fake/path/token.json")
-
-
-class DataGeneratorUtil:
-    """Test data generator utility class."""
-
-    @staticmethod
-    def generate_anime_data(count: int = 5) -> List[Dict[str, Any]]:
-        """Generate test anime data."""
-        anime_titles = [
-            "ワンピース",
-            "進撃の巨人",
-            "鬼滅の刃",
-            "呪術廻戦",
-            "僕のヒーローアカデミア",
-            "ドラゴンボール超",
-            "ナルト",
-            "ブリーチ",
-            "ハンターxハンター",
-            "フェアリーテイル",
-        ]
-
-        results = []
-        for i in range(min(count, len(anime_titles))):
-            results.append(
-                {
-                    "id": i + 1,
-                    "title": {
-                        "romaji": anime_titles[i],
-                        "english": f"Test Anime {i+1}",
-                        "native": anime_titles[i],
-                    },
-                    "type": "ANIME",
-                    "status": "RELEASING",
-                    "episodes": 24,
-                    "genres": ["Action", "Adventure"],
-                    "tags": [{"name": "Shounen"}],
-                    "nextAiringEpisode": {
-                        "episode": i + 100,
-                        "airingAt": int(
-                            (datetime.now() + timedelta(days=i)).timestamp()
-                        ),
-                    },
-                }
-            )
-
-        return results
-
-    @staticmethod
-    def generate_manga_data(count: int = 5) -> List[str]:
-        """Generate test manga RSS data."""
-        manga_titles = [
-            "進撃の巨人",
-            "鬼滅の刃",
-            "呪術廻戦",
-            "チェンソーマン",
-            "東京リベンジャーズ",
-        ]
-
-        items = []
-        for i, title in enumerate(manga_titles[:count]):
-            items.append(
-                f"""
-                <item>
-                    <title>{title} 第{i+20}巻</title>
-                    <link>https://example.com/manga/{i+1}</link>
-                    <description>第{i+20}巻発売</description>
-                    <pubDate>{(datetime.now() + timedelta(days=i)).strftime('%a, %d %b %Y %H:%M:%S %z')}</pubDate>
-                </item>
-            """
-            )
-
-        return f"""<?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0">
-            <channel>
-                <title>Test Manga Feed</title>
-                {''.join(items)}
-            </channel>
-        </rss>"""
-
-
-@pytest.fixture
-def test_data_generator():
-    """Provide test data generator instance."""
-    return DataGeneratorUtil()
-
-
-# Performance testing fixtures
-@pytest.fixture
-def performance_test_config():
-    """Configuration for performance testing."""
-    return {
-        "concurrent_requests": 10,
-        "request_timeout": 30,
-        "max_response_time": 5.0,  # seconds
-        "memory_limit_mb": 100,
-        "cpu_usage_limit": 80.0,  # percentage
-    }
-
-
-@pytest.fixture
-def sample_config_data():
-    """Sample configuration data for testing."""
-    return {
-        "system": {
-            "name": "MangaAnime情報配信システム",
-            "environment": "production",
-            "timezone": "Asia/Tokyo",
-            "log_level": "INFO",
-        },
-        "database": {"path": "db.sqlite3", "backup_enabled": True},
-        "apis": {
-            "anilist": {
-                "graphql_url": "https://graphql.anilist.co",
-                "rate_limit": {"requests_per_minute": 90},
-                "timeout_seconds": 30,
-            },
-            "rss_feeds": {
-                "timeout_seconds": 30,
-                "user_agent": "MangaAnime-Info-System/1.0",
-            },
-        },
-        "email": {
-            "smtp_server": "smtp.gmail.com",
-            "smtp_port": 587,
-            "username": "test@gmail.com",
-            "use_tls": True,
-        },
-        "notifications": {
-            "enabled": True,
-            "email_enabled": True,
-            "calendar_enabled": True,
-        },
-        "error_notifications": {"enabled": True, "recipient": "error@example.com"},
-        "filtering": {
-            "ng_keywords": ["エロ", "R18", "成人向け"],
-            "ng_genres": ["Hentai", "Ecchi"],
-        },
-    }
-
-
-@pytest.fixture
-def temp_config_file(tmp_path):
-    """Create a temporary config file for testing."""
-    config_data = {
-        "system": {"name": "Test System", "environment": "test"},
-        "database": {"path": ":memory:"},
-    }
-
-    config_file = tmp_path / "test_config.json"
-    config_file.write_text(json.dumps(config_data, indent=2))
-    return str(config_file)
-
-
-# Mock services fixture with automatic reset
-@pytest.fixture
-def mock_services():
-    """Provide mock services with automatic reset."""
-    services = create_mock_services()
-    yield services
-    # Reset all mocks after each test
-    _reset_all_mocks(services)
-
-
-def _reset_all_mocks(services: Dict[str, Any]):
-    """Reset all mock services."""
-    # Reset AniList service
-    if "anilist" in services:
-        services["anilist"].rate_limit_remaining = 90
-        services["anilist"].request_count = 0
-
-    # Reset RSS service
-    if "rss" in services:
-        services["rss"].network_delay_ms = 100
-
-    # Reset Google services
-    if "google" in services:
-        google = services["google"]
-        if hasattr(google, "gmail_service"):
-            _reset_mock_recursively(google.gmail_service)
-        if hasattr(google, "calendar_service"):
-            _reset_mock_recursively(google.calendar_service)
-        if hasattr(google, "auth_service"):
-            _reset_mock_recursively(google.auth_service)
-
-    # Reset Database service
-    if "database" in services:
-        services["database"].data = {"works": [], "releases": []}
-        services["database"].next_id = 1
-
-    # Reset Performance simulator
-    if "performance" in services:
-        services["performance"].load_factor = 1.0
-        services["performance"].memory_usage_mb = 10
-
-
-def _reset_mock_recursively(mock_obj):
-    """Recursively reset mock objects."""
-    if isinstance(mock_obj, (Mock, MagicMock)):
-        mock_obj.reset_mock()
-        # Reset all child mocks
-        for attr_name in dir(mock_obj):
-            if not attr_name.startswith("_"):
-                try:
-                    attr = getattr(mock_obj, attr_name)
-                    if isinstance(attr, (Mock, MagicMock)):
-                        _reset_mock_recursively(attr)
-                except (AttributeError, TypeError):
-                    pass
-
-
-# Test markers configuration
-def pytest_configure(config):
-    """Configure pytest markers."""
-    config.addinivalue_line("markers", "unit: Unit tests")
-    config.addinivalue_line("markers", "integration: Integration tests")
-    config.addinivalue_line("markers", "e2e: End-to-end tests")
-    config.addinivalue_line("markers", "performance: Performance tests")
-    config.addinivalue_line("markers", "slow: Slow running tests")
-    config.addinivalue_line("markers", "api: Tests that call external APIs")
-    config.addinivalue_line("markers", "auth: Authentication related tests")
-    config.addinivalue_line("markers", "db: Database related tests")
-    config.addinivalue_line("markers", "asyncio: Asynchronous tests using asyncio")
+def prevent_external_calls():
+    """Prevent any external network calls during testing"""
+    with patch('requests.get') as mock_get, \
+         patch('requests.post') as mock_post, \
+         patch('urllib.request.urlopen') as mock_urlopen:
+        
+        # Default mock responses
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"status": "ok", "data": []}
+        mock_response.text = '{"status": "ok", "data": []}'
+        
+        mock_get.return_value = mock_response
+        mock_post.return_value = mock_response
+        mock_urlopen.return_value.__enter__.return_value.read.return_value = b'{"status": "ok"}'
+        
+        yield
