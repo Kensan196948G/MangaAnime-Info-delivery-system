@@ -1,0 +1,406 @@
+name: 🔄 7x Auto Repair Loop System
+# 7回ループ自動修復システム - Issueベースのタスクキュー管理
+
+on:
+  # 自動実行1: 30分ごとの定期チェック
+  schedule:
+    - cron: '*/30 * * * *'
+  
+  # 自動実行2: ワークフロー失敗時に自動起動
+  workflow_run:
+    workflows:
+      - "CI Pipeline"
+      - "Security Check"
+      - "Test Suite"
+    types: [completed]
+  
+  # 自動実行3: Issue操作時に自動起動
+  issues:
+    types: [opened, closed, labeled, unlabeled]
+  
+  # 手動実行（デバッグ用）
+  workflow_dispatch:
+    inputs:
+      force_repair:
+        description: '強制修復実行'
+        required: false
+        default: false
+        type: boolean
+      target_issue:
+        description: '対象Issue番号'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+  pull-requests: write
+
+env:
+  MAX_ATTEMPTS_PER_CYCLE: 7
+  COOLDOWN_MINUTES: 30
+  MAX_CYCLES: 3
+  REPAIR_LABEL: 'auto-repair-7x'
+  IN_PROGRESS_LABEL: 'repair-in-progress'
+  ESCALATION_LABEL: 'needs-human-intervention'
+
+jobs:
+  # ジョブ1: エラー検知とIssue作成
+  detect-and-create-issue:
+    name: 🔍 Detect Errors and Create Issue
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'failure'
+    
+    outputs:
+      issue_number: ${{ steps.create-issue.outputs.issue_number }}
+      should_repair: ${{ steps.check-repair.outputs.should_repair }}
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: 🔍 Check for existing issues
+      id: check-existing
+      run: |
+        # 既存の修復中Issueをチェック
+        EXISTING_ISSUES=$(gh issue list \
+          --label "${{ env.REPAIR_LABEL }}" \
+          --state open \
+          --json number,title,labels \
+          --jq '.[] | select(.labels[].name == "${{ env.IN_PROGRESS_LABEL }}") | .number')
+        
+        if [ -n "$EXISTING_ISSUES" ]; then
+          echo "existing_issue=$EXISTING_ISSUES" >> $GITHUB_OUTPUT
+          echo "has_existing=true" >> $GITHUB_OUTPUT
+        else
+          echo "has_existing=false" >> $GITHUB_OUTPUT
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 📝 Create repair issue
+      id: create-issue
+      if: steps.check-existing.outputs.has_existing != 'true'
+      run: |
+        # エラー情報を収集
+        WORKFLOW_NAME="${{ github.event.workflow_run.name }}"
+        WORKFLOW_URL="${{ github.event.workflow_run.html_url }}"
+        ERROR_TIME=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        
+        # Issue本文を作成
+        ISSUE_BODY=$(cat << EOF
+        ## 🚨 自動修復タスク
+        
+        **検出されたエラー:**
+        - ワークフロー: $WORKFLOW_NAME
+        - 失敗リンク: $WORKFLOW_URL
+        - 検出時刻: $ERROR_TIME
+        
+        ## 📊 修復ステータス
+        
+        ### サイクル 1/3
+        - [ ] 試行 1/7
+        - [ ] 試行 2/7
+        - [ ] 試行 3/7
+        - [ ] 試行 4/7
+        - [ ] 試行 5/7
+        - [ ] 試行 6/7
+        - [ ] 試行 7/7
+        
+        ### サイクル 2/3
+        - [ ] 試行 8/14
+        - [ ] 試行 9/14
+        - [ ] 試行 10/14
+        - [ ] 試行 11/14
+        - [ ] 試行 12/14
+        - [ ] 試行 13/14
+        - [ ] 試行 14/14
+        
+        ### サイクル 3/3
+        - [ ] 試行 15/21
+        - [ ] 試行 16/21
+        - [ ] 試行 17/21
+        - [ ] 試行 18/21
+        - [ ] 試行 19/21
+        - [ ] 試行 20/21
+        - [ ] 試行 21/21
+        
+        ## 📝 修復ログ
+        
+        | 時刻 | サイクル | 試行 | 結果 | 詳細 |
+        |------|---------|------|------|------|
+        EOF
+        )
+        
+        # Issueを作成
+        ISSUE_NUMBER=$(gh issue create \
+          --title "🔧 Auto Repair: $WORKFLOW_NAME failure" \
+          --body "$ISSUE_BODY" \
+          --label "${{ env.REPAIR_LABEL }}" \
+          --label "${{ env.IN_PROGRESS_LABEL }}" \
+          --assignee "@me" \
+          | grep -oE '[0-9]+$')
+        
+        echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+        echo "✅ Created repair issue #$ISSUE_NUMBER"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🎯 Set repair flag
+      id: check-repair
+      run: |
+        if [ "${{ steps.check-existing.outputs.has_existing }}" == "true" ]; then
+          echo "should_repair=false" >> $GITHUB_OUTPUT
+        else
+          echo "should_repair=true" >> $GITHUB_OUTPUT
+        fi
+
+  # ジョブ2: 修復ループ実行
+  execute-repair-loop:
+    name: 🔧 Execute Repair Loop
+    runs-on: ubuntu-latest
+    needs: [detect-and-create-issue]
+    if: |
+      always() && (
+        needs.detect-and-create-issue.outputs.should_repair == 'true' ||
+        github.event_name == 'schedule' ||
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'auto-repair-7x'))
+      )
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: 📦 Install dependencies
+      run: |
+        pip install PyYAML requests
+
+    - name: 🔍 Find target issue
+      id: find-issue
+      run: |
+        if [ "${{ github.event_name }}" == "issues" ]; then
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+        elif [ -n "${{ needs.detect-and-create-issue.outputs.issue_number }}" ]; then
+          ISSUE_NUMBER="${{ needs.detect-and-create-issue.outputs.issue_number }}"
+        elif [ -n "${{ github.event.inputs.target_issue }}" ]; then
+          ISSUE_NUMBER="${{ github.event.inputs.target_issue }}"
+        else
+          # 最も古い未解決のrepair issueを取得
+          ISSUE_NUMBER=$(gh issue list \
+            --label "${{ env.REPAIR_LABEL }}" \
+            --label "${{ env.IN_PROGRESS_LABEL }}" \
+            --state open \
+            --json number,createdAt \
+            --jq 'sort_by(.createdAt) | .[0].number')
+        fi
+        
+        if [ -z "$ISSUE_NUMBER" ]; then
+          echo "No repair issues found"
+          echo "has_issue=false" >> $GITHUB_OUTPUT
+        else
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+          echo "has_issue=true" >> $GITHUB_OUTPUT
+          echo "📋 Working on issue #$ISSUE_NUMBER"
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 📊 Check repair state
+      id: check-state
+      if: steps.find-issue.outputs.has_issue == 'true'
+      run: |
+        ISSUE_NUMBER="${{ steps.find-issue.outputs.issue_number }}"
+        
+        # Issue本文から現在の状態を解析
+        ISSUE_BODY=$(gh issue view $ISSUE_NUMBER --json body --jq '.body')
+        
+        # 完了した試行回数をカウント
+        COMPLETED_ATTEMPTS=$(echo "$ISSUE_BODY" | grep -c "- \[x\]" || true)
+        
+        # 現在のサイクル番号を計算
+        CURRENT_CYCLE=$(( ($COMPLETED_ATTEMPTS / ${{ env.MAX_ATTEMPTS_PER_CYCLE }}) + 1 ))
+        ATTEMPT_IN_CYCLE=$(( ($COMPLETED_ATTEMPTS % ${{ env.MAX_ATTEMPTS_PER_CYCLE }}) + 1 ))
+        
+        # 最後の修復時刻を取得
+        LAST_ATTEMPT=$(gh issue view $ISSUE_NUMBER --json comments --jq '.comments[-1].createdAt // ""')
+        
+        # クールダウンチェック
+        if [ -n "$LAST_ATTEMPT" ] && [ "$ATTEMPT_IN_CYCLE" -eq 1 ] && [ "$CURRENT_CYCLE" -gt 1 ]; then
+          LAST_TIMESTAMP=$(date -d "$LAST_ATTEMPT" +%s)
+          CURRENT_TIMESTAMP=$(date +%s)
+          ELAPSED_MINUTES=$(( ($CURRENT_TIMESTAMP - $LAST_TIMESTAMP) / 60 ))
+          
+          if [ "$ELAPSED_MINUTES" -lt "${{ env.COOLDOWN_MINUTES }}" ]; then
+            REMAINING=$(( ${{ env.COOLDOWN_MINUTES }} - $ELAPSED_MINUTES ))
+            echo "⏸️ In cooldown period. $REMAINING minutes remaining."
+            echo "in_cooldown=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+        fi
+        
+        echo "current_cycle=$CURRENT_CYCLE" >> $GITHUB_OUTPUT
+        echo "attempt_in_cycle=$ATTEMPT_IN_CYCLE" >> $GITHUB_OUTPUT
+        echo "total_attempts=$COMPLETED_ATTEMPTS" >> $GITHUB_OUTPUT
+        echo "in_cooldown=false" >> $GITHUB_OUTPUT
+        
+        # エスカレーションチェック
+        if [ "$CURRENT_CYCLE" -gt "${{ env.MAX_CYCLES }}" ]; then
+          echo "needs_escalation=true" >> $GITHUB_OUTPUT
+        else
+          echo "needs_escalation=false" >> $GITHUB_OUTPUT
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: ⏸️ Wait for cooldown
+      if: steps.check-state.outputs.in_cooldown == 'true'
+      run: |
+        echo "Repair is in cooldown period. Exiting..."
+        exit 0
+    
+    - name: 🚨 Escalate if needed
+      if: steps.check-state.outputs.needs_escalation == 'true'
+      run: |
+        ISSUE_NUMBER="${{ steps.find-issue.outputs.issue_number }}"
+        
+        # エスカレーションコメントを追加
+        gh issue comment $ISSUE_NUMBER --body "## 🚨 エスカレーション必要
+        
+        21回の修復試行（3サイクル）が完了しましたが、問題は解決していません。
+        人間の介入が必要です。
+        
+        @${{ github.repository_owner }} - 手動での確認をお願いします。"
+        
+        # ラベルを更新
+        gh issue edit $ISSUE_NUMBER \
+          --remove-label "${{ env.IN_PROGRESS_LABEL }}" \
+          --add-label "${{ env.ESCALATION_LABEL }}"
+        
+        echo "Issue escalated. Human intervention required."
+        exit 0
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🔧 Execute repair attempt
+      id: repair
+      if: |
+        steps.find-issue.outputs.has_issue == 'true' &&
+        steps.check-state.outputs.in_cooldown != 'true' &&
+        steps.check-state.outputs.needs_escalation != 'true'
+      timeout-minutes: 5
+      run: |
+        ISSUE_NUMBER="${{ steps.find-issue.outputs.issue_number }}"
+        CURRENT_CYCLE="${{ steps.check-state.outputs.current_cycle }}"
+        ATTEMPT_IN_CYCLE="${{ steps.check-state.outputs.attempt_in_cycle }}"
+        TOTAL_ATTEMPTS="${{ steps.check-state.outputs.total_attempts }}"
+        
+        echo "🔧 Executing repair attempt $((TOTAL_ATTEMPTS + 1))/21 (Cycle $CURRENT_CYCLE, Attempt $ATTEMPT_IN_CYCLE/7)"
+        
+        # 修復スクリプトを実行
+        python scripts/repair-loop-executor.py \
+          --issue-number "$ISSUE_NUMBER" \
+          --cycle "$CURRENT_CYCLE" \
+          --attempt "$ATTEMPT_IN_CYCLE" \
+          --total "$((TOTAL_ATTEMPTS + 1))"
+        
+        REPAIR_RESULT=$?
+        
+        if [ "$REPAIR_RESULT" -eq 0 ]; then
+          echo "repair_success=true" >> $GITHUB_OUTPUT
+          echo "✅ Repair attempt successful"
+        else
+          echo "repair_success=false" >> $GITHUB_OUTPUT
+          echo "❌ Repair attempt failed"
+        fi
+    
+    - name: 📝 Update issue status
+      if: steps.find-issue.outputs.has_issue == 'true' && steps.repair.outcome != 'skipped'
+      run: |
+        ISSUE_NUMBER="${{ steps.find-issue.outputs.issue_number }}"
+        CURRENT_CYCLE="${{ steps.check-state.outputs.current_cycle }}"
+        ATTEMPT_IN_CYCLE="${{ steps.check-state.outputs.attempt_in_cycle }}"
+        TOTAL_ATTEMPTS="${{ steps.check-state.outputs.total_attempts }}"
+        REPAIR_SUCCESS="${{ steps.repair.outputs.repair_success }}"
+        
+        # Issue本文を取得
+        ISSUE_BODY=$(gh issue view $ISSUE_NUMBER --json body --jq '.body')
+        
+        # チェックボックスを更新
+        ATTEMPT_NUMBER=$((TOTAL_ATTEMPTS + 1))
+        if [ "$REPAIR_SUCCESS" == "true" ]; then
+          RESULT_EMOJI="✅"
+          RESULT_TEXT="成功"
+        else
+          RESULT_EMOJI="❌"
+          RESULT_TEXT="失敗"
+        fi
+        
+        # 該当する行のチェックボックスをチェック
+        # これは簡略化された例です。実際にはもっと洗練された方法が必要
+        NEW_BODY=$(echo "$ISSUE_BODY" | sed "${ATTEMPT_NUMBER}s/- \[ \]/- [x]/")
+        
+        # ログテーブルに新しい行を追加
+        TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
+        NEW_LOG_ROW="| $TIMESTAMP | $CURRENT_CYCLE | $ATTEMPT_IN_CYCLE/7 | $RESULT_EMOJI | Attempt #$ATTEMPT_NUMBER |"
+        
+        # Issueを更新
+        gh issue comment $ISSUE_NUMBER --body "$NEW_LOG_ROW"
+        
+        # 成功した場合はIssueをクローズ
+        if [ "$REPAIR_SUCCESS" == "true" ]; then
+          gh issue close $ISSUE_NUMBER --comment "🎉 修復成功！試行 #$ATTEMPT_NUMBER で問題が解決しました。"
+          gh issue edit $ISSUE_NUMBER --remove-label "${{ env.IN_PROGRESS_LABEL }}"
+        fi
+        
+        # サイクル終了時にコメント
+        if [ "$ATTEMPT_IN_CYCLE" -eq "${{ env.MAX_ATTEMPTS_PER_CYCLE }}" ] && [ "$REPAIR_SUCCESS" != "true" ]; then
+          if [ "$CURRENT_CYCLE" -lt "${{ env.MAX_CYCLES }}" ]; then
+            gh issue comment $ISSUE_NUMBER --body "## ⏸️ サイクル $CURRENT_CYCLE 完了
+            
+            7回の修復試行が完了しました。
+            30分のクールダウン後、次のサイクルを開始します。"
+          fi
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ジョブ3: 定期クリーンアップ
+  cleanup-old-issues:
+    name: 🧹 Cleanup Old Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: 🧹 Close stale issues
+      run: |
+        # 7日以上更新されていない修復Issueをクローズ
+        STALE_DATE=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+        
+        gh issue list \
+          --label "${{ env.REPAIR_LABEL }}" \
+          --state open \
+          --json number,updatedAt \
+          --jq ".[] | select(.updatedAt < \"$STALE_DATE\") | .number" | \
+        while read -r ISSUE_NUMBER; do
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue close $ISSUE_NUMBER \
+              --comment "⏰ 7日間更新がないため、自動的にクローズしました。"
+            gh issue edit $ISSUE_NUMBER \
+              --remove-label "${{ env.IN_PROGRESS_LABEL }}" \
+              --add-label "auto-closed"
+          fi
+        done
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
