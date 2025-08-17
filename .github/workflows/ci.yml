@@ -16,6 +16,8 @@ on:
         required: false
         default: 'manual'
         type: string
+  repository_dispatch:
+    types: [trigger-ci, start-ci, manual-trigger]
   push:
     branches: [ main, develop ]
   pull_request:
@@ -30,8 +32,8 @@ permissions:
   metadata: read         # Repository metadata access
 
 env:
-  ITERATION_NUMBER: ${{ github.event.inputs.iteration_number || '0' }}
-  LOOP_ID: ${{ github.event.inputs.loop_id || 'standalone' }}
+  ITERATION_NUMBER: ${{ github.event.inputs.iteration_number || github.event.client_payload.iteration_number || '0' }}
+  LOOP_ID: ${{ github.event.inputs.loop_id || github.event.client_payload.loop_id || 'standalone' }}
   PYTHON_VERSION: '3.9'
   NODE_VERSION: '18'
 
