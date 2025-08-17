@@ -5,7 +5,7 @@ Dashboard Integration Module
 
 import time
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 from contextlib import contextmanager
 from .dashboard import dashboard_service

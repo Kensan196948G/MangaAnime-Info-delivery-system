@@ -148,7 +148,7 @@ jobs:
         echo "✅ Security scan completed / セキュリティスキャン完了"
 
     - name: 📊 Upload security reports / セキュリティレポートアップロード
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-reports-${{ needs.setup.outputs.iteration }}
@@ -252,7 +252,7 @@ jobs:
         ITERATION_NUMBER: ${{ needs.setup.outputs.iteration }}
 
     - name: 📊 Upload test reports / テストレポートアップロード
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-reports-python-${{ matrix.python-version }}-${{ needs.setup.outputs.iteration }}
@@ -330,7 +330,7 @@ jobs:
         fi
 
     - name: 📊 Upload build artifacts / ビルド成果物アップロード
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts-${{ needs.setup.outputs.iteration }}
         path: dist/
