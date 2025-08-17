@@ -21,7 +21,6 @@ on:
         type: string
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MAX_ITERATIONS: ${{ inputs.max_iterations || '10' }}
 
 permissions:
@@ -49,7 +48,9 @@ jobs:
       - name: Setup GitHub CLI
         run: |
           gh --version
-          gh auth status || echo "GitHub CLI authentication will use GITHUB_TOKEN"
+          gh auth status
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create repair state directory
         run: |
@@ -76,10 +77,10 @@ jobs:
           fi
           
           # Check if we should continue
-          if [[ $CURRENT_ITERATION -ge $MAX_ITERATIONS ]]; then
+          MAX_ITER="${{ env.MAX_ITERATIONS }}"
+          if [[ $CURRENT_ITERATION -ge $MAX_ITER ]]; then
             echo "should_continue=false" >> $GITHUB_OUTPUT
-            echo "Maximum iterations ($MAX_ITERATIONS) reached. Stopping loop."
-            exit 0
+            echo "Maximum iterations ($MAX_ITER) reached. Stopping loop."
           else
             echo "should_continue=true" >> $GITHUB_OUTPUT
           fi
@@ -90,8 +91,6 @@ jobs:
       - name: Detect failed workflows
         id: detect
         if: steps.state.outputs.should_continue == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Detecting failed workflows..."
           
@@ -101,13 +100,13 @@ jobs:
             --status failure \
             --limit 10 \
             --json databaseId,workflowName,headBranch,conclusion,createdAt \
-            --jq '.[] | select(.conclusion == "failure") | .databaseId' || echo "")
+            --jq '.[] | select(.conclusion == "failure") | .databaseId' 2>/dev/null || echo "")
           
           echo "Raw failed runs: $FAILED_RUNS"
           
           # Convert to JSON array
           if [[ -n "$FAILED_RUNS" ]] && [[ "$FAILED_RUNS" != "" ]]; then
-            FAILED_ARRAY=$(echo "$FAILED_RUNS" | jq -R . | jq -s . || echo '[]')
+            FAILED_ARRAY=$(echo "$FAILED_RUNS" | jq -R . | jq -s . 2>/dev/null || echo '[]')
             echo "failed_runs=$FAILED_ARRAY" >> $GITHUB_OUTPUT
             echo "Found $(echo "$FAILED_RUNS" | wc -l) failed workflows"
             echo "$FAILED_RUNS"
@@ -115,6 +114,8 @@ jobs:
             echo "failed_runs=[]" >> $GITHUB_OUTPUT
             echo "No failed workflows found"
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update loop state
         if: steps.state.outputs.should_continue == 'true'
@@ -156,8 +157,6 @@ jobs:
     
     steps:
       - name: Trigger repair workflow
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh workflow run parallel-repair.yml \
             --repo ${{ github.repository }} \
@@ -165,6 +164,8 @@ jobs:
             --field iteration=${{ needs.detect-failures.outputs.current_iteration }}
           
           echo "Triggered repair for run ID: ${{ matrix.run_id }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   schedule-verification:
     name: Schedule Verification
@@ -174,8 +175,6 @@ jobs:
     
     steps:
       - name: Wait and trigger verification
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Scheduling verification workflow in 35 minutes..."
           # The verification workflow runs on its own cron, but we can also trigger it
@@ -185,6 +184,8 @@ jobs:
             --repo ${{ github.repository }} \
             --field triggered_by="auto-repair-loop" \
             --field iteration=${{ needs.detect-failures.outputs.current_iteration }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   status-report:
     name: Status Report
