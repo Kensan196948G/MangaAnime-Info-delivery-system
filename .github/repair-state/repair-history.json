@@ -1,15 +1,11 @@
 {
   "repairs": [],
-  "total_repairs": 0,
-  "success_rate": 0,
   "statistics": {
-    "by_error_type": {},
-    "by_strategy": {},
-    "by_month": {}
+    "total_attempts": 0,
+    "successful": 0,
+    "failed": 0,
+    "in_progress": 0,
+    "success_rate": 0
   },
-  "metadata": {
-    "created_at": "2025-08-17T00:00:00Z",
-    "version": "1.0",
-    "description": "Historical log of all auto-repair attempts and their outcomes"
-  }
+  "last_updated": "2025-08-17T08:40:00Z"
 }

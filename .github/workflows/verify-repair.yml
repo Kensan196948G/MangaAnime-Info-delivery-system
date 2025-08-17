@@ -25,6 +25,12 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   CHECK_HOURS: ${{ inputs.check_last_hours || '2' }}
 
+permissions:
+  contents: write
+  actions: write
+  issues: write
+  pull-requests: write
+
 jobs:
   verify-repairs:
     name: Verify Repair Success

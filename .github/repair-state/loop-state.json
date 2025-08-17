@@ -1,13 +1,15 @@
 {
-  "iteration": 0,
-  "start_time": "",
-  "last_run": "",
-  "total_repairs": 0,
+  "current_iteration": 0,
+  "current_cycle": 1,
   "max_iterations": 10,
-  "status": "idle",
-  "metadata": {
-    "created_at": "2025-08-17T00:00:00Z",
-    "version": "1.0",
-    "description": "Tracks the current state of the auto-repair loop system"
-  }
+  "max_cycles": 7,
+  "last_run": "",
+  "status": "initialized",
+  "total_repairs": 0,
+  "successful_repairs": 0,
+  "failed_repairs": 0,
+  "created_at": "2025-08-17T08:30:00Z",
+  "updated_at": "2025-08-17T08:40:00Z",
+  "iteration": 0,
+  "start_time": ""
 }

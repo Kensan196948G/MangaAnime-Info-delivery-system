@@ -7,9 +7,9 @@ set -euo pipefail
 
 # Default configuration
 REFRESH_INTERVAL=10
-STATE_FILE="../.repair_state.json"
-LOG_DIR="../logs"
-WORKFLOW_DIR="../.github/workflows"
+STATE_FILE="$(dirname "$0")/../.github/repair-state/loop-state.json"
+LOG_DIR="$(dirname "$0")/../.github/logs"
+WORKFLOW_DIR="$(dirname "$0")/../.github/workflows"
 
 # Color codes
 RED='\033[0;31m'
