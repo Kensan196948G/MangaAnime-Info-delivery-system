@@ -129,7 +129,7 @@ jobs:
           --body "$ISSUE_BODY" \
           --label "${{ env.REPAIR_LABEL }}" \
           --label "${{ env.IN_PROGRESS_LABEL }}" \
-          --assignee "@me" \
+          --assignee "${{ github.repository_owner }}" \
           | grep -oE '[0-9]+$')
         
         echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
