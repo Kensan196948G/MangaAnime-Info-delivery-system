@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 ドキュメント
+    url: https://github.com/your-username/MangaAnime-Info-delivery-system/wiki
+    about: プロジェクトのドキュメントとガイドを確認
+  - name: 💬 ディスカッション
+    url: https://github.com/your-username/MangaAnime-Info-delivery-system/discussions
+    about: アイデアや質問について話し合う

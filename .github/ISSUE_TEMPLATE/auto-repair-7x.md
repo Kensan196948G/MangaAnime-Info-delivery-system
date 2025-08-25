@@ -1,78 +1,79 @@
 ---
-name: Auto Repair 7x Loop
-about: Automated issue template for 7-attempt repair loops with 30-minute cooldown
-title: "🔧 Auto-Repair: [WORKFLOW_NAME] Failed"
+name: 自動修復 7xループ
+about: 7回試行・30分クールダウンの自動修復ループ用テンプレート
+title: "🔧 自動修復: [WORKFLOW_NAME] 失敗"
 labels: auto-repair-7x, automated, error
 assignees: ''
 
 ---
 
-## 🚨 Automated Error Detection
+@claude
+## 🚨 自動エラー検出
 
-**Failed Workflow:** <!-- WORKFLOW_NAME -->
-**Failure Time:** <!-- TIMESTAMP -->
-**Workflow Run:** <!-- WORKFLOW_URL -->
-**Commit:** <!-- COMMIT_SHA -->
+**失敗したワークフロー:** <!-- WORKFLOW_NAME -->
+**失敗時刻:** <!-- TIMESTAMP -->
+**ワークフロー実行:** <!-- WORKFLOW_URL -->
+**コミット:** <!-- COMMIT_SHA -->
 
-### 📊 Repair Status
+### 📊 修復ステータス
 
-- **Current Cycle:** 1
-- **Attempts in Cycle:** 0 / 7
-- **Total Attempts:** 0
-- **Status:** 🔄 Pending Repair
-- **Next Action:** Awaiting repair loop execution
+- **現在のサイクル:** 1
+- **サイクル内の試行回数:** 0 / 7
+- **総試行回数:** 0
+- **ステータス:** 🔄 修復待機中
+- **次のアクション:** 修復ループ実行待ち
 
-### 🔄 Repair Loop Configuration
+### 🔄 修復ループ設定
 
-| Parameter | Value |
+| パラメータ | 値 |
 |-----------|-------|
-| Max attempts per cycle | **7** |
-| Cooldown between cycles | **30 minutes** |
-| Auto-escalation after | **3 cycles** (21 attempts) |
-| Max total cycles | **Unlimited** (with escalation) |
+| サイクルごとの最大試行回数 | **7回** |
+| サイクル間のクールダウン | **30分** |
+| 自動エスカレーション | **3サイクル後** (21試行) |
+| 最大サイクル数 | **無制限** (エスカレーション付き) |
 
-### 📝 Repair Attempt Log
+### 📝 修復試行ログ
 
-| Time | Cycle | Attempt | Action | Result | Details |
-|------|-------|---------|--------|--------|---------|
-| <!-- TIMESTAMP --> | - | - | Error Detected | 🔴 Failed | Initial detection |
+| 時刻 | サイクル | 試行 | アクション | 結果 | 詳細 |
+|------|---------|------|-----------|------|------|
+| <!-- TIMESTAMP --> | - | - | エラー検出 | 🔴 失敗 | 初回検出 |
 
-### 🔧 Repair Strategy
+### 🔧 修復戦略
 
-1. **Cycle 1 (Attempts 1-7):** Basic fixes
-   - Config file validation
-   - Dependency updates
-   - Permission fixes
+1. **サイクル1 (試行1-7):** 基本的な修正
+   - 設定ファイルの検証
+   - 依存関係の更新
+   - 権限の修正
    
-2. **30-minute cooldown**
+2. **30分のクールダウン**
 
-3. **Cycle 2 (Attempts 8-14):** Advanced fixes
-   - Workflow syntax corrections
-   - Cache clearing
-   - Full dependency reinstall
+3. **サイクル2 (試行8-14):** 高度な修正
+   - ワークフロー構文の修正
+   - キャッシュのクリア
+   - 依存関係の完全再インストール
    
-4. **30-minute cooldown**
+4. **30分のクールダウン**
 
-5. **Cycle 3 (Attempts 15-21):** Deep fixes
-   - Complete workflow regeneration
-   - System-wide validation
-   - Rollback to last known good state
+5. **サイクル3 (試行15-21):** 深層修正
+   - ワークフローの完全再生成
+   - システム全体の検証
+   - 最後の正常な状態へのロールバック
 
-6. **Escalation:** If still failing after 21 attempts
+6. **エスカレーション:** 21回の試行後も失敗している場合
 
-### 📈 Success Metrics
+### 📈 成功メトリクス
 
-- Previous success rate: <!-- SUCCESS_RATE -->
-- Average fix time: <!-- AVG_FIX_TIME -->
-- Most common fix: <!-- COMMON_FIX -->
+- 過去の成功率: <!-- SUCCESS_RATE -->
+- 平均修正時間: <!-- AVG_FIX_TIME -->
+- 最も一般的な修正: <!-- COMMON_FIX -->
 
-### 🚦 Automation Rules
+### 🚦 自動化ルール
 
-- ✅ **Auto-close** when repair succeeds
-- ⏸️ **Auto-pause** during cooldown periods
-- ⚠️ **Auto-escalate** after 3 cycles
-- 🔄 **Auto-retry** on transient failures
+- ✅ **自動クローズ** 修復成功時
+- ⏸️ **自動一時停止** クールダウン期間中
+- ⚠️ **自動エスカレーション** 3サイクル後
+- 🔄 **自動リトライ** 一時的な障害時
 
 ---
-*This issue is managed by the Auto-Repair Loop System (7x30)*
-*Do not manually close unless the issue is resolved*
+*このIssueは自動修復ループシステム (7x30) によって管理されています*
+*問題が解決されない限り、手動でクローズしないでください*

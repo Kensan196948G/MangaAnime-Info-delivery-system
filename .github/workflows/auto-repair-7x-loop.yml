@@ -92,6 +92,7 @@ jobs:
         
         # Issue本文を作成
         ISSUE_BODY=$(cat << EOF
+        @claude
         ## 🚨 自動修復タスク（無限ループモード）
         
         **検出されたエラー:**
