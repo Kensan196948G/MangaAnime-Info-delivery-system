@@ -3,11 +3,15 @@ name: Claude Simple Responder
 on:
   issue_comment:
     types: [created]
+  issues:
+    types: [opened]
 
 jobs:
   respond:
     runs-on: ubuntu-latest
-    if: contains(github.event.comment.body, '@claude')
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
     
     steps:
     - name: Setup Python
@@ -26,7 +30,8 @@ jobs:
         ISSUE_TITLE: ${{ github.event.issue.title }}
         ISSUE_BODY: ${{ github.event.issue.body }}
         COMMENT_BODY: ${{ github.event.comment.body }}
-        USER_NAME: ${{ github.event.comment.user.login }}
+        USER_NAME: ${{ github.event.comment.user.login || github.event.issue.user.login }}
+        EVENT_NAME: ${{ github.event_name }}
       run: |
         python3 << 'EOF'
         import os
@@ -44,9 +49,13 @@ jobs:
         issue_body = os.environ.get('ISSUE_BODY', '')
         comment_body = os.environ.get('COMMENT_BODY', '')
         user_name = os.environ.get('USER_NAME', 'unknown')
+        event_name = os.environ.get('EVENT_NAME', '')
         
-        # @claude を除去
-        query = comment_body.replace('@claude', '').strip()
+        # Issueオープン時は本文から、コメント時はコメントから@claudeを除去
+        if event_name == 'issues':
+            query = issue_body.replace('@claude', '').strip()
+        else:
+            query = comment_body.replace('@claude', '').strip()
         
         # クエリが空の場合、Issueの内容を含めて分析
         if not query:
