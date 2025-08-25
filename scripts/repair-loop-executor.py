@@ -93,10 +93,27 @@ class RepairExecutor:
         """CI失敗を修復"""
         self.log("Attempting to repair CI failures...")
         
-        # 具体的なエラーログを取得
+        # 最新の失敗したワークフローのIDを取得
         returncode, stdout, stderr = self.run_command([
-            "gh", "run", "view", "--log-failed"
+            "gh", "run", "list", "--limit=1", "--json", "databaseId,conclusion"
         ])
+        
+        run_id = None
+        if returncode == 0 and stdout:
+            try:
+                runs = json.loads(stdout)
+                if runs and runs[0].get("conclusion") == "failure":
+                    run_id = runs[0].get("databaseId")
+            except:
+                pass
+        
+        # ログを取得
+        if run_id:
+            returncode, stdout, stderr = self.run_command([
+                "gh", "run", "view", str(run_id), "--log-failed"
+            ])
+        else:
+            stdout = ""
         
         # エラーログから問題を特定
         if "pytest" in stdout or "test" in stdout.lower():
@@ -254,12 +271,12 @@ def test_import():
         """汎用的な修復を実行"""
         self.log("Running generic repair strategies...")
         
-        # 試行回数に応じて異なる戦略を試す
+        # プロジェクト固有の修復戦略
         strategies = [
-            lambda: self.run_command(["pytest", "--tb=short"]),
-            lambda: self.run_command(["python", "-m", "pytest", "tests/"]),
+            lambda: self.run_python_tests(),
             lambda: self.fix_missing_dependencies(),
-            lambda: self.fix_linting_errors(),
+            lambda: self.fix_python_syntax(),
+            lambda: self.check_config_files(),
             lambda: self.reset_test_environment(),
         ]
         
@@ -275,6 +292,74 @@ def test_import():
             return returncode == 0
         elif isinstance(result, bool):
             return result
+        
+        return False
+    
+    def run_python_tests(self) -> bool:
+        """Pythonテストを実行"""
+        self.log("Running Python tests...")
+        
+        # プロジェクトのテストファイルを実行
+        test_files = [
+            "test_phase2.py",
+            "test_security.py",
+            "test_anime_collector.py",
+            "test_credentials_format.py"
+        ]
+        
+        success = True
+        for test_file in test_files:
+            if (self.repo_root / test_file).exists():
+                self.log(f"Running {test_file}...")
+                returncode, stdout, stderr = self.run_command([
+                    "python", test_file
+                ])
+                if returncode != 0:
+                    self.log(f"Test {test_file} failed: {stderr[:200]}")
+                    success = False
+        
+        return success
+    
+    def fix_python_syntax(self) -> bool:
+        """Python構文エラーを修復"""
+        self.log("Fixing Python syntax errors...")
+        
+        # すべてのPythonファイルの構文をチェック
+        returncode, stdout, stderr = self.run_command([
+            "python", "-m", "compileall", ".", "-q"
+        ])
+        
+        if returncode != 0 and stderr:
+            self.log(f"Syntax errors found: {stderr[:500]}")
+            # autopep8がインストールされていれば使用
+            self.run_command(["pip", "install", "autopep8", "--quiet"])
+            self.run_command(["autopep8", "--in-place", "--aggressive", "-r", "."])
+            return True
+        
+        return False
+    
+    def check_config_files(self) -> bool:
+        """設定ファイルをチェック・修復"""
+        self.log("Checking configuration files...")
+        
+        # config.jsonが存在するか確認
+        config_file = self.repo_root / "config.json"
+        if not config_file.exists():
+            self.log("Creating default config.json...")
+            default_config = {
+                "gmail": {
+                    "sender_email": "example@gmail.com",
+                    "app_password": "your-app-password"
+                },
+                "recipient_email": "recipient@example.com",
+                "ng_keywords": ["エロ", "R18", "成人向け"],
+                "calendar_id": "primary"
+            }
+            
+            import json
+            with open(config_file, "w", encoding="utf-8") as f:
+                json.dump(default_config, f, ensure_ascii=False, indent=2)
+            return True
         
         return False
     
