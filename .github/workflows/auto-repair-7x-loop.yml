@@ -1,5 +1,5 @@
-name: 🔄 7x Auto Repair Loop System
-# 7回ループ自動修復システム - Issueベースのタスクキュー管理
+name: 🔄 7x Infinite Auto Repair Loop System
+# 7回ループ→30分待機を永続的に繰り返す自動修復システム
 
 on:
   # 自動実行1: 30分ごとの定期チェック
@@ -40,10 +40,10 @@ permissions:
 env:
   MAX_ATTEMPTS_PER_CYCLE: 7
   COOLDOWN_MINUTES: 30
-  MAX_CYCLES: 3
+  # 無限ループ設定 - エスカレーションなしで永続的に実行
   REPAIR_LABEL: 'auto-repair-7x'
   IN_PROGRESS_LABEL: 'repair-in-progress'
-  ESCALATION_LABEL: 'needs-human-intervention'
+  COMPLETED_LABEL: 'repair-completed'
 
 jobs:
   # ジョブ1: エラー検知とIssue作成
@@ -92,7 +92,7 @@ jobs:
         
         # Issue本文を作成
         ISSUE_BODY=$(cat << EOF
-        ## 🚨 自動修復タスク
+        ## 🚨 自動修復タスク（無限ループモード）
         
         **検出されたエラー:**
         - ワークフロー: $WORKFLOW_NAME
@@ -101,32 +101,20 @@ jobs:
         
         ## 📊 修復ステータス
         
-        ### サイクル 1/3
-        - [ ] 試行 1/7
-        - [ ] 試行 2/7
-        - [ ] 試行 3/7
-        - [ ] 試行 4/7
-        - [ ] 試行 5/7
-        - [ ] 試行 6/7
-        - [ ] 試行 7/7
+        ### 現在のサイクル情報
+        - サイクル番号: 1
+        - 開始時刻: $ERROR_TIME
+        - 状態: 実行中
         
-        ### サイクル 2/3
-        - [ ] 試行 8/14
-        - [ ] 試行 9/14
-        - [ ] 試行 10/14
-        - [ ] 試行 11/14
-        - [ ] 試行 12/14
-        - [ ] 試行 13/14
-        - [ ] 試行 14/14
+        ### 試行カウンター
+        - 現在のサイクル内試行: 0/7
+        - 総試行回数: 0
+        - 成功回数: 0
+        - 失敗回数: 0
         
-        ### サイクル 3/3
-        - [ ] 試行 15/21
-        - [ ] 試行 16/21
-        - [ ] 試行 17/21
-        - [ ] 試行 18/21
-        - [ ] 試行 19/21
-        - [ ] 試行 20/21
-        - [ ] 試行 21/21
+        ## 🔄 無限ループ設定
+        このIssueは7回の修復試行後、30分の待機を挟んで自動的に次のサイクルを開始します。
+        修復が成功するまで、または手動でクローズされるまで無限に継続します。
         
         ## 📝 修復ログ
         
@@ -137,7 +125,7 @@ jobs:
         
         # Issueを作成
         ISSUE_NUMBER=$(gh issue create \
-          --title "🔧 Auto Repair: $WORKFLOW_NAME failure" \
+          --title "🔧 Auto Repair [∞ Loop]: $WORKFLOW_NAME failure" \
           --body "$ISSUE_BODY" \
           --label "${{ env.REPAIR_LABEL }}" \
           --label "${{ env.IN_PROGRESS_LABEL }}" \
@@ -160,7 +148,7 @@ jobs:
 
   # ジョブ2: 修復ループ実行
   execute-repair-loop:
-    name: 🔧 Execute Repair Loop
+    name: 🔧 Execute Infinite Repair Loop
     runs-on: ubuntu-latest
     needs: [detect-and-create-issue]
     if: |
@@ -223,18 +211,19 @@ jobs:
         # Issue本文から現在の状態を解析
         ISSUE_BODY=$(gh issue view $ISSUE_NUMBER --json body --jq '.body')
         
-        # 完了した試行回数をカウント
-        COMPLETED_ATTEMPTS=$(echo "$ISSUE_BODY" | grep -c "- \[x\]" || true)
+        # 状態情報を抽出
+        CURRENT_CYCLE=$(echo "$ISSUE_BODY" | grep "サイクル番号:" | head -1 | grep -oE '[0-9]+' || echo "1")
+        ATTEMPT_IN_CYCLE=$(echo "$ISSUE_BODY" | grep "現在のサイクル内試行:" | head -1 | grep -oE '[0-9]+' | head -1 || echo "0")
+        TOTAL_ATTEMPTS=$(echo "$ISSUE_BODY" | grep "総試行回数:" | head -1 | grep -oE '[0-9]+' || echo "0")
         
-        # 現在のサイクル番号を計算
-        CURRENT_CYCLE=$(( ($COMPLETED_ATTEMPTS / ${{ env.MAX_ATTEMPTS_PER_CYCLE }}) + 1 ))
-        ATTEMPT_IN_CYCLE=$(( ($COMPLETED_ATTEMPTS % ${{ env.MAX_ATTEMPTS_PER_CYCLE }}) + 1 ))
+        # 次の試行番号を計算
+        NEXT_ATTEMPT_IN_CYCLE=$(( ($ATTEMPT_IN_CYCLE % ${{ env.MAX_ATTEMPTS_PER_CYCLE }}) + 1 ))
         
         # 最後の修復時刻を取得
         LAST_ATTEMPT=$(gh issue view $ISSUE_NUMBER --json comments --jq '.comments[-1].createdAt // ""')
         
-        # クールダウンチェック
-        if [ -n "$LAST_ATTEMPT" ] && [ "$ATTEMPT_IN_CYCLE" -eq 1 ] && [ "$CURRENT_CYCLE" -gt 1 ]; then
+        # クールダウンチェック（サイクル完了後）
+        if [ -n "$LAST_ATTEMPT" ] && [ "$ATTEMPT_IN_CYCLE" -eq "${{ env.MAX_ATTEMPTS_PER_CYCLE }}" ]; then
           LAST_TIMESTAMP=$(date -d "$LAST_ATTEMPT" +%s)
           CURRENT_TIMESTAMP=$(date +%s)
           ELAPSED_MINUTES=$(( ($CURRENT_TIMESTAMP - $LAST_TIMESTAMP) / 60 ))
@@ -244,20 +233,18 @@ jobs:
             echo "⏸️ In cooldown period. $REMAINING minutes remaining."
             echo "in_cooldown=true" >> $GITHUB_OUTPUT
             exit 0
+          else
+            # クールダウン終了、新しいサイクルを開始
+            CURRENT_CYCLE=$((CURRENT_CYCLE + 1))
+            NEXT_ATTEMPT_IN_CYCLE=1
+            echo "🔄 Starting new cycle #$CURRENT_CYCLE after cooldown"
           fi
         fi
         
         echo "current_cycle=$CURRENT_CYCLE" >> $GITHUB_OUTPUT
-        echo "attempt_in_cycle=$ATTEMPT_IN_CYCLE" >> $GITHUB_OUTPUT
-        echo "total_attempts=$COMPLETED_ATTEMPTS" >> $GITHUB_OUTPUT
+        echo "attempt_in_cycle=$NEXT_ATTEMPT_IN_CYCLE" >> $GITHUB_OUTPUT
+        echo "total_attempts=$TOTAL_ATTEMPTS" >> $GITHUB_OUTPUT
         echo "in_cooldown=false" >> $GITHUB_OUTPUT
-        
-        # エスカレーションチェック
-        if [ "$CURRENT_CYCLE" -gt "${{ env.MAX_CYCLES }}" ]; then
-          echo "needs_escalation=true" >> $GITHUB_OUTPUT
-        else
-          echo "needs_escalation=false" >> $GITHUB_OUTPUT
-        fi
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
@@ -267,35 +254,11 @@ jobs:
         echo "Repair is in cooldown period. Exiting..."
         exit 0
     
-    - name: 🚨 Escalate if needed
-      if: steps.check-state.outputs.needs_escalation == 'true'
-      run: |
-        ISSUE_NUMBER="${{ steps.find-issue.outputs.issue_number }}"
-        
-        # エスカレーションコメントを追加
-        gh issue comment $ISSUE_NUMBER --body "## 🚨 エスカレーション必要
-        
-        21回の修復試行（3サイクル）が完了しましたが、問題は解決していません。
-        人間の介入が必要です。
-        
-        @${{ github.repository_owner }} - 手動での確認をお願いします。"
-        
-        # ラベルを更新
-        gh issue edit $ISSUE_NUMBER \
-          --remove-label "${{ env.IN_PROGRESS_LABEL }}" \
-          --add-label "${{ env.ESCALATION_LABEL }}"
-        
-        echo "Issue escalated. Human intervention required."
-        exit 0
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
     - name: 🔧 Execute repair attempt
       id: repair
       if: |
         steps.find-issue.outputs.has_issue == 'true' &&
-        steps.check-state.outputs.in_cooldown != 'true' &&
-        steps.check-state.outputs.needs_escalation != 'true'
+        steps.check-state.outputs.in_cooldown != 'true'
       timeout-minutes: 5
       run: |
         ISSUE_NUMBER="${{ steps.find-issue.outputs.issue_number }}"
@@ -303,16 +266,23 @@ jobs:
         ATTEMPT_IN_CYCLE="${{ steps.check-state.outputs.attempt_in_cycle }}"
         TOTAL_ATTEMPTS="${{ steps.check-state.outputs.total_attempts }}"
         
-        echo "🔧 Executing repair attempt $((TOTAL_ATTEMPTS + 1))/21 (Cycle $CURRENT_CYCLE, Attempt $ATTEMPT_IN_CYCLE/7)"
+        echo "🔧 Executing repair attempt (Total: $((TOTAL_ATTEMPTS + 1)), Cycle $CURRENT_CYCLE, Attempt $ATTEMPT_IN_CYCLE/7)"
         
-        # 修復スクリプトを実行
-        python scripts/repair-loop-executor.py \
-          --issue-number "$ISSUE_NUMBER" \
-          --cycle "$CURRENT_CYCLE" \
-          --attempt "$ATTEMPT_IN_CYCLE" \
-          --total "$((TOTAL_ATTEMPTS + 1))"
-        
-        REPAIR_RESULT=$?
+        # 修復スクリプトを実行（存在する場合）
+        if [ -f "scripts/repair-loop-executor.py" ]; then
+          python scripts/repair-loop-executor.py \
+            --issue-number "$ISSUE_NUMBER" \
+            --cycle "$CURRENT_CYCLE" \
+            --attempt "$ATTEMPT_IN_CYCLE" \
+            --total "$((TOTAL_ATTEMPTS + 1))"
+          REPAIR_RESULT=$?
+        else
+          # デモ用の修復試行（実際の修復ロジックに置き換える）
+          echo "Running repair logic..."
+          # ここに実際の修復コマンドを追加
+          # 例: npm test, pytest, make fix など
+          REPAIR_RESULT=$((RANDOM % 2))  # デモ用のランダム結果
+        fi
         
         if [ "$REPAIR_RESULT" -eq 0 ]; then
           echo "repair_success=true" >> $GITHUB_OUTPUT
@@ -334,7 +304,7 @@ jobs:
         # Issue本文を取得
         ISSUE_BODY=$(gh issue view $ISSUE_NUMBER --json body --jq '.body')
         
-        # チェックボックスを更新
+        # ステータス更新
         ATTEMPT_NUMBER=$((TOTAL_ATTEMPTS + 1))
         if [ "$REPAIR_SUCCESS" == "true" ]; then
           RESULT_EMOJI="✅"
@@ -344,31 +314,48 @@ jobs:
           RESULT_TEXT="失敗"
         fi
         
-        # 該当する行のチェックボックスをチェック
-        # これは簡略化された例です。実際にはもっと洗練された方法が必要
-        NEW_BODY=$(echo "$ISSUE_BODY" | sed "${ATTEMPT_NUMBER}s/- \[ \]/- [x]/")
+        # カウンターを更新
+        NEW_BODY=$(echo "$ISSUE_BODY" | 
+          sed "s/サイクル番号: [0-9]*/サイクル番号: $CURRENT_CYCLE/" |
+          sed "s/現在のサイクル内試行: [0-9]*\/7/現在のサイクル内試行: $ATTEMPT_IN_CYCLE\/7/" |
+          sed "s/総試行回数: [0-9]*/総試行回数: $ATTEMPT_NUMBER/")
+        
+        if [ "$REPAIR_SUCCESS" == "true" ]; then
+          SUCCESS_COUNT=$(echo "$ISSUE_BODY" | grep "成功回数:" | grep -oE '[0-9]+' || echo "0")
+          NEW_BODY=$(echo "$NEW_BODY" | sed "s/成功回数: [0-9]*/成功回数: $((SUCCESS_COUNT + 1))/")
+        else
+          FAIL_COUNT=$(echo "$ISSUE_BODY" | grep "失敗回数:" | grep -oE '[0-9]+' || echo "0")
+          NEW_BODY=$(echo "$NEW_BODY" | sed "s/失敗回数: [0-9]*/失敗回数: $((FAIL_COUNT + 1))/")
+        fi
+        
+        # Issue本文を更新
+        echo "$NEW_BODY" | gh issue edit $ISSUE_NUMBER --body-file -
         
         # ログテーブルに新しい行を追加
-        TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
+        TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
         NEW_LOG_ROW="| $TIMESTAMP | $CURRENT_CYCLE | $ATTEMPT_IN_CYCLE/7 | $RESULT_EMOJI | Attempt #$ATTEMPT_NUMBER |"
         
-        # Issueを更新
         gh issue comment $ISSUE_NUMBER --body "$NEW_LOG_ROW"
         
         # 成功した場合はIssueをクローズ
         if [ "$REPAIR_SUCCESS" == "true" ]; then
           gh issue close $ISSUE_NUMBER --comment "🎉 修復成功！試行 #$ATTEMPT_NUMBER で問題が解決しました。"
-          gh issue edit $ISSUE_NUMBER --remove-label "${{ env.IN_PROGRESS_LABEL }}"
+          gh issue edit $ISSUE_NUMBER \
+            --remove-label "${{ env.IN_PROGRESS_LABEL }}" \
+            --add-label "${{ env.COMPLETED_LABEL }}"
         fi
         
-        # サイクル終了時にコメント
+        # サイクル終了時の処理
         if [ "$ATTEMPT_IN_CYCLE" -eq "${{ env.MAX_ATTEMPTS_PER_CYCLE }}" ] && [ "$REPAIR_SUCCESS" != "true" ]; then
-          if [ "$CURRENT_CYCLE" -lt "${{ env.MAX_CYCLES }}" ]; then
-            gh issue comment $ISSUE_NUMBER --body "## ⏸️ サイクル $CURRENT_CYCLE 完了
-            
-            7回の修復試行が完了しました。
-            30分のクールダウン後、次のサイクルを開始します。"
-          fi
+          # 次のサイクル番号
+          NEXT_CYCLE=$((CURRENT_CYCLE + 1))
+          
+          gh issue comment $ISSUE_NUMBER --body "## ⏸️ サイクル $CURRENT_CYCLE 完了
+          
+          7回の修復試行が完了しました。
+          30分のクールダウン後、サイクル $NEXT_CYCLE を自動的に開始します。
+          
+          🔄 **無限ループモード**: 修復成功または手動クローズまで継続します。"
         fi
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -385,8 +372,8 @@ jobs:
     
     - name: 🧹 Close stale issues
       run: |
-        # 7日以上更新されていない修復Issueをクローズ
-        STALE_DATE=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+        # 30日以上更新されていない修復Issueをクローズ（無限ループでも古すぎるものは整理）
+        STALE_DATE=$(date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ)
         
         gh issue list \
           --label "${{ env.REPAIR_LABEL }}" \
@@ -396,10 +383,10 @@ jobs:
         while read -r ISSUE_NUMBER; do
           if [ -n "$ISSUE_NUMBER" ]; then
             gh issue close $ISSUE_NUMBER \
-              --comment "⏰ 7日間更新がないため、自動的にクローズしました。"
+              --comment "⏰ 30日間更新がないため、自動的にクローズしました。"
             gh issue edit $ISSUE_NUMBER \
               --remove-label "${{ env.IN_PROGRESS_LABEL }}" \
-              --add-label "auto-closed"
+              --add-label "auto-closed-stale"
           fi
         done
       env:
