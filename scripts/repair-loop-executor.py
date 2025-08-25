@@ -57,28 +57,61 @@ class RepairExecutor:
         """エラータイプを検出"""
         self.log("Detecting error type...")
         
-        # 最新のワークフロー実行ログを取得
+        # Issue本文からエラー情報を取得
         returncode, stdout, stderr = self.run_command([
-            "gh", "run", "list", 
-            "--workflow=CI Pipeline",
-            "--limit=1", 
-            "--json", "conclusion,status"
+            "gh", "issue", "view", str(self.issue_number),
+            "--json", "body"
         ])
         
         if returncode == 0 and stdout:
             try:
                 data = json.loads(stdout)
-                if data and data[0].get("conclusion") == "failure":
-                    # エラータイプを判定（簡略化）
-                    return "test_failure"
-            except:
-                pass
+                issue_body = data.get("body", "")
+                
+                # エラータイプを判定
+                if "CI Pipeline" in issue_body:
+                    # CI Pipeline失敗の詳細を取得
+                    returncode2, stdout2, _ = self.run_command([
+                        "gh", "run", "list",
+                        "--limit=1",
+                        "--json", "conclusion,workflowName"
+                    ])
+                    
+                    if returncode2 == 0 and stdout2:
+                        runs = json.loads(stdout2)
+                        if runs and runs[0].get("conclusion") == "failure":
+                            return "ci_failure"
+                
+                # デフォルトでCI失敗として扱う
+                return "ci_failure"
+            except Exception as e:
+                self.log(f"Error parsing issue: {e}")
         
-        return "unknown"
+        return "ci_failure"  # デフォルトでCI失敗として扱う
+    
+    def repair_ci_failure(self) -> bool:
+        """CI失敗を修復"""
+        self.log("Attempting to repair CI failures...")
+        
+        # 具体的なエラーログを取得
+        returncode, stdout, stderr = self.run_command([
+            "gh", "run", "view", "--log-failed"
+        ])
+        
+        # エラーログから問題を特定
+        if "pytest" in stdout or "test" in stdout.lower():
+            return self.repair_test_failure()
+        elif "lint" in stdout or "flake8" in stdout or "black" in stdout:
+            return self.fix_linting_errors()
+        elif "import" in stdout or "ModuleNotFound" in stdout:
+            return self.fix_import_errors()
+        else:
+            # 一般的な修復を試みる
+            return self.repair_generic()
     
     def repair_test_failure(self) -> bool:
         """テスト失敗を修復"""
-        self.log("Attempting to repair test failures...")
+        self.log("Repairing test failures...")
         
         # 修復戦略リスト
         strategies = [
@@ -217,6 +250,34 @@ def test_import():
         
         return True
     
+    def repair_generic(self) -> bool:
+        """汎用的な修復を実行"""
+        self.log("Running generic repair strategies...")
+        
+        # 試行回数に応じて異なる戦略を試す
+        strategies = [
+            lambda: self.run_command(["pytest", "--tb=short"]),
+            lambda: self.run_command(["python", "-m", "pytest", "tests/"]),
+            lambda: self.fix_missing_dependencies(),
+            lambda: self.fix_linting_errors(),
+            lambda: self.reset_test_environment(),
+        ]
+        
+        strategy_index = (self.attempt - 1) % len(strategies)
+        strategy = strategies[strategy_index]
+        
+        self.log(f"Trying generic strategy #{strategy_index + 1}")
+        result = strategy()
+        
+        # 結果をチェック
+        if isinstance(result, tuple):
+            returncode = result[0]
+            return returncode == 0
+        elif isinstance(result, bool):
+            return result
+        
+        return False
+    
     def extract_missing_modules(self, error_text: str) -> List[str]:
         """エラーテキストから不足モジュールを抽出"""
         modules = []
@@ -256,7 +317,7 @@ def test_import():
     def execute(self) -> int:
         """修復を実行"""
         self.log(f"Starting repair for Issue #{self.issue_number}")
-        self.log(f"Cycle {self.cycle}, Attempt {self.attempt}/7, Total {self.total}/21")
+        self.log(f"Cycle {self.cycle}, Attempt {self.attempt}/7, Total {self.total} (Infinite Loop Mode)")
         
         try:
             # エラータイプを検出
@@ -265,11 +326,11 @@ def test_import():
             
             # 修復を実行
             success = False
-            if error_type == "test_failure":
-                success = self.repair_test_failure()
+            if error_type in ["test_failure", "ci_failure"]:
+                success = self.repair_ci_failure()
             else:
-                self.log(f"Unknown error type: {error_type}")
-                success = False
+                self.log(f"Attempting generic repair for: {error_type}")
+                success = self.repair_generic()
             
             if success:
                 # 修正をコミット
