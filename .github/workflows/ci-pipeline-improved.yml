@@ -54,7 +54,7 @@ jobs:
       continue-on-error: true
 
     - name: 📊 Upload security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-report
@@ -108,7 +108,7 @@ jobs:
         fail_ci_if_error: false
 
     - name: 📈 Upload coverage HTML
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: matrix.python-version == '3.13' && matrix.os == 'ubuntu-latest'
       with:
         name: coverage-report
@@ -190,7 +190,7 @@ jobs:
       continue-on-error: true
 
     - name: 📊 Upload benchmark results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: benchmark-results

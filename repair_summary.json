@@ -1,69 +1,21 @@
 {
-  "timestamp": "2025-11-11T17:58:14.580970",
-  "duration_seconds": 81.450695,
+  "timestamp": "2025-11-11T20:22:36.544783",
+  "duration_seconds": 29.620495,
   "total_loops": 1,
   "max_loops": 1,
-  "successful_repairs": 10,
+  "successful_repairs": 2,
   "failed_repairs": 1,
   "detected_errors": [
     {
       "type": "ImportError",
-      "file": "modules\\backend_validator.py",
-      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import backend_validator\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\backend_validator.py\", line 19, in <module>\n    from .db import get_db, DatabaseManager\nImportError: attempted relative import with no known parent package\n",
-      "severity": "medium"
-    },
-    {
-      "type": "ImportError",
-      "file": "modules\\collection_api.py",
-      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import collection_api\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\collection_api.py\", line 31, in <module>\n    from .anime_anilist import AniListCollector\nImportError: attempted relative import with no known parent package\n",
-      "severity": "medium"
-    },
-    {
-      "type": "ImportError",
       "file": "modules\\dashboard.py",
-      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import dashboard\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\dashboard.py\", line 11, in <module>\n    from .monitoring import PerformanceMonitor, MetricType\nImportError: attempted relative import with no known parent package\n",
+      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import modules.dashboard\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\dashboard.py\", line 11, in <module>\n    from .",
       "severity": "medium"
     },
     {
       "type": "ImportError",
       "file": "modules\\dashboard_integration.py",
-      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import dashboard_integration\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\dashboard_integration.py\", line 11, in <module>\n    from .dashboard import dashboard_service\nImportError: attempted relative import with no known parent package\n",
-      "severity": "medium"
-    },
-    {
-      "type": "ImportError",
-      "file": "modules\\data_normalizer.py",
-      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import data_normalizer\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\data_normalizer.py\", line 23, in <module>\n    from .models import Work, Release, WorkType, ReleaseType, DataSource\nImportError: attempted relative import with no known parent package\n",
-      "severity": "medium"
-    },
-    {
-      "type": "ImportError",
-      "file": "modules\\filter_logic.py",
-      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import filter_logic\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\filter_logic.py\", line 11, in <module>\n    from .models import Work, AniListWork, RSSFeedItem, WorkType\nImportError: attempted relative import with no known parent package\n",
-      "severity": "medium"
-    },
-    {
-      "type": "ImportError",
-      "file": "modules\\filter_logic_enhanced.py",
-      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import filter_logic_enhanced\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\filter_logic_enhanced.py\", line 24, in <module>\n    from .models import Work, AniListWork, RSSFeedItem, WorkType\nImportError: attempted relative import with no known parent package\n",
-      "severity": "medium"
-    },
-    {
-      "type": "ImportError",
-      "file": "modules\\manga_rss.py",
-      "message": "Google API libraries not available. Install google-auth, google-auth-oauthlib, google-api-python-client\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import manga_rss\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\manga_rss.py\", line 9, in <module>\n    import requests\n  File \"C:\\Python313\\Lib\\site-packages\\requests\\__init__.py\", line 45, in <module>\n    from .exceptions import RequestsDependencyWarning\n  File \"C:\\Python313\\Lib\\site-packages\\requests\\exceptions.py\", line 9, in <module>\n    from .compat import JSONDecodeError as CompatJSONDecodeError\n  File \"C:\\Python313\\Lib\\site-packages\\requests\\compat.py\", line 74, in <module>\n    from http import cookiejar as cookielib\n  File \"C:\\Python313\\Lib\\http\\cookiejar.py\", line 39, in <module>\n    from calendar import timegm\nImportError: cannot import name 'timegm' from 'calendar' (consider renaming 'D:\\\\MangaAnime-Info-delivery-system\\\\modules\\\\calendar.py' since it has the same name as the standard library module named 'calendar' and prevents importing that standard library module). Did you mean: 'time'?\n",
-      "severity": "medium"
-    },
-    {
-      "type": "ImportError",
-      "file": "modules\\manga_rss_enhanced.py",
-      "message": "Google API libraries not available. Install google-auth, google-auth-oauthlib, google-api-python-client\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import manga_rss_enhanced\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\manga_rss_enhanced.py\", line 15, in <module>\n    import requests\n  File \"C:\\Python313\\Lib\\site-packages\\requests\\__init__.py\", line 45, in <module>\n    from .exceptions import RequestsDependencyWarning\n  File \"C:\\Python313\\Lib\\site-packages\\requests\\exceptions.py\", line 9, in <module>\n    from .compat import JSONDecodeError as CompatJSONDecodeError\n  File \"C:\\Python313\\Lib\\site-packages\\requests\\compat.py\", line 74, in <module>\n    from http import cookiejar as cookielib\n  File \"C:\\Python313\\Lib\\http\\cookiejar.py\", line 39, in <module>\n    from calendar import timegm\nImportError: cannot import name 'timegm' from 'calendar' (consider renaming 'D:\\\\MangaAnime-Info-delivery-system\\\\modules\\\\calendar.py' since it has the same name as the standard library module named 'calendar' and prevents importing that standard library module). Did you mean: 'time'?\n",
-      "severity": "medium"
-    },
-    {
-      "type": "ImportError",
-      "file": "modules\\__init__.py",
-      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import __init__\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\__init__.py\", line 23, in <module>\n    from .db import DatabaseManager, get_db\nImportError: attempted relative import with no known parent package\n",
+      "message": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import modules.dashboard_integration\n  File \"D:\\MangaAnime-Info-delivery-system\\modules\\dashboard_integration.py\", line 11",
       "severity": "medium"
     },
     {
@@ -75,70 +27,14 @@
   ],
   "repair_attempts": [
     {
-      "timestamp": "2025-11-11T17:57:22.959547",
+      "timestamp": "2025-11-11T20:22:30.721238",
       "error_type": "ImportError",
       "action": "pip install requirements",
       "success": true,
       "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
     },
     {
-      "timestamp": "2025-11-11T17:57:28.582419",
-      "error_type": "ImportError",
-      "action": "pip install requirements",
-      "success": true,
-      "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
-    },
-    {
-      "timestamp": "2025-11-11T17:57:34.966139",
-      "error_type": "ImportError",
-      "action": "pip install requirements",
-      "success": true,
-      "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
-    },
-    {
-      "timestamp": "2025-11-11T17:57:40.849968",
-      "error_type": "ImportError",
-      "action": "pip install requirements",
-      "success": true,
-      "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
-    },
-    {
-      "timestamp": "2025-11-11T17:57:46.305895",
-      "error_type": "ImportError",
-      "action": "pip install requirements",
-      "success": true,
-      "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
-    },
-    {
-      "timestamp": "2025-11-11T17:57:51.853619",
-      "error_type": "ImportError",
-      "action": "pip install requirements",
-      "success": true,
-      "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
-    },
-    {
-      "timestamp": "2025-11-11T17:57:57.421846",
-      "error_type": "ImportError",
-      "action": "pip install requirements",
-      "success": true,
-      "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
-    },
-    {
-      "timestamp": "2025-11-11T17:58:02.946606",
-      "error_type": "ImportError",
-      "action": "pip install requirements",
-      "success": true,
-      "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
-    },
-    {
-      "timestamp": "2025-11-11T17:58:08.300016",
-      "error_type": "ImportError",
-      "action": "pip install requirements",
-      "success": true,
-      "output": "Requirement already satisfied: pyyaml>=6.0 in c:\\python313\\lib\\site-packages (from -r requirements.txt (line 4)) (6.0.3)\nRequirement already satisfied: python-dotenv>=1.0.0 in c:\\python313\\lib\\site-pa"
-    },
-    {
-      "timestamp": "2025-11-11T17:58:14.576730",
+      "timestamp": "2025-11-11T20:22:36.539443",
       "error_type": "ImportError",
       "action": "pip install requirements",
       "success": true,
