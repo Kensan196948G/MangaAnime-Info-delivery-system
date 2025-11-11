@@ -1,9 +1,9 @@
-name: 自動エラー検知・修復ループシステム
+name: 自動エラー検知・修復ループシステム（本番）
 
 on:
-  # 30分おきに自動実行
+  # 1時間おきに自動実行（本番設定）
   schedule:
-    - cron: '*/30 * * * *'  # 30分ごと
+    - cron: '0 * * * *'  # 毎時0分実行
 
   # 手動実行も可能
   workflow_dispatch:
@@ -25,7 +25,7 @@ concurrency:
 jobs:
   error-detection-and-repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 20  # 最大20分でタイムアウト
+    timeout-minutes: 30  # 本番用: 最大30分でタイムアウト
     # Issueコメントが@auto-repairの場合のみ実行
     if: |
       github.event_name == 'schedule' ||
@@ -34,7 +34,8 @@ jobs:
 
     env:
       MAX_LOOPS: ${{ github.event.inputs.max_loops || '10' }}
-      REPAIR_INTERVAL: 30  # 秒（GitHub Actions用に短縮）
+      REPAIR_INTERVAL: 60  # 秒（本番設定: 各ループ間隔）
+      PRODUCTION_MODE: 'true'  # 本番モードフラグ
 
     steps:
       - name: チェックアウト
