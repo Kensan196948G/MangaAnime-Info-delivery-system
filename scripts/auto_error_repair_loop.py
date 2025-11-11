@@ -67,23 +67,31 @@ class ErrorDetector:
         errors = []
         logger.info("インポートエラーをチェック中...")
 
+        # パッケージとして正しくインポート
         for py_file in Path('modules').glob('*.py'):
+            # __init__.pyとprivateファイルはスキップ
+            if py_file.stem.startswith('_'):
+                continue
+
             try:
+                # modules.xxx としてインポート
+                module_name = f'modules.{py_file.stem}'
                 result = subprocess.run(
-                    ['python', '-c', f'import {py_file.stem}'],
+                    ['python', '-c', f'import {module_name}'],
                     capture_output=True,
                     text=True,
-                    timeout=30,
-                    cwd='modules'
+                    timeout=30
                 )
 
                 if result.returncode != 0 and 'ImportError' in result.stderr:
-                    errors.append({
-                        'type': 'ImportError',
-                        'file': str(py_file),
-                        'message': result.stderr,
-                        'severity': 'medium'
-                    })
+                    # 実際のインポートエラーのみ記録（相対インポートの警告は除外）
+                    if 'attempted relative import' not in result.stderr:
+                        errors.append({
+                            'type': 'ImportError',
+                            'file': str(py_file),
+                            'message': result.stderr[:200],
+                            'severity': 'medium'
+                        })
             except Exception as e:
                 logger.error(f"{py_file}のインポートチェックエラー: {e}")
 
