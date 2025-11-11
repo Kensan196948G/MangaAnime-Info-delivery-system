@@ -16,6 +16,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
+# ログディレクトリの作成
+log_dir = Path('logs')
+log_dir.mkdir(exist_ok=True)
+
 # ログ設定
 logging.basicConfig(
     level=logging.INFO,
