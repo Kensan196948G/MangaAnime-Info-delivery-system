@@ -32,7 +32,7 @@ try:
     from modules.manga_rss import RSSProcessor
     from modules.filter_logic import FilterLogic
     from modules.mailer import EmailNotificationManager
-    from modules.calendar import CalendarManager
+    from modules.calendar_integration import CalendarManager
     from release_notifier import main as release_notifier_main
 except ImportError:
     pytest.skip("Module imports failed", allow_module_level=True)

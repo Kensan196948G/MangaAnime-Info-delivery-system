@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Mock the calendar module if it doesn't exist
 try:
-    from modules.calendar import CalendarManager
+    from modules.calendar_integration import CalendarManager
 except ImportError:
 
     class CalendarManager:

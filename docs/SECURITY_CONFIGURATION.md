@@ -138,7 +138,7 @@ if gmail.authenticate():
 ### Calendar API認証
 
 ```python
-from modules.calendar import GoogleCalendarManager
+from modules.calendar_integration import GoogleCalendarManager
 
 calendar = GoogleCalendarManager(config)
 

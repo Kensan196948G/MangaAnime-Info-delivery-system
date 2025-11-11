@@ -115,7 +115,7 @@ class ReleaseNotifierSystem:
             from modules.manga_rss import MangaRSSCollector
             from modules.filter_logic import ContentFilter
             from modules.mailer import GmailNotifier, EmailTemplateGenerator
-            from modules.calendar import GoogleCalendarManager
+            from modules.calendar_integration import GoogleCalendarManager
 
             # 設定を辞書形式で渡す
             config_dict = (

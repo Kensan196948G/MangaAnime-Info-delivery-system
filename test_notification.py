@@ -16,7 +16,7 @@ from modules.config import get_config
 from modules.db import DatabaseManager
 from modules.logger import setup_logging
 from modules.mailer import GmailNotifier, EmailTemplateGenerator
-from modules.calendar import GoogleCalendarManager
+from modules.calendar_integration import GoogleCalendarManager
 
 
 def main():

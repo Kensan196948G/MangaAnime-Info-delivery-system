@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from modules.config import ConfigManager, SecureConfigManager
     from modules.mailer import GmailNotifier, AuthenticationState
-    from modules.calendar import GoogleCalendarManager, CalendarAuthState
+    from modules.calendar_integration import GoogleCalendarManager, CalendarAuthState
 except ImportError as e:
     print(f"Error: Cannot import modules: {e}")
     sys.exit(1)

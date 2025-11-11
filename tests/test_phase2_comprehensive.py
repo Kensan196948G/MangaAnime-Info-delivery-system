@@ -19,7 +19,7 @@ try:
     from modules.manga_rss import RSSProcessor
     from modules.filter_logic import FilterLogic
     from modules.mailer import EmailNotificationManager
-    from modules.calendar import CalendarManager
+    from modules.calendar_integration import CalendarManager
     from modules.monitoring import SystemMonitor
 except ImportError:
     pytest.skip("Module imports failed", allow_module_level=True)
