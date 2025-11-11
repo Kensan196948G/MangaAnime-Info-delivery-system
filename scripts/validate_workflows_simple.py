@@ -4,7 +4,6 @@ GitHub Actions ワークフロー検証スクリプト（シンプル版）
 ruamel.yamlを使用してonキーワードの問題を回避
 """
 
-import os
 import sys
 from pathlib import Path
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 #!/usr/bin/env python3
 """
 Flask Web UI for Anime/Manga Information Delivery System
@@ -10,7 +11,6 @@ import json
 import sqlite3
 import requests
 import time
-from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 import logging
 
@@ -218,7 +218,7 @@ def dashboard():
     recent_releases = conn.execute(
         """
         SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
-               w.type, r.release_type, r.number, r.platform, 
+               w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url, r.notified
         FROM releases r
         JOIN works w ON r.work_id = w.id
@@ -232,7 +232,7 @@ def dashboard():
     upcoming_releases = conn.execute(
         """
         SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
-               w.type, r.release_type, r.number, r.platform, 
+               w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url
         FROM releases r
         JOIN works w ON r.work_id = w.id
@@ -281,7 +281,7 @@ def releases():
     # Build query with filters - Japanese title priority
     query = """
         SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
-               w.type, r.release_type, r.number, r.platform, 
+               w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url, r.notified, r.created_at
         FROM releases r
         JOIN works w ON r.work_id = w.id
@@ -364,11 +364,11 @@ def calendar():
     releases_data = conn.execute(
         """
         SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
-               w.type, r.release_type, r.number, r.platform, 
+               w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url
         FROM releases r
         JOIN works w ON r.work_id = w.id
-        WHERE strftime('%Y', r.release_date) = ? 
+        WHERE strftime('%Y', r.release_date) = ?
         AND strftime('%m', r.release_date) = ?
         ORDER BY r.release_date, COALESCE(w.title_kana, w.title)
     """,
@@ -603,7 +603,7 @@ def api_recent_releases():
     releases = conn.execute(
         """
         SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
-               w.type, r.release_type, r.number, r.platform, 
+               w.type, r.release_type, r.number, r.platform,
                r.release_date, r.notified
         FROM releases r
         JOIN works w ON r.work_id = w.id
@@ -720,7 +720,7 @@ def api_works():
 
     # Build base query with Japanese title priority
     query = """
-        SELECT w.id, COALESCE(w.title_kana, w.title) as title, w.title as original_title, 
+        SELECT w.id, COALESCE(w.title_kana, w.title) as title, w.title as original_title,
                w.title_en, w.type, w.official_url,
                GROUP_CONCAT(DISTINCT r.platform) as platforms,
                MIN(r.release_date) as next_release_date,
@@ -1044,8 +1044,6 @@ def api_test_configuration():
     import os
     import smtplib
     import ssl
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
 
     results = {
         "gmail": {"status": "testing", "message": "", "details": {}},

@@ -1,3 +1,5 @@
+import random
+from typing import Any, Dict, List
 #!/usr/bin/env python3
 """
 Advanced test data management and fixtures system
@@ -7,15 +9,11 @@ import json
 import sqlite3
 import tempfile
 import os
-import shutil
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Generator, Union
 from dataclasses import dataclass, asdict
 import secrets
-import string
 from pathlib import Path
 import pytest
-import yaml
 
 
 @dataclass
@@ -482,7 +480,7 @@ class DataManager:
                 official_url TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 work_id INTEGER NOT NULL,
@@ -496,7 +494,7 @@ class DataManager:
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(work_id, release_type, number, platform, release_date)
             );
-            
+
             -- Additional metadata tables for testing
             CREATE TABLE work_genres (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -504,14 +502,14 @@ class DataManager:
                 genre TEXT NOT NULL,
                 FOREIGN KEY (work_id) REFERENCES works (id)
             );
-            
+
             CREATE TABLE work_tags (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 work_id INTEGER NOT NULL,
                 tag TEXT NOT NULL,
                 FOREIGN KEY (work_id) REFERENCES works (id)
             );
-            
+
             CREATE TABLE work_metadata (
                 work_id INTEGER PRIMARY KEY,
                 description TEXT,
@@ -567,7 +565,7 @@ class DataManager:
             # Insert metadata
             cursor.execute(
                 """
-                INSERT INTO work_metadata (work_id, description, status) 
+                INSERT INTO work_metadata (work_id, description, status)
                 VALUES (?, ?, ?)
             """,
                 (work_id, work.description, work.status),
@@ -591,7 +589,7 @@ class DataManager:
 
         cursor.executemany(
             """
-            INSERT INTO releases (work_id, release_type, number, platform, 
+            INSERT INTO releases (work_id, release_type, number, platform,
                                 release_date, source, source_url, notified)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
@@ -782,7 +780,7 @@ class MockAPIDataManager:
                     pub_date += " +0000"
 
                 items.append(
-                    f"""
+                    """
                     <item>
                         <title>{work.title} 第{release.number}巻</title>
                         <link>{release.source_url}</link>
@@ -794,7 +792,7 @@ class MockAPIDataManager:
                 """
                 )
 
-            rss_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+            rss_content = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>{platform} 新刊情報</title>
@@ -802,7 +800,7 @@ class MockAPIDataManager:
         <link>https://example.com/{platform.lower()}/rss</link>
         <language>ja</language>
         <lastBuildDate>{datetime.now().strftime('%a, %d %b %Y %H:%M:%S +0000')}</lastBuildDate>
-        <atom:link href="https://example.com/{platform.lower()}/rss" rel="self" type="application/rss+xml" />
+        <atom:link href="https://example.com/{platform.lower()}/rss" rel="sel" type="application/rss+xml" />
         {''.join(items)}
     </channel>
 </rss>"""

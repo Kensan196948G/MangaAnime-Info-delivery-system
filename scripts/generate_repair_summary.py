@@ -7,8 +7,6 @@ repair_summary.jsonを読み込んでMarkdown形式のレポートを生成し�
 
 import json
 import sys
-from datetime import datetime
-from pathlib import Path
 
 
 def format_duration(seconds: float) -> str:
@@ -46,7 +44,7 @@ def generate_summary_report(summary_file: str) -> str:
     # ステータスアイコン
     status_icon = '✅' if final_status == 'success' else '❌'
 
-    report = f"""
+    report = """
 ### {status_icon} 実行サマリー
 
 | 項目 | 値 |

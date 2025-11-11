@@ -18,7 +18,7 @@ if os.path.exists(tests_path):
                 try:
                     with open(item_path, "r") as f:
                         lines = f.readlines()[:10]
-                    print(f"   First lines:")
+                    print("   First lines:")
                     for i, line in enumerate(lines, 1):
                         print(f"   {i:2d}: {line.rstrip()}")
                     if len(lines) == 10:

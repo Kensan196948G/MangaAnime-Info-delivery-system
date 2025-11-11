@@ -14,7 +14,8 @@ Usage: python3 test_backend_api.py
 import sys
 import os
 import logging
-from datetime import datetime, date
+from datetime import date
+from modules import get_config, get_db
 
 # Add modules to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,6 @@ def test_configuration():
     print("\n=== Testing Configuration Management ===")
 
     try:
-        from modules import get_config, initialize_system
 
         # Initialize configuration (will use defaults if no config file exists)
         config = get_config()
@@ -60,7 +60,6 @@ def test_database_operations():
     print("\n=== Testing Database Operations ===")
 
     try:
-        from modules import get_db, Work, Release, WorkType, ReleaseType
 
         db = get_db()
         print("✓ Database manager initialized")
@@ -183,7 +182,7 @@ def test_system_integration():
 
         # Get system information
         system_info = get_system_info()
-        print(f"✓ System info retrieved:")
+        print("✓ System info retrieved:")
         print(f"  - Version: {system_info['version']}")
         print(f"  - System: {system_info['system']['name']}")
         print(f"  - Environment: {system_info['system']['environment']}")

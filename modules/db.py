@@ -496,7 +496,7 @@ class DatabaseManager:
             try:
                 cursor = conn.execute(
                     """
-                    INSERT INTO releases (work_id, release_type, number, platform, 
+                    INSERT INTO releases (work_id, release_type, number, platform,
                                         release_date, source, source_url)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
@@ -527,7 +527,7 @@ class DatabaseManager:
                     # Return existing release ID
                     cursor = conn.execute(
                         """
-                        SELECT id FROM releases 
+                        SELECT id FROM releases
                         WHERE work_id=? AND release_type=? AND number=? AND platform=? AND release_date=?
                     """,
                         (work_id, release_type, number, platform, release_date),
@@ -636,8 +636,8 @@ class DatabaseManager:
         with self.get_connection() as conn:
             cursor = conn.execute(
                 """
-                DELETE FROM releases 
-                WHERE notified = 1 
+                DELETE FROM releases
+                WHERE notified = 1
                 AND created_at < date('now', '-{} days')
             """.format(
                     days

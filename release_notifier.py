@@ -27,13 +27,12 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 import time
 import signal
-import asyncio
 
 # プロジェクトのルートディレクトリをPythonパスに追加
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from modules.config import get_config, ConfigManager
+from modules import get_config
 from modules.db import DatabaseManager
 from modules.logger import setup_logging
 from modules.email_scheduler import EmailScheduler
@@ -381,7 +380,7 @@ class ReleaseNotifierSystem:
                     )
                 else:
                     self.logger.error(
-                        f"❌ バッチ {batch.current_batch}/{batch.total_batches} " f"配信失敗"
+                        f"❌ バッチ {batch.current_batch}/{batch.total_batches} " "配信失敗"
                     )
                     success = False
 
@@ -471,7 +470,7 @@ class ReleaseNotifierSystem:
         """分散配信統計のフォーマット"""
         try:
             stats = self.email_scheduler.get_delivery_stats()
-            return f"""総バッチ数: {stats['total_batches']}
+            return """総バッチ数: {stats['total_batches']}
   送信済みバッチ数: {stats['sent_batches']}
   未送信バッチ数: {stats['pending_batches']}
   完了率: {stats['completion_rate']:.1f}%
@@ -498,7 +497,7 @@ class ReleaseNotifierSystem:
             self.statistics["errors"] / max(self.statistics["processed_sources"], 1)
         ) * 100
 
-        report = f"""
+        report = """
 {'=' * 60}
 📊 Phase 2 実行結果レポート
 {'=' * 60}
@@ -513,11 +512,11 @@ class ReleaseNotifierSystem:
   新リリース数: {self.statistics['new_releases']}
   フィルタリング除外数: {self.statistics['filtered_items']}
   🚀 処理速度: {items_per_second:.2f} リリース/秒
-  
+
 📧 通知統計:
   メール通知送信数: {self.statistics['notifications_sent']}
   カレンダーイベント作成数: {self.statistics['calendar_events_created']}
-  
+
 ❌ エラー統計:
   エラー発生回数: {self.statistics['errors']}
   📉 エラー率: {error_rate:.1f}%
@@ -539,7 +538,7 @@ class ReleaseNotifierSystem:
         # Add critical issues if any
         critical_issues = health_status.get("critical_issues", [])
         if critical_issues:
-            report += f"""
+            report += """
 ⚠️ 重要な問題:
 """
             for issue in critical_issues[:5]:  # Show max 5 issues
@@ -548,7 +547,7 @@ class ReleaseNotifierSystem:
         # Add collection performance details
         collection_perf = health_status.get("collection_performance", {})
         if collection_perf:
-            report += f"""
+            report += """
 🔍 収集システムパフォーマンス:
 """
             for service, metrics in collection_perf.items():
@@ -661,7 +660,7 @@ def main():
   python3 release_notifier.py --verbose          # 詳細ログ
   python3 release_notifier.py --force-send       # 強制送信（時刻無視）
   python3 release_notifier.py --config custom.json --dry-run --verbose
-  
+
 分散配信について:
   ・100件以上のリリース: 2回分散（朝8時、夜20時）
   ・200件以上のリリース: 3回分散（朝8時、昼12時、夜20時）

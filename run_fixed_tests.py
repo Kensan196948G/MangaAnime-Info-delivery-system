@@ -55,7 +55,7 @@ def run_tests():
         return
 
     # Run tests
-    print(f"\n🧪 Running pytest...")
+    print("\n🧪 Running pytest...")
     try:
         # First try: run all tests
         result = subprocess.run(
@@ -87,7 +87,7 @@ def run_tests():
         print(f"❌ Unexpected error: {e}")
 
     # Try individual file testing if main run failed
-    print(f"\n🔍 Testing individual files...")
+    print("\n🔍 Testing individual files...")
     for test_file in existing_files:
         if test_file == "conftest.py":
             continue

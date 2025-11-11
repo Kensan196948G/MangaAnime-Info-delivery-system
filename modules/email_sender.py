@@ -62,7 +62,7 @@ class EmailSender:
             # Production mode - actual email sending
             current_time = datetime.now().strftime("%Y年%m月%d日 %H:%M:%S")
 
-            email_body = f"""
+            email_body = """
 MangaAnime情報配信システムからのテスト通知です。
 
 {message}

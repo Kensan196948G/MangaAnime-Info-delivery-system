@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 #!/usr/bin/env python3
 """
 Advanced test coverage analysis and quality gates system
@@ -6,16 +7,11 @@ Advanced test coverage analysis and quality gates system
 import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass, asdict
-import subprocess
-import os
 import re
 from datetime import datetime
 import sqlite3
-import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 
 @dataclass
@@ -664,7 +660,7 @@ class CoverageAnalyzer:
                 total_modules INTEGER,
                 git_commit TEXT
             );
-            
+
             CREATE TABLE IF NOT EXISTS module_coverage (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 snapshot_id INTEGER,
@@ -675,7 +671,7 @@ class CoverageAnalyzer:
                 branch_coverage REAL,
                 FOREIGN KEY (snapshot_id) REFERENCES coverage_snapshots(id)
             );
-            
+
             CREATE TABLE IF NOT EXISTS quality_gate_history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 snapshot_id INTEGER,
@@ -709,7 +705,7 @@ class CoverageAnalyzer:
         for module in coverage_data:
             cursor.execute(
                 """
-                INSERT INTO module_coverage (snapshot_id, module_name, line_coverage, 
+                INSERT INTO module_coverage (snapshot_id, module_name, line_coverage,
                                            lines_total, lines_covered, branch_coverage)
                 VALUES (?, ?, ?, ?, ?, ?)
             """,
@@ -727,7 +723,7 @@ class CoverageAnalyzer:
         for result in quality_results:
             cursor.execute(
                 """
-                INSERT INTO quality_gate_history (snapshot_id, gate_name, threshold_value, 
+                INSERT INTO quality_gate_history (snapshot_id, gate_name, threshold_value,
                                                  actual_value, passed)
                 VALUES (?, ?, ?, ?, ?)
             """,

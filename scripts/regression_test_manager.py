@@ -1,20 +1,18 @@
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 #!/usr/bin/env python3
 """
 Regression Test Manager
 Manages baseline data, detects regressions, and provides comparative analysis
 """
 
-import os
 import sys
 import json
 import hashlib
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-from datetime import datetime, timedelta
 import sqlite3
 from dataclasses import dataclass, asdict
 import subprocess
-import shutil
 
 
 @dataclass
@@ -282,7 +280,7 @@ class RegressionTestManager:
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """
-                INSERT OR REPLACE INTO baselines 
+                INSERT OR REPLACE INTO baselines
                 (timestamp, version, data_hash, baseline_data)
                 VALUES (?, ?, ?, ?)
             """,
@@ -333,7 +331,7 @@ class RegressionTestManager:
             else:
                 cursor = conn.execute(
                     """
-                    SELECT baseline_data FROM baselines 
+                    SELECT baseline_data FROM baselines
                     ORDER BY created_at DESC LIMIT 1
                 """
                 )
@@ -600,7 +598,7 @@ class RegressionTestManager:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute(
                 """
-                INSERT INTO regression_reports 
+                INSERT INTO regression_reports
                 (comparison_timestamp, regression_count, overall_score, report_data)
                 VALUES (?, ?, ?, ?)
             """,

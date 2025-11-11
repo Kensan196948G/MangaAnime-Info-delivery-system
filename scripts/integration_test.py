@@ -1,3 +1,5 @@
+from datetime import datetime
+from typing import Any, Dict, List
 #!/usr/bin/env python3
 """
 システム統合テスト・エンドツーエンド検証スクリプト
@@ -10,16 +12,11 @@ import json
 import sqlite3
 import time
 import logging
-import os
 import sys
 import subprocess
-import tempfile
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
 import xml.etree.ElementTree as ET
 import requests
-from unittest.mock import patch, MagicMock
 
 # プロジェクトルートをパスに追加
 project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")

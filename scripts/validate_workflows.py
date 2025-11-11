@@ -4,7 +4,6 @@ GitHub Actions ワークフロー検証スクリプト
 """
 
 import yaml
-import os
 import sys
 from pathlib import Path
 

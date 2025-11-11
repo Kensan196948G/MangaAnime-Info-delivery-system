@@ -307,7 +307,7 @@ class TestEmailTemplates:
         }
 
         # Create HTML template
-        html_template = f"""
+        html_template = """
         <html>
             <body>
                 <h1>New Episode Available!</h1>
@@ -338,7 +338,7 @@ class TestEmailTemplates:
             "cover_url": "https://example.com/jjk-cover.jpg",
         }
 
-        html_template = f"""
+        html_template = """
         <html>
             <body>
                 <h1>New Volume Released!</h1>
@@ -378,7 +378,7 @@ class TestEmailTemplates:
         """
 
         for anime in weekly_data["anime_releases"]:
-            html_template += f"""
+            html_template += """
                     <li>{anime['title']} - Episode {anime['episode']} ({anime['date']})</li>
             """
 
@@ -389,7 +389,7 @@ class TestEmailTemplates:
         """
 
         for manga in weekly_data["manga_releases"]:
-            html_template += f"""
+            html_template += """
                     <li>{manga['title']} - Volume {manga['volume']} ({manga['date']})</li>
             """
 

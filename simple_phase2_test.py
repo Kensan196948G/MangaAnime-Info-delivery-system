@@ -7,8 +7,6 @@ Tests core functionality without external dependencies.
 
 import sys
 import os
-import json
-from datetime import datetime, timedelta
 
 # Add the modules path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "modules"))
@@ -83,7 +81,6 @@ def test_models():
     print("\nTesting Enhanced Models...")
 
     try:
-        from modules.models import (
             Work,
             Release,
             WorkType,
@@ -143,7 +140,6 @@ def test_database():
     print("\nTesting Database Integration...")
 
     try:
-        from modules.db import DatabaseManager, get_db
 
         # Test 1: Database manager initialization
         db = get_db()

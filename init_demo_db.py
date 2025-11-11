@@ -185,7 +185,7 @@ def create_database():
     # Insert releases
     cursor.executemany(
         """
-        INSERT OR IGNORE INTO releases 
+        INSERT OR IGNORE INTO releases
         (work_id, release_type, number, platform, release_date, source, source_url, notified)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """,

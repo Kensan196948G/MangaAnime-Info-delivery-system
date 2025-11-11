@@ -7,18 +7,14 @@ import asyncio
 import json
 import time
 import secrets
+import random
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Callable, Union
-from unittest.mock import Mock, AsyncMock, MagicMock, patch
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from unittest.mock import Mock, AsyncMock, patch
 import pytest
-import aiohttp
-import feedparser
-from dataclasses import dataclass, asdict
-import xml.etree.ElementTree as ET
 from contextlib import asynccontextmanager, contextmanager
 import threading
-import queue
-from pathlib import Path
 
 
 @dataclass
@@ -547,7 +543,7 @@ class RealisticRSSMocker:
 
         items_xml = []
         for item in feed_info["items"]:
-            item_xml = f"""
+            item_xml = """
         <item>
             <title><![CDATA[{item['title']}]]></title>
             <link>{item['link']}</link>
@@ -558,7 +554,7 @@ class RealisticRSSMocker:
         </item>"""
             items_xml.append(item_xml)
 
-        rss_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+        rss_xml = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title><![CDATA[{feed_info['title']}]]></title>
@@ -566,7 +562,7 @@ class RealisticRSSMocker:
         <link>{feed_info['link']}</link>
         <language>ja</language>
         <lastBuildDate>{datetime.now().strftime('%a, %d %b %Y %H:%M:%S +0000')}</lastBuildDate>
-        <atom:link href="{feed_info['link']}/rss" rel="self" type="application/rss+xml" />
+        <atom:link href="{feed_info['link']}/rss" rel="sel" type="application/rss+xml" />
         {''.join(items_xml)}
     </channel>
 </rss>"""

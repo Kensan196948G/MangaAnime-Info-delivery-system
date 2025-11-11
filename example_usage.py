@@ -15,8 +15,6 @@ Features demonstrated:
 
 import sys
 import os
-import asyncio
-from datetime import datetime, date
 
 # Add modules to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -42,13 +40,13 @@ def demo_system_initialization():
 
     # Initialize the system
     config, db = initialize_system()
-    print(f"✓ System initialized")
+    print("✓ System initialized")
     print(f"  - Config loaded from: {config._loaded_from}")
     print(f"  - Database path: {config.get('database.path')}")
 
     # Get system information
     system_info = get_system_info()
-    print(f"✓ System info:")
+    print("✓ System info:")
     print(f"  - Name: {system_info['system']['name']}")
     print(f"  - Version: {system_info['version']}")
     print(f"  - Environment: {system_info['system']['environment']}")
@@ -166,7 +164,7 @@ def demo_data_models():
     # Convert to dict for database operations
     work_dict = work1.to_dict()
     release_dict = release1.to_dict()
-    print(f"✓ Converted models to dict format for database storage")
+    print("✓ Converted models to dict format for database storage")
 
     return work1, release1
 
@@ -201,7 +199,7 @@ def demo_query_operations(db):
 
     # Get statistics
     stats = db.get_work_stats()
-    print(f"✓ Database statistics:")
+    print("✓ Database statistics:")
     for key, value in stats.items():
         print(f"  - {key}: {value}")
 
@@ -250,7 +248,7 @@ def demo_data_collection_concepts(config):
 
         # Filtering setup
         filtering_config = config.get_filtering_config()
-        print(f"✓ Content filtering configured:")
+        print("✓ Content filtering configured:")
         print(f"  - NG keywords: {len(filtering_config.ng_keywords)}")
         print(f"  - NG genres: {len(filtering_config.ng_genres)}")
 

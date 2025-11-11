@@ -15,7 +15,7 @@ import json
 import os
 import gc
 from dataclasses import dataclass
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock, Mock
 
 # Import test utilities
 from tests.fixtures.mock_services import create_mock_services, PerformanceSimulator

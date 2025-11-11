@@ -77,9 +77,9 @@ for module in modules_to_check:
 # Check the main modules directory
 modules_dir = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/modules"
 if os.path.exists(modules_dir):
-    print(f"\n=== modules/ directory ===")
+    print("\n=== modules/ directory ===")
     for item in os.listdir(modules_dir):
         if item.endswith(".py"):
             print(f"  📄 {item}")
 else:
-    print(f"\n❌ modules/ directory not found")
+    print("\n❌ modules/ directory not found")

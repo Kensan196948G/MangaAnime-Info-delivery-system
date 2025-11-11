@@ -15,10 +15,8 @@ Usage:
 import sys
 import os
 import asyncio
-import json
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
 
 # Add the modules path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "modules"))
@@ -30,7 +28,6 @@ from modules.manga_rss import (
     BookWalkerRSSCollector,
     DAnimeRSSCollector,
 )
-from modules.data_normalizer import (
     TitleNormalizer,
     WorkMatcher,
     DataQualityAnalyzer,
@@ -40,7 +37,6 @@ from modules.data_normalizer import (
     integrate_work_data,
     analyze_data_quality,
 )
-from modules.collection_api import CollectionManager, CollectionType
 from modules.models import Work, WorkType
 from modules.config import load_config
 

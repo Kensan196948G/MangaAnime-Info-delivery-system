@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 #!/usr/bin/env python3
 """
 Advanced Test Runner for MangaAnime Information Delivery System
@@ -12,7 +13,6 @@ import json
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Any, Optional
 import xml.etree.ElementTree as ET
 
 
@@ -284,7 +284,7 @@ class TestRunner:
 
     def _generate_html_summary(self, test_results: Dict[str, Any], timestamp: str):
         """Generate HTML summary report"""
-        html_content = f"""
+        html_content = """
         <!DOCTYPE html>
         <html>
         <head>
@@ -308,7 +308,7 @@ class TestRunner:
                     Status: {'✅ PASSED' if test_results['passed'] else '❌ FAILED'}
                 </p>
             </div>
-            
+
             <div class="metrics">
                 <div class="metric-card">
                     <div class="metric-value">{test_results.get('tests_passed', 0)}</div>
@@ -328,12 +328,12 @@ class TestRunner:
                 </div>
                 {f'<div class="metric-card"><div class="metric-value">{test_results.get("coverage_percentage", 0):.1f}%</div><div>Code Coverage</div></div>' if 'coverage_percentage' in test_results else ''}
             </div>
-            
+
             <h2>Test Output</h2>
             <pre style="background: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto;">
 {test_results['stdout']}
             </pre>
-            
+
             {f'<h2>Error Output</h2><pre style="background: #ffe6e6; padding: 15px; border-radius: 5px; overflow-x: auto;">{test_results["stderr"]}</pre>' if test_results['stderr'] else ''}
         </body>
         </html>
@@ -500,7 +500,7 @@ class TestRunner:
 
             summary = perf_data.get("performance_summary", {})
 
-            print(f"🎯 Performance Summary:")
+            print("🎯 Performance Summary:")
             print(f"   Total benchmarks: {summary.get('total_benchmarks', 0)}")
             print(f"   Average execution time: {summary.get('avg_mean_time', 0):.3f}s")
             print(f"   Slowest test: {summary.get('slowest_test', 0):.3f}s")
@@ -560,7 +560,7 @@ def main():
         "--workers", type=str, default="auto", help="Number of parallel workers"
     )
     parser.add_argument(
-        "--fail-fast", "-f", action="store_true", help="Stop on first failure"
+        "--fail-fast", "-", action="store_true", help="Stop on first failure"
     )
     parser.add_argument("--timeout", type=int, help="Test timeout in seconds")
     parser.add_argument("--markers", "-m", help="Pytest markers to run")

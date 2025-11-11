@@ -1,3 +1,5 @@
+from datetime import datetime
+from typing import Any, Dict
 #!/usr/bin/env python3
 """
 運用監視・24時間365日システム対応監視スクリプト
@@ -11,16 +13,9 @@ import sqlite3
 import requests
 import psutil
 import subprocess
-import smtplib
-from datetime import datetime, timedelta
 from pathlib import Path
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from typing import Dict, List, Any, Optional
 import schedule
-import threading
 import sys
-import os
 
 # ログ設定
 logging.basicConfig(

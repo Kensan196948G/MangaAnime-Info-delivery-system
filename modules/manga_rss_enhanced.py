@@ -142,7 +142,7 @@ class EnhancedMangaRSSCollector:
         }
 
         self.logger.info(
-            f"Enhanced Manga RSS Collector initialized with "
+            "Enhanced Manga RSS Collector initialized with "
             f"{len(self.MANGA_SOURCES)} sources"
         )
 
@@ -348,7 +348,7 @@ class EnhancedMangaRSSCollector:
                     desc_elem = container.select_one(desc_selector)
 
                     title = title_elem.get_text(strip=True) if title_elem else ""
-                    link = link_elem.get("href", "") if link_elem else ""
+                    link = link_elem.get("hre", "") if link_elem else ""
                     description = desc_elem.get_text(strip=True) if desc_elem else ""
 
                     if title and link:

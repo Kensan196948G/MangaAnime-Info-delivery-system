@@ -1,14 +1,13 @@
+from datetime import datetime
 """
 Flask Web UI for Manga/Anime Information Delivery System
 アニメ・マンガ情報配信システム Web UI
 """
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
-from datetime import datetime, timedelta
 import sqlite3
 import json
 import os
-from typing import Dict, List, Any
 from modules.db import DatabaseManager
 from modules.dashboard import dashboard_bp, dashboard_service
 from modules.monitoring import PerformanceMonitor
@@ -38,11 +37,11 @@ def index():
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
                 """
-                SELECT w.title, r.release_type, r.number, r.platform, 
+                SELECT w.title, r.release_type, r.number, r.platform,
                        r.release_date, r.notified, w.type
-                FROM releases r 
-                JOIN works w ON r.work_id = w.id 
-                ORDER BY r.release_date DESC, r.created_at DESC 
+                FROM releases r
+                JOIN works w ON r.work_id = w.id
+                ORDER BY r.release_date DESC, r.created_at DESC
                 LIMIT 50
             """
             )
@@ -59,7 +58,7 @@ def index():
 
             cursor = conn.execute(
                 """
-                SELECT COUNT(*) as count FROM releases 
+                SELECT COUNT(*) as count FROM releases
                 WHERE release_date >= date('now') AND release_date <= date('now', '+7 days')
             """
             )
@@ -93,10 +92,10 @@ def works():
 
             # 基本クエリ
             query = """
-                SELECT w.*, 
+                SELECT w.*,
                        COUNT(r.id) as release_count,
                        MAX(r.release_date) as latest_release
-                FROM works w 
+                FROM works w
                 LEFT JOIN releases r ON w.id = r.work_id
                 WHERE 1=1
             """
@@ -146,8 +145,8 @@ def work_detail(work_id):
             # リリース情報を取得
             cursor = conn.execute(
                 """
-                SELECT * FROM releases 
-                WHERE work_id = ? 
+                SELECT * FROM releases
+                WHERE work_id = ?
                 ORDER BY release_date DESC, created_at DESC
             """,
                 (work_id,),
@@ -264,7 +263,7 @@ def api_system_stats():
 
             cursor = conn.execute(
                 """
-                SELECT COUNT(*) as count FROM releases 
+                SELECT COUNT(*) as count FROM releases
                 WHERE notified = 1 AND created_at > datetime('now', '-24 hours')
             """
             )

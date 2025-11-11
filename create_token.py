@@ -59,7 +59,7 @@ def _obtain_new_creds(port: int) -> Credentials:
     if not Path(CREDENTIALS_FILE).exists():
         raise FileNotFoundError(
             f"'{CREDENTIALS_FILE}' が見つかりません。Google Cloud Console で "
-            f"OAuth クライアント（種別: デスクトップ アプリ）を作成し、同名で配置してください。"
+            "OAuth クライアント（種別: デスクトップ アプリ）を作成し、同名で配置してください。"
         )
 
     flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
@@ -74,9 +74,9 @@ def _obtain_new_creds(port: int) -> Credentials:
             access_type="offline", include_granted_scopes="true"
         )
 
-        log(f"\n📋 以下のURLをブラウザで開いて認証してください:")
+        log("\n📋 以下のURLをブラウザで開いて認証してください:")
         log(f"{auth_url}")
-        log(f"\n許可後、認証コードが表示されます。そのコードを入力してください。")
+        log("\n許可後、認証コードが表示されます。そのコードを入力してください。")
 
         # 認証コードの手動入力
         try:
@@ -105,7 +105,7 @@ def _obtain_new_creds(port: int) -> Credentials:
                 access_type="offline", include_granted_scopes="true"
             )
 
-            log(f"\n📋 新しい認証URLです:")
+            log("\n📋 新しい認証URLです:")
             log(f"{auth_url}")
 
             try:

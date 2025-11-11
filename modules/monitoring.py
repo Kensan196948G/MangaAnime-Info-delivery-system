@@ -576,15 +576,15 @@ class AlertManager:
             msg["To"] = email_config["to_email"]
             msg["Subject"] = f"[{alert.severity}] System Alert: {alert.condition_name}"
 
-            body = f"""
+            body = """
             Alert Details:
-            
+
             Condition: {alert.condition_name}
             Severity: {alert.severity}
             Message: {alert.message}
             Timestamp: {datetime.fromtimestamp(alert.timestamp)}
             Metric Value: {alert.metric_value}
-            
+
             Please investigate this issue.
             """
 

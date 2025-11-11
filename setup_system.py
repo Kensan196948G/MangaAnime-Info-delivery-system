@@ -14,14 +14,11 @@ Usage:
     python3 setup_system.py [--full-setup] [--test-run]
 """
 
-import os
 import sys
 import json
-import sqlite3
 import subprocess
 import argparse
 from pathlib import Path
-from datetime import datetime
 import logging
 
 # プロジェクトルートの設定
@@ -231,7 +228,7 @@ class SystemSetup:
         self.logger.info("📅 cron設定ファイルを生成しています...")
 
         try:
-            cron_config = f"""# アニメ・マンガ情報配信システム cron設定
+            cron_config = """# アニメ・マンガ情報配信システム cron設定
 # 毎朝8時に実行
 0 8 * * * {sys.executable} {self.project_root}/release_notifier.py >> {self.project_root}/logs/cron.log 2>&1
 

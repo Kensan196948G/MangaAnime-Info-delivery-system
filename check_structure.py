@@ -50,12 +50,12 @@ def check_main_modules():
     # Check modules directory
     modules_dir = os.path.join(base_path, "modules")
     if os.path.exists(modules_dir):
-        print(f"✅ modules/ directory exists")
+        print("✅ modules/ directory exists")
         for item in os.listdir(modules_dir):
             if item.endswith(".py"):
                 print(f"  📄 modules/{item}")
     else:
-        print(f"❌ modules/ directory not found")
+        print("❌ modules/ directory not found")
 
 
 if __name__ == "__main__":

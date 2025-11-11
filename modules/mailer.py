@@ -605,7 +605,7 @@ class GmailNotifier:
             elif status_code == 403:  # Forbidden
                 if any("rate" in str(detail).lower() for detail in error_details):
                     logger.warning(
-                        "Gmail API rate limit error, will retry with backoff"
+                        "Gmail API rate limit error, will retry with backo"
                     )
                     time.sleep(2)  # Additional delay
                     raise  # Trigger retry
@@ -613,7 +613,7 @@ class GmailNotifier:
                     logger.error(f"Gmail API forbidden error (non-retryable): {error}")
                     return False
             elif status_code == 429:  # Too Many Requests
-                logger.warning("Gmail API rate limit exceeded, backing off")
+                logger.warning("Gmail API rate limit exceeded, backing o")
                 time.sleep(5)  # Longer delay for rate limit
                 raise  # Trigger retry
             elif 500 <= status_code < 600:  # Server errors
@@ -750,7 +750,7 @@ class EmailTemplateGenerator:
         anime_releases = [r for r in releases if r.get("type") == "anime"]
         manga_releases = [r for r in releases if r.get("type") == "manga"]
 
-        html = f"""
+        html = """
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -867,10 +867,10 @@ class EmailTemplateGenerator:
             <h1>🎬 アニメ・マンガ最新情報</h1>
             <div class="date">{date_str}</div>
         </div>
-        
+
         {self._generate_anime_section(anime_releases) if anime_releases else ""}
         {self._generate_manga_section(manga_releases) if manga_releases else ""}
-        
+
         <div class="footer">
             <p>📧 このメールは自動配信されています</p>
             <p>🤖 Generated with MangaAnime Information System</p>

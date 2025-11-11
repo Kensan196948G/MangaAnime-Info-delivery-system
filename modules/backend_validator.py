@@ -326,7 +326,7 @@ class BackendValidator:
                 # This should fail due to foreign key constraint
                 cursor = conn.execute(
                     """
-                    INSERT INTO releases (work_id, release_type) 
+                    INSERT INTO releases (work_id, release_type)
                     VALUES (999999, 'episode')
                 """
                 )
@@ -1039,7 +1039,7 @@ if __name__ == "__main__":
             report = await run_backend_validation()
 
             print(f"\n{'='*60}")
-            print(f"BACKEND VALIDATION REPORT")
+            print("BACKEND VALIDATION REPORT")
             print(f"{'='*60}")
             print(f"Total Tests: {report.total_tests}")
             print(f"Passed: {report.passed_tests}")

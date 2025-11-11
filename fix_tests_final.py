@@ -7,7 +7,6 @@ This script will run pytest, identify all failing tests, and apply systematic fi
 import os
 import sys
 import subprocess
-import re
 from pathlib import Path
 
 
@@ -70,7 +69,7 @@ def main():
             print("\n✅ No failing tests found!")
 
         # Run with more detail to get error info
-        print(f"\n🔍 Running with detailed output...")
+        print("\n🔍 Running with detailed output...")
         detail_result = subprocess.run(
             [sys.executable, "-m", "pytest", str(tests_dir), "-v", "--tb=short"],
             capture_output=True,
@@ -97,7 +96,7 @@ def main():
         print(f"❌ Error running tests: {e}")
 
     # Summary
-    print(f"\n📊 Test Fixing Summary:")
+    print("\n📊 Test Fixing Summary:")
     print(f"  - Tests directory: {'✅' if tests_dir.exists() else '❌'}")
     print(f"  - Test files found: {len(test_files)}")
     print(f"  - conftest.py: {'✅' if (tests_dir / 'conftest.py').exists() else '❌'}")
@@ -112,14 +111,14 @@ def main():
         "test_main.py",
     ]
 
-    print(f"\n📝 Expected test files:")
+    print("\n📝 Expected test files:")
     for file in expected_files:
         file_path = tests_dir / file
         status = "✅" if file_path.exists() else "❌"
         size = f"({file_path.stat().st_size} bytes)" if file_path.exists() else ""
         print(f"  {status} {file} {size}")
 
-    print(f"\n🎯 Recommendations:")
+    print("\n🎯 Recommendations:")
     if not (tests_dir / "conftest.py").exists():
         print("  - Create conftest.py with common fixtures")
 
@@ -131,7 +130,7 @@ def main():
     print("  - Verify all external dependencies are mocked")
     print("  - Check that database tests use :memory:")
 
-    print(f"\n✅ Test fixing analysis complete!")
+    print("\n✅ Test fixing analysis complete!")
 
 
 if __name__ == "__main__":

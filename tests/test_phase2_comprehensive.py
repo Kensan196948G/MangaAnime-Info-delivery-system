@@ -3,11 +3,16 @@
 Comprehensive Phase 2 Integration Testing Suite
 """
 import pytest
-from unittest.mock import patch, AsyncMock
-
-# Import system modules
+from unittest.mock import patch, AsyncMock, Mock
 import sys
 import os
+import json
+import time
+import sqlite3
+import statistics
+import feedparser
+from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -303,7 +308,7 @@ class TestIntegratedEndToEndWorkflow:
                         "title_kana": f"めもりてすと{iteration}_{i}",
                         "title_en": f"Memory Test {iteration}_{i}",
                         "type": "anime" if i % 2 == 0 else "manga",
-                        "description": f"説明文" * 100,  # 長い説明文
+                        "description": "説明文" * 100,  # 長い説明文
                         "official_url": f"https://example.com/memory/{iteration}/{i}",
                     }
                 )

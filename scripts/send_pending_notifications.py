@@ -67,8 +67,8 @@ def mark_as_notified(release_ids):
     for release_id in release_ids:
         cursor.execute(
             """
-            UPDATE releases 
-            SET notified = 1 
+            UPDATE releases
+            SET notified = 1
             WHERE id = ?
         """,
             (release_id,),
@@ -166,7 +166,7 @@ def main():
     total_pending = cursor.fetchone()[0]
     conn.close()
 
-    print(f"\n📊 現在の状況:")
+    print("\n📊 現在の状況:")
     print(f"   未通知リリース: {total_pending} 件")
     print(f"   バッチサイズ: {BATCH_SIZE} 件/回")
     print(f"   最大送信数: {MAX_NOTIFICATIONS} 件")
@@ -199,7 +199,7 @@ def main():
             sent_count += len(releases)
             print(f"   ✅ 送信成功 (累計: {sent_count} 件)")
         else:
-            print(f"   ❌ 送信失敗")
+            print("   ❌ 送信失敗")
             break
 
         # 次のバッチまで待機
@@ -214,7 +214,7 @@ def main():
     print(f"   残り: {total_pending - sent_count} 件")
 
     if total_pending - sent_count > 0:
-        print(f"\n💡 ヒント: 残りの通知を送信するには、再度このスクリプトを実行してください")
+        print("\n💡 ヒント: 残りの通知を送信するには、再度このスクリプトを実行してください")
     else:
         print("\n✅ すべての通知を送信しました！")
 

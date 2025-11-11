@@ -6,6 +6,8 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from modules.mailer import send_email
+
 
 class TestMailerIntegration(unittest.TestCase):
     @pytest.mark.asyncio

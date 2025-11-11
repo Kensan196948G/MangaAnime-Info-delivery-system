@@ -3,7 +3,6 @@
 CI Pipeline修正の検証スクリプト
 """
 
-import yaml
 import sys
 from pathlib import Path
 

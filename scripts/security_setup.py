@@ -8,20 +8,17 @@ environment variable validation, and OAuth2 token encryption.
 
 import os
 import sys
-import json
 import getpass
 import stat
 import base64
 import secrets
 from pathlib import Path
-from typing import Dict, Any, Optional
 import logging
 
 # Add the parent directory to the path to import modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
-    from modules.config import ConfigManager, SecureConfigManager
 except ImportError as e:
     print(f"Error: Cannot import configuration modules: {e}")
     print("Please run this script from the project root directory.")

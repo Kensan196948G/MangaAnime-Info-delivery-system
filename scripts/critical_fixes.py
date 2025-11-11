@@ -14,8 +14,6 @@ import sys
 import subprocess
 import logging
 import argparse
-import hashlib
-import secrets
 from pathlib import Path
 
 # ログ設定

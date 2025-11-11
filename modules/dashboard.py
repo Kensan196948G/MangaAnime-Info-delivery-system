@@ -60,14 +60,14 @@ class DashboardService:
 
                 conn.execute(
                     """
-                    CREATE INDEX IF NOT EXISTS idx_dashboard_stats_timestamp 
+                    CREATE INDEX IF NOT EXISTS idx_dashboard_stats_timestamp
                     ON dashboard_stats(timestamp)
                 """
                 )
 
                 conn.execute(
                     """
-                    CREATE INDEX IF NOT EXISTS idx_dashboard_stats_metric 
+                    CREATE INDEX IF NOT EXISTS idx_dashboard_stats_metric
                     ON dashboard_stats(metric_name, timestamp)
                 """
                 )
@@ -85,8 +85,8 @@ class DashboardService:
                 cursor = conn.execute(
                     """
                     SELECT metric_name, metric_value, metric_type, timestamp, source
-                    FROM dashboard_stats 
-                    WHERE timestamp > ? 
+                    FROM dashboard_stats
+                    WHERE timestamp > ?
                     ORDER BY timestamp DESC
                 """,
                     (since,),
@@ -98,7 +98,7 @@ class DashboardService:
                 cursor = conn.execute(
                     """
                     SELECT component, status, last_check, error_message, performance_score
-                    FROM system_health 
+                    FROM system_health
                     ORDER BY last_check DESC
                 """
                 )
@@ -128,8 +128,8 @@ class DashboardService:
                     SELECT AVG(metric_value) as avg_response_time,
                            COUNT(*) as total_requests,
                            MAX(metric_value) as max_response_time
-                    FROM dashboard_stats 
-                    WHERE metric_name = 'anilist_response_time' 
+                    FROM dashboard_stats
+                    WHERE metric_name = 'anilist_response_time'
                     AND timestamp > datetime('now', '-24 hours')
                 """
                 )
@@ -138,11 +138,11 @@ class DashboardService:
                 # RSS収集統計
                 cursor = conn.execute(
                     """
-                    SELECT 
+                    SELECT
                         SUM(CASE WHEN metric_name = 'rss_success' THEN metric_value ELSE 0 END) as successes,
                         SUM(CASE WHEN metric_name = 'rss_error' THEN metric_value ELSE 0 END) as errors,
                         COUNT(DISTINCT source) as sources_checked
-                    FROM dashboard_stats 
+                    FROM dashboard_stats
                     WHERE metric_name IN ('rss_success', 'rss_error')
                     AND timestamp > datetime('now', '-24 hours')
                 """
@@ -154,8 +154,8 @@ class DashboardService:
                     """
                     SELECT AVG(metric_value) as avg_query_time,
                            COUNT(*) as total_queries
-                    FROM dashboard_stats 
-                    WHERE metric_name = 'db_query_time' 
+                    FROM dashboard_stats
+                    WHERE metric_name = 'db_query_time'
                     AND timestamp > datetime('now', '-24 hours')
                 """
                 )
@@ -165,8 +165,8 @@ class DashboardService:
                 cursor = conn.execute(
                     """
                     SELECT COUNT(*) as total_notifications
-                    FROM releases 
-                    WHERE notified = 1 
+                    FROM releases
+                    WHERE notified = 1
                     AND created_at > datetime('now', '-24 hours')
                 """
                 )
@@ -196,7 +196,7 @@ class DashboardService:
             with sqlite3.connect(self.db_path) as conn:
                 conn.execute(
                     """
-                    INSERT INTO dashboard_stats 
+                    INSERT INTO dashboard_stats
                     (metric_name, metric_value, metric_type, source, metadata)
                     VALUES (?, ?, ?, ?, ?)
                 """,
@@ -223,7 +223,7 @@ class DashboardService:
             with sqlite3.connect(self.db_path) as conn:
                 conn.execute(
                     """
-                    INSERT OR REPLACE INTO system_health 
+                    INSERT OR REPLACE INTO system_health
                     (component, status, error_message, performance_score)
                     VALUES (?, ?, ?, ?)
                 """,
@@ -242,7 +242,7 @@ class DashboardService:
                 cursor = conn.execute(
                     """
                     SELECT metric_value, timestamp
-                    FROM dashboard_stats 
+                    FROM dashboard_stats
                     WHERE metric_name = ? AND timestamp > ?
                     ORDER BY timestamp ASC
                 """,

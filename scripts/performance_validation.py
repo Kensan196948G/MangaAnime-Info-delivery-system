@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 #!/usr/bin/env python3
 """
 アニメ・マンガ情報配信システム - パフォーマンス・運用性最終検証スクリプト
@@ -18,8 +19,6 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import requests
-from typing import Dict, List, Tuple, Any
-import threading
 import traceback
 
 # ログ設定

@@ -1,18 +1,16 @@
+from typing import Any, Dict, List, Optional
 #!/usr/bin/env python3
 """
 Test Coverage Analyzer and Quality Assessment Tool
 Analyzes test coverage, quality metrics, and generates comprehensive reports
 """
 
-import os
 import sys
 import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
 import subprocess
 from datetime import datetime
-import sqlite3
 import re
 from dataclasses import dataclass, asdict
 
@@ -599,7 +597,7 @@ class TestCoverageAnalyzer:
         # Run bandit for security analysis
         try:
             result = subprocess.run(
-                ["bandit", "-r", str(self.modules_dir), "-f", "json"],
+                ["bandit", "-r", str(self.modules_dir), "-", "json"],
                 capture_output=True,
                 text=True,
                 timeout=60,
@@ -652,7 +650,7 @@ class TestCoverageAnalyzer:
         # Run black in check mode
         try:
             result = subprocess.run(
-                ["black", "--check", "--diff", str(self.modules_dir)],
+                ["black", "--check", "--di", str(self.modules_dir)],
                 capture_output=True,
                 text=True,
                 timeout=60,
@@ -792,7 +790,7 @@ class TestCoverageAnalyzer:
         md_report_path = self.reports_dir / f"coverage_summary_{timestamp}.md"
         self._generate_markdown_summary(analysis_results, md_report_path)
 
-        print(f"📄 Reports generated:")
+        print("📄 Reports generated:")
         print(f"   JSON: {json_report_path}")
         print(f"   HTML: {html_report_path}")
         print(f"   Markdown: {md_report_path}")
@@ -801,7 +799,7 @@ class TestCoverageAnalyzer:
         self, analysis_results: Dict[str, Any], output_path: Path
     ):
         """Generate HTML report"""
-        html_content = f"""
+        html_content = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -830,7 +828,7 @@ class TestCoverageAnalyzer:
         <p>Generated: {analysis_results['timestamp']}</p>
         <p>Project: MangaAnime Information Delivery System</p>
     </div>
-    
+
     <div class="section">
         <h2>📊 Key Metrics</h2>
         <div class="metrics">
@@ -852,17 +850,17 @@ class TestCoverageAnalyzer:
             </div>
         </div>
     </div>
-    
+
     <div class="section">
         <h2>🎯 Recommendations</h2>
         {self._generate_recommendations_html(analysis_results.get('recommendations', []))}
     </div>
-    
+
     <div class="section">
         <h2>📋 Coverage Gaps</h2>
         {self._generate_gaps_html(analysis_results.get('gap_analysis', {}))}
     </div>
-    
+
     <div class="section">
         <h2>📁 Project Structure</h2>
         {self._generate_project_structure_html(analysis_results.get('project_overview', {}))}
@@ -884,7 +882,7 @@ class TestCoverageAnalyzer:
         html = ""
         for rec in recommendations:
             priority_class = f"{rec['priority'].lower()}-priority"
-            html += f"""
+            html += """
             <div class="recommendation {priority_class}">
                 <h4>{rec['title']} ({rec['priority']} Priority)</h4>
                 <p>{rec['description']}</p>
@@ -901,7 +899,7 @@ class TestCoverageAnalyzer:
         html = ""
 
         if gaps.get("missing_test_files"):
-            html += f"""
+            html += """
             <div class="gap">
                 <h4>Missing Test Files ({len(gaps['missing_test_files'])})</h4>
                 <ul>
@@ -911,7 +909,7 @@ class TestCoverageAnalyzer:
             """
 
         if gaps.get("uncovered_modules"):
-            html += f"""
+            html += """
             <div class="gap">
                 <h4>Uncovered Modules ({len(gaps['uncovered_modules'])})</h4>
                 <ul>
@@ -924,7 +922,7 @@ class TestCoverageAnalyzer:
 
     def _generate_project_structure_html(self, project_overview: Dict[str, Any]) -> str:
         """Generate HTML for project structure section"""
-        return f"""
+        return """
         <table>
             <tr><th>Metric</th><th>Value</th></tr>
             <tr><td>Total Modules</td><td>{project_overview.get('total_modules', 0)}</td></tr>
@@ -939,7 +937,7 @@ class TestCoverageAnalyzer:
         self, analysis_results: Dict[str, Any], output_path: Path
     ):
         """Generate markdown summary report"""
-        md_content = f"""# Test Coverage Analysis Summary
+        md_content = """# Test Coverage Analysis Summary
 
 Generated: {analysis_results['timestamp']}
 Project: MangaAnime Information Delivery System
@@ -959,7 +957,7 @@ Project: MangaAnime Information Delivery System
 """
 
         for rec in analysis_results.get("recommendations", [])[:3]:
-            md_content += f"""### {rec['title']} ({rec['priority']} Priority)
+            md_content += """### {rec['title']} ({rec['priority']} Priority)
 
 {rec['description']}
 
@@ -968,7 +966,7 @@ Action Items:
 
 """
 
-        md_content += f"""## 📋 Coverage Gaps
+        md_content += """## 📋 Coverage Gaps
 
 ### Missing Test Files
 {chr(10).join(f'- {module}' for module in analysis_results.get('gap_analysis', {}).get('missing_test_files', []))}

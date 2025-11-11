@@ -6,7 +6,6 @@
 認証URLを表示し、ユーザーがブラウザで認証後にコードを取得する方式
 """
 
-import json
 import os
 from google_auth_oauthlib.flow import InstalledAppFlow
 

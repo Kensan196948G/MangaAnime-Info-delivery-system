@@ -51,7 +51,7 @@ class TestInputValidationSecurity:
         <iframe src="evil.com"></iframe>
         <img src="x" onerror="alert('xss')">
         <a href="javascript:alert('xss')">click me</a>
-        <object data="evil.swf"></object>
+        <object data="evil.sw"></object>
         """
 
         sanitized = InputSanitizer.sanitize_html_content(malicious_html)
@@ -341,7 +341,7 @@ class TestDatabaseSecurity:
 
         # Should be a valid SHA-256 hash
         assert len(hash1) == 64  # SHA-256 produces 64-character hex string
-        assert all(c in "0123456789abcdef" for c in hash1)
+        assert all(c in "0123456789abcde" for c in hash1)
 
         # Different inputs should produce different hashes
         different_hash = db_security.hash_identifier("different_data")

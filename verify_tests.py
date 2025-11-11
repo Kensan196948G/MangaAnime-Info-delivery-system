@@ -32,7 +32,7 @@ def check_test_status():
             print(f"  - {f.name} ({size} bytes)")
 
     # Try running a simple pytest command
-    print(f"\n🧪 Testing pytest availability...")
+    print("\n🧪 Testing pytest availability...")
     try:
         result = subprocess.run(
             [
@@ -48,13 +48,13 @@ def check_test_status():
         if result.returncode == 0:
             print(f"✅ {result.stdout.strip()}")
         else:
-            print(f"❌ pytest import failed")
+            print("❌ pytest import failed")
     except Exception as e:
         print(f"❌ pytest check error: {e}")
 
     # Try running tests if they exist
     if tests_dir.exists() and any(tests_dir.glob("*.py")):
-        print(f"\n🏃 Quick test run...")
+        print("\n🏃 Quick test run...")
         try:
             result = subprocess.run(
                 [
@@ -79,7 +79,7 @@ def check_test_status():
         except Exception as e:
             print(f"❌ Test collection error: {e}")
 
-    print(f"\n📊 Summary:")
+    print("\n📊 Summary:")
     print(f"  - Tests directory: {'✅ exists' if tests_dir.exists() else '❌ missing'}")
     print(
         f"  - Test files: {len(list(tests_dir.glob('*.py'))) if tests_dir.exists() else 0}"

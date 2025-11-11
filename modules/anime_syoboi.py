@@ -112,7 +112,7 @@ class SyoboiCalendarClient:
         self.cache: Dict[str, Any] = {}
 
         self.logger.info(
-            f"Syoboi Calendar client initialized: "
+            "Syoboi Calendar client initialized: "
             f"timeout={timeout}s, rate_limit={requests_per_minute}/min"
         )
 

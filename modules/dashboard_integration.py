@@ -165,13 +165,13 @@ class DashboardIntegration:
                 # API パフォーマンス
                 cursor = conn.execute(
                     """
-                    SELECT 
+                    SELECT
                         source,
                         AVG(metric_value) as avg_response_time,
                         MAX(metric_value) as max_response_time,
                         COUNT(*) as request_count
-                    FROM dashboard_stats 
-                    WHERE metric_name LIKE '%_response_time' 
+                    FROM dashboard_stats
+                    WHERE metric_name LIKE '%_response_time'
                     AND timestamp > ?
                     GROUP BY source
                 """,
@@ -182,10 +182,10 @@ class DashboardIntegration:
                 # RSS収集統計
                 cursor = conn.execute(
                     """
-                    SELECT 
+                    SELECT
                         SUM(CASE WHEN metric_name = 'rss_success' THEN metric_value ELSE 0 END) as successes,
                         SUM(CASE WHEN metric_name = 'rss_error' THEN metric_value ELSE 0 END) as errors
-                    FROM dashboard_stats 
+                    FROM dashboard_stats
                     WHERE metric_name IN ('rss_success', 'rss_error')
                     AND timestamp > ?
                 """,
@@ -196,10 +196,10 @@ class DashboardIntegration:
                 # データベース統計
                 cursor = conn.execute(
                     """
-                    SELECT 
+                    SELECT
                         AVG(metric_value) as avg_query_time,
                         COUNT(*) as total_queries
-                    FROM dashboard_stats 
+                    FROM dashboard_stats
                     WHERE metric_name = 'db_query_time'
                     AND timestamp > ?
                 """,
@@ -210,10 +210,10 @@ class DashboardIntegration:
                 # 通知統計
                 cursor = conn.execute(
                     """
-                    SELECT 
+                    SELECT
                         SUM(CASE WHEN metric_name = 'notification_success' THEN metric_value ELSE 0 END) as successful_notifications,
                         SUM(CASE WHEN metric_name = 'notification_error' THEN metric_value ELSE 0 END) as failed_notifications
-                    FROM dashboard_stats 
+                    FROM dashboard_stats
                     WHERE metric_name IN ('notification_success', 'notification_error')
                     AND timestamp > ?
                 """,
@@ -241,7 +241,7 @@ class DashboardIntegration:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.execute(
                     """
-                    DELETE FROM dashboard_stats 
+                    DELETE FROM dashboard_stats
                     WHERE timestamp < ?
                 """,
                     (cutoff_date,),
@@ -253,7 +253,7 @@ class DashboardIntegration:
                 # システムヘルスの古いレコードもクリーンアップ
                 cursor = conn.execute(
                     """
-                    DELETE FROM system_health 
+                    DELETE FROM system_health
                     WHERE last_check < ?
                 """,
                     (cutoff_date,),

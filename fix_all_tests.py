@@ -147,7 +147,7 @@ def fix_common_test_issues(content, filepath):
             "email": {"enabled": False},
             "api": {"enabled": False}
         }
-        
+
 '''
         content = re.sub(class_pattern, r"\1" + setup_method, content)
         fixes_applied.append("Added setUp method")
@@ -163,7 +163,7 @@ def fix_common_test_issues(content, filepath):
         """Clean up after tests"""
         # Close any open database connections
         pass
-        
+
 '''
         # Add before the first test method
         test_method_pattern = r"(\n    def test_)"
@@ -227,14 +227,14 @@ def mock_requests():
     """Mock requests for API calls"""
     with patch('requests.get') as mock_get, \\
          patch('requests.post') as mock_post:
-        
+
         # Default successful responses
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {"data": [], "status": "ok"}
-        
+
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {"data": [], "status": "ok"}
-        
+
         yield {
             "get": mock_get,
             "post": mock_post
@@ -258,7 +258,7 @@ def mock_calendar():
 '''
 
         write_file(conftest_path, conftest_content)
-        print(f"✅ Created conftest.py")
+        print("✅ Created conftest.py")
         return True
 
     return False
@@ -340,12 +340,12 @@ def main():
             print(f"   Applied fixes: {', '.join(fixes)}")
             total_fixes += len(fixes)
         else:
-            print(f"   No fixes needed")
+            print("   No fixes needed")
 
     print(f"\n✅ Applied {total_fixes} total fixes")
 
     # Run tests to check results
-    print(f"\n🧪 Running tests to check results...")
+    print("\n🧪 Running tests to check results...")
     failed_tests, stdout, stderr = run_tests_and_get_failures(tests_dir)
 
     if failed_tests:
@@ -369,7 +369,7 @@ def main():
             )
         ]
         if summary_lines:
-            print(f"\n📊 Test Summary:")
+            print("\n📊 Test Summary:")
             for line in summary_lines[-5:]:  # Last 5 summary lines
                 print(f"  {line}")
 

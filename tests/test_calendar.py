@@ -296,9 +296,9 @@ class TestCalendarEventFormatting:
             "url": "https://viz.com/jujutsu-kaisen",
         }
 
-        description = f"""
+        description = """
         New volume of {manga_data['title']} is now available!
-        
+
         Volume: {manga_data['volume']}
         Platform: {manga_data['platform']}
         Read online: {manga_data['url']}

@@ -456,7 +456,7 @@ class DataIntegrityValidator:
         # Check for orphaned releases
         cursor = conn.execute(
             """
-            SELECT COUNT(*) FROM releases 
+            SELECT COUNT(*) FROM releases
             WHERE work_id NOT IN (SELECT id FROM works)
         """
         )
@@ -476,7 +476,7 @@ class DataIntegrityValidator:
         # Check for invalid work types
         cursor = conn.execute(
             """
-            SELECT COUNT(*) FROM works 
+            SELECT COUNT(*) FROM works
             WHERE type NOT IN ('anime', 'manga')
         """
         )
@@ -498,7 +498,7 @@ class DataIntegrityValidator:
         # Check for inconsistent title formats
         cursor = conn.execute(
             """
-            SELECT id, title FROM works 
+            SELECT id, title FROM works
             WHERE LENGTH(title) < 2 OR LENGTH(title) > 500
         """
         )
@@ -518,7 +518,7 @@ class DataIntegrityValidator:
         # Check for invalid release dates
         cursor = conn.execute(
             """
-            SELECT COUNT(*) FROM releases 
+            SELECT COUNT(*) FROM releases
             WHERE release_date < '1900-01-01' OR release_date > DATE('now', '+2 years')
         """
         )
@@ -540,8 +540,8 @@ class DataIntegrityValidator:
         # Check for duplicate works
         cursor = conn.execute(
             """
-            SELECT title, COUNT(*) as count FROM works 
-            GROUP BY LOWER(title) 
+            SELECT title, COUNT(*) as count FROM works
+            GROUP BY LOWER(title)
             HAVING count > 1
         """
         )
@@ -563,7 +563,7 @@ class DataIntegrityValidator:
         cursor = conn.execute(
             """
             SELECT work_id, release_type, number, platform, release_date, COUNT(*) as count
-            FROM releases 
+            FROM releases
             GROUP BY work_id, release_type, number, platform, release_date
             HAVING count > 1
         """
@@ -586,7 +586,7 @@ class DataIntegrityValidator:
         # Check for incomplete work records
         cursor = conn.execute(
             """
-            SELECT COUNT(*) FROM works 
+            SELECT COUNT(*) FROM works
             WHERE title IS NULL OR title = '' OR type IS NULL OR type = ''
         """
         )
@@ -606,7 +606,7 @@ class DataIntegrityValidator:
         # Check for incomplete releases
         cursor = conn.execute(
             """
-            SELECT COUNT(*) FROM releases 
+            SELECT COUNT(*) FROM releases
             WHERE work_id IS NULL OR release_date IS NULL OR platform IS NULL OR platform = ''
         """
         )
@@ -628,9 +628,9 @@ class DataIntegrityValidator:
         # Check URL formats
         cursor = conn.execute(
             """
-            SELECT COUNT(*) FROM works 
-            WHERE official_url IS NOT NULL 
-            AND official_url != '' 
+            SELECT COUNT(*) FROM works
+            WHERE official_url IS NOT NULL
+            AND official_url != ''
             AND official_url NOT LIKE 'http%'
         """
         )
@@ -787,10 +787,10 @@ class PerformanceValidator:
             join_start = time.time()
             cursor = conn.execute(
                 """
-                SELECT w.title, COUNT(r.id) 
-                FROM works w 
-                LEFT JOIN releases r ON w.id = r.work_id 
-                GROUP BY w.id 
+                SELECT w.title, COUNT(r.id)
+                FROM works w
+                LEFT JOIN releases r ON w.id = r.work_id
+                GROUP BY w.id
                 LIMIT 100
             """
             )
@@ -1159,7 +1159,7 @@ def run_qa_audit_cli(project_root: str, output_file: str = None) -> None:
     print("Starting comprehensive QA audit...")
     results = qa_framework.run_comprehensive_qa_audit()
 
-    print(f"\nQA Audit Results:")
+    print("\nQA Audit Results:")
     print(f"Overall Score: {results['overall_score']}/100")
     print(f"Quality Level: {results['summary']['quality_level']}")
     print(f"Total Issues: {results['summary']['total_issues_found']}")
@@ -1168,7 +1168,7 @@ def run_qa_audit_cli(project_root: str, output_file: str = None) -> None:
     print(f"Performance: {results['summary']['performance_score']}/100")
 
     if results["action_items"]:
-        print(f"\nTop Action Items:")
+        print("\nTop Action Items:")
         for i, item in enumerate(results["action_items"][:5], 1):
             print(f"{i}. {item}")
 

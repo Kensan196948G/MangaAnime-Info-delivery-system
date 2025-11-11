@@ -74,7 +74,6 @@ async def test_manga_rss_enhanced():
 
     try:
         from manga_rss import MangaRSSCollector
-        from config import ConfigManager
 
         # Mock config manager
         class MockConfig:
@@ -205,7 +204,6 @@ def test_error_recovery():
     logger.info("=== Testing Enhanced Error Recovery ===")
 
     try:
-        from enhanced_error_recovery import (
             EnhancedErrorRecovery,
             ErrorSeverity,
             initialize_error_recovery,
@@ -280,7 +278,7 @@ async def test_gmail_enhanced():
     try:
         # Mock Gmail testing since we don't have real credentials
         logger.info("Gmail API enhancements:")
-        logger.info("  ✓ Retry mechanism with exponential backoff")
+        logger.info("  ✓ Retry mechanism with exponential backo")
         logger.info("  ✓ Enhanced authentication state management")
         logger.info("  ✓ Rate limiting enforcement")
         logger.info("  ✓ Performance monitoring")

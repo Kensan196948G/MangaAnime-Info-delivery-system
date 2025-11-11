@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 #!/usr/bin/env python3
 
 """
@@ -7,17 +8,11 @@ Analyzes repair patterns, success rates, failure trends, and generates optimizat
 
 import json
 import sqlite3
-import sys
 import os
 import argparse
-import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
-from collections import defaultdict, Counter
-import statistics
-import re
 
 try:
     import numpy as np
@@ -30,7 +25,6 @@ except ImportError:
 
 try:
     import matplotlib.pyplot as plt
-    import seaborn as sns
     from sklearn.ensemble import IsolationForest
     from sklearn.preprocessing import StandardScaler
 
@@ -259,8 +253,8 @@ class RepairAnalytics:
                     timestamp = base_time + timedelta(days=i * 6, hours=i * 2)
                     cursor.execute(
                         """
-                        INSERT INTO repair_history 
-                        (timestamp, repair_type, status, duration, error_message, workflow_name, 
+                        INSERT INTO repair_history
+                        (timestamp, repair_type, status, duration, error_message, workflow_name,
                          commit_hash, retry_count, system_load, github_api_remaining)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
@@ -289,12 +283,12 @@ class RepairAnalytics:
             # Analyze by repair type
             cursor.execute(
                 """
-                SELECT repair_type, 
+                SELECT repair_type,
                        COUNT(*) as total,
                        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successful,
                        AVG(duration) as avg_duration,
                        GROUP_CONCAT(error_message, '|') as errors
-                FROM repair_history 
+                FROM repair_history
                 GROUP BY repair_type
                 HAVING total > 1
             """
@@ -319,7 +313,7 @@ class RepairAnalytics:
                 cursor.execute(
                     """
                     SELECT strftime('%H', timestamp) as hour, COUNT(*) as count
-                    FROM repair_history 
+                    FROM repair_history
                     WHERE repair_type = ? AND status = 'failure'
                     GROUP BY hour
                     ORDER BY count DESC
@@ -414,7 +408,7 @@ class RepairAnalytics:
             # Overall success rate
             cursor.execute(
                 """
-                SELECT 
+                SELECT
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successful
                 FROM repair_history
@@ -434,7 +428,7 @@ class RepairAnalytics:
             cursor.execute(
                 """
                 SELECT COUNT(*) / 30.0 as repairs_per_day
-                FROM repair_history 
+                FROM repair_history
                 WHERE timestamp > datetime('now', '-30 days')
             """
             )
@@ -443,10 +437,10 @@ class RepairAnalytics:
             # Failure recovery rate (retries that eventually succeeded)
             cursor.execute(
                 """
-                SELECT 
+                SELECT
                     COUNT(*) as total_retries,
                     SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successful_retries
-                FROM repair_history 
+                FROM repair_history
                 WHERE retry_count > 0
             """
             )
@@ -460,7 +454,7 @@ class RepairAnalytics:
             cursor.execute(
                 """
                 SELECT COUNT(*) as failure_count
-                FROM repair_history 
+                FROM repair_history
                 WHERE status = 'failure' AND timestamp > datetime('now', '-24 hours')
             """
             )
@@ -473,8 +467,8 @@ class RepairAnalytics:
             # MTTR (Mean Time To Repair) - average time to resolve failures
             cursor.execute(
                 """
-                SELECT AVG(duration) 
-                FROM repair_history 
+                SELECT AVG(duration)
+                FROM repair_history
                 WHERE status = 'success' AND retry_count > 0
             """
             )
@@ -483,9 +477,9 @@ class RepairAnalytics:
             # MTBF (Mean Time Between Failures)
             cursor.execute(
                 """
-                SELECT 
+                SELECT
                     (MAX(julianday(timestamp)) - MIN(julianday(timestamp))) * 24 / COUNT(*) as mtbf_hours
-                FROM repair_history 
+                FROM repair_history
                 WHERE status = 'failure'
             """
             )
@@ -686,12 +680,12 @@ class RepairAnalytics:
             conn = sqlite3.connect(self.db_path)
 
             # Load time series data
-            query = f"""
+            query = """
                 SELECT DATE(timestamp) as date,
                        COUNT(*) as total_repairs,
                        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successful_repairs,
                        AVG(duration) as avg_duration
-                FROM repair_history 
+                FROM repair_history
                 WHERE timestamp > datetime('now', '-{days} days')
                 GROUP BY DATE(timestamp)
                 ORDER BY date
@@ -788,7 +782,7 @@ class RepairAnalytics:
                 SELECT DATE(timestamp) as date,
                        COUNT(*) as total,
                        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successful
-                FROM repair_history 
+                FROM repair_history
                 GROUP BY DATE(timestamp)
                 ORDER BY date
             """,
@@ -823,7 +817,7 @@ class RepairAnalytics:
                     """
                     SELECT repair_type, COUNT(*) as count,
                            SUM(CASE WHEN status = 'failure' THEN 1 ELSE 0 END) as failures
-                    FROM repair_history 
+                    FROM repair_history
                     GROUP BY repair_type
                 """,
                     conn,
@@ -841,7 +835,7 @@ class RepairAnalytics:
                 # Plot 4: Duration distribution
                 df_duration = pd.read_sql_query(
                     """
-                    SELECT duration FROM repair_history 
+                    SELECT duration FROM repair_history
                     WHERE duration IS NOT NULL AND duration > 0
                 """,
                     conn,

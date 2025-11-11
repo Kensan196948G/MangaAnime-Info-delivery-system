@@ -68,12 +68,12 @@ def calculate_something():
     result = value * 3.14159  # Pi - should be constant
     timeout = 30  # Should be configuration
     max_retries = 5  # Should be constant
-    
+
     # These should be acceptable
     if count > 0:  # 0 is acceptable
         items = items[1:]  # 1 is acceptable
         percentage = (value / 100) * 10  # 100 and 10 should be flagged
-    
+
     return result + 42  # Magic number
 """
         test_file.write_text(code_with_magic_numbers)
@@ -140,16 +140,16 @@ class ClassWithDocstring:
 
         # Use a filename without 'test' in it to avoid being skipped
         test_file = test_project / "module.py"
-        code_with_style_issues = f"""
+        code_with_style_issues = """
 # This line is way too long and should be flagged by the line length checker because it exceeds the maximum allowed line length which is typically set to 120 characters
 def function_with_issues():
     # TODO: Fix this later
     print("This should use logging instead")  # Print statement issue
-    
+
     try:
         risky_operation()
     except: pass
-    
+
     return 123  # Magic number
 """
         test_file.write_text(code_with_style_issues)
@@ -220,14 +220,14 @@ This module demonstrates proper Python coding practices.
 def well_documented_function(param1: str, param2: int) -> str:
     """
     A function with proper documentation and implementation.
-    
+
     Args:
         param1: A string parameter for processing
         param2: An integer parameter for calculation
-    
+
     Returns:
         A processed string result
-    
+
     Example:
         >>> result = well_documented_function("test", some_value)
         >>> return result
@@ -235,18 +235,18 @@ def well_documented_function(param1: str, param2: int) -> str:
     """
     if not param1:
         return "empty"
-    
+
     result = f"{param1} processed with {param2}"
     return result
 
 
 class WellDocumentedClass:
     """A class that follows good documentation practices."""
-    
+
     def __init__(self, value: str):
         """Initialize the class with a value."""
         self.value = value
-    
+
     def process_value(self) -> str:
         """Process the stored value and return result."""
         return f"Processed: {self.value}"
@@ -313,7 +313,7 @@ class TestDataIntegrityValidation:
                 type TEXT NOT NULL,
                 official_url TEXT
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY,
                 work_id INTEGER,
@@ -367,7 +367,7 @@ class TestDataIntegrityValidation:
                 type TEXT NOT NULL,
                 official_url TEXT
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY,
                 work_id INTEGER,
@@ -423,7 +423,7 @@ class TestDataIntegrityValidation:
                 title TEXT NOT NULL,
                 type TEXT NOT NULL
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY,
                 work_id INTEGER,
@@ -478,7 +478,7 @@ class TestDataIntegrityValidation:
                 title TEXT,
                 type TEXT
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY,
                 work_id INTEGER,
@@ -568,7 +568,7 @@ class TestDataIntegrityValidation:
                 type TEXT NOT NULL,
                 official_url TEXT
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY,
                 work_id INTEGER,
@@ -613,7 +613,7 @@ class TestPerformanceValidation:
                 title TEXT NOT NULL,
                 type TEXT NOT NULL
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY,
                 work_id INTEGER,
@@ -812,7 +812,7 @@ class TestIntegratedQAFramework:
                 title TEXT NOT NULL,
                 type TEXT NOT NULL
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY,
                 work_id INTEGER,
@@ -838,27 +838,27 @@ class TestIntegratedQAFramework:
 def well_written_function(param1: str, param2: int) -> str:
     '''
     A well-documented function that follows coding standards.
-    
+
     Args:
         param1: String parameter for processing
         param2: Integer parameter for calculation
-    
+
     Returns:
         Processed string result
     '''
     if not param1:
         return "empty"
-    
+
     return f"{param1} processed with {param2}"
 
 
 class TestClass:
     '''A test class for QA validation.'''
-    
+
     def __init__(self, value: str):
         '''Initialize with value.'''
         self.value = value
-    
+
     def process(self) -> str:
         '''Process the value.'''
         return f"Processed: {self.value}"
@@ -999,7 +999,7 @@ class TestQAPerformanceImpact:
         for i in range(10):
             test_file = test_project / f"module_{i}.py"
             test_file.write_text(
-                f"""
+                """
 def function_{i}(param):
     '''Function {i} documentation'''
     return param + {i}
@@ -1039,7 +1039,7 @@ class Class{i}:
                 title TEXT NOT NULL,
                 type TEXT NOT NULL
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY,
                 work_id INTEGER,
@@ -1056,7 +1056,7 @@ class Class{i}:
             )
             conn.execute(
                 "INSERT INTO releases (work_id, release_type, release_date) VALUES (?, ?, ?)",
-                (i + 1, "episode", f"2024-01-01"),
+                (i + 1, "episode", "2024-01-01"),
             )
 
         conn.commit()

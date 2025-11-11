@@ -23,7 +23,7 @@ except Exception as e:
 
 # Check specifically for tests
 tests_path = os.path.join(base_path, "tests")
-print(f"\n=== Tests directory check ===")
+print("\n=== Tests directory check ===")
 print(f"Tests path: {tests_path}")
 print(f"Tests exists: {os.path.exists(tests_path)}")
 
@@ -46,7 +46,7 @@ if os.path.exists(tests_path):
         print(f"Error listing tests directory: {e}")
 
 # Look for any Python test files anywhere
-print(f"\n=== Searching for test files ===")
+print("\n=== Searching for test files ===")
 test_patterns = [
     os.path.join(base_path, "**/test_*.py"),
     os.path.join(base_path, "**/*_test.py"),
@@ -67,7 +67,7 @@ for f in sorted(all_test_files):
     print(f"  {f}")
 
 # Check if pytest is installed
-print(f"\n=== Python and pytest check ===")
+print("\n=== Python and pytest check ===")
 import sys
 
 print(f"Python version: {sys.version}")
@@ -81,7 +81,7 @@ except ImportError:
 
 # Try to run pytest if we found test files
 if all_test_files:
-    print(f"\n=== Attempting to run first test file ===")
+    print("\n=== Attempting to run first test file ===")
     import subprocess
 
     first_test = all_test_files[0]

@@ -14,8 +14,6 @@ from typing import Dict, Any, Optional
 # Import our security and QA modules
 from modules.security_compliance import SecurityCompliance, SecurityTestRunner
 from modules.qa_validation import QAFramework
-from modules.security_utils import get_security_monitor
-from modules.monitoring import get_system_monitor
 
 
 def print_banner():
@@ -80,7 +78,7 @@ def run_security_audit(
     # Show top recommendations
     recommendations = audit_results.get("recommendations", [])
     if recommendations:
-        print(f"\n📋 Top Recommendations:")
+        print("\n📋 Top Recommendations:")
         for i, rec in enumerate(recommendations[:3], 1):
             print(f"  {i}. {rec}")
 
@@ -130,7 +128,7 @@ def run_qa_audit(
     print(f"Total Issues: {qa_results.get('summary', {}).get('total_issues_found', 0)}")
 
     summary = qa_results.get("summary", {})
-    print(f"\nComponent Scores:")
+    print("\nComponent Scores:")
     print(f"  • Code Quality: {summary.get('code_quality_score', 0):.1f}/100")
     print(f"  • Data Integrity: {summary.get('data_integrity_score', 0):.1f}/100")
     print(f"  • Performance: {summary.get('performance_score', 0):.1f}/100")
@@ -138,7 +136,7 @@ def run_qa_audit(
     # Show top action items
     action_items = qa_results.get("action_items", [])
     if action_items:
-        print(f"\n📋 Top Action Items:")
+        print("\n📋 Top Action Items:")
         for i, item in enumerate(action_items[:3], 1):
             print(f"  {i}. {item}")
 
@@ -208,7 +206,7 @@ def run_combined_audit(
     print(f"Combined Score: {combined_score:.1f}/100")
     print(f"Audit Duration: {overall_execution_time:.1f}s")
 
-    print(f"\nDetailed Breakdown:")
+    print("\nDetailed Breakdown:")
     print(f"  Security Score: {security_score:.1f}/100")
     print(f"  QA Score: {qa_score:.1f}/100")
 
@@ -232,7 +230,7 @@ def run_combined_audit(
     all_recommendations.extend(qa_results.get("action_items", []))
 
     if all_recommendations:
-        print(f"\n📋 Priority Actions:")
+        print("\n📋 Priority Actions:")
         for i, rec in enumerate(all_recommendations[:5], 1):
             print(f"  {i}. {rec}")
 
@@ -242,7 +240,7 @@ def run_combined_audit(
             )
 
     # Next steps
-    print(f"\n🎯 Next Steps:")
+    print("\n🎯 Next Steps:")
     if combined_score < 70:
         print("  1. Address critical and high-priority security issues")
         print("  2. Implement recommended code quality improvements")

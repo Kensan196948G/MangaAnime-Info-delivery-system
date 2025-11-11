@@ -471,7 +471,7 @@ class TestCalendarEventFormatting:
         event_summary = f'📺 {work["title"]} - 第{release["number"]}話'
         event_description = self._format_anime_event_description(work, release)
 
-        expected_description = f"""アニメ: {work['title']}
+        expected_description = """アニメ: {work['title']}
 エピソード: 第{release['number']}話
 配信プラットフォーム: {release['platform']}
 配信日: {release['release_date']}
@@ -592,7 +592,7 @@ class TestCalendarEventFormatting:
 
     def _format_anime_event_description(self, work: dict, release: dict) -> str:
         """Format anime event description."""
-        return f"""アニメ: {work['title']}
+        return """アニメ: {work['title']}
 エピソード: 第{release['number']}話
 配信プラットフォーム: {release['platform']}
 配信日: {release['release_date']}
@@ -603,7 +603,7 @@ class TestCalendarEventFormatting:
 
     def _format_manga_event_description(self, work: dict, release: dict) -> str:
         """Format manga event description."""
-        return f"""マンガ: {work['title']}
+        return """マンガ: {work['title']}
 巻数: 第{release['number']}巻
 配信プラットフォーム: {release['platform']}
 発売日: {release['release_date']}

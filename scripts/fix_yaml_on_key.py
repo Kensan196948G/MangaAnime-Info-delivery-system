@@ -4,7 +4,6 @@ GitHub Actions ワークフローの 'true:' を 'on:' に修正するスクリ�
 YAMLライブラリがonをブール値として解釈する問題を文字列処理で解決
 """
 
-import os
 from pathlib import Path
 
 
@@ -52,10 +51,10 @@ def main():
     for filepath in workflow_files:
         print(f"📄 {filepath.name}:")
         if fix_workflow_file(filepath):
-            print(f"   ✅ 修正完了")
+            print("   ✅ 修正完了")
             fixed_count += 1
         else:
-            print(f"   ⚪ 修正不要")
+            print("   ⚪ 修正不要")
 
     print("\n" + "=" * 50)
     print(f"✅ {fixed_count} 個のファイルを修正しました")

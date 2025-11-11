@@ -105,7 +105,7 @@ class ConfigBasedFilterManager:
         self.custom_rules = self._load_custom_rules()
 
         self.logger.info(
-            f"Config-based Filter Manager initialized: "
+            "Config-based Filter Manager initialized: "
             f"{len(self.ng_keywords)} keywords, "
             f"{len(self.ng_genres)} genres, "
             f"{len(self.exclude_tags)} tags, "

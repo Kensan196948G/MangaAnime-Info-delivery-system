@@ -3,6 +3,8 @@
 Test utilities and helper functions for the anime/manga notification system tests
 """
 
+import os
+import random
 import secrets
 import json
 import tempfile
@@ -180,9 +182,9 @@ class DataFactory:
             # Add some variety with suffixes for sequels/seasons
             if secrets.SystemRandom().random() < 0.3:
                 season_num = secrets.randbelow(2, 4)
-                title += f" 第{season_num}期" if work_type == "anime" else f" 続編"
+                title += f" 第{season_num}期" if work_type == "anime" else " 続編"
                 title_en += (
-                    f" Season {season_num}" if work_type == "anime" else f" Sequel"
+                    f" Season {season_num}" if work_type == "anime" else " Sequel"
                 )
 
             work = {
@@ -339,7 +341,7 @@ class DataFactory:
             link = f"https://example.com/{feed_type}/{uuid.uuid4().hex[:8]}"
 
             entries.append(
-                f"""
+                """
         <item>
             <title>{title}</title>
             <link>{link}</link>
@@ -351,13 +353,13 @@ class DataFactory:
             """
             )
 
-        feed_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+        feed_xml = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Test {feed_type.title()} RSS Feed</title>
         <description>Test RSS feed for {feed_type} releases</description>
         <link>https://example.com/{feed_type}/rss</link>
-        <atom:link href="https://example.com/{feed_type}/rss" rel="self" type="application/rss+xml" />
+        <atom:link href="https://example.com/{feed_type}/rss" rel="sel" type="application/rss+xml" />
         <language>ja</language>
         <lastBuildDate>{datetime.now().strftime('%a, %d %b %Y %H:%M:%S %z')}</lastBuildDate>
         {''.join(entries)}
@@ -389,7 +391,7 @@ class DataFactory:
                 "rss_feeds": {
                     "enabled_feeds": self._generate_rss_feed_config(),
                     "timeout_seconds": 20,
-                    "user_agent": f"MangaAnimeNotifier-Test/1.0",
+                    "user_agent": "MangaAnimeNotifier-Test/1.0",
                 },
             },
             "filtering": {
@@ -670,7 +672,7 @@ class DatabaseTestHelper:
                 official_url TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
-            
+
             CREATE TABLE releases (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 work_id INTEGER NOT NULL,
@@ -685,7 +687,7 @@ class DatabaseTestHelper:
                 FOREIGN KEY (work_id) REFERENCES works (id) ON DELETE CASCADE,
                 UNIQUE(work_id, release_type, number, platform, release_date)
             );
-            
+
             -- Indexes for performance
             CREATE INDEX idx_works_title ON works(title);
             CREATE INDEX idx_works_type ON works(type);
@@ -769,8 +771,8 @@ class DatabaseTestHelper:
         # Count releases by type and notification status
         cursor.execute(
             """
-            SELECT r.release_type, r.notified, COUNT(*) 
-            FROM releases r 
+            SELECT r.release_type, r.notified, COUNT(*)
+            FROM releases r
             GROUP BY r.release_type, r.notified
         """
         )

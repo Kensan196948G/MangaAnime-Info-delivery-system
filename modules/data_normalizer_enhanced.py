@@ -96,7 +96,7 @@ class EnhancedDuplicateDetector:
         self.logger = logging.getLogger(__name__)
 
         self.logger.info(
-            f"Enhanced Duplicate Detector initialized: "
+            "Enhanced Duplicate Detector initialized: "
             f"fuzzy={fuzzy_threshold}, phonetic={phonetic_threshold}"
         )
 

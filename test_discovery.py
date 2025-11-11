@@ -5,7 +5,6 @@ Test discovery and failure analysis script
 import os
 import sys
 import subprocess
-import json
 from pathlib import Path
 
 
@@ -35,7 +34,7 @@ def main():
         return
 
     # Step 3: Run pytest to collect test failures
-    print(f"\n🧪 Running pytest to identify failures...")
+    print("\n🧪 Running pytest to identify failures...")
 
     try:
         # First, just try to collect tests

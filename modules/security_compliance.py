@@ -911,7 +911,7 @@ def run_security_audit_cli(project_root: str, output_file: str = None) -> None:
     print("Starting security audit...")
     results = compliance.run_comprehensive_security_audit()
 
-    print(f"\nSecurity Audit Results:")
+    print("\nSecurity Audit Results:")
     print(f"Overall Score: {results['overall_score']}/100")
     print(f"Total Findings: {results['total_findings']}")
     print(f"Critical: {results['critical_findings']}")
@@ -920,7 +920,7 @@ def run_security_audit_cli(project_root: str, output_file: str = None) -> None:
     print(f"Low: {results['low_findings']}")
 
     if results["recommendations"]:
-        print(f"\nRecommendations:")
+        print("\nRecommendations:")
         for rec in results["recommendations"]:
             print(f"- {rec}")
 

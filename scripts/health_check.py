@@ -6,10 +6,8 @@ MangaAnime System Health Check Script
 
 import json
 import sys
-import os
 import sqlite3
 import requests
-from datetime import datetime
 
 
 def check_config():

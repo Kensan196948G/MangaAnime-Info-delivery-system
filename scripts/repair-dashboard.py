@@ -7,21 +7,18 @@ Provides system overview, statistics, trends, and export capabilities
 
 import json
 import csv
-import sys
 import os
 import time
 import argparse
 import sqlite3
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Any, Optional
-from dataclasses import dataclass, asdict
 import subprocess
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, Optional
 
 try:
     import matplotlib.pyplot as plt
-    import matplotlib.dates as mdates
-    from matplotlib.animation import FuncAnimation
 
     HAS_MATPLOTLIB = True
 except ImportError:
@@ -183,7 +180,7 @@ class RepairDashboard:
             # Repairs per hour (last 24 hours)
             cursor.execute(
                 """
-                SELECT COUNT(*) FROM repair_history 
+                SELECT COUNT(*) FROM repair_history
                 WHERE timestamp > datetime('now', '-24 hours')
             """
             )
@@ -193,11 +190,11 @@ class RepairDashboard:
             # Most common failure
             cursor.execute(
                 """
-                SELECT error_message, COUNT(*) as count 
-                FROM repair_history 
-                WHERE status = 'failure' 
-                GROUP BY error_message 
-                ORDER BY count DESC 
+                SELECT error_message, COUNT(*) as count
+                FROM repair_history
+                WHERE status = 'failure'
+                GROUP BY error_message
+                ORDER BY count DESC
                 LIMIT 1
             """
             )
@@ -287,7 +284,7 @@ class RepairDashboard:
 
             cursor.execute(
                 """
-                INSERT INTO system_metrics 
+                INSERT INTO system_metrics
                 (cpu_usage, memory_usage, disk_usage, github_api_remaining, active_repairs)
                 VALUES (?, ?, ?, ?, ?)
             """,
@@ -406,8 +403,8 @@ class RepairDashboard:
             cursor.execute(
                 """
                 SELECT timestamp, repair_type, status, duration, workflow_name
-                FROM repair_history 
-                ORDER BY timestamp DESC 
+                FROM repair_history
+                ORDER BY timestamp DESC
                 LIMIT 10
             """
             )
@@ -446,8 +443,8 @@ class RepairDashboard:
             cursor.execute(
                 """
                 SELECT failure_type, count, last_occurrence, resolution_strategy
-                FROM failure_patterns 
-                ORDER BY count DESC 
+                FROM failure_patterns
+                ORDER BY count DESC
                 LIMIT 5
             """
             )
@@ -485,10 +482,10 @@ class RepairDashboard:
 
             # Load data for plotting
             query = """
-                SELECT DATE(timestamp) as date, 
+                SELECT DATE(timestamp) as date,
                        COUNT(*) as total_repairs,
                        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successful
-                FROM repair_history 
+                FROM repair_history
                 WHERE timestamp > datetime('now', '-30 days')
                 GROUP BY DATE(timestamp)
                 ORDER BY date
