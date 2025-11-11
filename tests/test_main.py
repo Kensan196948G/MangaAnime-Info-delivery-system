@@ -1,11 +1,12 @@
 """
 Test main application functionality and integration
 """
+
 import pytest
 import os
 import sys
 import json
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock
 from datetime import datetime
 
 # Add project root to path
@@ -39,7 +40,6 @@ except ImportError:
 
         def initialize_components(self):
             """Initialize all system components"""
-            pass
 
         def collect_anime_data(self):
             """Collect anime data from APIs"""
@@ -285,7 +285,7 @@ class TestMainApplicationFlow:
     @patch("logging.basicConfig")
     def test_logging_configuration(self, mock_logging):
         """Test logging configuration"""
-        notifier = ReleaseNotifier()
+        ReleaseNotifier()
         # Logging should be configured
         assert mock_logging.called or True  # Flexible assertion
 
@@ -298,7 +298,7 @@ class TestMainApplicationFlow:
 
             # Should handle exceptions gracefully
             try:
-                result = notifier.run_daily_check()
+                notifier.run_daily_check()
                 # If no exception handling, this will raise
                 assert False, "Should have raised exception"
             except Exception:

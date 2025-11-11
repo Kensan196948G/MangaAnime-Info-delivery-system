@@ -16,32 +16,28 @@ import asyncio
 import aiohttp
 import logging
 import time
-from datetime import datetime, date, timedelta
-from typing import List, Dict, Any, Optional, Tuple, Union
-import json
-from dataclasses import asdict, dataclass
+from datetime import datetime
+from typing import List, Dict, Any, Optional, Tuple
+from dataclasses import dataclass
 from enum import Enum
 
-from .models import AniListWork, Work, Release, WorkType, ReleaseType, DataSource
+from .models import AniListWork, DataSource
 from .db import get_db
 
 
 class AniListAPIError(Exception):
     """Custom exception for AniList API errors."""
 
-    pass
 
 
 class RateLimitExceeded(AniListAPIError):
     """Exception raised when rate limit is exceeded."""
 
-    pass
 
 
 class CircuitBreakerOpen(AniListAPIError):
     """Exception raised when circuit breaker is open."""
 
-    pass
 
 
 class CircuitState(Enum):
@@ -1331,7 +1327,7 @@ class AniListCollector:
         """
 
         async def _run():
-            results = await self.run_collection()
+            await self.run_collection()
 
             # For now, return empty list as a placeholder
             # In a full implementation, this would return actual collected data
@@ -1361,9 +1357,11 @@ class AniListCollector:
                     "tags": [{"name": tag} for tag in work.tags],
                     "description": work.description,
                     "startDate": work.start_date,
-                    "episodes": work.metadata.get("total_episodes")
-                    if hasattr(work, "metadata")
-                    else None,
+                    "episodes": (
+                        work.metadata.get("total_episodes")
+                        if hasattr(work, "metadata")
+                        else None
+                    ),
                     "streamingEpisodes": work.streaming_episodes,
                     "siteUrl": work.site_url,
                 }

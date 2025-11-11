@@ -19,10 +19,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from functools import lru_cache
-import hashlib
 
-from .models import Work, AniListWork, RSSFeedItem, WorkType
-from .filter_logic import ContentFilter, FilterResult
+from .models import Work
 
 
 class FilterAction(Enum):
@@ -138,12 +136,18 @@ class ConfigBasedFilterManager:
         return {
             "filtering": {
                 "ng_keywords": [
-                    "エロ", "R18", "成人向け", "BL", "百合",
-                    "ボーイズラブ", "アダルト", "18禁"
+                    "エロ",
+                    "R18",
+                    "成人向け",
+                    "BL",
+                    "百合",
+                    "ボーイズラブ",
+                    "アダルト",
+                    "18禁",
                 ],
                 "ng_genres": ["Hentai", "Ecchi"],
                 "exclude_tags": ["Adult Cast", "Erotica"],
-                "custom_rules": []
+                "custom_rules": [],
             }
         }
 
@@ -178,7 +182,7 @@ class ConfigBasedFilterManager:
                     targets=rule_data.get("targets", ["title", "description"]),
                     case_sensitive=rule_data.get("case_sensitive", False),
                     enabled=rule_data.get("enabled", True),
-                    reason=rule_data.get("reason", "")
+                    reason=rule_data.get("reason", ""),
                 )
                 rules.append(rule)
             except Exception as e:
@@ -268,17 +272,19 @@ class ConfigBasedFilterManager:
         filtering_config = self.config.setdefault("filtering", {})
         rules_list = filtering_config.setdefault("custom_rules", [])
 
-        rules_list.append({
-            "id": rule.rule_id,
-            "name": rule.name,
-            "pattern": rule.pattern,
-            "action": rule.action.value,
-            "priority": rule.priority.value,
-            "targets": rule.targets,
-            "case_sensitive": rule.case_sensitive,
-            "enabled": rule.enabled,
-            "reason": rule.reason
-        })
+        rules_list.append(
+            {
+                "id": rule.rule_id,
+                "name": rule.name,
+                "pattern": rule.pattern,
+                "action": rule.action.value,
+                "priority": rule.priority.value,
+                "targets": rule.targets,
+                "case_sensitive": rule.case_sensitive,
+                "enabled": rule.enabled,
+                "reason": rule.reason,
+            }
+        )
 
         self._save_config()
 
@@ -331,10 +337,10 @@ class ConfigBasedFilterManager:
                         "targets": rule.targets,
                         "case_sensitive": rule.case_sensitive,
                         "enabled": rule.enabled,
-                        "reason": rule.reason
+                        "reason": rule.reason,
                     }
                     for rule in self.custom_rules
-                ]
+                ],
             }
 
             with open(output_path, "w", encoding="utf-8") as f:
@@ -363,7 +369,7 @@ class EnhancedContentFilter:
     def __init__(
         self,
         config_manager: Optional[ConfigBasedFilterManager] = None,
-        config_path: Optional[str] = None
+        config_path: Optional[str] = None,
     ):
         """
         Initialize enhanced content filter.
@@ -377,12 +383,7 @@ class EnhancedContentFilter:
 
         # Statistics
         self.total_filtered = 0
-        self.filter_stats = {
-            "keywords": 0,
-            "genres": 0,
-            "tags": 0,
-            "custom_rules": 0
-        }
+        self.filter_stats = {"keywords": 0, "genres": 0, "tags": 0, "custom_rules": 0}
 
     @lru_cache(maxsize=1000)
     def _match_keyword(self, text: str, keyword: str) -> bool:
@@ -429,7 +430,9 @@ class EnhancedContentFilter:
             tags = metadata["tags"]
             if isinstance(tags, list):
                 for tag in tags:
-                    tag_name = tag.get("name", tag) if isinstance(tag, dict) else str(tag)
+                    tag_name = (
+                        tag.get("name", tag) if isinstance(tag, dict) else str(tag)
+                    )
                     if tag_name.lower() in self.config_manager.exclude_tags:
                         matched_tags.append(tag_name)
                         self.filter_stats["tags"] += 1
@@ -441,7 +444,9 @@ class EnhancedContentFilter:
                 self.filter_stats["custom_rules"] += 1
 
         # Determine filter action
-        is_filtered = bool(matched_keywords or matched_genres or matched_tags or matched_rules)
+        is_filtered = bool(
+            matched_keywords or matched_genres or matched_tags or matched_rules
+        )
 
         if is_filtered:
             self.total_filtered += 1
@@ -480,15 +485,14 @@ class EnhancedContentFilter:
             matched_keywords=matched_keywords,
             matched_genres=matched_genres,
             matched_tags=matched_tags,
-            reason=reason
+            reason=reason,
         )
 
     def _check_custom_rule(self, work: Work, rule: FilterRule) -> bool:
         """Check if work matches custom rule."""
         try:
             pattern = re.compile(
-                rule.pattern,
-                re.IGNORECASE if not rule.case_sensitive else 0
+                rule.pattern, re.IGNORECASE if not rule.case_sensitive else 0
             )
 
             for target in rule.targets:
@@ -515,7 +519,7 @@ class EnhancedContentFilter:
         keywords: List[str],
         genres: List[str],
         tags: List[str],
-        rules: List[FilterRule]
+        rules: List[FilterRule],
     ) -> float:
         """Calculate filter confidence score."""
         if not any([keywords, genres, tags, rules]):
@@ -547,11 +551,12 @@ class EnhancedContentFilter:
             "active_keywords": len(self.config_manager.ng_keywords),
             "active_genres": len(self.config_manager.ng_genres),
             "active_tags": len(self.config_manager.exclude_tags),
-            "active_rules": len(self.config_manager.get_active_rules())
+            "active_rules": len(self.config_manager.get_active_rules()),
         }
 
 
 # Convenience functions
+
 
 def create_enhanced_filter(config_path: Optional[str] = None) -> EnhancedContentFilter:
     """Create enhanced content filter instance."""
@@ -559,8 +564,7 @@ def create_enhanced_filter(config_path: Optional[str] = None) -> EnhancedContent
 
 
 def filter_works(
-    works: List[Work],
-    config_path: Optional[str] = None
+    works: List[Work], config_path: Optional[str] = None
 ) -> Tuple[List[Work], List[Work]]:
     """
     Filter list of works.

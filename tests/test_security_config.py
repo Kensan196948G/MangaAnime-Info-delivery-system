@@ -8,15 +8,14 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-from datetime import datetime, timedelta
+from unittest.mock import patch
 
 # Add the parent directory to the path to import modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
     from modules.config import ConfigManager, SecureConfigManager
-    from modules.mailer import GmailNotifier, AuthenticationState
+    from modules.mailer import AuthenticationState
     from modules.calendar_integration import GoogleCalendarManager, CalendarAuthState
 except ImportError as e:
     print(f"Error: Cannot import modules: {e}")

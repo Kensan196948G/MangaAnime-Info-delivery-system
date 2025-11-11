@@ -13,7 +13,6 @@ import json
 import os
 import logging
 import base64
-import hashlib
 from typing import Dict, Any, Optional, List
 from pathlib import Path
 from dataclasses import dataclass, field
@@ -356,7 +355,9 @@ class ConfigManager:
 
     def get_system_name(self) -> str:
         """Get system name."""
-        return self._config_data.get("system", {}).get("name", "MangaAnime情報配信システム")
+        return self._config_data.get("system", {}).get(
+            "name", "MangaAnime情報配信システム"
+        )
 
     def get_system_version(self) -> str:
         """Get system version."""

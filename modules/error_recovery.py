@@ -13,14 +13,12 @@ import time
 import logging
 import asyncio
 import threading
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Callable, Union
+from datetime import datetime
+from typing import Dict, List, Any, Optional, Callable
 from dataclasses import dataclass, asdict
 from enum import Enum
 import json
 import sqlite3
-from concurrent.futures import ThreadPoolExecutor
-import traceback
 
 
 class ErrorSeverity(Enum):

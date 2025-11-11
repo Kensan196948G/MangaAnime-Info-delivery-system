@@ -16,13 +16,11 @@ Database Schema:
 import sqlite3
 import logging
 import hashlib
-from datetime import datetime
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Dict, Any
 from contextlib import contextmanager
 import threading
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor
 
 
 class DatabaseManager:

@@ -12,7 +12,7 @@ import hashlib
 import logging
 import sqlite3
 import unicodedata
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from collections import defaultdict
 from threading import Lock
 from pathlib import Path
@@ -37,8 +37,6 @@ except ImportError:
 
 class SecurityError(Exception):
     """Custom exception for security-related errors"""
-
-    pass
 
 
 class InputSanitizer:
@@ -148,7 +146,8 @@ class InputSanitizer:
 
         # Remove control characters and normalize unicode
         title = unicodedata.normalize("NFKC", title)
-        title = "".join(char for char in title if unicodedata.category(char)[0] != "C")
+        title = "".join(
+            char for char in title if unicodedata.category(char)[0] != "C")
 
         # Remove potentially dangerous characters
         title = re.sub(r'[<>"\'\x00-\x1f\x7f-\x9f]', "", title)
@@ -232,7 +231,10 @@ class RateLimiter:
         wait_time = 60 - (time.time() - oldest_request)
         return max(0, wait_time)
 
-    def get_remaining_requests(self, identifier: str, limit_per_minute: int) -> int:
+    def get_remaining_requests(
+            self,
+            identifier: str,
+            limit_per_minute: int) -> int:
         """Get remaining requests in current window"""
         current_requests = len(self.requests.get(identifier, []))
         return max(0, limit_per_minute - current_requests)
@@ -271,9 +273,8 @@ class SecureTokenManager:
         # Generate new key
         new_key = Fernet.generate_key()
         logging.warning(
-            "Generated new token encryption key. "
-            f"Set TOKEN_ENCRYPTION_KEY={base64.urlsafe_b64encode(new_key).decode()}"
-        )
+            "Generated new token encryption key. " f"Set TOKEN_ENCRYPTION_KEY={
+                base64.urlsafe_b64encode(new_key).decode()}")
         return new_key
 
     def save_token(self, token_data: Dict[str, Any]) -> None:
@@ -285,18 +286,23 @@ class SecureTokenManager:
                 if field not in token_data:
                     raise ValueError(f"Missing required token field: {field}")
 
-            # Encrypt and save or save as plain text if encryption not available
+            # Encrypt and save or save as plain text if encryption not
+            # available
             json_data = json.dumps(token_data, indent=2)
 
             if self.fernet is not None:
                 encrypted_data = self.fernet.encrypt(json_data.encode())
                 with open(self.token_file, "wb") as f:
                     f.write(encrypted_data)
-                logging.info(f"Token saved securely (encrypted) to {self.token_file}")
+                logging.info(
+                    f"Token saved securely (encrypted) to {
+                        self.token_file}")
             else:
                 with open(self.token_file, "w") as f:
                     f.write(json_data)
-                logging.warning(f"Token saved without encryption to {self.token_file}")
+                logging.warning(
+                    f"Token saved without encryption to {
+                        self.token_file}")
 
             # Set restrictive permissions
             os.chmod(self.token_file, 0o600)
@@ -478,7 +484,10 @@ class DatabaseSecurity:
         self.conn = db_connection
         self.logger = logging.getLogger(__name__)
 
-    def safe_execute(self, query: str, parameters: tuple = ()) -> sqlite3.Cursor:
+    def safe_execute(
+            self,
+            query: str,
+            parameters: tuple = ()) -> sqlite3.Cursor:
         """Execute SQL query safely with parameterized statements"""
         try:
             cursor = self.conn.execute(query, parameters)
@@ -524,7 +533,8 @@ class SecurityMonitor:
         self.last_incident_time = defaultdict(float)
         self.security_events = []
 
-    def log_security_event(self, event_type: str, details: Dict[str, Any]) -> None:
+    def log_security_event(self, event_type: str,
+                           details: Dict[str, Any]) -> None:
         """Log security event for monitoring"""
         event = {
             "timestamp": time.time(),
@@ -534,7 +544,8 @@ class SecurityMonitor:
         }
 
         self.security_events.append(event)
-        self.logger.warning(f"SECURITY_EVENT: {event_type} - {json.dumps(details)}")
+        self.logger.warning(
+            f"SECURITY_EVENT: {event_type} - {json.dumps(details)}")
 
         # Keep only last 1000 events
         if len(self.security_events) > 1000:
@@ -565,19 +576,21 @@ class SecurityMonitor:
 
         self.last_incident_time[key] = current_time
 
-    def check_authentication_failure(self, service: str, error_details: str) -> None:
+    def check_authentication_failure(
+            self,
+            service: str,
+            error_details: str) -> None:
         """Monitor authentication failures"""
         self.log_security_event(
-            "AUTH_FAILURE",
-            {"service": service, "error": error_details, "timestamp": time.time()},
-        )
+            "AUTH_FAILURE", {
+                "service": service, "error": error_details, "timestamp": time.time()}, )
 
-    def check_input_validation_failure(self, input_type: str, reason: str) -> None:
+    def check_input_validation_failure(
+            self, input_type: str, reason: str) -> None:
         """Monitor input validation failures"""
         self.log_security_event(
-            "INPUT_VALIDATION_FAILURE",
-            {"input_type": input_type, "reason": reason, "timestamp": time.time()},
-        )
+            "INPUT_VALIDATION_FAILURE", {
+                "input_type": input_type, "reason": reason, "timestamp": time.time()}, )
 
     def _get_event_severity(self, event_type: str) -> str:
         """Determine severity level for security event"""
@@ -595,8 +608,7 @@ class SecurityMonitor:
         """Get security event summary for specified time period"""
         cutoff_time = time.time() - (hours * 3600)
         recent_events = [
-            event for event in self.security_events if event["timestamp"] > cutoff_time
-        ]
+            event for event in self.security_events if event["timestamp"] > cutoff_time]
 
         event_types = defaultdict(int)
         severity_counts = defaultdict(int)

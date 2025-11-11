@@ -47,7 +47,6 @@ Test Configuration:
 
 import os
 import sys
-import pytest
 import logging
 from pathlib import Path
 

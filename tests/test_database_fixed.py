@@ -1,12 +1,12 @@
 """
 Fixed database tests using correct DatabaseManager API
 """
+
 import pytest
 import sqlite3
 import os
 import sys
-from datetime import datetime, date
-from pathlib import Path
+from datetime import date
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -25,7 +25,7 @@ class TestDatabaseManagerFixed:
 
     def teardown_method(self):
         """Clean up after tests"""
-        if hasattr(self, 'db'):
+        if hasattr(self, "db"):
             self.db.close_connections()
 
     def test_database_initialization(self):
@@ -35,17 +35,21 @@ class TestDatabaseManagerFixed:
             cursor = conn.cursor()
 
             # Check works table
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT name FROM sqlite_master
                 WHERE type='table' AND name='works'
-            """)
+            """
+            )
             assert cursor.fetchone() is not None
 
             # Check releases table
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT name FROM sqlite_master
                 WHERE type='table' AND name='releases'
-            """)
+            """
+            )
             assert cursor.fetchone() is not None
 
     def test_create_work(self):
@@ -55,7 +59,7 @@ class TestDatabaseManagerFixed:
             work_type="anime",  # Use string value
             title_kana="しんげきのきょじん",
             title_en="Attack on Titan",
-            official_url="https://example.com/aot"
+            official_url="https://example.com/aot",
         )
 
         assert work_id > 0
@@ -68,7 +72,7 @@ class TestDatabaseManagerFixed:
             work_type="manga",
             title_kana="ワンピース",
             title_en="One Piece",
-            official_url="https://example.com/onepiece"
+            official_url="https://example.com/onepiece",
         )
 
         assert work_id > 0
@@ -76,26 +80,17 @@ class TestDatabaseManagerFixed:
     def test_get_or_create_work(self):
         """Test get_or_create_work functionality"""
         # First call creates
-        work_id1 = self.db.get_or_create_work(
-            title="Test Anime",
-            work_type="anime"
-        )
+        work_id1 = self.db.get_or_create_work(title="Test Anime", work_type="anime")
 
         # Second call retrieves existing
-        work_id2 = self.db.get_or_create_work(
-            title="Test Anime",
-            work_type="anime"
-        )
+        work_id2 = self.db.get_or_create_work(title="Test Anime", work_type="anime")
 
         assert work_id1 == work_id2
 
     def test_create_release(self):
         """Test creating a release"""
         # First create a work
-        work_id = self.db.create_work(
-            title="Test Anime",
-            work_type="anime"
-        )
+        work_id = self.db.create_work(title="Test Anime", work_type="anime")
 
         # Then create a release
         release_id = self.db.create_release(
@@ -105,17 +100,14 @@ class TestDatabaseManagerFixed:
             platform="Crunchyroll",
             release_date=date(2024, 1, 7),
             source="AniList",
-            source_url="https://example.com/ep1"
+            source_url="https://example.com/ep1",
         )
 
         assert release_id > 0
 
     def test_create_manga_release(self):
         """Test creating a manga volume release"""
-        work_id = self.db.create_work(
-            title="Test Manga",
-            work_type="manga"
-        )
+        work_id = self.db.create_work(title="Test Manga", work_type="manga")
 
         release_id = self.db.create_release(
             work_id=work_id,
@@ -124,7 +116,7 @@ class TestDatabaseManagerFixed:
             platform="Viz Media",
             release_date=date(2024, 2, 2),
             source="RSS",
-            source_url="https://example.com/vol108"
+            source_url="https://example.com/vol108",
         )
 
         assert release_id > 0
@@ -132,17 +124,14 @@ class TestDatabaseManagerFixed:
     def test_get_unnotified_releases(self):
         """Test getting unnotified releases"""
         # Create work and releases
-        work_id = self.db.create_work(
-            title="Test Work",
-            work_type="anime"
-        )
+        work_id = self.db.create_work(title="Test Work", work_type="anime")
 
         self.db.create_release(
             work_id=work_id,
             release_type="episode",
             number="1",
             platform="Test Platform",
-            release_date=date(2024, 1, 1)
+            release_date=date(2024, 1, 1),
         )
 
         self.db.create_release(
@@ -150,28 +139,25 @@ class TestDatabaseManagerFixed:
             release_type="episode",
             number="2",
             platform="Test Platform",
-            release_date=date(2024, 1, 8)
+            release_date=date(2024, 1, 8),
         )
 
         # Get unnotified releases
         releases = self.db.get_unnotified_releases(limit=10)
 
         assert len(releases) == 2
-        assert all(r['notified'] == 0 for r in releases)
+        assert all(r["notified"] == 0 for r in releases)
 
     def test_mark_release_notified(self):
         """Test marking a release as notified"""
-        work_id = self.db.create_work(
-            title="Test Work",
-            work_type="anime"
-        )
+        work_id = self.db.create_work(title="Test Work", work_type="anime")
 
         release_id = self.db.create_release(
             work_id=work_id,
             release_type="episode",
             number="1",
             platform="Test Platform",
-            release_date=date(2024, 1, 1)
+            release_date=date(2024, 1, 1),
         )
 
         # Mark as notified
@@ -184,10 +170,7 @@ class TestDatabaseManagerFixed:
 
     def test_duplicate_release_handling(self):
         """Test that duplicate releases are prevented by UNIQUE constraint"""
-        work_id = self.db.create_work(
-            title="Test Work",
-            work_type="anime"
-        )
+        work_id = self.db.create_work(title="Test Work", work_type="anime")
 
         # Create first release
         release_id1 = self.db.create_release(
@@ -195,7 +178,7 @@ class TestDatabaseManagerFixed:
             release_type="episode",
             number="1",
             platform="Test Platform",
-            release_date=date(2024, 1, 1)
+            release_date=date(2024, 1, 1),
         )
 
         # Try to create duplicate (should be handled gracefully or raise error)
@@ -205,7 +188,7 @@ class TestDatabaseManagerFixed:
                 release_type="episode",
                 number="1",
                 platform="Test Platform",
-                release_date=date(2024, 1, 1)
+                release_date=date(2024, 1, 1),
             )
             # If no error, should return same ID or 0
             assert release_id2 == release_id1 or release_id2 == 0
@@ -224,10 +207,12 @@ class TestDatabaseManagerFixed:
 
         # Check for actual keys returned by get_work_stats
         assert isinstance(stats, dict)
-        assert 'anime_works' in stats or 'total_works' in stats
-        assert 'manga_works' in stats or 'manga_count' in stats
+        assert "anime_works" in stats or "total_works" in stats
+        assert "manga_works" in stats or "manga_count" in stats
         # Verify we have 3 total works
-        total = stats.get('total_works', stats.get('anime_works', 0) + stats.get('manga_works', 0))
+        total = stats.get(
+            "total_works", stats.get("anime_works", 0) + stats.get("manga_works", 0)
+        )
         assert total >= 3
 
     def test_connection_pooling(self):
@@ -250,18 +235,15 @@ class TestDatabaseTransactions:
 
     def teardown_method(self):
         """Clean up"""
-        if hasattr(self, 'db'):
+        if hasattr(self, "db"):
             self.db.close_connections()
 
     def test_transaction_context_manager(self):
         """Test transaction context manager"""
         with self.db.get_transaction() as conn:
-            cursor = conn.cursor()
+            conn.cursor()
             # Transaction should auto-commit on success
-            work_id = self.db.create_work(
-                title="Transaction Test",
-                work_type="anime"
-            )
+            work_id = self.db.create_work(title="Transaction Test", work_type="anime")
             assert work_id > 0
 
 
@@ -275,7 +257,7 @@ class TestDatabasePerformance:
 
     def teardown_method(self):
         """Clean up"""
-        if hasattr(self, 'db'):
+        if hasattr(self, "db"):
             self.db.close_connections()
 
     @pytest.mark.performance
@@ -287,10 +269,7 @@ class TestDatabasePerformance:
 
         # Create 100 works
         for i in range(100):
-            self.db.create_work(
-                title=f"Anime {i}",
-                work_type="anime"
-            )
+            self.db.create_work(title=f"Anime {i}", work_type="anime")
 
         elapsed = time.time() - start
 
@@ -317,7 +296,7 @@ class TestDatabaseIntegration:
 
     def teardown_method(self):
         """Clean up"""
-        if hasattr(self, 'db'):
+        if hasattr(self, "db"):
             self.db.close_connections()
 
     def test_full_workflow(self):
@@ -326,7 +305,7 @@ class TestDatabaseIntegration:
         work_id = self.db.create_work(
             title="Integration Test Anime",
             work_type="anime",
-            title_en="Integration Test"
+            title_en="Integration Test",
         )
 
         # 2. Create multiple releases
@@ -336,7 +315,7 @@ class TestDatabaseIntegration:
                 release_type="episode",
                 number=str(i),
                 platform="Test Platform",
-                release_date=date(2024, 1, i)
+                release_date=date(2024, 1, i),
             )
 
         # 3. Query unnotified
@@ -344,7 +323,7 @@ class TestDatabaseIntegration:
         assert len(unnotified) == 3
 
         # 4. Mark first as notified
-        self.db.mark_release_notified(unnotified[0]['id'])
+        self.db.mark_release_notified(unnotified[0]["id"])
 
         # 5. Verify only 2 remain unnotified
         remaining = self.db.get_unnotified_releases(limit=10)

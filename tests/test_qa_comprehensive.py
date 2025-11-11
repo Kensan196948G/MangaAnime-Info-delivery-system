@@ -5,14 +5,11 @@ Tests code quality standards, data integrity, performance benchmarks, and system
 """
 
 import pytest
-import os
 import json
-import tempfile
 import sqlite3
 import time
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 from pathlib import Path
-from datetime import datetime, timedelta
 
 from modules.qa_validation import (
     CodeQualityValidator,
@@ -82,7 +79,7 @@ def calculate_something():
         test_file.write_text(code_with_magic_numbers)
 
         validator = CodeQualityValidator(str(test_project))
-        results = validator.validate_code_quality()
+        validator.validate_code_quality()
 
         # Should detect magic numbers
         magic_number_issues = [
@@ -126,7 +123,7 @@ class ClassWithDocstring:
         test_file.write_text(code_with_docstring_issues)
 
         validator = CodeQualityValidator(str(test_project))
-        results = validator.validate_code_quality()
+        validator.validate_code_quality()
 
         # Should detect missing and insufficient docstrings
         docstring_issues = [
@@ -158,7 +155,7 @@ def function_with_issues():
         test_file.write_text(code_with_style_issues)
 
         validator = CodeQualityValidator(str(test_project))
-        results = validator.validate_code_quality()
+        validator.validate_code_quality()
 
         # Should detect various style issues
         style_issues = validator.issues
@@ -196,7 +193,7 @@ def function_with_acceptable_params(a, b, c):
         test_file.write_text(code_with_parameter_issues)
 
         validator = CodeQualityValidator(str(test_project))
-        results = validator.validate_code_quality()
+        validator.validate_code_quality()
 
         # Should detect function with too many parameters
         parameter_issues = [
@@ -459,7 +456,7 @@ class TestDataIntegrityValidation:
         conn.close()
 
         validator = DataIntegrityValidator(str(db_file))
-        results = validator.validate_data_integrity()
+        validator.validate_data_integrity()
 
         # Should detect duplicates
         duplicate_issues = [
@@ -510,7 +507,7 @@ class TestDataIntegrityValidation:
         conn.close()
 
         validator = DataIntegrityValidator(str(db_file))
-        results = validator.validate_data_integrity()
+        validator.validate_data_integrity()
 
         # Should detect incomplete data
         completeness_issues = [
@@ -549,7 +546,7 @@ class TestDataIntegrityValidation:
         conn.close()
 
         validator = DataIntegrityValidator(str(db_file))
-        results = validator.validate_data_integrity()
+        validator.validate_data_integrity()
 
         # Should detect format issues
         format_issues = [
@@ -1068,7 +1065,7 @@ class Class{i}:
         validator = DataIntegrityValidator(str(db_file))
 
         start_time = time.time()
-        results = validator.validate_data_integrity()
+        validator.validate_data_integrity()
         end_time = time.time()
 
         # Should complete in reasonable time even with larger dataset
@@ -1104,7 +1101,7 @@ class TestQAIntegration:
 if __name__ == "__main__":
     # Set psutil availability for tests
     try:
-        import psutil
+        pass
 
         pytest.psutil_available = True
     except ImportError:

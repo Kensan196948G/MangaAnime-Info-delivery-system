@@ -6,11 +6,9 @@ using the Gmail API with OAuth2 authentication.
 """
 
 import os
-import json
 import base64
 import logging
 import time
-import asyncio
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
@@ -713,7 +711,9 @@ class EmailTemplateGenerator:
 
             # Generate subject
             if subject_prefix is None:
-                subject_prefix = self.gmail_config.get("subject_prefix", "[アニメ・マンガ情報]")
+                subject_prefix = self.gmail_config.get(
+                    "subject_prefix", "[アニメ・マンガ情報]"
+                )
             anime_count = len([r for r in releases if r.get("type") == "anime"])
             manga_count = len([r for r in releases if r.get("type") == "manga"])
 

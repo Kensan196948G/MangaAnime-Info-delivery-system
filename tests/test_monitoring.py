@@ -4,18 +4,10 @@ Monitoring and observability tests for the anime/manga notification system
 """
 
 import pytest
-import time
-import json
 import psutil
-import threading
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, timedelta
-import logging
-import tempfile
-import os
+from datetime import datetime
 from collections import defaultdict
-from typing import Dict, List, Any, Optional
-import asyncio
+from typing import Dict, List, Any
 
 
 class TestSystemMonitoring:

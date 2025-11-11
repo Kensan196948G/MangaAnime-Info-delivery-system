@@ -15,12 +15,12 @@ import re
 import logging
 import unicodedata
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple, Set
+from typing import Dict, List, Any
 from difflib import SequenceMatcher
 from dataclasses import dataclass
 from enum import Enum
 
-from .models import Work, Release, WorkType, ReleaseType, DataSource
+from .models import Work, WorkType
 
 
 class NormalizationLevel(Enum):
@@ -154,7 +154,9 @@ class TitleNormalizer:
         # Fullwidth ASCII to halfwidth
         text = text.translate(
             str.maketrans(
-                "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ" "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ" "０１２３４５６７８９",
+                "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
+                "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
+                "０１２３４５６７８９",
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "abcdefghijklmnopqrstuvwxyz" "0123456789",
             )
         )

@@ -9,25 +9,20 @@ including database operations, API clients, RSS collectors, and filtering logic.
 import asyncio
 import logging
 import time
-from typing import Dict, Any, List, Optional, Tuple
-from datetime import datetime, timedelta
+from typing import Dict, Any, List, Optional
+from datetime import datetime
 from dataclasses import dataclass, field
 import traceback
 import json
 
 # Import all modules to test
-from .db import get_db, DatabaseManager
-from .anime_anilist import AniListClient, AniListCollector, CircuitBreakerOpen
+from .db import get_db
+from .anime_anilist import AniListClient, CircuitBreakerOpen
 from .manga_rss import MangaRSSCollector, FeedHealth, EnhancedRSSParser
-from .filter_logic import ContentFilter, FilterResult
+from .filter_logic import ContentFilter
 from .models import (
     Work,
-    Release,
-    AniListWork,
-    RSSFeedItem,
     WorkType,
-    ReleaseType,
-    DataSource,
 )
 
 

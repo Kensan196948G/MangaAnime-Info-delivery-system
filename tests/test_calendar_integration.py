@@ -4,9 +4,8 @@ Integration tests for Google Calendar API integration
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, date, timedelta
-import json
+from unittest.mock import Mock, patch
+from datetime import datetime, timedelta
 
 
 class TestCalendarIntegration:

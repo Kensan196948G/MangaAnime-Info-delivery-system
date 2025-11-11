@@ -8,19 +8,29 @@ import sqlite3
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 from contextlib import contextmanager
-from .dashboard import dashboard_service
-from .monitoring import PerformanceMonitor, MetricType
+from .monitoring import MetricsCollector
 import logging
 
 logger = logging.getLogger(__name__)
 
 
+# Note: dashboard_service循環参照を避けるため、遅延インポート
+def get_dashboard_service():
+    """Get dashboard service instance (lazy import to avoid circular dependency)"""
+    from .dashboard import dashboard_service
+
+    return dashboard_service
+
+
 class DashboardIntegration:
     """ダッシュボード統合クラス - 既存のモジュールにメトリクス収集機能を追加"""
 
-    def __init__(self, db_path: str = "db.sqlite3"):
+    def __init__(self, db_path: str = "db.sqlite3", config: Optional[Dict] = None):
         self.db_path = db_path
-        self.performance_monitor = PerformanceMonitor()
+        self.config = config or {}
+        # SystemMonitorは必要時に初期化
+        self.performance_monitor = None
+        self.metrics_collector = MetricsCollector() if MetricsCollector else None
 
     @contextmanager
     def track_operation(self, operation_name: str, component: str = "system"):

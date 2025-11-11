@@ -6,10 +6,8 @@ using the Google Calendar API with OAuth2 authentication.
 """
 
 import os
-import json
 import logging
 import time
-import asyncio
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Any
 from dataclasses import dataclass, field

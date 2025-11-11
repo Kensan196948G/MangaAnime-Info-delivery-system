@@ -7,17 +7,14 @@
 import logging
 import feedparser
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
-from .models import RSSFeedItem, Work, Release, WorkType, ReleaseType, DataSource
+from .models import RSSFeedItem, WorkType, ReleaseType, DataSource
 import time
 import hashlib
-from urllib.parse import urljoin, urlparse
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from enum import Enum
 import asyncio
 import aiohttp
 from typing import Set
@@ -78,7 +75,9 @@ class FeedHealth:
             return 0.0
 
         success_rate = self.get_success_rate()
-        response_penalty = min(self.average_response_time / 10.0, 0.5)  # 10秒で50%ペナルティ
+        response_penalty = min(
+            self.average_response_time / 10.0, 0.5
+        )  # 10秒で50%ペナルティ
         consecutive_failure_penalty = min(self.consecutive_failures * 0.1, 0.3)
 
         score = success_rate - response_penalty - consecutive_failure_penalty
@@ -432,7 +431,7 @@ class MangaRSSCollector:
 
             # フィード固有設定を取得
             feed_config = self._get_feed_config(feed_name)
-            timeout = feed_config.get("timeout", self.timeout)
+            feed_config.get("timeout", self.timeout)
             retry_count = feed_config.get("retry_count", 3)
             retry_delay = feed_config.get("retry_delay", 2)
 
@@ -469,7 +468,9 @@ class MangaRSSCollector:
                         return items
 
                 except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-                    self.logger.warning(f"{feed_name} 非同期収集試行 {attempt + 1} 失敗: {e}")
+                    self.logger.warning(
+                        f"{feed_name} 非同期収集試行 {attempt + 1} 失敗: {e}"
+                    )
                     if attempt < retry_count - 1:
                         await asyncio.sleep(retry_delay)
                         continue
@@ -651,7 +652,9 @@ class MangaRSSCollector:
                     continue
 
         # 全ての試行が失敗した場合
-        self.logger.error(f"{feed_name}から情報を取得できませんでした（{retry_count}回試行後）")
+        self.logger.error(
+            f"{feed_name}から情報を取得できませんでした（{retry_count}回試行後）"
+        )
 
         # フィードヘルス更新（失敗）
         if feed_url in self.feed_health:
@@ -700,7 +703,9 @@ class MangaRSSCollector:
             # コンテンツタイプをチェック
             content_type = response.headers.get("content-type", "").lower()
             if not any(ct in content_type for ct in ["xml", "rss", "atom"]):
-                self.logger.warning(f"予期しないコンテンツタイプ ({feed_name}): {content_type}")
+                self.logger.warning(
+                    f"予期しないコンテンツタイプ ({feed_name}): {content_type}"
+                )
 
             # レスポンスサイズをチェック（空でないか）
             if len(response.content) < 100:
@@ -753,11 +758,15 @@ class MangaRSSCollector:
         # レスポンスサイズチェック
         content_length = len(response.content)
         if content_length < 100:  # 極端に小さいレスポンス
-            self.logger.warning(f"レスポンスが小さすぎます ({feed_name}): {content_length} bytes")
+            self.logger.warning(
+                f"レスポンスが小さすぎます ({feed_name}): {content_length} bytes"
+            )
             return False
 
         if content_length > 10 * 1024 * 1024:  # 10MB以上
-            self.logger.warning(f"レスポンスが大きすぎます ({feed_name}): {content_length} bytes")
+            self.logger.warning(
+                f"レスポンスが大きすぎます ({feed_name}): {content_length} bytes"
+            )
             return False
 
         # 基本的なXML構造チェック

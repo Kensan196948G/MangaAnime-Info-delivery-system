@@ -1,11 +1,12 @@
 """
 Test Google Calendar integration functionality
 """
+
 import pytest
 import os
 import sys
-from unittest.mock import patch, Mock, MagicMock
-from datetime import datetime, timedelta
+from unittest.mock import patch, Mock
+from datetime import datetime
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))

@@ -10,7 +10,7 @@ This module defines:
 
 from dataclasses import dataclass, field
 from datetime import datetime, date
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any
 from enum import Enum
 import re
 from urllib.parse import urlparse

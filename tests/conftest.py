@@ -1,12 +1,12 @@
 """
 Common test fixtures and configuration for the MangaAnime Info Delivery System
 """
+
 import pytest
-import tempfile
 import os
 import sys
 import sqlite3
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 # Add project root to Python path
 project_root = os.path.dirname(os.path.dirname(__file__))

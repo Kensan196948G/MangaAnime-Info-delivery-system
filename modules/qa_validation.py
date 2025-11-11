@@ -10,13 +10,11 @@ import json
 import time
 import sqlite3
 import logging
-import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple, Union
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import defaultdict
-import tempfile
 
 try:
     import psutil
@@ -889,7 +887,7 @@ class PerformanceValidator:
 
         try:
             # Simulate API processing time
-            import time as time_module
+            pass
 
             # Test data processing performance
             test_anime_data = []

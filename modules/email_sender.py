@@ -11,7 +11,6 @@ import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -218,7 +217,9 @@ MangaAnime情報配信システム
 def test_email_functionality():
     """Test function to verify email functionality"""
     sender = EmailSender()
-    result = sender.send_test_notification("システムテスト - メール機能が正常に動作しています")
+    result = sender.send_test_notification(
+        "システムテスト - メール機能が正常に動作しています"
+    )
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
 

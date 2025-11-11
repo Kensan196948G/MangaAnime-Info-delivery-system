@@ -12,11 +12,9 @@ This module extends the manga_rss module with:
 
 import logging
 import feedparser
-import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
-import time
 from urllib.parse import urljoin, urlparse
 import re
 import json
@@ -68,8 +66,8 @@ class EnhancedMangaRSSCollector:
             custom_selectors={
                 "title": ".series-title",
                 "description": ".series-description",
-                "link": "a.series-link"
-            }
+                "link": "a.series-link",
+            },
         ),
         "jump_book_store": MangaRSSFeedConfig(
             name="ジャンプBOOKストア (Jump BOOK Store)",
@@ -78,7 +76,7 @@ class EnhancedMangaRSSCollector:
             enabled=True,
             priority="high",
             timeout=20,
-            parser_type="standard"
+            parser_type="standard",
         ),
         "rakuten_kobo": MangaRSSFeedConfig(
             name="楽天Kobo - コミック新刊",
@@ -87,7 +85,7 @@ class EnhancedMangaRSSCollector:
             enabled=True,
             priority="medium",
             timeout=20,
-            parser_type="standard"
+            parser_type="standard",
         ),
         "bookwalker": MangaRSSFeedConfig(
             name="BOOK☆WALKER - マンガ新刊",
@@ -96,7 +94,7 @@ class EnhancedMangaRSSCollector:
             enabled=True,
             priority="high",
             timeout=20,
-            parser_type="standard"
+            parser_type="standard",
         ),
         "manga_up": MangaRSSFeedConfig(
             name="マンガUP! - SQUARE ENIX",
@@ -105,7 +103,7 @@ class EnhancedMangaRSSCollector:
             enabled=True,
             priority="medium",
             timeout=20,
-            parser_type="html"
+            parser_type="html",
         ),
         "comic_walker": MangaRSSFeedConfig(
             name="ComicWalker - 無料マンガ",
@@ -114,16 +112,11 @@ class EnhancedMangaRSSCollector:
             enabled=True,
             priority="medium",
             timeout=20,
-            parser_type="standard"
-        )
+            parser_type="standard",
+        ),
     }
 
-    def __init__(
-        self,
-        config_manager=None,
-        timeout: int = 20,
-        max_retries: int = 3
-    ):
+    def __init__(self, config_manager=None, timeout: int = 20, max_retries: int = 3):
         """
         Initialize enhanced manga RSS collector.
 
@@ -145,7 +138,7 @@ class EnhancedMangaRSSCollector:
             "total_requests": 0,
             "successful_requests": 0,
             "failed_requests": 0,
-            "total_items": 0
+            "total_items": 0,
         }
 
         self.logger.info(
@@ -155,18 +148,14 @@ class EnhancedMangaRSSCollector:
 
     def get_all_sources(self) -> List[MangaRSSFeedConfig]:
         """Get all available manga RSS sources."""
-        return [
-            source for source in self.MANGA_SOURCES.values()
-            if source.enabled
-        ]
+        return [source for source in self.MANGA_SOURCES.values() if source.enabled]
 
     def get_source_by_name(self, name: str) -> Optional[MangaRSSFeedConfig]:
         """Get manga RSS source by name."""
         return self.MANGA_SOURCES.get(name)
 
     async def fetch_feed_async(
-        self,
-        feed_config: MangaRSSFeedConfig
+        self, feed_config: MangaRSSFeedConfig
     ) -> List[RSSFeedItem]:
         """
         Asynchronously fetch and parse RSS feed.
@@ -181,7 +170,7 @@ class EnhancedMangaRSSCollector:
 
         headers = {
             "User-Agent": self.user_agent,
-            "Accept": "application/rss+xml, application/xml, text/xml, text/html"
+            "Accept": "application/rss+xml, application/xml, text/xml, text/html",
         }
 
         try:
@@ -189,7 +178,7 @@ class EnhancedMangaRSSCollector:
                 async with session.get(
                     feed_config.url,
                     headers=headers,
-                    timeout=aiohttp.ClientTimeout(total=feed_config.timeout)
+                    timeout=aiohttp.ClientTimeout(total=feed_config.timeout),
                 ) as response:
                     self.stats["total_requests"] += 1
 
@@ -228,9 +217,7 @@ class EnhancedMangaRSSCollector:
             return []
 
     def _parse_standard_rss(
-        self,
-        content: str,
-        feed_config: MangaRSSFeedConfig
+        self, content: str, feed_config: MangaRSSFeedConfig
     ) -> List[RSSFeedItem]:
         """Parse standard RSS/Atom feed."""
         items = []
@@ -243,13 +230,15 @@ class EnhancedMangaRSSCollector:
                 title = entry.get("title", "")
                 link = entry.get("link", "")
                 description = entry.get("summary", entry.get("description", ""))
-                pub_date = self._parse_date(entry.get("published", entry.get("updated", "")))
+                pub_date = self._parse_date(
+                    entry.get("published", entry.get("updated", ""))
+                )
 
                 # Extract metadata
                 metadata = {
                     "source": feed_config.name,
                     "feed_url": feed_config.url,
-                    "category": feed_config.category
+                    "category": feed_config.category,
                 }
 
                 # Add author if available
@@ -267,7 +256,7 @@ class EnhancedMangaRSSCollector:
                     description=description,
                     pub_date=pub_date,
                     source=feed_config.name,
-                    metadata=metadata
+                    metadata=metadata,
                 )
 
                 items.append(item)
@@ -278,9 +267,7 @@ class EnhancedMangaRSSCollector:
         return items
 
     def _parse_json_feed(
-        self,
-        content: str,
-        feed_config: MangaRSSFeedConfig
+        self, content: str, feed_config: MangaRSSFeedConfig
     ) -> List[RSSFeedItem]:
         """Parse JSON feed format."""
         items = []
@@ -302,7 +289,7 @@ class EnhancedMangaRSSCollector:
                 metadata = {
                     "source": feed_config.name,
                     "feed_url": feed_config.url,
-                    "category": feed_config.category
+                    "category": feed_config.category,
                 }
 
                 # Add author
@@ -323,7 +310,7 @@ class EnhancedMangaRSSCollector:
                     description=description,
                     pub_date=pub_date,
                     source=feed_config.name,
-                    metadata=metadata
+                    metadata=metadata,
                 )
 
                 items.append(item)
@@ -334,24 +321,26 @@ class EnhancedMangaRSSCollector:
         return items
 
     def _parse_html_feed(
-        self,
-        content: str,
-        feed_config: MangaRSSFeedConfig
+        self, content: str, feed_config: MangaRSSFeedConfig
     ) -> List[RSSFeedItem]:
         """Parse HTML page as feed using custom selectors."""
         items = []
 
         try:
-            soup = BeautifulSoup(content, 'html.parser')
+            soup = BeautifulSoup(content, "html.parser")
 
             # Use custom selectors if provided
             if feed_config.custom_selectors:
                 title_selector = feed_config.custom_selectors.get("title", ".title")
                 link_selector = feed_config.custom_selectors.get("link", "a")
-                desc_selector = feed_config.custom_selectors.get("description", ".description")
+                desc_selector = feed_config.custom_selectors.get(
+                    "description", ".description"
+                )
 
                 # Find all items (assume they're in a common container)
-                containers = soup.find_all(class_=re.compile(r"(item|entry|article|series)"))
+                containers = soup.find_all(
+                    class_=re.compile(r"(item|entry|article|series)")
+                )
 
                 for container in containers:
                     title_elem = container.select_one(title_selector)
@@ -365,7 +354,11 @@ class EnhancedMangaRSSCollector:
                     if title and link:
                         # Make link absolute if needed
                         if not link.startswith("http"):
-                            base_url = urlparse(feed_config.url).scheme + "://" + urlparse(feed_config.url).netloc
+                            base_url = (
+                                urlparse(feed_config.url).scheme
+                                + "://"
+                                + urlparse(feed_config.url).netloc
+                            )
                             link = urljoin(base_url, link)
 
                         item = RSSFeedItem(
@@ -377,8 +370,8 @@ class EnhancedMangaRSSCollector:
                             metadata={
                                 "source": feed_config.name,
                                 "feed_url": feed_config.url,
-                                "category": feed_config.category
-                            }
+                                "category": feed_config.category,
+                            },
                         )
 
                         items.append(item)
@@ -412,6 +405,7 @@ class EnhancedMangaRSSCollector:
         # Try feedparser's date parser as fallback
         try:
             import feedparser
+
             parsed = feedparser._parse_date(date_str)
             if parsed:
                 return datetime(*parsed[:6])
@@ -452,8 +446,7 @@ class EnhancedMangaRSSCollector:
         return all_items
 
     def convert_to_works_and_releases(
-        self,
-        feed_items: List[RSSFeedItem]
+        self, feed_items: List[RSSFeedItem]
     ) -> Tuple[List[Work], List[Release]]:
         """
         Convert RSS feed items to Work and Release models.
@@ -486,8 +479,8 @@ class EnhancedMangaRSSCollector:
                     metadata={
                         "source": item.source,
                         "description": item.description,
-                        "original_title": item.title
-                    }
+                        "original_title": item.title,
+                    },
                 )
                 works.append(work)
                 work_map[clean_title] = len(works) - 1
@@ -498,13 +491,12 @@ class EnhancedMangaRSSCollector:
                 release_type=release_type or ReleaseType.VOLUME,
                 number=number,
                 platform=item.source,
-                release_date=item.pub_date.date() if item.pub_date else datetime.now().date(),
+                release_date=(
+                    item.pub_date.date() if item.pub_date else datetime.now().date()
+                ),
                 source=DataSource.RSS_GENERAL,
                 source_url=item.link,
-                metadata={
-                    "source": item.source,
-                    "description": item.description
-                }
+                metadata={"source": item.source, "description": item.description},
             )
             releases.append(release)
 
@@ -515,7 +507,9 @@ class EnhancedMangaRSSCollector:
 
         return works, releases
 
-    def _extract_number_and_type(self, title: str) -> Tuple[Optional[str], Optional[ReleaseType]]:
+    def _extract_number_and_type(
+        self, title: str
+    ) -> Tuple[Optional[str], Optional[ReleaseType]]:
         """Extract volume/episode number and release type from title."""
         # Volume patterns
         volume_patterns = [
@@ -582,11 +576,12 @@ class EnhancedMangaRSSCollector:
             "success_rate": f"{success_rate:.2%}",
             "total_items_collected": self.stats["total_items"],
             "available_sources": len(self.MANGA_SOURCES),
-            "enabled_sources": len(self.get_all_sources())
+            "enabled_sources": len(self.get_all_sources()),
         }
 
 
 # Async wrapper functions
+
 
 async def fetch_enhanced_manga_feeds() -> List[RSSFeedItem]:
     """Fetch all enhanced manga RSS feeds."""
@@ -602,6 +597,7 @@ async def fetch_manga_works_and_releases() -> Tuple[List[Work], List[Release]]:
 
 
 # Synchronous wrappers
+
 
 def fetch_enhanced_manga_feeds_sync() -> List[RSSFeedItem]:
     """Synchronous wrapper for fetch_enhanced_manga_feeds."""

@@ -1,11 +1,11 @@
 """
 Test API functionality for anime and manga data collection
 """
+
 import pytest
-import json
 import os
 import sys
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))

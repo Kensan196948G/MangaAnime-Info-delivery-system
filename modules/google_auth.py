@@ -15,6 +15,7 @@ try:
     from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
     from google_auth_oauthlib.flow import InstalledAppFlow
+
     GOOGLE_AVAILABLE = True
 except ImportError:
     GOOGLE_AVAILABLE = False
@@ -22,7 +23,7 @@ except ImportError:
 
 class GoogleAuthenticationError(Exception):
     """Google認証関連のエラー"""
-    pass
+
 
 
 class GoogleAuthenticator:
@@ -38,7 +39,7 @@ class GoogleAuthenticator:
         credentials_file: str,
         token_file: str,
         scopes: List[str],
-        service_name: str = "Google API"
+        service_name: str = "Google API",
     ):
         """
         認証マネージャーの初期化
@@ -138,7 +139,9 @@ class GoogleAuthenticator:
 
             return None
 
-    def _refresh_or_reauthorize(self, creds: Optional[Credentials]) -> Optional[Credentials]:
+    def _refresh_or_reauthorize(
+        self, creds: Optional[Credentials]
+    ) -> Optional[Credentials]:
         """
         トークンをリフレッシュまたは再認証
 
@@ -184,16 +187,15 @@ class GoogleAuthenticator:
             self.logger.info("ブラウザが開きます。Googleアカウントで認証してください。")
 
             flow = InstalledAppFlow.from_client_secrets_file(
-                self.credentials_file,
-                self.scopes
+                self.credentials_file, self.scopes
             )
 
             # ローカルサーバーを起動して認証
             creds = flow.run_local_server(
                 port=0,
                 timeout_seconds=300,  # 5分タイムアウト
-                access_type='offline',
-                prompt='consent'
+                access_type="offline",
+                prompt="consent",
             )
 
             self.logger.info("OAuth2認証フローが完了しました")
@@ -226,8 +228,9 @@ class GoogleAuthenticator:
 
             # Windows環境でもファイルパーミッションを制限
             try:
-                if os.name == 'nt':  # Windows
+                if os.name == "nt":  # Windows
                     import stat
+
                     os.chmod(self.token_file, stat.S_IREAD | stat.S_IWRITE)
             except Exception:
                 pass
@@ -305,7 +308,9 @@ class GoogleAuthenticator:
             "service_name": self.service_name,
             "token_file": self.token_file,
             "token_exists": os.path.exists(self.token_file),
-            "last_auth_time": self._last_auth_time.isoformat() if self._last_auth_time else None,
+            "last_auth_time": (
+                self._last_auth_time.isoformat() if self._last_auth_time else None
+            ),
             "auth_failure_count": self._auth_failure_count,
         }
 

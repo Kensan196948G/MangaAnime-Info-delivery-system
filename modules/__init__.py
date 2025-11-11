@@ -81,7 +81,7 @@ def initialize_system(config_path=None):
     config = get_config(config_path)
 
     # Initialize database with config
-    db_config = config.get_database_config()
+    config.get_database_config()
     db = get_db()
 
     # Ensure database is initialized

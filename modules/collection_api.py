@@ -18,20 +18,18 @@ Features:
 """
 
 import asyncio
-import json
 import logging
 import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Union
-from dataclasses import dataclass, asdict
+from datetime import datetime
+from typing import Dict, List, Any, Optional
+from dataclasses import dataclass
 from enum import Enum
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 
 from .anime_anilist import AniListCollector
 from .manga_rss import MangaRSSCollector, BookWalkerRSSCollector, DAnimeRSSCollector
 from .data_normalizer import DataIntegrator, DataQualityAnalyzer, analyze_data_quality
-from .models import Work, Release, WorkType, DataSource
+from .models import Work
 from .db import get_db
 
 

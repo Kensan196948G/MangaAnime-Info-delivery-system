@@ -6,20 +6,17 @@ Provides system health monitoring, performance tracking, security incident alert
 import os
 import json
 import time
-import smtplib
 import logging
 import sqlite3
 from collections import deque
 import threading
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple, Callable
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, asdict
 from collections import defaultdict, deque
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import psutil
-import asyncio
-from pathlib import Path
 
 try:
     import psutil

@@ -6,9 +6,9 @@ Dashboard module for monitoring and statistics visualization
 import sqlite3
 import json
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any, Optional
 from flask import Blueprint, render_template, jsonify, request
-from .monitoring import PerformanceMonitor, MetricType
+from .monitoring import MetricsCollector
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,9 +19,12 @@ dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 class DashboardService:
     """ダッシュボードデータ提供サービス"""
 
-    def __init__(self, db_path: str = "db.sqlite3"):
+    def __init__(self, db_path: str = "db.sqlite3", config: Optional[Dict] = None):
         self.db_path = db_path
-        self.monitor = PerformanceMonitor()
+        self.config = config or {}
+        # SystemMonitorは必要時に初期化（configが必要）
+        self.monitor = None
+        self.metrics_collector = MetricsCollector() if MetricsCollector else None
         self._init_dashboard_tables()
 
     def _init_dashboard_tables(self):

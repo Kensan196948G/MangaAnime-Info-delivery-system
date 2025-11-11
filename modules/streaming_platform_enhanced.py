@@ -13,11 +13,10 @@ This module provides enhanced support for:
 import asyncio
 import aiohttp
 import logging
-from datetime import datetime, date, timedelta
-from typing import List, Dict, Any, Optional, Tuple, Set
+from datetime import datetime, date
+from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
-import json
 import re
 
 from .models import Work, Release, WorkType, ReleaseType, DataSource
@@ -171,7 +170,7 @@ class EnhancedStreamingCollector:
         season: Optional[str] = None,
         year: Optional[int] = None,
         page: int = 1,
-        per_page: int = 50
+        per_page: int = 50,
     ) -> List[Dict[str, Any]]:
         """
         Fetch anime streaming data from AniList.
@@ -189,11 +188,7 @@ class EnhancedStreamingCollector:
             f"Fetching streaming data: season={season}, year={year}, page={page}"
         )
 
-        variables = {
-            "page": page,
-            "perPage": per_page,
-            "type": "ANIME"
-        }
+        variables = {"page": page, "perPage": per_page, "type": "ANIME"}
 
         if season:
             variables["season"] = season.upper()
@@ -205,7 +200,7 @@ class EnhancedStreamingCollector:
                 async with session.post(
                     self.ANILIST_API_URL,
                     json={"query": self.STREAMING_QUERY, "variables": variables},
-                    timeout=aiohttp.ClientTimeout(total=self.timeout)
+                    timeout=aiohttp.ClientTimeout(total=self.timeout),
                 ) as response:
                     self.request_count += 1
 
@@ -214,7 +209,9 @@ class EnhancedStreamingCollector:
 
                         if "data" in data and "Page" in data["data"]:
                             media_list = data["data"]["Page"]["media"]
-                            self.logger.info(f"Retrieved {len(media_list)} anime entries")
+                            self.logger.info(
+                                f"Retrieved {len(media_list)} anime entries"
+                            )
                             return media_list
                         else:
                             self.logger.warning("No data found in response")
@@ -238,10 +235,7 @@ class EnhancedStreamingCollector:
             self.logger.error(f"Error fetching streaming data: {e}")
             return []
 
-    def extract_streaming_info(
-        self,
-        anime_data: Dict[str, Any]
-    ) -> List[StreamingInfo]:
+    def extract_streaming_info(self, anime_data: Dict[str, Any]) -> List[StreamingInfo]:
         """
         Extract streaming platform information from anime data.
 
@@ -270,8 +264,8 @@ class EnhancedStreamingCollector:
                     metadata={
                         "site": site_name,
                         "title": episode_title,
-                        "thumbnail": episode.get("thumbnail")
-                    }
+                        "thumbnail": episode.get("thumbnail"),
+                    },
                 )
 
                 streaming_infos.append(streaming_info)
@@ -289,10 +283,7 @@ class EnhancedStreamingCollector:
                     streaming_info = StreamingInfo(
                         platform=platform,
                         url=link.get("url"),
-                        metadata={
-                            "site": site_name,
-                            "link_type": link_type
-                        }
+                        metadata={"site": site_name, "link_type": link_type},
                     )
 
                     streaming_infos.append(streaming_info)
@@ -320,9 +311,7 @@ class EnhancedStreamingCollector:
         return None
 
     def filter_by_platform(
-        self,
-        streaming_infos: List[StreamingInfo],
-        platforms: List[StreamingPlatform]
+        self, streaming_infos: List[StreamingInfo], platforms: List[StreamingPlatform]
     ) -> List[StreamingInfo]:
         """
         Filter streaming info by platforms.
@@ -334,15 +323,10 @@ class EnhancedStreamingCollector:
         Returns:
             Filtered streaming information
         """
-        return [
-            info for info in streaming_infos
-            if info.platform in platforms
-        ]
+        return [info for info in streaming_infos if info.platform in platforms]
 
     async def fetch_netflix_prime_anime(
-        self,
-        season: Optional[str] = None,
-        year: Optional[int] = None
+        self, season: Optional[str] = None, year: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         """
         Fetch anime available on Netflix and Amazon Prime.
@@ -371,16 +355,12 @@ class EnhancedStreamingCollector:
                 anime["filtered_streaming"] = netflix_prime
                 filtered_anime.append(anime)
 
-        self.logger.info(
-            f"Found {len(filtered_anime)} anime on Netflix/Amazon Prime"
-        )
+        self.logger.info(f"Found {len(filtered_anime)} anime on Netflix/Amazon Prime")
 
         return filtered_anime
 
     def convert_to_releases(
-        self,
-        anime_data: Dict[str, Any],
-        work_id: int
+        self, anime_data: Dict[str, Any], work_id: int
     ) -> List[Release]:
         """
         Convert anime streaming data to Release models.
@@ -405,14 +385,10 @@ class EnhancedStreamingCollector:
             release_date_obj = info.release_date
             if not release_date_obj and "startDate" in anime_data:
                 start_date = anime_data["startDate"]
-                if all(
-                    start_date.get(k) for k in ["year", "month", "day"]
-                ):
+                if all(start_date.get(k) for k in ["year", "month", "day"]):
                     try:
                         release_date_obj = date(
-                            start_date["year"],
-                            start_date["month"],
-                            start_date["day"]
+                            start_date["year"], start_date["month"], start_date["day"]
                         )
                     except (ValueError, TypeError):
                         release_date_obj = datetime.now().date()
@@ -433,8 +409,8 @@ class EnhancedStreamingCollector:
                 metadata={
                     "platform": info.platform.value,
                     "is_simulcast": info.is_simulcast,
-                    **info.metadata
-                }
+                    **info.metadata,
+                },
             )
 
             releases.append(release)
@@ -445,7 +421,7 @@ class EnhancedStreamingCollector:
         self,
         season: Optional[str] = None,
         year: Optional[int] = None,
-        netflix_prime_only: bool = False
+        netflix_prime_only: bool = False,
     ) -> Tuple[List[Work], List[Release]]:
         """
         Fetch streaming data and convert to Work/Release models.
@@ -485,8 +461,8 @@ class EnhancedStreamingCollector:
                     "anilist_id": anime.get("id"),
                     "format": anime.get("format"),
                     "status": anime.get("status"),
-                    "start_date": anime.get("startDate")
-                }
+                    "start_date": anime.get("startDate"),
+                },
             )
 
             works.append(work)
@@ -512,9 +488,9 @@ class EnhancedStreamingCollector:
 
 # Async wrapper functions
 
+
 async def fetch_netflix_prime_anime(
-    season: Optional[str] = None,
-    year: Optional[int] = None
+    season: Optional[str] = None, year: Optional[int] = None
 ) -> List[Dict[str, Any]]:
     """Fetch anime available on Netflix and Amazon Prime."""
     collector = EnhancedStreamingCollector()
@@ -524,7 +500,7 @@ async def fetch_netflix_prime_anime(
 async def fetch_streaming_works_and_releases(
     season: Optional[str] = None,
     year: Optional[int] = None,
-    netflix_prime_only: bool = False
+    netflix_prime_only: bool = False,
 ) -> Tuple[List[Work], List[Release]]:
     """Fetch streaming anime as Work/Release models."""
     collector = EnhancedStreamingCollector()
@@ -533,9 +509,9 @@ async def fetch_streaming_works_and_releases(
 
 # Synchronous wrappers
 
+
 def fetch_netflix_prime_anime_sync(
-    season: Optional[str] = None,
-    year: Optional[int] = None
+    season: Optional[str] = None, year: Optional[int] = None
 ) -> List[Dict[str, Any]]:
     """Synchronous wrapper for fetch_netflix_prime_anime."""
     return asyncio.run(fetch_netflix_prime_anime(season, year))
@@ -544,7 +520,7 @@ def fetch_netflix_prime_anime_sync(
 def fetch_streaming_works_and_releases_sync(
     season: Optional[str] = None,
     year: Optional[int] = None,
-    netflix_prime_only: bool = False
+    netflix_prime_only: bool = False,
 ) -> Tuple[List[Work], List[Release]]:
     """Synchronous wrapper for fetch_streaming_works_and_releases."""
     return asyncio.run(

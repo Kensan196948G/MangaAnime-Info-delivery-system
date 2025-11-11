@@ -19,7 +19,7 @@ class MangaAnimeSystemError(Exception):
         self,
         message: str,
         error_code: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None
+        details: Optional[Dict[str, Any]] = None,
     ):
         """
         Args:
@@ -48,7 +48,7 @@ class MangaAnimeSystemError(Exception):
             "error_type": self.__class__.__name__,
             "message": self.message,
             "error_code": self.error_code,
-            "details": self.details
+            "details": self.details,
         }
 
 
@@ -56,19 +56,20 @@ class MangaAnimeSystemError(Exception):
 # データ収集関連の例外
 # =============================================================================
 
+
 class DataCollectionError(MangaAnimeSystemError):
     """データ収集に関するエラー"""
-    pass
+
 
 
 class APIError(DataCollectionError):
     """API呼び出しの失敗"""
-    pass
+
 
 
 class AniListAPIError(APIError):
     """AniList API固有のエラー"""
-    pass
+
 
 
 class RateLimitExceeded(APIError):
@@ -78,7 +79,7 @@ class RateLimitExceeded(APIError):
         self,
         message: str = "Rate limit exceeded",
         retry_after: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Args:
@@ -98,7 +99,7 @@ class CircuitBreakerOpen(APIError):
         self,
         message: str = "Circuit breaker is open",
         failure_count: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Args:
@@ -112,18 +113,13 @@ class CircuitBreakerOpen(APIError):
 
 class RSSCollectionError(DataCollectionError):
     """RSSフィード収集のエラー"""
-    pass
+
 
 
 class RSSParsingError(RSSCollectionError):
     """RSSフィードの解析エラー"""
 
-    def __init__(
-        self,
-        message: str,
-        feed_url: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, feed_url: Optional[str] = None, **kwargs):
         """
         Args:
             message: エラーメッセージ
@@ -142,7 +138,7 @@ class FeedUnavailableError(RSSCollectionError):
         message: str,
         feed_url: Optional[str] = None,
         status_code: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Args:
@@ -161,9 +157,10 @@ class FeedUnavailableError(RSSCollectionError):
 # データベース関連の例外
 # =============================================================================
 
+
 class DatabaseError(MangaAnimeSystemError):
     """データベース操作に関するエラー"""
-    pass
+
 
 
 class DatabaseConnectionError(DatabaseError):
@@ -173,7 +170,7 @@ class DatabaseConnectionError(DatabaseError):
         self,
         message: str = "Failed to connect to database",
         db_path: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(message, error_code="DB_CONNECTION_ERROR", **kwargs)
         if db_path:
@@ -183,12 +180,7 @@ class DatabaseConnectionError(DatabaseError):
 class DatabaseIntegrityError(DatabaseError):
     """データベース整合性エラー"""
 
-    def __init__(
-        self,
-        message: str,
-        constraint: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, constraint: Optional[str] = None, **kwargs):
         """
         Args:
             message: エラーメッセージ
@@ -207,7 +199,7 @@ class RecordNotFoundError(DatabaseError):
         message: str,
         record_type: Optional[str] = None,
         record_id: Optional[Any] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Args:
@@ -226,36 +218,28 @@ class RecordNotFoundError(DatabaseError):
 # 通知関連の例外
 # =============================================================================
 
+
 class NotificationError(MangaAnimeSystemError):
     """通知送信に関するエラー"""
-    pass
+
 
 
 class EmailNotificationError(NotificationError):
     """メール通知のエラー"""
-    pass
+
 
 
 class EmailAuthenticationError(EmailNotificationError):
     """Gmail認証エラー"""
 
-    def __init__(
-        self,
-        message: str = "Gmail authentication failed",
-        **kwargs
-    ):
+    def __init__(self, message: str = "Gmail authentication failed", **kwargs):
         super().__init__(message, error_code="EMAIL_AUTH_ERROR", **kwargs)
 
 
 class EmailSendError(EmailNotificationError):
     """メール送信エラー"""
 
-    def __init__(
-        self,
-        message: str,
-        recipient: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, recipient: Optional[str] = None, **kwargs):
         """
         Args:
             message: エラーメッセージ
@@ -268,16 +252,14 @@ class EmailSendError(EmailNotificationError):
 
 class CalendarNotificationError(NotificationError):
     """カレンダー通知のエラー"""
-    pass
+
 
 
 class CalendarAuthenticationError(CalendarNotificationError):
     """Google Calendar認証エラー"""
 
     def __init__(
-        self,
-        message: str = "Google Calendar authentication failed",
-        **kwargs
+        self, message: str = "Google Calendar authentication failed", **kwargs
     ):
         super().__init__(message, error_code="CALENDAR_AUTH_ERROR", **kwargs)
 
@@ -285,12 +267,7 @@ class CalendarAuthenticationError(CalendarNotificationError):
 class CalendarEventCreationError(CalendarNotificationError):
     """カレンダーイベント作成エラー"""
 
-    def __init__(
-        self,
-        message: str,
-        event_title: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, event_title: Optional[str] = None, **kwargs):
         """
         Args:
             message: エラーメッセージ
@@ -305,9 +282,10 @@ class CalendarEventCreationError(CalendarNotificationError):
 # データ処理関連の例外
 # =============================================================================
 
+
 class DataProcessingError(MangaAnimeSystemError):
     """データ処理に関するエラー"""
-    pass
+
 
 
 class DataValidationError(DataProcessingError):
@@ -318,7 +296,7 @@ class DataValidationError(DataProcessingError):
         message: str,
         field_name: Optional[str] = None,
         invalid_value: Optional[Any] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Args:
@@ -335,17 +313,14 @@ class DataValidationError(DataProcessingError):
 
 class FilteringError(DataProcessingError):
     """フィルタリング処理のエラー"""
-    pass
+
 
 
 class NormalizationError(DataProcessingError):
     """データ正規化のエラー"""
 
     def __init__(
-        self,
-        message: str,
-        source_data: Optional[Dict[str, Any]] = None,
-        **kwargs
+        self, message: str, source_data: Optional[Dict[str, Any]] = None, **kwargs
     ):
         """
         Args:
@@ -361,20 +336,16 @@ class NormalizationError(DataProcessingError):
 # 設定関連の例外
 # =============================================================================
 
+
 class ConfigurationError(MangaAnimeSystemError):
     """設定に関するエラー"""
-    pass
+
 
 
 class ConfigFileNotFoundError(ConfigurationError):
     """設定ファイルが見つからない"""
 
-    def __init__(
-        self,
-        message: str,
-        config_path: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, config_path: Optional[str] = None, **kwargs):
         """
         Args:
             message: エラーメッセージ
@@ -388,12 +359,7 @@ class ConfigFileNotFoundError(ConfigurationError):
 class InvalidConfigurationError(ConfigurationError):
     """設定内容が無効"""
 
-    def __init__(
-        self,
-        message: str,
-        config_key: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, config_key: Optional[str] = None, **kwargs):
         """
         Args:
             message: エラーメッセージ
@@ -408,9 +374,10 @@ class InvalidConfigurationError(ConfigurationError):
 # セキュリティ関連の例外
 # =============================================================================
 
+
 class SecurityError(MangaAnimeSystemError):
     """セキュリティに関するエラー"""
-    pass
+
 
 
 class AuthenticationError(SecurityError):
@@ -420,7 +387,7 @@ class AuthenticationError(SecurityError):
         self,
         message: str = "Authentication failed",
         service: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Args:
@@ -439,7 +406,7 @@ class AuthorizationError(SecurityError):
         self,
         message: str = "Authorization failed",
         required_permission: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Args:
@@ -454,12 +421,7 @@ class AuthorizationError(SecurityError):
 class InputValidationError(SecurityError):
     """入力バリデーションエラー"""
 
-    def __init__(
-        self,
-        message: str,
-        input_type: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, input_type: Optional[str] = None, **kwargs):
         """
         Args:
             message: エラーメッセージ
@@ -474,11 +436,12 @@ class InputValidationError(SecurityError):
 # ユーティリティ関数
 # =============================================================================
 
+
 def handle_exception(
     exception: Exception,
     logger,
     reraise: bool = True,
-    additional_context: Optional[Dict[str, Any]] = None
+    additional_context: Optional[Dict[str, Any]] = None,
 ) -> Optional[MangaAnimeSystemError]:
     """
     例外を適切に処理し、ログ出力する
@@ -516,8 +479,7 @@ def handle_exception(
 
     # 例外を変換
     converted_error = converted_error_class(
-        message=str(exception),
-        details=additional_context or {}
+        message=str(exception), details=additional_context or {}
     )
 
     logger.error(f"Exception converted: {exception_type} -> {converted_error}")

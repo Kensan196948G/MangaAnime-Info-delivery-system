@@ -11,9 +11,6 @@ Tests:
 """
 
 import pytest
-import asyncio
-from datetime import datetime, date, timedelta
-from typing import List, Dict, Any
 import sys
 from pathlib import Path
 
@@ -24,33 +21,24 @@ sys.path.insert(0, str(project_root))
 from modules.anime_syoboi import (
     SyoboiCalendarClient,
     fetch_syoboi_programs_sync,
-    fetch_syoboi_works_and_releases_sync
 )
 from modules.manga_rss_enhanced import (
     EnhancedMangaRSSCollector,
-    fetch_enhanced_manga_feeds_sync,
-    fetch_manga_works_and_releases_sync
 )
 from modules.streaming_platform_enhanced import (
     EnhancedStreamingCollector,
-    fetch_netflix_prime_anime_sync,
-    fetch_streaming_works_and_releases_sync,
-    StreamingPlatform
+    StreamingPlatform,
 )
 from modules.data_normalizer_enhanced import (
     EnhancedDuplicateDetector,
     EnhancedDataMerger,
-    detect_duplicates,
-    deduplicate_works,
-    MatchAlgorithm
 )
 from modules.filter_logic_enhanced import (
     ConfigBasedFilterManager,
     EnhancedContentFilter,
-    filter_works,
-    FilterAction
+    FilterAction,
 )
-from modules.models import Work, Release, WorkType, ReleaseType
+from modules.models import Work, WorkType
 
 
 class TestSyoboiCalendarIntegration:
@@ -75,8 +63,8 @@ class TestSyoboiCalendarIntegration:
 
             if programs:
                 program = programs[0]
-                assert hasattr(program, 'title')
-                assert hasattr(program, 'program_id')
+                assert hasattr(program, "title")
+                assert hasattr(program, "program_id")
                 print(f"Sample program: {program.title}")
 
         except Exception as e:
@@ -185,9 +173,7 @@ class TestStreamingPlatformEnhanced:
         try:
             # Fetch current season
             anime_list = await collector.fetch_streaming_data(
-                season="FALL",
-                year=2024,
-                per_page=5
+                season="FALL", year=2024, per_page=5
             )
 
             assert isinstance(anime_list, list)
@@ -213,8 +199,7 @@ class TestStreamingPlatformEnhanced:
 
         try:
             anime_list = await collector.fetch_netflix_prime_anime(
-                season="FALL",
-                year=2024
+                season="FALL", year=2024
             )
 
             assert isinstance(anime_list, list)
@@ -222,7 +207,7 @@ class TestStreamingPlatformEnhanced:
 
             if anime_list:
                 for anime in anime_list[:3]:
-                    title = anime.get('title', {})
+                    title = anime.get("title", {})
                     print(f"  - {title.get('romaji', 'Unknown')}")
 
         except Exception as e:
@@ -309,7 +294,7 @@ class TestEnhancedDataMerger:
             work_type=WorkType.MANGA,
             id=1,
             title_en="One Piece",
-            metadata={"genres": ["Adventure", "Action"]}
+            metadata={"genres": ["Adventure", "Action"]},
         )
 
         work2 = Work(
@@ -318,7 +303,7 @@ class TestEnhancedDataMerger:
             id=2,
             title_kana="ワンピース",
             official_url="https://one-piece.com",
-            metadata={"genres": ["Fantasy"], "status": "ongoing"}
+            metadata={"genres": ["Fantasy"], "status": "ongoing"},
         )
 
         merged = merger.merge_works(work1, work2)
@@ -340,7 +325,12 @@ class TestEnhancedDataMerger:
 
         works = [
             Work(title="鬼滅の刃", work_type=WorkType.ANIME, id=1),
-            Work(title="鬼滅の刃", work_type=WorkType.ANIME, id=2, title_en="Demon Slayer"),
+            Work(
+                title="鬼滅の刃",
+                work_type=WorkType.ANIME,
+                id=2,
+                title_en="Demon Slayer",
+            ),
             Work(title="呪術廻戦", work_type=WorkType.ANIME, id=3),
         ]
 
@@ -383,7 +373,7 @@ class TestEnhancedContentFilter:
         work = Work(
             title="エロいアニメ",
             work_type=WorkType.ANIME,
-            metadata={"description": "18禁コンテンツ"}
+            metadata={"description": "18禁コンテンツ"},
         )
 
         result = filter_instance.filter_work(work)
@@ -400,7 +390,7 @@ class TestEnhancedContentFilter:
         work = Work(
             title="進撃の巨人",
             work_type=WorkType.ANIME,
-            metadata={"description": "人類と巨人の戦いを描いた作品"}
+            metadata={"description": "人類と巨人の戦いを描いた作品"},
         )
 
         result = filter_instance.filter_work(work)

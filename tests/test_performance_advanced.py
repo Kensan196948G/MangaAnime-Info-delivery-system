@@ -1,7 +1,6 @@
 import time
 import threading
-from unittest.mock import patch, Mock, MagicMock
-import pytest
+from unittest.mock import patch, Mock
 
 
 class TestPerformanceAdvanced:
@@ -69,7 +68,7 @@ class TestPerformanceAdvanced:
         start_time = time.time()
 
         for i in range(10):
-            db = DatabaseManager("mock_path")
+            DatabaseManager("mock_path")
             try:
                 # Simulate database query
                 mock_cursor.execute("SELECT * FROM works LIMIT 1")
@@ -246,7 +245,7 @@ class TestPerformanceAdvanced:
             if key in cache:
                 cache_hits += 1
                 # Simulate cache hit
-                value = cache[key]
+                cache[key]
             else:
                 cache_misses += 1
                 # Simulate cache miss and population

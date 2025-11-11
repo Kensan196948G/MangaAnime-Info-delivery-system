@@ -18,24 +18,21 @@ import aiohttp
 import logging
 import time
 import json
-from datetime import datetime, date, timedelta
-from typing import List, Dict, Any, Optional, Tuple, Set
+from datetime import datetime, timedelta
+from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
-from enum import Enum
-import hashlib
-import xml.etree.ElementTree as ET
 
 from .models import Work, Release, WorkType, ReleaseType, DataSource
 
 
 class SyoboiAPIError(Exception):
     """Custom exception for Syoboi Calendar API errors."""
-    pass
+
 
 
 class SyoboiRateLimitError(SyoboiAPIError):
     """Exception raised when rate limit is exceeded."""
-    pass
+
 
 
 @dataclass
@@ -89,7 +86,7 @@ class SyoboiCalendarClient:
         timeout: int = 15,
         max_retries: int = 3,
         retry_delay: int = 2,
-        requests_per_minute: int = 60
+        requests_per_minute: int = 60,
     ):
         """
         Initialize Syoboi Calendar client.
@@ -142,10 +139,7 @@ class SyoboiCalendarClient:
         self.request_times.append(now)
 
     async def _make_request(
-        self,
-        endpoint: str,
-        params: Dict[str, Any],
-        retries: int = 0
+        self, endpoint: str, params: Dict[str, Any], retries: int = 0
     ) -> Dict[str, Any]:
         """
         Make API request with retry logic.
@@ -167,14 +161,14 @@ class SyoboiCalendarClient:
                 async with session.get(
                     url,
                     params=params,
-                    timeout=aiohttp.ClientTimeout(total=self.timeout)
+                    timeout=aiohttp.ClientTimeout(total=self.timeout),
                 ) as response:
                     self.request_count += 1
 
                     if response.status == 200:
-                        content_type = response.headers.get('Content-Type', '')
+                        content_type = response.headers.get("Content-Type", "")
 
-                        if 'json' in content_type:
+                        if "json" in content_type:
                             data = await response.json()
                         else:
                             # Try to parse as JSON anyway
@@ -200,7 +194,7 @@ class SyoboiCalendarClient:
             self.error_count += 1
 
             if retries < self.max_retries:
-                wait_time = self.retry_delay * (2 ** retries)  # Exponential backoff
+                wait_time = self.retry_delay * (2**retries)  # Exponential backoff
                 self.logger.warning(
                     f"Request failed (attempt {retries + 1}/{self.max_retries}): {e}. "
                     f"Retrying in {wait_time}s..."
@@ -208,12 +202,12 @@ class SyoboiCalendarClient:
                 await asyncio.sleep(wait_time)
                 return await self._make_request(endpoint, params, retries + 1)
 
-            raise SyoboiAPIError(f"Request failed after {self.max_retries} retries: {e}")
+            raise SyoboiAPIError(
+                f"Request failed after {self.max_retries} retries: {e}"
+            )
 
     async def get_recent_programs(
-        self,
-        days_ahead: int = 7,
-        channels: Optional[List[str]] = None
+        self, days_ahead: int = 7, channels: Optional[List[str]] = None
     ) -> List[BroadcastProgram]:
         """
         Get recent and upcoming anime broadcasts.
@@ -262,11 +256,7 @@ class SyoboiCalendarClient:
         """
         self.logger.info(f"Searching for program: {title}")
 
-        params = {
-            "Req": "TitleLookup",
-            "TID": "*",
-            "Title": title
-        }
+        params = {"Req": "TitleLookup", "TID": "*", "Title": title}
 
         try:
             data = await self._make_request(self.JSON_API, params)
@@ -289,10 +279,7 @@ class SyoboiCalendarClient:
         Returns:
             Program details or None if not found
         """
-        params = {
-            "Req": "TitleFull",
-            "TID": program_id
-        }
+        params = {"Req": "TitleFull", "TID": program_id}
 
         try:
             data = await self._make_request(self.JSON_API, params)
@@ -345,8 +332,7 @@ class SyoboiCalendarClient:
             elif isinstance(program_data, list):
                 for prog_info in program_data:
                     program = self._parse_single_program(
-                        prog_info.get("TID", prog_info.get("PID", "")),
-                        prog_info
+                        prog_info.get("TID", prog_info.get("PID", "")), prog_info
                     )
                     if program:
                         programs.append(program)
@@ -357,9 +343,7 @@ class SyoboiCalendarClient:
         return programs
 
     def _parse_single_program(
-        self,
-        program_id: str,
-        data: Dict[str, Any]
+        self, program_id: str, data: Dict[str, Any]
     ) -> Optional[BroadcastProgram]:
         """Parse a single program entry."""
         try:
@@ -369,7 +353,7 @@ class SyoboiCalendarClient:
                 channel = BroadcastChannel(
                     channel_id=str(data.get("ChID", "")),
                     channel_name=data.get("ChName", ""),
-                    channel_group=data.get("ChGroup", None)
+                    channel_group=data.get("ChGroup", None),
                 )
 
             # Parse broadcast times
@@ -378,19 +362,13 @@ class SyoboiCalendarClient:
 
             if "StTime" in data:
                 try:
-                    start_time = datetime.strptime(
-                        data["StTime"],
-                        "%Y-%m-%d %H:%M:%S"
-                    )
+                    start_time = datetime.strptime(data["StTime"], "%Y-%m-%d %H:%M:%S")
                 except (ValueError, TypeError):
                     pass
 
             if "EdTime" in data:
                 try:
-                    end_time = datetime.strptime(
-                        data["EdTime"],
-                        "%Y-%m-%d %H:%M:%S"
-                    )
+                    end_time = datetime.strptime(data["EdTime"], "%Y-%m-%d %H:%M:%S")
                 except (ValueError, TypeError):
                     pass
 
@@ -413,7 +391,7 @@ class SyoboiCalendarClient:
                     "Cat": data.get("Cat", None),
                     "UserPoint": data.get("UserPoint", None),
                 },
-                raw_data=data
+                raw_data=data,
             )
 
             return program
@@ -429,7 +407,7 @@ class SyoboiCalendarClient:
             "program_id": program.program_id,
             "channel": program.channel.channel_name if program.channel else None,
             "description": program.description,
-            "flags": program.flags
+            "flags": program.flags,
         }
 
         work = Work(
@@ -438,15 +416,13 @@ class SyoboiCalendarClient:
             title_kana=program.title_kana,
             title_en=program.title_en,
             official_url=program.official_url,
-            metadata=metadata
+            metadata=metadata,
         )
 
         return work
 
     def _convert_to_release(
-        self,
-        program: BroadcastProgram,
-        work_id: int
+        self, program: BroadcastProgram, work_id: int
     ) -> Optional[Release]:
         """Convert BroadcastProgram to Release model."""
         if not program.start_time:
@@ -473,14 +449,13 @@ class SyoboiCalendarClient:
             release_date=program.start_time.date(),
             source=DataSource.SYOBOI,
             source_url=f"{self.BASE_URL}/tid/{program.program_id}",
-            metadata=metadata
+            metadata=metadata,
         )
 
         return release
 
     async def fetch_and_convert(
-        self,
-        days_ahead: int = 7
+        self, days_ahead: int = 7
     ) -> Tuple[List[Work], List[Release]]:
         """
         Fetch programs and convert to Work/Release models.
@@ -535,9 +510,9 @@ class SyoboiCalendarClient:
 
 # Async wrapper functions for easy integration
 
+
 async def fetch_syoboi_programs(
-    days_ahead: int = 7,
-    timeout: int = 15
+    days_ahead: int = 7, timeout: int = 15
 ) -> List[BroadcastProgram]:
     """
     Fetch anime programs from Syoboi Calendar.
@@ -569,8 +544,7 @@ async def search_syoboi_anime(title: str, timeout: int = 15) -> List[BroadcastPr
 
 
 async def fetch_syoboi_works_and_releases(
-    days_ahead: int = 7,
-    timeout: int = 15
+    days_ahead: int = 7, timeout: int = 15
 ) -> Tuple[List[Work], List[Release]]:
     """
     Fetch anime data from Syoboi Calendar as Work/Release models.
@@ -588,6 +562,7 @@ async def fetch_syoboi_works_and_releases(
 
 # Synchronous wrapper for non-async contexts
 
+
 def fetch_syoboi_programs_sync(days_ahead: int = 7) -> List[BroadcastProgram]:
     """Synchronous wrapper for fetch_syoboi_programs."""
     return asyncio.run(fetch_syoboi_programs(days_ahead))
@@ -599,7 +574,7 @@ def search_syoboi_anime_sync(title: str) -> List[BroadcastProgram]:
 
 
 def fetch_syoboi_works_and_releases_sync(
-    days_ahead: int = 7
+    days_ahead: int = 7,
 ) -> Tuple[List[Work], List[Release]]:
     """Synchronous wrapper for fetch_syoboi_works_and_releases."""
     return asyncio.run(fetch_syoboi_works_and_releases(days_ahead))

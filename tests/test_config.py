@@ -7,8 +7,6 @@ import pytest
 import json
 import tempfile
 import os
-from unittest.mock import Mock, patch, mock_open
-from pathlib import Path
 
 
 # Assuming config module structure based on the system design

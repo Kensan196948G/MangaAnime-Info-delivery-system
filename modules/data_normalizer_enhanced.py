@@ -10,24 +10,19 @@ This module extends data_normalizer.py with:
 - Database-backed deduplication
 """
 
-import hashlib
-import re
 import logging
-import unicodedata
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple, Set
+from typing import Dict, List, Any, Optional, Set
 from difflib import SequenceMatcher
 from dataclasses import dataclass
 from enum import Enum
 import jellyfish  # For phonetic matching (install: pip install jellyfish)
 
-from .models import Work, Release, WorkType, ReleaseType, DataSource
+from .models import Work, DataSource
 from .data_normalizer import (
     TitleNormalizer,
     DataQualityAnalyzer,
     NormalizationLevel,
-    MatchConfidence,
-    DataQualityScore
 )
 
 
@@ -82,7 +77,7 @@ class EnhancedDuplicateDetector:
         self,
         exact_threshold: float = 1.0,
         fuzzy_threshold: float = 0.85,
-        phonetic_threshold: float = 0.80
+        phonetic_threshold: float = 0.80,
     ):
         """
         Initialize duplicate detector.
@@ -109,7 +104,7 @@ class EnhancedDuplicateDetector:
         self,
         title1: str,
         title2: str,
-        algorithm: MatchAlgorithm = MatchAlgorithm.HYBRID
+        algorithm: MatchAlgorithm = MatchAlgorithm.HYBRID,
     ) -> float:
         """
         Calculate similarity between two titles.
@@ -174,9 +169,7 @@ class EnhancedDuplicateDetector:
                 )
 
             # Fuzzy on original
-            scores.append(
-                SequenceMatcher(None, title1.lower(), title2.lower()).ratio()
-            )
+            scores.append(SequenceMatcher(None, title1.lower(), title2.lower()).ratio())
 
             # Phonetic (if applicable)
             try:
@@ -208,7 +201,7 @@ class EnhancedDuplicateDetector:
         self,
         work1: Work,
         work2: Work,
-        algorithm: MatchAlgorithm = MatchAlgorithm.HYBRID
+        algorithm: MatchAlgorithm = MatchAlgorithm.HYBRID,
     ) -> Optional[DuplicateMatch]:
         """
         Detect if two works are duplicates.
@@ -226,9 +219,7 @@ class EnhancedDuplicateDetector:
             return None
 
         # Calculate title similarity
-        title_sim = self.calculate_title_similarity(
-            work1.title, work2.title, algorithm
-        )
+        title_sim = self.calculate_title_similarity(work1.title, work2.title, algorithm)
 
         # Check alternate titles if available
         max_title_sim = title_sim
@@ -276,7 +267,7 @@ class EnhancedDuplicateDetector:
                 title_similarity=max_title_sim,
                 metadata_similarity=metadata_sim,
                 recommended_action=action,
-                reason=reason
+                reason=reason,
             )
 
         return None
@@ -313,9 +304,7 @@ class EnhancedDuplicateDetector:
         return similarity_score / factors if factors > 0 else 0.0
 
     def find_duplicates_in_list(
-        self,
-        works: List[Work],
-        algorithm: MatchAlgorithm = MatchAlgorithm.HYBRID
+        self, works: List[Work], algorithm: MatchAlgorithm = MatchAlgorithm.HYBRID
     ) -> List[DuplicateMatch]:
         """
         Find all duplicates in a list of works.
@@ -335,7 +324,9 @@ class EnhancedDuplicateDetector:
                 if match:
                     duplicates.append(match)
 
-        self.logger.info(f"Found {len(duplicates)} duplicate pairs in {len(works)} works")
+        self.logger.info(
+            f"Found {len(duplicates)} duplicate pairs in {len(works)} works"
+        )
         return duplicates
 
 
@@ -381,7 +372,12 @@ class EnhancedDataMerger:
             primary = work1 if quality1.completeness >= quality2.completeness else work2
             secondary = work2 if primary == work1 else work1
         elif self.strategy.prefer_newer:
-            primary = work1 if (work1.created_at or datetime.min) >= (work2.created_at or datetime.min) else work2
+            primary = (
+                work1
+                if (work1.created_at or datetime.min)
+                >= (work2.created_at or datetime.min)
+                else work2
+            )
             secondary = work2 if primary == work1 else work1
         else:
             primary = work1
@@ -396,19 +392,18 @@ class EnhancedDataMerger:
             title_en=primary.title_en or secondary.title_en,
             official_url=primary.official_url or secondary.official_url,
             created_at=primary.created_at or secondary.created_at,
-            metadata=self._merge_metadata(
-                primary.metadata or {},
-                secondary.metadata or {}
-            ) if self.strategy.merge_metadata else primary.metadata
+            metadata=(
+                self._merge_metadata(primary.metadata or {}, secondary.metadata or {})
+                if self.strategy.merge_metadata
+                else primary.metadata
+            ),
         )
 
         self.logger.debug(f"Merged works: '{primary.title}' + '{secondary.title}'")
         return merged
 
     def _merge_metadata(
-        self,
-        meta1: Dict[str, Any],
-        meta2: Dict[str, Any]
+        self, meta1: Dict[str, Any], meta2: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         Merge metadata dictionaries with conflict resolution.
@@ -437,9 +432,7 @@ class EnhancedDataMerger:
         return merged
 
     def deduplicate_works(
-        self,
-        works: List[Work],
-        detector: EnhancedDuplicateDetector
+        self, works: List[Work], detector: EnhancedDuplicateDetector
     ) -> List[Work]:
         """
         Deduplicate a list of works by detecting and merging duplicates.
@@ -509,9 +502,9 @@ class EnhancedDataMerger:
 
 # Convenience functions
 
+
 def detect_duplicates(
-    works: List[Work],
-    threshold: float = 0.85
+    works: List[Work], threshold: float = 0.85
 ) -> List[DuplicateMatch]:
     """
     Detect duplicates in a list of works.
@@ -530,7 +523,7 @@ def detect_duplicates(
 def deduplicate_works(
     works: List[Work],
     threshold: float = 0.85,
-    merge_strategy: Optional[MergeStrategy] = None
+    merge_strategy: Optional[MergeStrategy] = None,
 ) -> List[Work]:
     """
     Deduplicate and merge works.

@@ -8,15 +8,14 @@ import pytest
 import asyncio
 import time
 import psutil
-import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List, Any
+from typing import Dict, Any
 import statistics
 import json
 import os
 import gc
 from dataclasses import dataclass
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 # Import test utilities
 from tests.fixtures.mock_services import create_mock_services, PerformanceSimulator
@@ -31,9 +30,6 @@ try:
     from modules.anime_anilist import AniListClient
     from modules.manga_rss import RSSProcessor
     from modules.filter_logic import FilterLogic
-    from modules.mailer import EmailNotificationManager
-    from modules.calendar_integration import CalendarManager
-    from release_notifier import main as release_notifier_main
 except ImportError:
     pytest.skip("Module imports failed", allow_module_level=True)
 
@@ -236,7 +232,7 @@ class TestDatabasePerformance:
                     db_manager.insert_work(
                         f"Concurrent Work {thread_id}_{i}", None, None, "anime", None
                     )
-                    releases = db_manager.get_unnotified_releases()
+                    db_manager.get_unnotified_releases()
 
         # Run concurrent operations
         with ThreadPoolExecutor(max_workers=5) as executor:
@@ -380,7 +376,7 @@ class TestFilteringPerformance:
                 if not filter_logic.contains_ng_keywords_regex(title)
             ]
 
-        summary = performance_suite.get_metrics_summary()
+        performance_suite.get_metrics_summary()
 
         # Both methods should produce similar results
         assert len(filtered_string) == len(filtered_regex)

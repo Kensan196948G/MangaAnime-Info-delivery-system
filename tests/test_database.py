@@ -1,11 +1,12 @@
 """
 Test database functionality
 """
+
 import pytest
 import sqlite3
 import os
 import sys
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))

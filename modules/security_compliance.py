@@ -3,21 +3,17 @@ Security compliance validation framework for the Anime/Manga Information Deliver
 Provides automated security testing, compliance checking, and vulnerability assessment tools.
 """
 
-import os
 import re
 import json
 import time
-import hashlib
 import logging
-import sqlite3
-import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import defaultdict
 
-from modules.security_utils import InputSanitizer, SecurityError
+from modules.security_utils import InputSanitizer
 
 
 @dataclass
@@ -190,9 +186,11 @@ class SecurityCompliance:
                             severity=self._get_pattern_severity(category),
                             category=category,
                             description=self._get_pattern_description(
-                                category, match.group(0)
-                            ),
-                            file_path=str(file_path.relative_to(self.project_root)),
+                                category,
+                                match.group(0)),
+                            file_path=str(
+                                file_path.relative_to(
+                                    self.project_root)),
                             line_number=line_num,
                             remediation=self._get_pattern_remediation(category),
                         )
@@ -259,10 +257,11 @@ class SecurityCompliance:
                             severity="MEDIUM",
                             category="configuration",
                             description=f"Config file {config_file} has insecure permissions: {permissions}",
-                            file_path=str(config_path.relative_to(self.project_root)),
+                            file_path=str(
+                                config_path.relative_to(
+                                    self.project_root)),
                             remediation="Set permissions to 600 (owner read/write only)",
-                        )
-                    )
+                        ))
                     score -= 15
 
         # Check for sensitive data in config
@@ -273,7 +272,8 @@ class SecurityCompliance:
                     config_data = json.load(f)
 
                 # Check for hardcoded credentials
-                sensitive_keys = ["password", "secret", "key", "token", "api_key"]
+                sensitive_keys = [
+                    "password", "secret", "key", "token", "api_key"]
                 self._check_nested_dict_for_sensitive_data(
                     config_data, sensitive_keys, findings, "config.json"
                 )
@@ -322,8 +322,7 @@ class SecurityCompliance:
                             description=f"Potential hardcoded credential in {file_path}: {key}",
                             file_path=file_path,
                             remediation="Move sensitive values to environment variables",
-                        )
-                    )
+                        ))
 
     def _scan_dependencies(self) -> ComplianceResult:
         """Scan dependencies for known vulnerabilities"""
@@ -338,8 +337,7 @@ class SecurityCompliance:
                     category="dependencies",
                     description="requirements.txt file not found",
                     remediation="Create requirements.txt file with pinned versions",
-                )
-            )
+                ))
             score -= 10
         else:
             # Check for unpinned versions
@@ -358,8 +356,7 @@ class SecurityCompliance:
                                     description=f"Unpinned dependency: {line}",
                                     file_path="requirements.txt",
                                     remediation="Pin dependency versions using == operator",
-                                )
-                            )
+                                ))
                             score -= 5
 
             except Exception as e:
@@ -411,8 +408,7 @@ class SecurityCompliance:
                         description=f"Database file has insecure permissions: {permissions}",
                         file_path="db.sqlite3",
                         remediation="Set database file permissions to 600 or 644",
-                    )
-                )
+                    ))
                 score -= 15
 
             # Check for database backups in version control
@@ -430,8 +426,7 @@ class SecurityCompliance:
                                 description="Database files may be committed to version control",
                                 file_path=".gitignore",
                                 remediation="Add *.sqlite3 and database files to .gitignore",
-                            )
-                        )
+                            ))
                         score -= 20
 
         # Check for SQL injection prevention in database modules
@@ -449,8 +444,7 @@ class SecurityCompliance:
                         description="Database queries may not be using parameterized statements",
                         file_path="modules/db.py",
                         remediation="Use parameterized queries with ? placeholders",
-                    )
-                )
+                    ))
                 score -= 25
 
         return ComplianceResult(
@@ -484,8 +478,7 @@ class SecurityCompliance:
                             description=f"Token file {token_file} has insecure permissions: {permissions}",
                             file_path=token_file,
                             remediation="Set token file permissions to 600",
-                        )
-                    )
+                        ))
                     score -= 20
 
                 # Check if token files are in .gitignore
@@ -502,8 +495,7 @@ class SecurityCompliance:
                                 description=f"Token file {token_file} may be committed to version control",
                                 file_path=".gitignore",
                                 remediation=f"Add {token_file} to .gitignore",
-                            )
-                        )
+                            ))
                         score -= 30
 
         # Check OAuth2 scope limitations
@@ -524,8 +516,7 @@ class SecurityCompliance:
                                 description=f"Overly broad Gmail scope in {module}",
                                 file_path=f"modules/{module}",
                                 remediation="Use gmail.send instead of full gmail scope",
-                            )
-                        )
+                            ))
                         score -= 10
 
         return ComplianceResult(
@@ -561,8 +552,7 @@ class SecurityCompliance:
                                 description=f"Non-HTTPS URL found in {module}: {match}",
                                 file_path=f"modules/{module}",
                                 remediation="Use HTTPS for all external API calls",
-                            )
-                        )
+                            ))
                         score -= 10
 
                 # Check for rate limiting implementation
@@ -574,8 +564,7 @@ class SecurityCompliance:
                             description=f"No rate limiting detected in {module}",
                             file_path=f"modules/{module}",
                             remediation="Implement rate limiting for API calls",
-                        )
-                    )
+                        ))
                     score -= 15
 
         return ComplianceResult(
@@ -609,8 +598,7 @@ class SecurityCompliance:
                             description=f"No input sanitization detected in {module}",
                             file_path=f"modules/{module}",
                             remediation="Use InputSanitizer class for all external inputs",
-                        )
-                    )
+                        ))
                     score -= 15
 
                 # Check for validation of user inputs
@@ -622,8 +610,7 @@ class SecurityCompliance:
                             description=f"Limited input validation in {module}",
                             file_path=f"modules/{module}",
                             remediation="Add comprehensive input validation",
-                        )
-                    )
+                        ))
                     score -= 5
 
         return ComplianceResult(
@@ -644,9 +631,8 @@ class SecurityCompliance:
 
         # Calculate overall score
         total_score = sum(result.score for result in self.compliance_results)
-        overall_score = (
-            total_score / len(self.compliance_results) if self.compliance_results else 0
-        )
+        overall_score = (total_score / len(self.compliance_results)
+                         if self.compliance_results else 0)
 
         # Generate recommendations
         recommendations = self._generate_security_recommendations()
@@ -669,11 +655,11 @@ class SecurityCompliance:
         recommendations = []
 
         # Critical findings recommendations
-        critical_count = sum(1 for f in self.findings if f.severity == "CRITICAL")
+        critical_count = sum(
+            1 for f in self.findings if f.severity == "CRITICAL")
         if critical_count > 0:
             recommendations.append(
-                f"Address {critical_count} critical security issues immediately"
-            )
+                f"Address {critical_count} critical security issues immediately")
 
         # High findings recommendations
         high_count = sum(1 for f in self.findings if f.severity == "HIGH")
@@ -683,14 +669,16 @@ class SecurityCompliance:
             )
 
         # Configuration recommendations
-        config_findings = [f for f in self.findings if f.category == "configuration"]
+        config_findings = [
+            f for f in self.findings if f.category == "configuration"]
         if config_findings:
             recommendations.append(
                 "Review and secure configuration files and permissions"
             )
 
         # Authentication recommendations
-        auth_findings = [f for f in self.findings if f.category == "authentication"]
+        auth_findings = [
+            f for f in self.findings if f.category == "authentication"]
         if auth_findings:
             recommendations.append(
                 "Strengthen authentication and credential management"
@@ -954,6 +942,7 @@ if __name__ == "__main__":
     import sys
 
     project_path = sys.argv[1] if len(sys.argv) > 1 else "."
-    output_path = sys.argv[2] if len(sys.argv) > 2 else "security_audit_report.json"
+    output_path = sys.argv[2] if len(
+        sys.argv) > 2 else "security_audit_report.json"
 
     run_security_audit_cli(project_path, output_path)

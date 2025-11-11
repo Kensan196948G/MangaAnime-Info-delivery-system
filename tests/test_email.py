@@ -1,13 +1,12 @@
 """
 Test email notification functionality
 """
+
 import pytest
 import os
 import sys
 import smtplib
-from unittest.mock import patch, Mock, MagicMock
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from unittest.mock import patch, Mock
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -459,7 +458,7 @@ class TestEmailIntegration:
         notifier = EmailNotifier()
 
         # Depending on implementation, this might retry
-        result = notifier.send_notification("Test", "Test body")
+        notifier.send_notification("Test", "Test body")
         # Result could be True or False depending on retry implementation
 
 

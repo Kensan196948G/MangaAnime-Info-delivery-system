@@ -5,14 +5,10 @@ Tests all security measures, input validation, authentication, and data protecti
 """
 
 import pytest
-import os
 import json
-import tempfile
 import sqlite3
-from unittest.mock import Mock, patch, MagicMock
-from pathlib import Path
+from unittest.mock import Mock, patch
 import time
-from datetime import datetime, timedelta
 
 from modules.security_utils import (
     InputSanitizer,
@@ -23,7 +19,6 @@ from modules.security_utils import (
     SecurityMonitor,
 )
 from modules.security_compliance import SecurityCompliance, SecurityTestRunner
-from modules.qa_validation import QAFramework
 
 
 class TestInputValidationSecurity:
