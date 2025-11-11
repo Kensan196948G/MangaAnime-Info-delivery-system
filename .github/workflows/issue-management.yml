@@ -1,0 +1,82 @@
+name: Issue自動管理
+
+on:
+  # 毎日0時に自動実行
+  schedule:
+    - cron: '0 0 * * *'
+
+  # 手動実行も可能
+  workflow_dispatch:
+    inputs:
+      close_old_days:
+        description: '何日以上古いIssueをクローズするか'
+        required: false
+        default: '7'
+      consolidate:
+        description: '重複Issueを統合するか'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  manage-issues:
+    name: Issue自動管理実行
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+
+      - name: Python環境セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 依存関係インストール
+        run: |
+          pip install PyYAML
+
+      - name: Issue自動管理実行
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/issue_manager.py \
+            --close-old ${{ github.event.inputs.close_old_days || '7' }} \
+            --consolidate-duplicates \
+            --check-threshold 10 \
+            --close-on-success 3
+
+      - name: 実行結果サマリー
+        if: always()
+        run: |
+          echo "## 🗂️ Issue自動管理結果" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f issue_management_summary.json ]; then
+            CLOSED_OLD=$(jq -r '.results.closed_old // 0' issue_management_summary.json)
+            CONSOLIDATED=$(jq -r '.results.consolidated // 0' issue_management_summary.json)
+            CLOSED_SUCCESS=$(jq -r '.results.closed_success // 0' issue_management_summary.json)
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| 項目 | 件数 |" >> $GITHUB_STEP_SUMMARY
+            echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+            echo "| クローズした古いIssue | $CLOSED_OLD |" >> $GITHUB_STEP_SUMMARY
+            echo "| 統合した重複Issue | $CONSOLIDATED |" >> $GITHUB_STEP_SUMMARY
+            echo "| 成功によりクローズ | $CLOSED_SUCCESS |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ サマリーファイルが生成されませんでした" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 実行ログを保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-management-logs-${{ github.run_number }}
+          path: |
+            issue_management_summary.json
+          retention-days: 30

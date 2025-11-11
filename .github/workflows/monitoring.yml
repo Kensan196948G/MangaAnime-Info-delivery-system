@@ -1,0 +1,133 @@
+name: CI/CD監視・アラート
+
+on:
+  # 6時間ごとに自動実行
+  schedule:
+    - cron: '0 */6 * * *'
+
+  # 手動実行も可能
+  workflow_dispatch:
+    inputs:
+      send_alerts:
+        description: 'アラートを送信するか'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  monitoring:
+    name: CI/CD監視実行
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50  # 履歴を取得
+
+      - name: Python環境セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 依存関係インストール
+        run: |
+          pip install requests PyYAML
+
+      - name: 過去のログをダウンロード
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: repair-logs-*
+          path: logs/
+
+      - name: 監視・アラート実行
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python scripts/monitoring_alert.py \
+            --collect-metrics \
+            --detect-anomalies \
+            ${{ github.event.inputs.send_alerts == 'true' && '--send-alerts' || '' }}
+
+      - name: 監視結果サマリー
+        if: always()
+        run: |
+          echo "## 📊 CI/CD監視結果" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f monitoring_report.json ]; then
+            # メトリクス表示
+            SUCCESS_RATE=$(jq -r '.metrics.success_rate // 0' monitoring_report.json)
+            TOTAL_REPAIRS=$(jq -r '.metrics.total_repairs // 0' monitoring_report.json)
+            AVG_LOOPS=$(jq -r '.metrics.average_loops // 0' monitoring_report.json)
+            ERROR_REDUCTION=$(jq -r '.metrics.error_reduction_rate // 0' monitoring_report.json)
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📈 メトリクス" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| 指標 | 値 |" >> $GITHUB_STEP_SUMMARY
+            echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+            echo "| 修復成功率 | ${SUCCESS_RATE}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| 総修復回数 | $TOTAL_REPAIRS |" >> $GITHUB_STEP_SUMMARY
+            echo "| 平均ループ回数 | $AVG_LOOPS |" >> $GITHUB_STEP_SUMMARY
+            echo "| エラー削減率 | ${ERROR_REDUCTION}% |" >> $GITHUB_STEP_SUMMARY
+
+            # 異常検知結果
+            ANOMALY_COUNT=$(jq '.anomalies | length' monitoring_report.json)
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🚨 異常検知" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$ANOMALY_COUNT" -gt 0 ]; then
+              echo "**検出された異常**: $ANOMALY_COUNT 件" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+
+              jq -r '.anomalies[] | "- **\(.type)**: \(.message) (重大度: \(.severity))"' \
+                monitoring_report.json >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ 異常は検出されませんでした" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            # 推奨アクション
+            if [ "$ANOMALY_COUNT" -gt 0 ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### 📝 推奨アクション" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "1. 異常の原因を調査" >> $GITHUB_STEP_SUMMARY
+              echo "2. 修復スクリプトの見直し" >> $GITHUB_STEP_SUMMARY
+              echo "3. 閾値の調整を検討" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ 監視レポートが生成されませんでした" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 監視レポートを保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitoring-report-${{ github.run_number }}
+          path: |
+            monitoring_report.json
+          retention-days: 90
+
+      - name: 重大な異常を検出した場合は失敗
+        if: always()
+        run: |
+          if [ -f monitoring_report.json ]; then
+            CRITICAL_COUNT=$(jq '[.anomalies[] | select(.severity == "critical")] | length' monitoring_report.json)
+
+            if [ "$CRITICAL_COUNT" -gt 0 ]; then
+              echo "🚨 重大な異常が検出されました"
+              exit 1
+            fi
+          fi
+
+          exit 0
