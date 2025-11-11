@@ -1,0 +1,418 @@
+.......FFFFF.FFFFFFF.........FF..FF....FFF.....EEEEEEEEEEEE..EEEF....... [ 25%]
+.....EE.FEFEFEFEFEFEFEFEFEEE.F..FFFF....FFFFF.FF.F...................... [ 48%]
+.............F..FFF..FF.....F....................F.....F.........F...... [ 73%]
+...............FFF...F.....F.FFFF....F...F...........F.................F [ 99%]
+.                                                                        [100%]
+============================== warnings summary ===============================
+tests\fixtures\test_config.py:13
+  D:\MangaAnime-Info-delivery-system\tests\fixtures\test_config.py:13: PytestCollectionWarning: cannot collect test class 'TestConfig' because it has a __init__ constructor (from: tests/fixtures/test_config.py)
+    class TestConfig:
+
+tests\test_calendar_integration.py:15
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:15: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:16
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:16: PytestUnknownMarkWarning: Unknown pytest.mark.auth - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.auth
+
+tests\test_calendar_integration.py:40
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:87
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:87: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:132
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:132: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:185
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:185: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:240
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:240: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:296
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:296: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:332
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:332: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:370
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:370: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:414
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:414: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:415
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:415: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_calendar_integration.py:465
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:465: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_calendar_integration.py:489
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:489: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_calendar_integration.py:525
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:525: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_calendar_integration.py:552
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:552: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_calendar_integration.py:634
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:634: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:666
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:666: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_calendar_integration.py:694
+  D:\MangaAnime-Info-delivery-system\tests\test_calendar_integration.py:694: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_config.py:93
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:93: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:104
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:104: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:119
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:119: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:134
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:134: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:148
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:148: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:171
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:171: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:192
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:192: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:210
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:210: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:220
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:220: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:228
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:228: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:250
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:250: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:363
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:363: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:380
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:380: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:392
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:392: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_config.py:459
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:459: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_config.py:479
+  D:\MangaAnime-Info-delivery-system\tests\test_config.py:479: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_monitoring.py:24
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:24: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_monitoring.py:58
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:58: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_monitoring.py:108
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:108: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_monitoring.py:164
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:164: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_monitoring.py:236
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:236: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_monitoring.py:333
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:333: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_monitoring.py:380
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:380: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_monitoring.py:414
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:414: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_monitoring.py:490
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:490: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_monitoring.py:550
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:550: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_monitoring.py:612
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:612: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_monitoring.py:687
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:687: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_monitoring.py:863
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:863: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_monitoring.py:922
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:922: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_monitoring.py:998
+  D:\MangaAnime-Info-delivery-system\tests\test_monitoring.py:998: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_phase2_integration.py:47
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:47: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_phase2_integration.py:48
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:48: PytestUnknownMarkWarning: Unknown pytest.mark.api - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.api
+
+tests\test_phase2_integration.py:147
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:147: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_phase2_integration.py:148
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:148: PytestUnknownMarkWarning: Unknown pytest.mark.api - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.api
+
+tests\test_phase2_integration.py:176
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:176: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests\test_phase2_integration.py:177
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:177: PytestUnknownMarkWarning: Unknown pytest.mark.api - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.api
+
+tests\test_phase2_integration.py:214
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:214: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_phase2_integration.py:215
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:215: PytestUnknownMarkWarning: Unknown pytest.mark.api - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.api
+
+tests\test_phase2_integration.py:318
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:318: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_phase2_integration.py:379
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:379: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_phase2_integration.py:451
+  D:\MangaAnime-Info-delivery-system\tests\test_phase2_integration.py:451: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.unit
+
+tests\test_qa_comprehensive.py:1081
+  D:\MangaAnime-Info-delivery-system\tests\test_qa_comprehensive.py:1081: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.integration
+
+tests\test_security_comprehensive.py:695
+  D:\MangaAnime-Info-delivery-system\tests\test_security_comprehensive.py:695: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests/test_google_apis.py::TestGoogleAPIs::test_calendar_event_formatting
+  C:\Python313\Lib\unittest\case.py:606: RuntimeWarning: coroutine 'TestGoogleAPIs.test_calendar_event_formatting' was never awaited
+    if method() is not None:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_google_apis.py::TestGoogleAPIs::test_calendar_event_formatting
+  C:\Python313\Lib\unittest\case.py:707: DeprecationWarning: It is deprecated to return a value that is not None from a test case (<bound method TestGoogleAPIs.test_calendar_event_formatting of <tests.test_google_apis.TestGoogleAPIs testMethod=test_calendar_event_formatting>>)
+    return self.run(*args, **kwds)
+
+tests/test_google_apis.py::TestGoogleAPIs::test_calendar_integration_failure
+  C:\Python313\Lib\unittest\case.py:606: RuntimeWarning: coroutine 'TestGoogleAPIs.test_calendar_integration_failure' was never awaited
+    if method() is not None:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_google_apis.py::TestGoogleAPIs::test_calendar_integration_failure
+  C:\Python313\Lib\unittest\case.py:707: DeprecationWarning: It is deprecated to return a value that is not None from a test case (<bound method TestGoogleAPIs.test_calendar_integration_failure of <tests.test_google_apis.TestGoogleAPIs testMethod=test_calendar_integration_failure>>)
+    return self.run(*args, **kwds)
+
+tests/test_google_apis.py::TestGoogleAPIs::test_calendar_integration_success
+  C:\Python313\Lib\unittest\case.py:606: RuntimeWarning: coroutine 'TestGoogleAPIs.test_calendar_integration_success' was never awaited
+    if method() is not None:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_google_apis.py::TestGoogleAPIs::test_calendar_integration_success
+  C:\Python313\Lib\unittest\case.py:707: DeprecationWarning: It is deprecated to return a value that is not None from a test case (<bound method TestGoogleAPIs.test_calendar_integration_success of <tests.test_google_apis.TestGoogleAPIs testMethod=test_calendar_integration_success>>)
+    return self.run(*args, **kwds)
+
+tests/test_google_apis.py::TestGoogleAPIs::test_gmail_api_integration
+  C:\Python313\Lib\unittest\case.py:606: RuntimeWarning: coroutine 'TestGoogleAPIs.test_gmail_api_integration' was never awaited
+    if method() is not None:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_google_apis.py::TestGoogleAPIs::test_gmail_api_integration
+  C:\Python313\Lib\unittest\case.py:707: DeprecationWarning: It is deprecated to return a value that is not None from a test case (<bound method TestGoogleAPIs.test_gmail_api_integration of <tests.test_google_apis.TestGoogleAPIs testMethod=test_gmail_api_integration>>)
+    return self.run(*args, **kwds)
+
+tests/test_mailer_integration.py::TestMailerIntegration::test_send_email_failure
+  C:\Python313\Lib\unittest\case.py:606: RuntimeWarning: coroutine 'TestMailerIntegration.test_send_email_failure' was never awaited
+    if method() is not None:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_mailer_integration.py::TestMailerIntegration::test_send_email_failure
+  C:\Python313\Lib\unittest\case.py:707: DeprecationWarning: It is deprecated to return a value that is not None from a test case (<bound method TestMailerIntegration.test_send_email_failure of <tests.test_mailer_integration.TestMailerIntegration testMethod=test_send_email_failure>>)
+    return self.run(*args, **kwds)
+
+tests/test_mailer_integration.py::TestMailerIntegration::test_send_email_success
+  C:\Python313\Lib\unittest\case.py:606: RuntimeWarning: coroutine 'TestMailerIntegration.test_send_email_success' was never awaited
+    if method() is not None:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_mailer_integration.py::TestMailerIntegration::test_send_email_success
+  C:\Python313\Lib\unittest\case.py:707: DeprecationWarning: It is deprecated to return a value that is not None from a test case (<bound method TestMailerIntegration.test_send_email_success of <tests.test_mailer_integration.TestMailerIntegration testMethod=test_send_email_success>>)
+    return self.run(*args, **kwds)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_api.py::TestAniListAPI::test_get_current_season_anime - ass...
+FAILED tests/test_api.py::TestAniListAPI::test_get_anime_episodes - Assertion...
+FAILED tests/test_api.py::TestAniListAPI::test_api_error_handling - Assertion...
+FAILED tests/test_api.py::TestAniListAPI::test_api_rate_limiting - AssertionE...
+FAILED tests/test_api.py::TestAniListAPI::test_malformed_response - Assertion...
+FAILED tests/test_api.py::TestMangaRSSCollector::test_get_latest_releases - A...
+FAILED tests/test_api.py::TestMangaRSSCollector::test_rss_parsing_error - Att...
+FAILED tests/test_api.py::TestMangaRSSCollector::test_network_error_handling
+FAILED tests/test_api.py::TestMangaRSSCollector::test_http_error_handling - A...
+FAILED tests/test_api.py::TestAPIIntegration::test_anime_and_manga_integration
+FAILED tests/test_api.py::TestAPIIntegration::test_rate_limiting_integration
+FAILED tests/test_api.py::TestAPIIntegration::test_error_recovery - Assertion...
+FAILED tests/test_calendar.py::TestCalendarManager::test_create_event_success
+FAILED tests/test_calendar.py::TestCalendarManager::test_create_all_day_event
+FAILED tests/test_calendar.py::TestCalendarManager::test_event_creation_error
+FAILED tests/test_calendar.py::TestCalendarManager::test_duplicate_event_handling
+FAILED tests/test_calendar.py::TestCalendarIntegration::test_end_to_end_calendar_flow
+FAILED tests/test_calendar.py::TestCalendarIntegration::test_batch_event_creation
+FAILED tests/test_calendar.py::TestCalendarIntegration::test_error_recovery
+FAILED tests/test_config.py::TestConfigManager::test_config_loading_from_file
+FAILED tests/test_database.py::TestDatabaseManager::test_create_tables - Attr...
+FAILED tests/test_database.py::TestDatabaseManager::test_add_work - Attribute...
+FAILED tests/test_database.py::TestDatabaseManager::test_add_manga_work - Att...
+FAILED tests/test_database.py::TestDatabaseManager::test_add_release - Attrib...
+FAILED tests/test_database.py::TestDatabaseManager::test_add_manga_release - ...
+FAILED tests/test_database.py::TestDatabaseManager::test_duplicate_release_handling
+FAILED tests/test_database.py::TestDatabaseManager::test_get_all_releases - A...
+FAILED tests/test_database.py::TestDatabaseManager::test_work_type_constraint
+FAILED tests/test_database.py::TestDatabaseManager::test_release_type_constraint
+FAILED tests/test_database.py::TestDatabaseIntegration::test_empty_database
+FAILED tests/test_email.py::TestEmailNotifier::test_send_notification_success
+FAILED tests/test_email.py::TestEmailNotifier::test_send_notification_with_html
+FAILED tests/test_email.py::TestEmailNotifier::test_smtp_connection_error - a...
+FAILED tests/test_email.py::TestEmailNotifier::test_smtp_authentication_error
+FAILED tests/test_email.py::TestGmailAPI::test_send_email_success - Assertion...
+FAILED tests/test_email.py::TestGmailAPI::test_send_html_email - AssertionErr...
+FAILED tests/test_email.py::TestGmailAPI::test_authentication_failure - asser...
+FAILED tests/test_email.py::TestEmailTemplates::test_anime_email_template - a...
+FAILED tests/test_email.py::TestEmailTemplates::test_manga_email_template - a...
+FAILED tests/test_email.py::TestEmailIntegration::test_end_to_end_email_flow
+FAILED tests/test_email.py::TestEmailIntegration::test_fallback_mechanisms - ...
+FAILED tests/test_email.py::TestEmailSecurity::test_password_not_logged - Key...
+FAILED tests/test_main.py::TestReleaseNotifier::test_load_config_success - As...
+FAILED tests/test_main.py::TestReleaseNotifier::test_initialize_components - ...
+FAILED tests/test_main.py::TestReleaseNotifier::test_collect_anime_data - Att...
+FAILED tests/test_main.py::TestReleaseNotifier::test_collect_manga_data - Ass...
+FAILED tests/test_main.py::TestMainApplicationFlow::test_main_execution - Mod...
+FAILED tests/test_main.py::TestMainApplicationFlow::test_command_line_execution
+FAILED tests/test_main.py::TestApplicationIntegration::test_full_integration_flow
+FAILED tests/test_performance.py::TestPerformance::test_anilist_api_rate_limiting_compliance
+FAILED tests/test_performance_advanced.py::TestPerformanceAdvanced::test_concurrent_api_requests
+FAILED tests/test_phase2_integration.py::TestRSSProcessingComprehensive::test_multiple_rss_feeds_parallel_processing
+FAILED tests/test_qa_comprehensive.py::TestDataIntegrityValidation::test_data_completeness_checking
+FAILED tests/test_qa_comprehensive.py::TestDataIntegrityValidation::test_data_format_compliance
+FAILED tests/test_qa_comprehensive.py::TestDataIntegrityValidation::test_integrity_score_calculation
+FAILED tests/test_qa_comprehensive.py::TestPerformanceValidation::test_performance_bottleneck_detection
+FAILED tests/test_qa_comprehensive.py::TestQAPerformanceImpact::test_code_quality_validation_performance
+FAILED tests/test_qa_comprehensive.py::TestQAIntegration::test_qa_with_real_modules
+FAILED tests/test_security_comprehensive.py::TestInputValidationSecurity::test_title_sanitization_xss_prevention
+FAILED tests/test_security_comprehensive.py::TestInputValidationSecurity::test_description_html_sanitization
+FAILED tests/test_security_comprehensive.py::TestInputValidationSecurity::test_url_validation_security
+FAILED tests/test_security_comprehensive.py::TestAuthenticationSecurity::test_token_file_permissions
+FAILED tests/test_security_comprehensive.py::TestDatabaseSecurity::test_data_validation_before_db_operations
+FAILED tests/test_security_comprehensive.py::TestComprehensiveSecurityScan::test_security_compliance_scan
+FAILED tests/test_security_config.py::TestSecurityCompliance::test_secure_file_permissions
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_authentication_setup
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_event_creation
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_bulk_calendar_event_creation
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_event_with_reminders
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_event_conflict_detection
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_event_update_and_deletion
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_recurring_events
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_multiple_calendar_support
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_timezone_handling
+ERROR tests/test_calendar_integration.py::TestCalendarIntegration::test_calendar_batch_operations_performance
+ERROR tests/test_calendar_integration.py::TestCalendarEventFormatting::test_anime_event_formatting
+ERROR tests/test_calendar_integration.py::TestCalendarEventFormatting::test_manga_event_formatting
+ERROR tests/test_calendar_integration.py::TestCalendarErrorHandling::test_calendar_quota_exceeded_handling
+ERROR tests/test_calendar_integration.py::TestCalendarErrorHandling::test_calendar_invalid_event_data_handling
+ERROR tests/test_calendar_integration.py::TestCalendarErrorHandling::test_calendar_network_error_recovery
+ERROR tests/test_config.py::TestConfigSecurityAndValidation::test_config_schema_validation
+ERROR tests/test_config.py::TestConfigPerformance::test_config_loading_performance
+ERROR tests/test_database.py::TestDatabaseManager::test_create_tables - Attri...
+ERROR tests/test_database.py::TestDatabaseManager::test_add_work - AttributeE...
+ERROR tests/test_database.py::TestDatabaseManager::test_add_manga_work - Attr...
+ERROR tests/test_database.py::TestDatabaseManager::test_add_release - Attribu...
+ERROR tests/test_database.py::TestDatabaseManager::test_add_manga_release - A...
+ERROR tests/test_database.py::TestDatabaseManager::test_duplicate_release_handling
+ERROR tests/test_database.py::TestDatabaseManager::test_get_all_releases - At...
+ERROR tests/test_database.py::TestDatabaseManager::test_work_type_constraint
+ERROR tests/test_database.py::TestDatabaseManager::test_release_type_constraint
+ERROR tests/test_database.py::TestDatabaseIntegration::test_sample_database
+ERROR tests/test_database.py::TestDatabaseIntegration::test_complex_query_scenarios
+65 failed, 196 passed, 2 skipped, 76 warnings, 28 errors in 23.86s
