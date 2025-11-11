@@ -10,6 +10,27 @@ Tests:
 - Enhanced content filter
 """
 
+from modules.models import Work, WorkType
+from modules.filter_logic_enhanced import (
+    ConfigBasedFilterManager,
+    EnhancedContentFilter,
+    FilterAction,
+)
+from modules.data_normalizer_enhanced import (
+    EnhancedDuplicateDetector,
+    EnhancedDataMerger,
+)
+from modules.streaming_platform_enhanced import (
+    EnhancedStreamingCollector,
+    StreamingPlatform,
+)
+from modules.manga_rss_enhanced import (
+    EnhancedMangaRSSCollector,
+)
+from modules.anime_syoboi import (
+    SyoboiCalendarClient,
+    fetch_syoboi_programs_sync,
+)
 import pytest
 import sys
 from pathlib import Path
@@ -17,28 +38,6 @@ from pathlib import Path
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-from modules.anime_syoboi import (
-    SyoboiCalendarClient,
-    fetch_syoboi_programs_sync,
-)
-from modules.manga_rss_enhanced import (
-    EnhancedMangaRSSCollector,
-)
-from modules.streaming_platform_enhanced import (
-    EnhancedStreamingCollector,
-    StreamingPlatform,
-)
-from modules.data_normalizer_enhanced import (
-    EnhancedDuplicateDetector,
-    EnhancedDataMerger,
-)
-from modules.filter_logic_enhanced import (
-    ConfigBasedFilterManager,
-    EnhancedContentFilter,
-    FilterAction,
-)
-from modules.models import Work, WorkType
 
 
 class TestSyoboiCalendarIntegration:

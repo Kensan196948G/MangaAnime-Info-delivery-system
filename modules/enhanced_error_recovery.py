@@ -230,7 +230,7 @@ class EnhancedErrorRecovery:
             self.error_events.append(error_event)
             # Limit stored events
             if len(self.error_events) > self.max_error_events:
-                self.error_events = self.error_events[-self.max_error_events :]
+                self.error_events = self.error_events[-self.max_error_events:]
 
         # Update component health
         self._update_component_health(component, error_event)

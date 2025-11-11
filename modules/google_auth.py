@@ -25,7 +25,6 @@ class GoogleAuthenticationError(Exception):
     """Google認証関連のエラー"""
 
 
-
 class GoogleAuthenticator:
     """
     Google API認証の共通処理クラス

@@ -29,10 +29,8 @@ class SyoboiAPIError(Exception):
     """Custom exception for Syoboi Calendar API errors."""
 
 
-
 class SyoboiRateLimitError(SyoboiAPIError):
     """Exception raised when rate limit is exceeded."""
-
 
 
 @dataclass

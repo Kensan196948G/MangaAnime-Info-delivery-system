@@ -61,15 +61,12 @@ class DataCollectionError(MangaAnimeSystemError):
     """データ収集に関するエラー"""
 
 
-
 class APIError(DataCollectionError):
     """API呼び出しの失敗"""
 
 
-
 class AniListAPIError(APIError):
     """AniList API固有のエラー"""
-
 
 
 class RateLimitExceeded(APIError):
@@ -113,7 +110,6 @@ class CircuitBreakerOpen(APIError):
 
 class RSSCollectionError(DataCollectionError):
     """RSSフィード収集のエラー"""
-
 
 
 class RSSParsingError(RSSCollectionError):
@@ -160,7 +156,6 @@ class FeedUnavailableError(RSSCollectionError):
 
 class DatabaseError(MangaAnimeSystemError):
     """データベース操作に関するエラー"""
-
 
 
 class DatabaseConnectionError(DatabaseError):
@@ -223,10 +218,8 @@ class NotificationError(MangaAnimeSystemError):
     """通知送信に関するエラー"""
 
 
-
 class EmailNotificationError(NotificationError):
     """メール通知のエラー"""
-
 
 
 class EmailAuthenticationError(EmailNotificationError):
@@ -252,7 +245,6 @@ class EmailSendError(EmailNotificationError):
 
 class CalendarNotificationError(NotificationError):
     """カレンダー通知のエラー"""
-
 
 
 class CalendarAuthenticationError(CalendarNotificationError):
@@ -287,7 +279,6 @@ class DataProcessingError(MangaAnimeSystemError):
     """データ処理に関するエラー"""
 
 
-
 class DataValidationError(DataProcessingError):
     """データバリデーションエラー"""
 
@@ -315,7 +306,6 @@ class FilteringError(DataProcessingError):
     """フィルタリング処理のエラー"""
 
 
-
 class NormalizationError(DataProcessingError):
     """データ正規化のエラー"""
 
@@ -339,7 +329,6 @@ class NormalizationError(DataProcessingError):
 
 class ConfigurationError(MangaAnimeSystemError):
     """設定に関するエラー"""
-
 
 
 class ConfigFileNotFoundError(ConfigurationError):
@@ -377,7 +366,6 @@ class InvalidConfigurationError(ConfigurationError):
 
 class SecurityError(MangaAnimeSystemError):
     """セキュリティに関するエラー"""
-
 
 
 class AuthenticationError(SecurityError):

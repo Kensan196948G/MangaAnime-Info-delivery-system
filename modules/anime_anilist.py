@@ -29,15 +29,12 @@ class AniListAPIError(Exception):
     """Custom exception for AniList API errors."""
 
 
-
 class RateLimitExceeded(AniListAPIError):
     """Exception raised when rate limit is exceeded."""
 
 
-
 class CircuitBreakerOpen(AniListAPIError):
     """Exception raised when circuit breaker is open."""
-
 
 
 class CircuitState(Enum):

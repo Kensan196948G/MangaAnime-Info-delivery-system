@@ -2,6 +2,7 @@
 Fixed database tests using correct DatabaseManager API
 """
 
+from modules.db import DatabaseManager
 import pytest
 import sqlite3
 import os
@@ -10,8 +11,6 @@ from datetime import date
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from modules.db import DatabaseManager
 
 
 class TestDatabaseManagerFixed:

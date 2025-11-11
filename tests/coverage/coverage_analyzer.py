@@ -226,7 +226,7 @@ class CoverageAnalyzer:
         parts = path.parts
         if "modules" in parts:
             idx = parts.index("modules")
-            parts = parts[idx + 1 :]
+            parts = parts[idx + 1:]
 
         if parts and parts[-1].endswith(".py"):
             parts = parts[:-1] + (parts[-1][:-3],)

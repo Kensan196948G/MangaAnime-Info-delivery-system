@@ -720,23 +720,6 @@ class MangaRSSCollector:
             self.logger.error(f"健全性チェックエラー ({feed_name}): {e}")
             return False
 
-            # Feed health記録
-            if feed_url in self.feed_health:
-                self.feed_health[feed_url].record_success(response_time)
-
-            return items
-
-        except requests.RequestException as e:
-            self.logger.error(f"RSS取得エラー ({feed_name}): {e}")
-            if feed_url in self.feed_health:
-                self.feed_health[feed_url].record_failure()
-            return []
-        except Exception as e:
-            self.logger.error(f"RSS処理エラー ({feed_name}): {e}")
-            if feed_url in self.feed_health:
-                self.feed_health[feed_url].record_failure()
-            return []
-
     def _is_feed_healthy(self, response: requests.Response, feed_name: str) -> bool:
         """
         フィードの健全性をチェック
@@ -1685,7 +1668,7 @@ class EnhancedRSSParser:
         ]
         for prefix in prefixes:
             if clean_title.startswith(prefix):
-                clean_title = clean_title[len(prefix) :].strip()
+                clean_title = clean_title[len(prefix):].strip()
 
         # Remove publication info at the end
         clean_title = re.sub(r"\s*\([^)]*出版[^)]*\)$", "", clean_title)

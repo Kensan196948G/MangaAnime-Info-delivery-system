@@ -1,3 +1,4 @@
+from modules.anime_anilist import AniListCollector
 import pytest
 import asyncio
 import aiohttp
@@ -7,8 +8,6 @@ import os
 
 # プロジェクトルートをパスに追加
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-from modules.anime_anilist import AniListCollector
 
 
 class TestAniListAPI:

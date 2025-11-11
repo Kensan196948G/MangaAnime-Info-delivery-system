@@ -222,7 +222,7 @@ class TestIntegratedEndToEndWorkflow:
         # バッチ処理による並列挿入
         batch_size = 1000
         batches = [
-            large_dataset[i : i + batch_size]
+            large_dataset[i: i + batch_size]
             for i in range(0, len(large_dataset), batch_size)
         ]
 
