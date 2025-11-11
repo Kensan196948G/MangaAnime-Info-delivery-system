@@ -35,3 +35,6 @@ faker>=19.0.0
 # ドキュメント生成
 sphinx>=5.0.0
 sphinx-rtd-theme>=1.2.0
+
+# 自動修復用
+autopep8>=2.0.4
