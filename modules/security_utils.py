@@ -272,9 +272,10 @@ class SecureTokenManager:
 
         # Generate new key
         new_key = Fernet.generate_key()
+        encoded_key = base64.urlsafe_b64encode(new_key).decode()
         logging.warning(
-            "Generated new token encryption key. " f"Set TOKEN_ENCRYPTION_KEY={
-                base64.urlsafe_b64encode(new_key).decode()}")
+            f"Generated new token encryption key. Set TOKEN_ENCRYPTION_KEY={encoded_key}"
+        )
         return new_key
 
     def save_token(self, token_data: Dict[str, Any]) -> None:
