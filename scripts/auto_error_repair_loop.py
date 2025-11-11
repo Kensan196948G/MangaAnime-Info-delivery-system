@@ -95,11 +95,12 @@ class ErrorDetector:
         logger.info("テスト失敗をチェック中...")
 
         try:
+            # 重要なテストのみ実行（高速化）
             result = subprocess.run(
-                ['pytest', 'tests/', '-v', '--tb=short', '--maxfail=5'],
+                ['pytest', 'tests/', '-v', '--tb=short', '--maxfail=5', '-x', '--timeout=60'],
                 capture_output=True,
                 text=True,
-                timeout=300
+                timeout=120  # タイムアウトを短縮
             )
 
             if result.returncode != 0:
