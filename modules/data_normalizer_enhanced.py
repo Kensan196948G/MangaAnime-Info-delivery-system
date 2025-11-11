@@ -142,7 +142,7 @@ class EnhancedDuplicateDetector:
                 metaphone1 = jellyfish.metaphone(title1)
                 metaphone2 = jellyfish.metaphone(title2)
                 return 1.0 if metaphone1 == metaphone2 else 0.0
-            except:
+            except Exception:
                 return 0.0
 
         elif algorithm == MatchAlgorithm.HYBRID:
@@ -178,7 +178,7 @@ class EnhancedDuplicateDetector:
                     metaphone2 = jellyfish.metaphone(title2)
                     if metaphone1 == metaphone2:
                         scores.append(1.0)
-            except:
+            except Exception:
                 pass
 
             # Return weighted average

@@ -324,9 +324,9 @@ class BackendValidator:
         try:
             with db.get_connection() as conn:
                 # This should fail due to foreign key constraint
-                cursor = conn.execute(
+                conn.execute(
                     """
-                    INSERT INTO releases (work_id, release_type) 
+                    INSERT INTO releases (work_id, release_type)
                     VALUES (999999, 'episode')
                 """
                 )
@@ -348,7 +348,7 @@ class BackendValidator:
             unique_constraint_enforced = (
                 release_id_1 == release_id_2
             )  # Should return same ID due to UNIQUE constraint
-        except Exception as e:
+        except Exception:
             unique_constraint_enforced = True
 
         # Cleanup
@@ -1039,7 +1039,7 @@ if __name__ == "__main__":
             report = await run_backend_validation()
 
             print(f"\n{'='*60}")
-            print(f"BACKEND VALIDATION REPORT")
+            print("BACKEND VALIDATION REPORT")
             print(f"{'='*60}")
             print(f"Total Tests: {report.total_tests}")
             print(f"Passed: {report.passed_tests}")

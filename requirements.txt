@@ -14,7 +14,7 @@ google-auth>=2.22.0
 google-auth-oauthlib>=1.0.0
 google-auth-httplib2>=0.1.0
 google-api-python-client>=2.95.0
-gmail>=0.6.3
+# gmail>=0.6.3  # Removed: causes build errors, using google-api-python-client instead
 
 # GraphQL Client
 gql>=3.4.1

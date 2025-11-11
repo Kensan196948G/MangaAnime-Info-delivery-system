@@ -150,7 +150,7 @@ class DatabaseManager:
             if connection:
                 try:
                     connection.rollback()
-                except:
+                except Exception:
                     pass
             self.logger.error(f"Database operation failed: {e}")
             raise
@@ -159,7 +159,7 @@ class DatabaseManager:
             if connection:
                 try:
                     connection.rollback()
-                except:
+                except Exception:
                     pass
             self.logger.error(f"Unexpected database error: {e}")
             raise
@@ -496,7 +496,7 @@ class DatabaseManager:
             try:
                 cursor = conn.execute(
                     """
-                    INSERT INTO releases (work_id, release_type, number, platform, 
+                    INSERT INTO releases (work_id, release_type, number, platform,
                                         release_date, source, source_url)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
@@ -527,7 +527,7 @@ class DatabaseManager:
                     # Return existing release ID
                     cursor = conn.execute(
                         """
-                        SELECT id FROM releases 
+                        SELECT id FROM releases
                         WHERE work_id=? AND release_type=? AND number=? AND platform=? AND release_date=?
                     """,
                         (work_id, release_type, number, platform, release_date),
@@ -636,8 +636,8 @@ class DatabaseManager:
         with self.get_connection() as conn:
             cursor = conn.execute(
                 """
-                DELETE FROM releases 
-                WHERE notified = 1 
+                DELETE FROM releases
+                WHERE notified = 1
                 AND created_at < date('now', '-{} days')
             """.format(
                     days
@@ -790,7 +790,7 @@ class DatabaseManager:
             for conn in self._connection_pool:
                 try:
                     conn.close()
-                except:
+                except Exception:
                     pass
             self._connection_pool.clear()
 
@@ -798,7 +798,7 @@ class DatabaseManager:
         if hasattr(self._local, "connection"):
             try:
                 self._local.connection.close()
-            except:
+            except Exception:
                 pass
             delattr(self._local, "connection")
 

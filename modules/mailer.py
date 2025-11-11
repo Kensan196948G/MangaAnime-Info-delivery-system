@@ -867,10 +867,10 @@ class EmailTemplateGenerator:
             <h1>🎬 アニメ・マンガ最新情報</h1>
             <div class="date">{date_str}</div>
         </div>
-        
+
         {self._generate_anime_section(anime_releases) if anime_releases else ""}
         {self._generate_manga_section(manga_releases) if manga_releases else ""}
-        
+
         <div class="footer">
             <p>📧 このメールは自動配信されています</p>
             <p>🤖 Generated with MangaAnime Information System</p>

@@ -375,7 +375,7 @@ class RecoveryExecutor:
             else:
                 result = target_function()
 
-            return result is not None and result != False
+            return result is not None and result is not False
 
         except Exception as e:
             self.logger.debug(f"Target function execution failed: {e}")
@@ -552,14 +552,14 @@ class SmartErrorRecoverySystem:
 
             cursor.execute(
                 """
-                CREATE INDEX IF NOT EXISTS idx_error_logs_timestamp 
+                CREATE INDEX IF NOT EXISTS idx_error_logs_timestamp
                 ON error_logs(timestamp)
             """
             )
 
             cursor.execute(
                 """
-                CREATE INDEX IF NOT EXISTS idx_error_logs_service 
+                CREATE INDEX IF NOT EXISTS idx_error_logs_service
                 ON error_logs(service_name)
             """
             )
@@ -710,7 +710,7 @@ class SmartErrorRecoverySystem:
 
             cursor.execute(
                 """
-                UPDATE error_logs 
+                UPDATE error_logs
                 SET recovery_success = ?, recovery_strategy = ?
                 WHERE timestamp = ? AND service_name = ? AND operation = ?
             """,
@@ -790,11 +790,11 @@ class SmartErrorRecoverySystem:
 
             cursor.execute(
                 """
-                SELECT service_name, operation, error_type, 
+                SELECT service_name, operation, error_type,
                        COUNT(*) as error_count,
                        AVG(CASE WHEN recovery_success = 1 THEN 1.0 ELSE 0.0 END) as success_rate,
                        recovery_strategy
-                FROM error_logs 
+                FROM error_logs
                 WHERE timestamp > ?
                 GROUP BY service_name, operation, error_type, recovery_strategy
                 ORDER BY error_count DESC

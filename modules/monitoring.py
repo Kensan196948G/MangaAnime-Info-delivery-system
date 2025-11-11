@@ -578,13 +578,13 @@ class AlertManager:
 
             body = f"""
             Alert Details:
-            
+
             Condition: {alert.condition_name}
             Severity: {alert.severity}
             Message: {alert.message}
             Timestamp: {datetime.fromtimestamp(alert.timestamp)}
             Metric Value: {alert.metric_value}
-            
+
             Please investigate this issue.
             """
 

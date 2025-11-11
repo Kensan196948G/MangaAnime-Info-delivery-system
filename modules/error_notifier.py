@@ -222,24 +222,24 @@ class ErrorNotifier:
             <div class="header">
                 <h2>🚨 MangaAnime システムエラー通知</h2>
             </div>
-            
+
             <div class="content">
                 <h3>エラー概要</h3>
                 <p><strong>エラータイプ:</strong> <span class="status">{error_type}</span></p>
                 <p><strong>発生時刻:</strong> {now}</p>
                 <p><strong>システム:</strong> MangaAnime情報配信システム</p>
             </div>
-            
+
             <div class="error-box">
                 <h3>🔍 エラー詳細</h3>
                 <p><strong>メッセージ:</strong></p>
                 <pre>{error_message}</pre>
-                
+
                 {f'<p><strong>詳細情報:</strong></p><pre>{error_details}</pre>' if error_details else ''}
             </div>
-            
+
             {'<div class="logs"><h3>📋 最新ログ (直近20行)</h3><pre>' + recent_logs + '</pre></div>' if recent_logs else ''}
-            
+
             <div class="content">
                 <h3>🔧 推奨対応</h3>
                 <ul>
@@ -249,7 +249,7 @@ class ErrorNotifier:
                     <li>問題が継続する場合は、設定ファイルを確認してください</li>
                 </ul>
             </div>
-            
+
             <div class="footer">
                 <p>このメールはMangaAnime情報配信システムから自動送信されました。</p>
                 <p>システム監視: kensan1969@gmail.com</p>
