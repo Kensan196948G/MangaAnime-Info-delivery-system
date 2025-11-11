@@ -5,9 +5,9 @@ Provides complete configuration for all test suites
 """
 
 import os
-from typing import Dict, Any, Optional
 from pathlib import Path
 import json
+from typing import Any, Dict
 
 
 class TestConfig:
@@ -168,7 +168,7 @@ class TestConfig:
         """Parse environment variable value"""
         if value.lower() in ("true", "1", "yes", "on"):
             return True
-        elif value.lower() in ("false", "0", "no", "off"):
+        elif value.lower() in ("false", "0", "no", "o"):
             return False
         elif value.isdigit():
             return int(value)

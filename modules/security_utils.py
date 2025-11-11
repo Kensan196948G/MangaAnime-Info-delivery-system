@@ -44,7 +44,7 @@ class InputSanitizer:
 
     ALLOWED_HTML_TAGS = ["p", "br", "strong", "em", "ul", "ol", "li", "a"]
     ALLOWED_ATTRIBUTES = {
-        "a": ["href", "title"],
+        "a": ["hre", "title"],
     }
     MAX_FEED_SIZE = 5 * 1024 * 1024  # 5MB
     MAX_TITLE_LENGTH = 500
@@ -296,14 +296,14 @@ class SecureTokenManager:
                 with open(self.token_file, "wb") as f:
                     f.write(encrypted_data)
                 logging.info(
-                    f"Token saved securely (encrypted) to {
-                        self.token_file}")
+                    f"Token saved securely (encrypted) to {self.token_file}"
+                )
             else:
                 with open(self.token_file, "w") as f:
                     f.write(json_data)
                 logging.warning(
-                    f"Token saved without encryption to {
-                        self.token_file}")
+                    f"Token saved without encryption to {self.token_file}"
+                )
 
             # Set restrictive permissions
             os.chmod(self.token_file, 0o600)

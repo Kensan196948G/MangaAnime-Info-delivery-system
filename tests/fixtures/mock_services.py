@@ -4,14 +4,13 @@ Advanced Mock Services for Comprehensive Testing
 Provides realistic mock implementations for external services
 """
 
-import json
+from typing import Any, Dict, List
 import asyncio
 import random
-from typing import Dict, Any, List, Optional, Union
-from unittest.mock import Mock, MagicMock, AsyncMock
 from datetime import datetime, timedelta
 import secrets
 import time
+from unittest.mock import Mock, MagicMock
 
 
 class MockAniListService:
@@ -200,7 +199,7 @@ class MockRSSFeedService:
         for i, title in enumerate(manga_titles[:5]):
             pub_date = datetime.now() + timedelta(days=i)
             items.append(
-                f"""
+                """
                 <item>
                     <title>{title} 第{20+i}巻</title>
                     <link>https://bookwalker.jp/manga/{title.replace(' ', '-')}-vol-{20+i}</link>
@@ -212,7 +211,7 @@ class MockRSSFeedService:
             """
             )
 
-        return f"""<?xml version="1.0" encoding="UTF-8"?>
+        return """<?xml version="1.0" encoding="UTF-8"?>
         <rss version="2.0">
             <channel>
                 <title>BookWalker新刊情報</title>
@@ -238,7 +237,7 @@ class MockRSSFeedService:
         for i, title in enumerate(manga_titles):
             pub_date = datetime.now() + timedelta(days=i + 1)
             items.append(
-                f"""
+                """
                 <item>
                     <title>【Kindle版】{title} 第{15+i}巻</title>
                     <link>https://amazon.co.jp/kindle/{title.replace(' ', '-')}-vol-{15+i}</link>
@@ -250,7 +249,7 @@ class MockRSSFeedService:
             """
             )
 
-        return f"""<?xml version="1.0" encoding="UTF-8"?>
+        return """<?xml version="1.0" encoding="UTF-8"?>
         <rss version="2.0">
             <channel>
                 <title>Kindle マンガ新刊</title>

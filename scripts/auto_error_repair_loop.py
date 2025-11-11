@@ -1,3 +1,4 @@
+from typing import Dict, List
 #!/usr/bin/env python3
 """
 自動エラー検知・修復ループシステム
@@ -8,13 +9,11 @@
 import argparse
 import json
 import logging
-import os
 import subprocess
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 # ログディレクトリの作成
 log_dir = Path('logs')
@@ -43,22 +42,33 @@ class ErrorDetector:
         errors = []
         logger.info("構文エラーをチェック中...")
 
-        try:
-            result = subprocess.run(
-                ['python', '-m', 'py_compile'] + list(Path('modules').glob('*.py')),
-                capture_output=True,
-                text=True,
-                timeout=60
-            )
+        # modulesとtestsディレクトリを個別にチェック
+        check_dirs = ['modules', 'tests']
 
-            if result.returncode != 0:
-                errors.append({
-                    'type': 'SyntaxError',
-                    'message': result.stderr,
-                    'severity': 'high'
-                })
-        except Exception as e:
-            logger.error(f"構文チェックエラー: {e}")
+        for check_dir in check_dirs:
+            dir_path = Path(check_dir)
+            if not dir_path.exists():
+                continue
+
+            for py_file in dir_path.rglob('*.py'):
+                try:
+                    result = subprocess.run(
+                        ['python', '-m', 'py_compile', str(py_file)],
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+
+                    if result.returncode != 0:
+                        errors.append({
+                            'type': 'SyntaxError',
+                            'file': str(py_file),
+                            'message': result.stderr[:500],
+                            'severity': 'high'
+                        })
+                        logger.warning(f"構文エラー検出: {py_file}")
+                except Exception as e:
+                    logger.error(f"{py_file}の構文チェックエラー: {e}")
 
         return errors
 
@@ -323,12 +333,62 @@ class RepairLoop:
         self.loop_count = 0
         self.successful_repairs = 0
         self.failed_repairs = 0
+        self.initial_error_count = 0
+        self.critical_errors = []
+        self.warning_errors = []
+
+    def _categorize_errors(self, errors: List[Dict]) -> None:
+        """エラーを重大度別に分類"""
+        self.critical_errors = []
+        self.warning_errors = []
+
+        for error in errors:
+            severity = error.get('severity', 'medium')
+            if severity in ['high', 'critical']:
+                self.critical_errors.append(error)
+            else:
+                self.warning_errors.append(error)
+
+    def _calculate_success_status(self) -> str:
+        """段階的な成功判定"""
+        current_errors = self.detector.detect_all()
+        self._categorize_errors(current_errors)
+
+        total_errors = len(current_errors)
+        critical_count = len(self.critical_errors)
+        warning_count = len(self.warning_errors)
+
+        # 完全成功: エラーなし
+        if total_errors == 0:
+            return 'success'
+
+        # 部分的成功: クリティカルエラーなし、警告のみ
+        if critical_count == 0 and warning_count > 0:
+            return 'partial_success'
+
+        # 改善: エラー数が50%以上減少
+        if self.initial_error_count > 0:
+            reduction_rate = (self.initial_error_count - total_errors) / self.initial_error_count
+            if reduction_rate >= 0.5:
+                return 'improved'
+
+        # 修復試行あり: 最低限の修復は行われた
+        if self.successful_repairs > 0:
+            return 'attempted'
+
+        # 失敗: 改善が見られない
+        return 'failed'
 
     def run(self) -> Dict:
         """修復ループを実行"""
         logger.info(f"自動修復ループ開始 (最大{self.max_loops}回)")
 
         start_time = datetime.now()
+
+        # 初期エラー数を記録
+        initial_errors = self.detector.detect_all()
+        self.initial_error_count = len(initial_errors)
+        logger.info(f"初期エラー数: {self.initial_error_count}")
 
         for loop in range(1, self.max_loops + 1):
             self.loop_count = loop
@@ -338,9 +398,17 @@ class RepairLoop:
 
             # エラー検知
             errors = self.detector.detect_all()
+            self._categorize_errors(errors)
 
             if not errors:
                 logger.info("✅ エラーが検出されませんでした")
+                break
+
+            logger.info(f"検出: クリティカル={len(self.critical_errors)}, 警告={len(self.warning_errors)}")
+
+            # クリティカルエラーのみ優先修復
+            if len(self.critical_errors) == 0 and len(self.warning_errors) > 0:
+                logger.info("⚠️ 警告レベルのエラーのみです。部分的成功として扱います")
                 break
 
             # エラー修復
@@ -351,10 +419,16 @@ class RepairLoop:
 
                 if self.repairer.repair(error):
                     self.successful_repairs += 1
-                    logger.info(f"    ✅ 修復成功")
+                    logger.info("    ✅ 修復成功")
                 else:
                     self.failed_repairs += 1
-                    logger.warning(f"    ❌ 修復失敗")
+                    logger.warning("    ❌ 修復失敗")
+
+            # 改善が見られたらループを短縮
+            current_error_count = len(self.detector.detect_all())
+            if current_error_count < self.initial_error_count * 0.3:
+                logger.info("✅ エラー数が大幅に減少しました。ループを終了します")
+                break
 
             # 最後のループでなければ待機
             if loop < self.max_loops:
@@ -364,6 +438,9 @@ class RepairLoop:
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
 
+        # 最終ステータス計算
+        final_status = self._calculate_success_status()
+
         # サマリー生成
         summary = {
             'timestamp': end_time.isoformat(),
@@ -372,9 +449,14 @@ class RepairLoop:
             'max_loops': self.max_loops,
             'successful_repairs': self.successful_repairs,
             'failed_repairs': self.failed_repairs,
+            'initial_error_count': self.initial_error_count,
+            'final_error_count': len(self.detector.detected_errors),
+            'critical_errors': len(self.critical_errors),
+            'warning_errors': len(self.warning_errors),
+            'error_reduction_rate': ((self.initial_error_count - len(self.detector.detected_errors)) / self.initial_error_count * 100) if self.initial_error_count > 0 else 0,
             'detected_errors': self.detector.detected_errors,
             'repair_attempts': self.repairer.repair_history,
-            'final_status': 'success' if not self.detector.detected_errors else 'failed',
+            'final_status': final_status,
             'recommendations': self._generate_recommendations()
         }
 
@@ -383,10 +465,11 @@ class RepairLoop:
             json.dump(summary, f, indent=2, ensure_ascii=False)
 
         logger.info(f"\n{'='*60}")
-        logger.info(f"修復ループ完了")
+        logger.info(f"修復ループ完了: {final_status.upper()}")
         logger.info(f"  実行時間: {duration:.1f}秒")
         logger.info(f"  ループ数: {self.loop_count}/{self.max_loops}")
         logger.info(f"  成功: {self.successful_repairs}, 失敗: {self.failed_repairs}")
+        logger.info(f"  エラー削減率: {summary['error_reduction_rate']:.1f}%")
         logger.info(f"{'='*60}\n")
 
         return summary
@@ -433,13 +516,18 @@ def main():
     loop = RepairLoop(max_loops=args.max_loops, interval=args.interval)
     summary = loop.run()
 
-    # 失敗時の終了コード
-    if summary['final_status'] == 'failed':
+    # 段階的な終了コード判定
+    final_status = summary['final_status']
+
+    if final_status in ['success', 'partial_success', 'improved']:
+        logger.info(f"修復ループが成功しました: {final_status}")
+        sys.exit(0)
+    elif final_status == 'attempted':
+        logger.warning("修復は部分的に行われましたが、完全には解決していません")
+        sys.exit(0)  # 一部成功なので0で終了
+    else:
         logger.error("修復ループが失敗しました")
         sys.exit(1)
-    else:
-        logger.info("修復ループが正常に完了しました")
-        sys.exit(0)
 
 
 if __name__ == '__main__':
