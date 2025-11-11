@@ -51,30 +51,35 @@ class DashboardIntegration:
             duration_ms = (end_time - start_time) * 1000
 
             # パフォーマンスメトリクスを記録
-            dashboard_service.record_metric(
-                f"{operation_name}_duration",
-                duration_ms,
-                "timer",
-                source=component,
-                metadata={
-                    "success": success,
-                    "error_message": error_message,
-                    "timestamp": datetime.now().isoformat(),
-                },
-            )
+            try:
+                service = get_dashboard_service()
+                service.record_metric(
+                    f"{operation_name}_duration",
+                    duration_ms,
+                    "timer",
+                    source=component,
+                    metadata={
+                        "success": success,
+                        "error_message": error_message,
+                        "timestamp": datetime.now().isoformat(),
+                    },
+                )
 
-            # システムヘルス状態を更新
-            status = "healthy" if success else "error"
-            dashboard_service.update_system_health(
-                component,
-                status,
-                error_message,
-                performance_score=1.0 if success else 0.0,
-            )
+                # システムヘルス状態を更新
+                status = "healthy" if success else "error"
+                service.update_system_health(
+                    component,
+                    status,
+                    error_message,
+                    performance_score=1.0 if success else 0.0,
+                )
+            except Exception as e:
+                logger.warning(f"Failed to record dashboard metrics: {e}")
 
     def track_api_request(self, api_name: str, response_time_ms: float, success: bool):
         """API リクエストを追跡"""
-        dashboard_service.record_metric(
+        service = get_dashboard_service()
+        service.record_metric(
             f"{api_name}_response_time",
             response_time_ms,
             "timer",
@@ -84,7 +89,7 @@ class DashboardIntegration:
 
         # 成功/失敗カウンターも更新
         metric_name = f"{api_name}_{'success' if success else 'error'}"
-        dashboard_service.record_metric(
+        service.record_metric(
             metric_name, 1, "counter", source=f"{api_name}_api"
         )
 
@@ -92,7 +97,8 @@ class DashboardIntegration:
         """RSS収集結果を追跡"""
         # 成功/失敗を記録
         metric_name = f"rss_{'success' if success else 'error'}"
-        dashboard_service.record_metric(
+        service = get_dashboard_service()
+        service.record_metric(
             metric_name,
             1,
             "counter",
@@ -105,7 +111,8 @@ class DashboardIntegration:
 
         # アイテム数も記録
         if success and items_count > 0:
-            dashboard_service.record_metric(
+            service = get_dashboard_service()
+            service.record_metric(
                 "rss_items_collected", items_count, "counter", source=source
             )
 
@@ -113,7 +120,8 @@ class DashboardIntegration:
         self, operation: str, duration_ms: float, rows_affected: int = 0
     ):
         """データベース操作を追跡"""
-        dashboard_service.record_metric(
+        service = get_dashboard_service()
+        service.record_metric(
             "db_query_time",
             duration_ms,
             "timer",
@@ -125,7 +133,7 @@ class DashboardIntegration:
             },
         )
 
-        dashboard_service.record_metric(
+        service.record_metric(
             f"db_{operation}_count", 1, "counter", source="database"
         )
 
@@ -134,7 +142,8 @@ class DashboardIntegration:
     ):
         """通知送信結果を追跡"""
         metric_name = f"notification_{'success' if success else 'error'}"
-        dashboard_service.record_metric(
+        service = get_dashboard_service()
+        service.record_metric(
             metric_name,
             recipient_count,
             "counter",
