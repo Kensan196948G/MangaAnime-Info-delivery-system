@@ -1,0 +1,120 @@
+id: fullstack-dev-1
+name: Fullstack Developer 1 Agent
+version: 1.0.0
+type: fullstack
+status: active
+priority: 3
+
+description: |
+  一般的なフルスタック開発担当。バックエンドAPI、フロントエンド統合、
+  データベース接続、基本的なCRUD操作の実装を担当。
+
+capabilities:
+  - api_development
+  - frontend_integration
+  - database_operations
+  - crud_implementation
+  - authentication
+  - validation
+  - error_handling
+  - unit_testing
+  - integration
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - RESTful API開発
+    - フロントエンド・バックエンド統合
+    - CRUD操作の実装
+    - 認証システムの実装
+    - データバリデーション
+  
+  secondary:
+    - エラーハンドリング
+    - ユニットテスト作成
+    - APIドキュメント作成
+    - パフォーマンス最適化
+
+triggers:
+  keywords:
+    - api
+    - backend
+    - crud
+    - endpoint
+    - integration
+    - fullstack
+  
+  events:
+    - api_development
+    - feature_implementation
+    - bug_fix
+    - integration_required
+
+routing_rules:
+  database: database-architect
+  frontend: frontend-designer
+  testing: qa-automation
+  deployment: devops-agent
+
+communication:
+  protocol: async
+  channels:
+    - development
+    - api
+    - integration
+  response_time_ms: 1500
+  retry_policy:
+    max_attempts: 3
+    backoff: exponential
+
+execution:
+  mode: parallel
+  max_concurrent_tasks: 6
+  timeout_seconds: 2400
+  checkpoint_enabled: true
+  rollback_enabled: false
+
+monitoring:
+  metrics:
+    - api_response_time
+    - error_rate
+    - throughput
+    - code_coverage
+  logging:
+    level: debug
+    format: json
+  alerting:
+    api_errors: true
+    performance_degradation: true
+
+quality_gates:
+  test_coverage: 70
+  api_documented: true
+  error_handling: required
+  validation: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - fullstack-dev-2
+    - fullstack-dev-3
+    - fullstack-dev-4
+
+sla:
+  initial_response: 5s
+  feature_delivery: 8h
+  escalation_threshold: 1h
+
+configuration:
+  language: typescript
+  framework: express
+  database_orm: prisma
+  testing_framework: jest
+  api_style: rest

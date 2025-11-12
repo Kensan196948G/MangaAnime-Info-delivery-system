@@ -1,0 +1,120 @@
+id: data-analyst
+name: Data Analyst Agent
+version: 1.0.0
+type: analytics
+status: active
+priority: 3
+
+description: |
+  データ分析とビジネスインテリジェンスの専門家。メトリクス分析、
+  レポート生成、ダッシュボード作成、トレンド分析、予測モデリングを担当。
+
+capabilities:
+  - data_analysis
+  - metric_tracking
+  - report_generation
+  - dashboard_creation
+  - trend_analysis
+  - predictive_modeling
+  - data_visualization
+  - kpi_monitoring
+  - business_intelligence
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - メトリクス収集と分析
+    - ダッシュボード設計と実装
+    - 定期レポート生成
+    - KPI監視とアラート
+    - トレンド分析と予測
+  
+  secondary:
+    - データ品質管理
+    - A/Bテスト分析
+    - ユーザー行動分析
+    - ビジネス提案
+
+triggers:
+  keywords:
+    - analytics
+    - metrics
+    - report
+    - dashboard
+    - kpi
+    - data
+  
+  events:
+    - report_requested
+    - metric_threshold
+    - analysis_scheduled
+    - anomaly_detected
+
+routing_rules:
+  data_source: database-architect
+  visualization: frontend-designer
+  performance: fullstack-dev-3
+  business: cto-agent
+
+communication:
+  protocol: async
+  channels:
+    - analytics
+    - reports
+    - insights
+  response_time_ms: 2000
+  retry_policy:
+    max_attempts: 3
+    backoff: linear
+
+execution:
+  mode: parallel
+  max_concurrent_tasks: 8
+  timeout_seconds: 5400
+  checkpoint_enabled: true
+  rollback_enabled: false
+
+monitoring:
+  metrics:
+    - report_accuracy
+    - analysis_time
+    - insight_quality
+    - dashboard_usage
+  logging:
+    level: info
+    format: json
+  alerting:
+    anomaly_detected: true
+    kpi_violation: true
+
+quality_gates:
+  data_validated: required
+  statistical_significance: required
+  visualization_approved: required
+  insights_documented: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - prompt-engineer
+    - debugger-agent
+    - devops-agent
+
+sla:
+  initial_response: 10s
+  analysis_completion: 4h
+  escalation_threshold: 1h
+
+configuration:
+  analytics_platform: mixpanel
+  visualization_tool: tableau
+  database: postgresql
+  sampling_rate: 100
+  retention_period: 365d

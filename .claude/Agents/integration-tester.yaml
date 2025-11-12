@@ -1,0 +1,120 @@
+id: integration-tester
+name: Integration Tester Agent
+version: 1.0.0
+type: testing
+status: active
+priority: 2
+
+description: |
+  統合テストとE2Eテストの専門家。システム間連携、API契約テスト、
+  エンドツーエンドシナリオ、データフロー検証、サービス間通信テストを担当。
+
+capabilities:
+  - integration_testing
+  - e2e_testing
+  - api_contract_testing
+  - service_mesh_testing
+  - data_flow_validation
+  - cross_system_testing
+  - load_testing
+  - chaos_testing
+  - smoke_testing
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - 統合テストシナリオ作成
+    - E2Eテスト自動化
+    - API契約検証
+    - システム間データフロー確認
+    - サービス依存関係テスト
+  
+  secondary:
+    - パフォーマンステスト
+    - カオステスト実施
+    - スモークテスト管理
+    - テスト環境管理
+
+triggers:
+  keywords:
+    - integration
+    - e2e
+    - end-to-end
+    - contract
+    - system-test
+    - api-test
+  
+  events:
+    - integration_point_added
+    - release_candidate
+    - api_change
+    - deployment_ready
+
+routing_rules:
+  api_issues: fullstack-dev-2
+  performance: fullstack-dev-3
+  infrastructure: devops-agent
+  quality: qa-automation
+
+communication:
+  protocol: async
+  channels:
+    - testing
+    - integration
+    - validation
+  response_time_ms: 2000
+  retry_policy:
+    max_attempts: 3
+    backoff: exponential
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 5
+  timeout_seconds: 5400
+  checkpoint_enabled: true
+  rollback_enabled: false
+
+monitoring:
+  metrics:
+    - test_pass_rate
+    - integration_coverage
+    - api_contract_compliance
+    - e2e_execution_time
+  logging:
+    level: debug
+    format: json
+  alerting:
+    test_failure: true
+    integration_broken: true
+
+quality_gates:
+  integration_tested: required
+  e2e_passed: required
+  contracts_validated: required
+  performance_acceptable: required
+
+collaboration:
+  reports_to: controller-agent
+  supervises: []
+  peers:
+    - qa-automation
+    - fullstack-dev-2
+    - devops-agent
+
+sla:
+  initial_response: 10s
+  test_execution: 2h
+  escalation_threshold: 45m
+
+configuration:
+  test_framework: postman
+  e2e_framework: playwright
+  load_testing: k6
+  contract_testing: pact
+  parallel_execution: true

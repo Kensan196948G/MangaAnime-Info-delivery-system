@@ -1,0 +1,24 @@
+{
+  "gmail_settings": {
+    "description": "Gmail App Password設定テンプレート",
+    "note": "このファイルをコピーして gmail_config.json として使用してください",
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "email_address": "your-email@gmail.com",
+    "app_password": "your-16-character-app-password",
+    "sender_name": "アニメ・マンガ通知システム"
+  },
+  "setup_instructions": [
+    "1. Googleアカウントの2段階認証を有効にする",
+    "2. Google アカウント設定 > セキュリティ > 2段階認証プロセス > アプリパスワード",
+    "3. アプリパスワードを生成（アプリ: その他、デバイス: Linux）",
+    "4. 生成された16文字のパスワードをapp_passwordに設定",
+    "5. このファイルを gmail_config.json にコピー",
+    "6. パーミッションを600に設定: chmod 600 gmail_config.json"
+  ],
+  "security_notes": [
+    "このファイルには機密情報が含まれます",
+    "必ずパーミッション600を設定してください",
+    ".gitignoreに追加してバージョン管理から除外してください"
+  ]
+}

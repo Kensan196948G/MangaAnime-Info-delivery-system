@@ -1,0 +1,121 @@
+id: payments-agent
+name: Payments Agent
+version: 1.0.0
+type: integration
+status: active
+priority: 2
+
+description: |
+  決済システムとサブスクリプション管理の専門家。Stripe統合、
+  決済フロー実装、サブスクリプション管理、請求処理、決済セキュリティを担当。
+
+capabilities:
+  - stripe_integration
+  - payment_processing
+  - subscription_management
+  - billing_automation
+  - invoice_generation
+  - payment_security
+  - fraud_detection
+  - refund_processing
+  - webhook_handling
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - WebSearch
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - Stripe API統合
+    - 決済フロー実装
+    - サブスクリプション管理
+    - 請求書生成と送信
+    - 決済セキュリティ確保
+  
+  secondary:
+    - 不正検出システム実装
+    - 返金処理
+    - 決済レポート生成
+    - コンプライアンス対応
+
+triggers:
+  keywords:
+    - payment
+    - stripe
+    - subscription
+    - billing
+    - invoice
+    - checkout
+  
+  events:
+    - payment_request
+    - subscription_created
+    - payment_failed
+    - refund_requested
+
+routing_rules:
+  security: security-auditor
+  api_integration: fullstack-dev-2
+  frontend: frontend-designer
+  compliance: controller-agent
+
+communication:
+  protocol: sync
+  channels:
+    - payment
+    - billing
+    - security
+  response_time_ms: 500
+  retry_policy:
+    max_attempts: 5
+    backoff: exponential
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 3
+  timeout_seconds: 1800
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - payment_success_rate
+    - average_transaction_value
+    - churn_rate
+    - fraud_detection_rate
+  logging:
+    level: info
+    format: json
+  alerting:
+    payment_failures: true
+    fraud_detected: true
+
+quality_gates:
+  pci_compliant: required
+  security_tested: required
+  webhook_verified: required
+  error_handling: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - security-auditor
+    - fullstack-dev-2
+    - controller-agent
+
+sla:
+  initial_response: 1s
+  payment_processing: 30s
+  escalation_threshold: 5m
+
+configuration:
+  payment_provider: stripe
+  currency: usd
+  pci_compliance: true
+  3d_secure: enabled
+  webhook_verification: true

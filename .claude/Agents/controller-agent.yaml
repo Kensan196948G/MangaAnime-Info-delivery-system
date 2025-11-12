@@ -1,0 +1,141 @@
+id: controller-agent
+name: Controller Agent
+version: 1.0.0
+type: supervisor
+status: active
+priority: 2
+
+description: |
+  品質ゲートと承認フローを管理するスーパーバイザー。
+  リリース可否判定、承認プロセス、品質基準の遵守を確保。
+
+capabilities:
+  - quality_gate_enforcement
+  - approval_workflow
+  - release_management
+  - coordination
+  - compliance_checking
+  - reporting
+  - audit_trail
+  - rollback_decision
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - 品質ゲートの実施と検証
+    - リリース承認の判定
+    - コンプライアンス確認
+    - 監査ログの管理
+  
+  secondary:
+    - プロセス改善の提案
+    - メトリクス収集と報告
+    - リスク評価
+    - ロールバック判定
+
+triggers:
+  keywords:
+    - approve
+    - release
+    - quality
+    - gate
+    - validation
+    - compliance
+  
+  events:
+    - quality_gate_check
+    - release_request
+    - rollback_request
+    - compliance_audit
+
+quality_gates:
+  coding:
+    lint: required
+    format: required
+    type_check: required
+  
+  testing:
+    unit_coverage: 75
+    e2e_pass_rate: 90
+    integration_tests: required
+  
+  security:
+    vulnerability_scan: required
+    secret_scan: required
+    rls_validation: required
+  
+  documentation:
+    api_spec: required
+    changelog: required
+    runbook: recommended
+
+approval_matrix:
+  development:
+    auto_approve: true
+    requirements: [lint, unit_tests]
+  
+  staging:
+    auto_approve: false
+    requirements: [all_tests, security_scan]
+    approvers: [cto-agent]
+  
+  production:
+    auto_approve: false
+    requirements: [all_gates, documentation]
+    approvers: [cto-agent, human_reviewer]
+
+communication:
+  protocol: async
+  channels:
+    - direct
+    - broadcast
+    - alert
+  response_time_ms: 2000
+  retry_policy:
+    max_attempts: 3
+    backoff: linear
+
+execution:
+  mode: sequential
+  timeout_seconds: 1800
+  checkpoint_enabled: true
+  audit_logging: true
+
+monitoring:
+  metrics:
+    - gate_pass_rate
+    - approval_time
+    - rejection_reasons
+    - rollback_frequency
+  logging:
+    level: info
+    format: json
+    audit: true
+  alerting:
+    gate_failures: true
+    compliance_violations: true
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - qa-automation
+    - security-auditor
+    - devops-agent
+
+sla:
+  gate_check: 5m
+  approval_decision: 15m
+  report_generation: 30m
+
+configuration:
+  strict_mode: true
+  auto_remediation: false
+  bypass_allowed: false
+  audit_trail: persistent

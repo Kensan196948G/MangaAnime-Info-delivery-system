@@ -1,0 +1,2102 @@
+<testsuites id="" name="" tests="510" failures="0" skipped="510" errors="0" time="2.8576669999999997">
+<testsuite name="01-navigation.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="chromium" tests="11" failures="0" skipped="11" time="0" errors="0">
+<testcase name="ナビゲーション機能 › ホームページが正常に表示される" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › リリース一覧ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 設定ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ブレッドクラムナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 404エラーページの表示" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › モバイル表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › タブレット表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › キーボードナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › アクティブページの視覚的インジケーター" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ページ読み込み性能の確認" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › サイドバーナビゲーション（存在する場合）" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="02-configuration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="chromium" tests="21" failures="0" skipped="21" time="0" errors="0">
+<testcase name="設定機能 › NGワード設定 › NGワードを追加できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › NGワードを削除できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 複数のNGワードを管理できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 空のNGワードは追加されない" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › 無効なメールアドレスでバリデーションエラーが表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール無効化時は関連フィールドが無効になる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › テストメール送信機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダー設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダーテスト機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 自動収集設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 収集間隔の選択肢が正しく表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知タイプの複数選択" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 完全な設定ワークフロー" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定のリセット機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定の永続性確認" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 必須フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 数値フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › モバイル表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › タブレット表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="03-releases-filtering.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="chromium" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › リリース一覧テーブルが正常に表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › ページネーションが正常に動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › 統計情報が表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › タイトル順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 日付順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 複数回ソートで昇順・降順が切り替わる" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 種別フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › プラットフォームフィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 日付範囲フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › キーワード検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 複合フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › フィルタークリア機能が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 部分一致検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 大文字小文字を区別しない検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 空の検索結果の表示" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 特殊文字を含む検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › リリース詳細表示が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › ウォッチリスト追加機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › 一括操作機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › モバイル表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › タブレット表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 大量データの表示性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › フィルタリングの応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 検索の応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › キーボードナビゲーション" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › スクリーンリーダー対応" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="04-calendar-integration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="chromium" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーページが正常に表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーの月間ビューナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › 今日の日付がハイライトされる" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › リリースイベントが表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › 異なるタイプのイベントが区別して表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › イベントの日付情報が正しく表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー設定変更後の表示更新" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー接続テスト機能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › Google Calendar API呼び出し" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › カレンダーイベント作成API" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › カレンダーAPI接続エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › 認証エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › レート制限エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › モバイル表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › タブレット表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › カレンダー読み込み性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › 月間ナビゲーション性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › キーボードナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › スクリーンリーダー対応" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="05-error-handling.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="chromium" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="エラーハンドリング › ネットワークエラー処理 › API接続エラー時のフォールバック表示" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › タイムアウトエラーの処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › 部分的なAPI失敗時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 不正なメールアドレス入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 必須フィールド未入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 数値範囲外エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 重複データエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 認証切れ時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 権限不足エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 無効なデータ形式エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 大きすぎるデータセットエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › リソース不足エラー › メモリ不足シミュレーション" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 複数システム連携時のエラー処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 依存関係エラーの連鎖処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › 一時的エラーからの自動回復" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › オフライン状態の検出と処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="06-integration-workflow.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="chromium" tests="9" failures="0" skipped="9" time="0" errors="0">
+<testcase name="統合ワークフロー › 新規ユーザーのオンボーディングフロー › 初回セットアップから運用開始まで" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 毎日の確認・管理フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 週次メンテナンス・設定見直しフロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › 通知が届かない問題の診断・解決フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › データ収集が停止した問題の対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › パフォーマンス問題の診断・対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 複数デバイス・ブラウザでの一貫性確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 大量データ処理時の統合動作確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 長時間運用シミュレーション" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="01-navigation.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="firefox" tests="11" failures="0" skipped="11" time="0" errors="0">
+<testcase name="ナビゲーション機能 › ホームページが正常に表示される" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › リリース一覧ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 設定ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ブレッドクラムナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 404エラーページの表示" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › モバイル表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › タブレット表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › キーボードナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › アクティブページの視覚的インジケーター" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ページ読み込み性能の確認" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › サイドバーナビゲーション（存在する場合）" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="02-configuration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="firefox" tests="21" failures="0" skipped="21" time="0" errors="0">
+<testcase name="設定機能 › NGワード設定 › NGワードを追加できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › NGワードを削除できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 複数のNGワードを管理できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 空のNGワードは追加されない" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › 無効なメールアドレスでバリデーションエラーが表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール無効化時は関連フィールドが無効になる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › テストメール送信機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダー設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダーテスト機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 自動収集設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 収集間隔の選択肢が正しく表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知タイプの複数選択" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 完全な設定ワークフロー" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定のリセット機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定の永続性確認" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 必須フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 数値フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › モバイル表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › タブレット表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="03-releases-filtering.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="firefox" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › リリース一覧テーブルが正常に表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › ページネーションが正常に動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › 統計情報が表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › タイトル順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 日付順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 複数回ソートで昇順・降順が切り替わる" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 種別フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › プラットフォームフィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 日付範囲フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › キーワード検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 複合フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › フィルタークリア機能が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 部分一致検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 大文字小文字を区別しない検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 空の検索結果の表示" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 特殊文字を含む検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › リリース詳細表示が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › ウォッチリスト追加機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › 一括操作機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › モバイル表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › タブレット表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 大量データの表示性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › フィルタリングの応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 検索の応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › キーボードナビゲーション" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › スクリーンリーダー対応" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="04-calendar-integration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="firefox" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーページが正常に表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーの月間ビューナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › 今日の日付がハイライトされる" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › リリースイベントが表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › 異なるタイプのイベントが区別して表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › イベントの日付情報が正しく表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー設定変更後の表示更新" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー接続テスト機能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › Google Calendar API呼び出し" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › カレンダーイベント作成API" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › カレンダーAPI接続エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › 認証エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › レート制限エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › モバイル表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › タブレット表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › カレンダー読み込み性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › 月間ナビゲーション性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › キーボードナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › スクリーンリーダー対応" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="05-error-handling.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="firefox" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="エラーハンドリング › ネットワークエラー処理 › API接続エラー時のフォールバック表示" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › タイムアウトエラーの処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › 部分的なAPI失敗時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 不正なメールアドレス入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 必須フィールド未入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 数値範囲外エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 重複データエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 認証切れ時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 権限不足エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 無効なデータ形式エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 大きすぎるデータセットエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › リソース不足エラー › メモリ不足シミュレーション" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 複数システム連携時のエラー処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 依存関係エラーの連鎖処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › 一時的エラーからの自動回復" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › オフライン状態の検出と処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="06-integration-workflow.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="firefox" tests="9" failures="0" skipped="9" time="0" errors="0">
+<testcase name="統合ワークフロー › 新規ユーザーのオンボーディングフロー › 初回セットアップから運用開始まで" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 毎日の確認・管理フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 週次メンテナンス・設定見直しフロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › 通知が届かない問題の診断・解決フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › データ収集が停止した問題の対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › パフォーマンス問題の診断・対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 複数デバイス・ブラウザでの一貫性確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 大量データ処理時の統合動作確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 長時間運用シミュレーション" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="01-navigation.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="webkit" tests="11" failures="0" skipped="11" time="0" errors="0">
+<testcase name="ナビゲーション機能 › ホームページが正常に表示される" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › リリース一覧ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 設定ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ブレッドクラムナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 404エラーページの表示" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › モバイル表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › タブレット表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › キーボードナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › アクティブページの視覚的インジケーター" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ページ読み込み性能の確認" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › サイドバーナビゲーション（存在する場合）" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="02-configuration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="webkit" tests="21" failures="0" skipped="21" time="0" errors="0">
+<testcase name="設定機能 › NGワード設定 › NGワードを追加できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › NGワードを削除できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 複数のNGワードを管理できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 空のNGワードは追加されない" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › 無効なメールアドレスでバリデーションエラーが表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール無効化時は関連フィールドが無効になる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › テストメール送信機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダー設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダーテスト機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 自動収集設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 収集間隔の選択肢が正しく表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知タイプの複数選択" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 完全な設定ワークフロー" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定のリセット機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定の永続性確認" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 必須フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 数値フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › モバイル表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › タブレット表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="03-releases-filtering.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="webkit" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › リリース一覧テーブルが正常に表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › ページネーションが正常に動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › 統計情報が表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › タイトル順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 日付順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 複数回ソートで昇順・降順が切り替わる" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 種別フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › プラットフォームフィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 日付範囲フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › キーワード検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 複合フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › フィルタークリア機能が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 部分一致検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 大文字小文字を区別しない検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 空の検索結果の表示" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 特殊文字を含む検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › リリース詳細表示が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › ウォッチリスト追加機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › 一括操作機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › モバイル表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › タブレット表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 大量データの表示性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › フィルタリングの応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 検索の応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › キーボードナビゲーション" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › スクリーンリーダー対応" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="04-calendar-integration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="webkit" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーページが正常に表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーの月間ビューナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › 今日の日付がハイライトされる" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › リリースイベントが表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › 異なるタイプのイベントが区別して表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › イベントの日付情報が正しく表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー設定変更後の表示更新" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー接続テスト機能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › Google Calendar API呼び出し" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › カレンダーイベント作成API" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › カレンダーAPI接続エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › 認証エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › レート制限エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › モバイル表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › タブレット表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › カレンダー読み込み性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › 月間ナビゲーション性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › キーボードナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › スクリーンリーダー対応" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="05-error-handling.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="webkit" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="エラーハンドリング › ネットワークエラー処理 › API接続エラー時のフォールバック表示" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › タイムアウトエラーの処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › 部分的なAPI失敗時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 不正なメールアドレス入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 必須フィールド未入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 数値範囲外エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 重複データエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 認証切れ時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 権限不足エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 無効なデータ形式エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 大きすぎるデータセットエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › リソース不足エラー › メモリ不足シミュレーション" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 複数システム連携時のエラー処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 依存関係エラーの連鎖処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › 一時的エラーからの自動回復" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › オフライン状態の検出と処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="06-integration-workflow.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="webkit" tests="9" failures="0" skipped="9" time="0" errors="0">
+<testcase name="統合ワークフロー › 新規ユーザーのオンボーディングフロー › 初回セットアップから運用開始まで" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 毎日の確認・管理フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 週次メンテナンス・設定見直しフロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › 通知が届かない問題の診断・解決フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › データ収集が停止した問題の対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › パフォーマンス問題の診断・対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 複数デバイス・ブラウザでの一貫性確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 大量データ処理時の統合動作確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 長時間運用シミュレーション" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="01-navigation.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Chrome" tests="11" failures="0" skipped="11" time="0" errors="0">
+<testcase name="ナビゲーション機能 › ホームページが正常に表示される" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › リリース一覧ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 設定ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ブレッドクラムナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 404エラーページの表示" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › モバイル表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › タブレット表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › キーボードナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › アクティブページの視覚的インジケーター" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ページ読み込み性能の確認" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › サイドバーナビゲーション（存在する場合）" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="02-configuration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Chrome" tests="21" failures="0" skipped="21" time="0" errors="0">
+<testcase name="設定機能 › NGワード設定 › NGワードを追加できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › NGワードを削除できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 複数のNGワードを管理できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 空のNGワードは追加されない" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › 無効なメールアドレスでバリデーションエラーが表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール無効化時は関連フィールドが無効になる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › テストメール送信機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダー設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダーテスト機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 自動収集設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 収集間隔の選択肢が正しく表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知タイプの複数選択" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 完全な設定ワークフロー" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定のリセット機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定の永続性確認" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 必須フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 数値フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › モバイル表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › タブレット表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="03-releases-filtering.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Chrome" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › リリース一覧テーブルが正常に表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › ページネーションが正常に動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › 統計情報が表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › タイトル順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 日付順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 複数回ソートで昇順・降順が切り替わる" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 種別フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › プラットフォームフィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 日付範囲フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › キーワード検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 複合フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › フィルタークリア機能が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 部分一致検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 大文字小文字を区別しない検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 空の検索結果の表示" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 特殊文字を含む検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › リリース詳細表示が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › ウォッチリスト追加機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › 一括操作機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › モバイル表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › タブレット表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 大量データの表示性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › フィルタリングの応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 検索の応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › キーボードナビゲーション" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › スクリーンリーダー対応" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="04-calendar-integration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Chrome" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーページが正常に表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーの月間ビューナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › 今日の日付がハイライトされる" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › リリースイベントが表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › 異なるタイプのイベントが区別して表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › イベントの日付情報が正しく表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー設定変更後の表示更新" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー接続テスト機能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › Google Calendar API呼び出し" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › カレンダーイベント作成API" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › カレンダーAPI接続エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › 認証エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › レート制限エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › モバイル表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › タブレット表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › カレンダー読み込み性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › 月間ナビゲーション性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › キーボードナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › スクリーンリーダー対応" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="05-error-handling.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Chrome" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="エラーハンドリング › ネットワークエラー処理 › API接続エラー時のフォールバック表示" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › タイムアウトエラーの処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › 部分的なAPI失敗時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 不正なメールアドレス入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 必須フィールド未入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 数値範囲外エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 重複データエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 認証切れ時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 権限不足エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 無効なデータ形式エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 大きすぎるデータセットエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › リソース不足エラー › メモリ不足シミュレーション" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 複数システム連携時のエラー処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 依存関係エラーの連鎖処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › 一時的エラーからの自動回復" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › オフライン状態の検出と処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="06-integration-workflow.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Chrome" tests="9" failures="0" skipped="9" time="0" errors="0">
+<testcase name="統合ワークフロー › 新規ユーザーのオンボーディングフロー › 初回セットアップから運用開始まで" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 毎日の確認・管理フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 週次メンテナンス・設定見直しフロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › 通知が届かない問題の診断・解決フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › データ収集が停止した問題の対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › パフォーマンス問題の診断・対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 複数デバイス・ブラウザでの一貫性確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 大量データ処理時の統合動作確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 長時間運用シミュレーション" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="01-navigation.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Safari" tests="11" failures="0" skipped="11" time="0" errors="0">
+<testcase name="ナビゲーション機能 › ホームページが正常に表示される" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › リリース一覧ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 設定ページへの遷移" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ブレッドクラムナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › 404エラーページの表示" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › モバイル表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › タブレット表示でのナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › キーボードナビゲーション" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › アクティブページの視覚的インジケーター" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › ページ読み込み性能の確認" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="ナビゲーション機能 › サイドバーナビゲーション（存在する場合）" classname="01-navigation.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="02-configuration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Safari" tests="21" failures="0" skipped="21" time="0" errors="0">
+<testcase name="設定機能 › NGワード設定 › NGワードを追加できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › NGワードを削除できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 複数のNGワードを管理できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › NGワード設定 › 空のNGワードは追加されない" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › 無効なメールアドレスでバリデーションエラーが表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › メール無効化時は関連フィールドが無効になる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › メール設定 › テストメール送信機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダー設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › カレンダー設定 › カレンダーテスト機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 自動収集設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 自動収集設定 › 収集間隔の選択肢が正しく表示される" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知設定を更新できる" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 通知設定 › 通知タイプの複数選択" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 完全な設定ワークフロー" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定のリセット機能" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › 設定の統合テスト › 設定の永続性確認" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 必須フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › フォームバリデーション › 数値フィールドのバリデーション" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › モバイル表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="設定機能 › レスポンシブ対応 › タブレット表示での設定フォーム" classname="02-configuration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="03-releases-filtering.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Safari" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › リリース一覧テーブルが正常に表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › ページネーションが正常に動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 基本表示機能 › 統計情報が表示される" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › タイトル順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 日付順ソートが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › ソート機能 › 複数回ソートで昇順・降順が切り替わる" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 種別フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › プラットフォームフィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 日付範囲フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › キーワード検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › 複合フィルターが動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › フィルタリング機能 › フィルタークリア機能が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 部分一致検索が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 大文字小文字を区別しない検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 空の検索結果の表示" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › 検索機能詳細 › 特殊文字を含む検索" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › リリース詳細表示が動作する" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › ウォッチリスト追加機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクション機能 › 一括操作機能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › モバイル表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › レスポンシブ対応 › タブレット表示でのリリース一覧" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 大量データの表示性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › フィルタリングの応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › パフォーマンステスト › 検索の応答性能" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › キーボードナビゲーション" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="リリース一覧とフィルタリング機能 › アクセシビリティ › スクリーンリーダー対応" classname="03-releases-filtering.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="04-calendar-integration.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Safari" tests="19" failures="0" skipped="19" time="0" errors="0">
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーページが正常に表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › カレンダーの月間ビューナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーページ表示 › 今日の日付がハイライトされる" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › リリースイベントが表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › 異なるタイプのイベントが区別して表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーイベント表示 › イベントの日付情報が正しく表示される" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー設定変更後の表示更新" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダー設定との連携 › カレンダー接続テスト機能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › Google Calendar API呼び出し" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › カレンダーAPI統合 › カレンダーイベント作成API" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › カレンダーAPI接続エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › 認証エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › エラーハンドリング › レート制限エラーの処理" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › モバイル表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › レスポンシブ対応 › タブレット表示でのカレンダー" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › カレンダー読み込み性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › パフォーマンス › 月間ナビゲーション性能" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › キーボードナビゲーション" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="カレンダー連携機能 › アクセシビリティ › スクリーンリーダー対応" classname="04-calendar-integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="05-error-handling.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Safari" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="エラーハンドリング › ネットワークエラー処理 › API接続エラー時のフォールバック表示" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › タイムアウトエラーの処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › ネットワークエラー処理 › 部分的なAPI失敗時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 不正なメールアドレス入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 必須フィールド未入力エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 数値範囲外エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › フォーム入力エラー › 重複データエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 認証切れ時の処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 権限・認証エラー › 権限不足エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 無効なデータ形式エラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › データ処理エラー › 大きすぎるデータセットエラー" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › リソース不足エラー › メモリ不足シミュレーション" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 複数システム連携時のエラー処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 統合エラーハンドリング › 依存関係エラーの連鎖処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › 一時的エラーからの自動回復" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="エラーハンドリング › 回復機能 › オフライン状態の検出と処理" classname="05-error-handling.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="06-integration-workflow.spec.ts" timestamp="2025-09-07T02:06:45.149Z" hostname="Mobile Safari" tests="9" failures="0" skipped="9" time="0" errors="0">
+<testcase name="統合ワークフロー › 新規ユーザーのオンボーディングフロー › 初回セットアップから運用開始まで" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 毎日の確認・管理フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 日常的な運用ワークフロー › 週次メンテナンス・設定見直しフロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › 通知が届かない問題の診断・解決フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › データ収集が停止した問題の対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › トラブルシューティングワークフロー › パフォーマンス問題の診断・対処フロー" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 複数デバイス・ブラウザでの一貫性確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 大量データ処理時の統合動作確認" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="統合ワークフロー › 高度な統合シナリオ › 長時間運用シミュレーション" classname="06-integration-workflow.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+</testsuites>

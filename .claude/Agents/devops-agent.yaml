@@ -1,0 +1,120 @@
+id: devops-agent
+name: DevOps Agent
+version: 1.0.0
+type: operations
+status: active
+priority: 2
+
+description: |
+  インフラストラクチャとデプロイメントの専門家。AWS/クラウド管理、
+  Terraform、監視システム、バックアップ、スケーリング、災害復旧を担当。
+
+capabilities:
+  - infrastructure_management
+  - cloud_orchestration
+  - terraform_automation
+  - monitoring_setup
+  - backup_management
+  - auto_scaling
+  - disaster_recovery
+  - log_aggregation
+  - cost_optimization
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - クラウドインフラの管理
+    - Terraformによる構成管理
+    - 監視システムの構築
+    - 自動スケーリング設定
+    - バックアップと復旧
+  
+  secondary:
+    - コスト最適化
+    - ログ集約と分析
+    - セキュリティグループ管理
+    - パフォーマンスチューニング
+
+triggers:
+  keywords:
+    - infrastructure
+    - deploy
+    - aws
+    - terraform
+    - monitoring
+    - backup
+  
+  events:
+    - deployment_request
+    - infrastructure_alert
+    - scaling_needed
+    - backup_scheduled
+
+routing_rules:
+  ci_cd: fullstack-dev-4
+  security: security-auditor
+  monitoring: incident-responder
+  database: database-architect
+
+communication:
+  protocol: async
+  channels:
+    - infrastructure
+    - deployment
+    - alerts
+  response_time_ms: 1000
+  retry_policy:
+    max_attempts: 3
+    backoff: exponential
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 5
+  timeout_seconds: 3600
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - uptime
+    - resource_utilization
+    - deployment_success_rate
+    - backup_success_rate
+  logging:
+    level: info
+    format: json
+  alerting:
+    infrastructure_failure: true
+    high_cost: true
+
+quality_gates:
+  high_availability: required
+  backup_tested: required
+  monitoring_configured: required
+  security_compliant: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - fullstack-dev-4
+    - incident-responder
+    - security-auditor
+
+sla:
+  initial_response: 5s
+  deployment_completion: 30m
+  escalation_threshold: 15m
+
+configuration:
+  cloud_provider: aws
+  iac_tool: terraform
+  monitoring: datadog
+  container_platform: ecs
+  backup_retention: 30d

@@ -1,0 +1,121 @@
+id: security-auditor
+name: Security Auditor Agent
+version: 1.0.0
+type: security
+status: active
+priority: 2
+
+description: |
+  セキュリティ監査とコンプライアンスの専門家。脆弱性診断、セキュリティテスト、
+  OWASP準拠、データ保護、暗号化、アクセス制御の実装と監査を担当。
+
+capabilities:
+  - vulnerability_scanning
+  - penetration_testing
+  - security_audit
+  - owasp_compliance
+  - data_encryption
+  - access_control
+  - threat_modeling
+  - security_monitoring
+  - incident_response
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - WebSearch
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - セキュリティ脆弱性の検出
+    - ペネトレーションテスト実行
+    - OWASP Top 10準拠確認
+    - データ暗号化の実装
+    - アクセス制御の設計
+  
+  secondary:
+    - 脅威モデリング
+    - セキュリティインシデント対応
+    - セキュリティポリシー策定
+    - コンプライアンス監査
+
+triggers:
+  keywords:
+    - security
+    - vulnerability
+    - audit
+    - encryption
+    - authentication
+    - authorization
+  
+  events:
+    - security_scan_requested
+    - vulnerability_detected
+    - compliance_audit
+    - incident_reported
+
+routing_rules:
+  incident: incident-responder
+  authentication: database-architect
+  payment_security: payments-agent
+  compliance: controller-agent
+
+communication:
+  protocol: sync
+  channels:
+    - security
+    - alerts
+    - audit
+  response_time_ms: 500
+  retry_policy:
+    max_attempts: 3
+    backoff: exponential
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 5
+  timeout_seconds: 7200
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - vulnerability_count
+    - security_score
+    - compliance_rate
+    - incident_response_time
+  logging:
+    level: info
+    format: json
+  alerting:
+    critical_vulnerability: true
+    security_breach: true
+
+quality_gates:
+  no_critical_vulnerabilities: required
+  owasp_compliant: required
+  encryption_enabled: required
+  access_control_configured: required
+
+collaboration:
+  reports_to: controller-agent
+  supervises: []
+  peers:
+    - incident-responder
+    - qa-automation
+    - devops-agent
+
+sla:
+  initial_response: 30s
+  vulnerability_assessment: 2h
+  escalation_threshold: 15m
+
+configuration:
+  scanner: owasp_zap
+  encryption_standard: aes256
+  auth_protocol: oauth2
+  compliance_framework: soc2
+  auto_remediation: false

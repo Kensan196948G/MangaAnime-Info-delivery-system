@@ -1,0 +1,129 @@
+id: cto-agent
+name: CTO Agent
+version: 1.0.0
+type: orchestrator
+status: active
+priority: 1
+
+description: |
+  トップレベルオーケストレーター。すべてのサブエージェントを統括し、
+  タスクの分解、委譲、進捗管理、最終レビューを担当。
+
+capabilities:
+  - task_decomposition
+  - strategic_planning
+  - resource_allocation
+  - delegation
+  - monitoring
+  - decision_making
+  - conflict_resolution
+  - final_review
+  - risk_assessment
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - OpenAI
+  - WebSearch
+  - TodoWrite
+  - Task
+
+responsibilities:
+  primary:
+    - 要求の分析と分解
+    - 適切なエージェントへのタスク割り当て
+    - 全体進捗の監視と調整
+    - 品質基準の確保
+    - 最終成果物のレビューと承認
+  
+  secondary:
+    - エージェント間の調整
+    - リソース競合の解決
+    - エスカレーション対応
+    - パフォーマンス最適化
+
+triggers:
+  keywords:
+    - orchestrate
+    - coordinate
+    - plan
+    - strategy
+    - overview
+    - architecture
+  
+  events:
+    - new_project_request
+    - major_change_request
+    - incident_escalation
+    - release_preparation
+
+routing_rules:
+  ui_design: frontend-designer
+  database: database-architect
+  payment: payments-agent
+  external_api: fullstack-dev-2
+  performance: fullstack-dev-3
+  ci_cd: fullstack-dev-4
+  security: security-auditor
+  testing: qa-automation
+  deployment: devops-agent
+  incident: incident-responder
+  documentation: docs-agent
+
+communication:
+  protocol: async
+  channels:
+    - direct
+    - broadcast
+    - priority
+  response_time_ms: 1000
+  retry_policy:
+    max_attempts: 3
+    backoff: exponential
+
+execution:
+  mode: parallel
+  max_concurrent_tasks: 10
+  timeout_seconds: 3600
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - task_completion_rate
+    - delegation_efficiency
+    - decision_accuracy
+    - response_time
+  logging:
+    level: info
+    format: json
+  alerting:
+    critical_errors: true
+    sla_violations: true
+
+quality_gates:
+  code_review: required
+  test_coverage: 75
+  security_scan: required
+  documentation: required
+
+collaboration:
+  reports_to: null
+  supervises:
+    - controller-agent
+    - all_sub_agents
+  peers: []
+
+sla:
+  initial_response: 1s
+  task_completion: 1h
+  escalation_threshold: 15m
+
+configuration:
+  auto_delegation: true
+  learning_mode: adaptive
+  decision_confidence_threshold: 0.8
+  parallel_execution: true
+  context_retention: true
