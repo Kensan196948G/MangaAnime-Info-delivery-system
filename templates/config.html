@@ -69,8 +69,8 @@
                         </div>
 
                         <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="anilist" name="anilist" 
-                                   {% if config.enabled_sources.anilist %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" id="anilist" name="anilist"
+                                   {% if config.get('enabled_sources', {}).get('anilist', True) %}checked{% endif %}>
                             <label class="form-check-label" for="anilist">
                                 <strong>AniList GraphQL API</strong>
                                 <div class="text-muted small">アニメの放送予定・配信プラットフォーム情報</div>
@@ -79,7 +79,7 @@
 
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="shobo_calendar" name="shobo_calendar"
-                                   {% if config.enabled_sources.shobo_calendar %}checked{% endif %}>
+                                   {% if config.get('enabled_sources', {}).get('shobo_calendar', True) %}checked{% endif %}>
                             <label class="form-check-label" for="shobo_calendar">
                                 <strong>しょぼいカレンダーAPI</strong>
                                 <div class="text-muted small">日本国内TV放送スケジュール</div>
@@ -88,7 +88,7 @@
 
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="bookwalker_rss" name="bookwalker_rss"
-                                   {% if config.enabled_sources.bookwalker_rss %}checked{% endif %}>
+                                   {% if config.get('enabled_sources', {}).get('bookwalker_rss', True) %}checked{% endif %}>
                             <label class="form-check-label" for="bookwalker_rss">
                                 <strong>BookWalker RSS</strong>
                                 <div class="text-muted small">電子書籍の新刊情報</div>
@@ -97,7 +97,7 @@
 
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="mangapocket_rss" name="mangapocket_rss"
-                                   {% if config.enabled_sources.mangapocket_rss %}checked{% endif %}>
+                                   {% if config.get('enabled_sources', {}).get('mangapocket_rss', True) %}checked{% endif %}>
                             <label class="form-check-label" for="mangapocket_rss">
                                 <strong>マガポケ RSS</strong>
                                 <div class="text-muted small">マガジンポケットの更新情報</div>
@@ -127,7 +127,7 @@
                                 
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" id="email_enabled" name="email_enabled"
-                                           {% if config.email.enabled %}checked{% endif %}>
+                                           {% if config.get('email', {}).get('enabled', False) %}checked{% endif %}>
                                     <label class="form-check-label" for="email_enabled">
                                         <strong>メール通知を有効にする</strong>
                                         <div class="text-muted small">新しいリリース情報をメールで受信します</div>
@@ -138,8 +138,8 @@
                                     <label for="email_subject_prefix" class="form-label">
                                         メール件名プレフィックス
                                     </label>
-                                    <input type="text" class="form-control" id="email_subject_prefix" 
-                                           name="email_subject_prefix" value="{{ config.email.subject_prefix or 'MangaAnime配信システム' }}"
+                                    <input type="text" class="form-control" id="email_subject_prefix"
+                                           name="email_subject_prefix" value="{{ config.get('email', {}).get('subject_prefix', 'MangaAnime配信システム') }}"
                                            placeholder="MangaAnime配信システム">
                                     <div class="form-text">
                                         メールの件名の先頭に付けるテキストを設定してください
@@ -151,8 +151,8 @@
                                         メールフォーマット
                                     </label>
                                     <select class="form-select" id="email_format" name="email_format">
-                                        <option value="html" {% if config.email.format == 'html' %}selected{% endif %}>HTML形式（推奨）</option>
-                                        <option value="plain" {% if config.email.format == 'plain' %}selected{% endif %}>テキスト形式</option>
+                                        <option value="html" {% if config.get('email', {}).get('format', 'html') == 'html' %}selected{% endif %}>HTML形式（推奨）</option>
+                                        <option value="plain" {% if config.get('email', {}).get('format', 'html') == 'plain' %}selected{% endif %}>テキスト形式</option>
                                     </select>
                                     <div class="form-text">
                                         メールの形式を選択してください
@@ -168,7 +168,7 @@
 
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" id="calendar_enabled" name="calendar_enabled"
-                                           {% if config.calendar.enabled %}checked{% endif %}>
+                                           {% if config.get('calendar', {}).get('enabled', False) %}checked{% endif %}>
                                     <label class="form-check-label" for="calendar_enabled">
                                         <strong>Googleカレンダー連携を有効にする</strong>
                                         <div class="text-muted small">リリース予定をカレンダーに自動登録します</div>
@@ -179,8 +179,8 @@
                                     <label for="calendar_id" class="form-label">
                                         カレンダーID
                                     </label>
-                                    <input type="text" class="form-control" id="calendar_id" 
-                                           name="calendar_id" value="{{ config.calendar.calendar_id or 'primary' }}"
+                                    <input type="text" class="form-control" id="calendar_id"
+                                           name="calendar_id" value="{{ config.get('calendar', {}).get('calendar_id', 'primary') }}"
                                            placeholder="primary">
                                     <div class="form-text">
                                         イベントを追加するGoogleカレンダーのIDを設定してください
@@ -192,9 +192,9 @@
                                         イベント期間（分）
                                     </label>
                                     <select class="form-select" id="calendar_event_duration" name="calendar_event_duration">
-                                        <option value="30" {% if config.calendar.event_duration == 30 %}selected{% endif %}>30分</option>
-                                        <option value="60" {% if config.calendar.event_duration == 60 %}selected{% endif %}>1時間</option>
-                                        <option value="120" {% if config.calendar.event_duration == 120 %}selected{% endif %}>2時間</option>
+                                        <option value="30" {% if config.get('calendar', {}).get('event_duration', 60) == 30 %}selected{% endif %}>30分</option>
+                                        <option value="60" {% if config.get('calendar', {}).get('event_duration', 60) == 60 %}selected{% endif %}>1時間</option>
+                                        <option value="120" {% if config.get('calendar', {}).get('event_duration', 60) == 120 %}selected{% endif %}>2時間</option>
                                     </select>
                                     <div class="form-text">
                                         カレンダーイベントの継続時間を設定してください
@@ -216,21 +216,21 @@
                                     <div class="col-md-6">
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="notify_anime" name="notify_anime"
-                                                   {% if config.notifications.anime %}checked{% endif %}>
+                                                   {% if config.get('notifications', {}).get('anime', True) %}checked{% endif %}>
                                             <label class="form-check-label" for="notify_anime">
                                                 アニメの新エピソード配信
                                             </label>
                                         </div>
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="notify_manga" name="notify_manga"
-                                                   {% if config.notifications.manga %}checked{% endif %}>
+                                                   {% if config.get('notifications', {}).get('manga', True) %}checked{% endif %}>
                                             <label class="form-check-label" for="notify_manga">
                                                 マンガの新巻発売
                                             </label>
                                         </div>
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" id="notify_updates" name="notify_updates"
-                                                   {% if config.notifications.updates %}checked{% endif %}>
+                                                   {% if config.get('notifications', {}).get('updates', True) %}checked{% endif %}>
                                             <label class="form-check-label" for="notify_updates">
                                                 作品情報の更新
                                             </label>
@@ -242,10 +242,10 @@
                                                 最小通知間隔（分）
                                             </label>
                                             <select class="form-select" id="min_notification_interval" name="min_notification_interval">
-                                                <option value="15" {% if config.notifications.min_interval == 15 %}selected{% endif %}>15分</option>
-                                                <option value="30" {% if config.notifications.min_interval == 30 %}selected{% endif %}>30分</option>
-                                                <option value="60" {% if config.notifications.min_interval == 60 %}selected{% endif %}>1時間</option>
-                                                <option value="180" {% if config.notifications.min_interval == 180 %}selected{% endif %}>3時間</option>
+                                                <option value="15" {% if config.get('notifications', {}).get('min_interval', 60) == 15 %}selected{% endif %}>15分</option>
+                                                <option value="30" {% if config.get('notifications', {}).get('min_interval', 60) == 30 %}selected{% endif %}>30分</option>
+                                                <option value="60" {% if config.get('notifications', {}).get('min_interval', 60) == 60 %}selected{% endif %}>1時間</option>
+                                                <option value="180" {% if config.get('notifications', {}).get('min_interval', 60) == 180 %}selected{% endif %}>3時間</option>
                                             </select>
                                             <div class="form-text">
                                                 同じ作品の通知を送信する最小間隔を設定してください
@@ -257,11 +257,11 @@
                                                 1日あたりの最大通知数
                                             </label>
                                             <select class="form-select" id="max_notifications_per_day" name="max_notifications_per_day">
-                                                <option value="10" {% if config.notifications.max_per_day == 10 %}selected{% endif %}>10件</option>
-                                                <option value="25" {% if config.notifications.max_per_day == 25 %}selected{% endif %}>25件</option>
-                                                <option value="50" {% if config.notifications.max_per_day == 50 %}selected{% endif %}>50件</option>
-                                                <option value="100" {% if config.notifications.max_per_day == 100 %}selected{% endif %}>100件</option>
-                                                <option value="0" {% if config.notifications.max_per_day == 0 %}selected{% endif %}>制限なし</option>
+                                                <option value="10" {% if config.get('notifications', {}).get('max_per_day', 50) == 10 %}selected{% endif %}>10件</option>
+                                                <option value="25" {% if config.get('notifications', {}).get('max_per_day', 50) == 25 %}selected{% endif %}>25件</option>
+                                                <option value="50" {% if config.get('notifications', {}).get('max_per_day', 50) == 50 %}selected{% endif %}>50件</option>
+                                                <option value="100" {% if config.get('notifications', {}).get('max_per_day', 50) == 100 %}selected{% endif %}>100件</option>
+                                                <option value="0" {% if config.get('notifications', {}).get('max_per_day', 50) == 0 %}selected{% endif %}>制限なし</option>
                                             </select>
                                             <div class="form-text">
                                                 スパムを防ぐため、1日あたりの通知数制限を設定してください
