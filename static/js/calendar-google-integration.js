@@ -75,10 +75,14 @@
             return;
         }
 
+        // グローバル変数に保存（バッチ処理用）
+        window.allReleasesForCalendar = allReleases;
+
         const confirmed = confirm(
             `今月の全リリース ${allReleases.length}件をGoogleカレンダーに個別登録しますか？\n\n` +
-            `⚠️ 多数のタブが開きます（${allReleases.length}個）\n` +
-            `10件ずつ登録することを推奨します。\n\n` +
+            `📌 各リリースが別々のイベントとして登録されます\n` +
+            `⚠️ ${allReleases.length}個のタブが開きます\n` +
+            `💡 10件ずつバッチ処理で登録します\n\n` +
             `続行しますか？`
         );
 
@@ -88,13 +92,13 @@
         const batchSize = 10;
         const batches = Math.ceil(allReleases.length / batchSize);
 
-        if (batches > 1) {
-            const proceedBatch = confirm(
-                `${allReleases.length}件を${batches}回に分けて登録します。\n` +
-                `まず最初の${Math.min(batchSize, allReleases.length)}件を登録しますか？`
-            );
-            if (!proceedBatch) return;
-        }
+        alert(
+            `📊 登録処理を開始します\n\n` +
+            `総件数: ${allReleases.length}件\n` +
+            `バッチ数: ${batches}回\n` +
+            `1バッチ: 最大10件\n\n` +
+            `まず最初の${Math.min(batchSize, allReleases.length)}件を開きます。`
+        );
 
         // 最初のバッチを開く
         const firstBatch = allReleases.slice(0, batchSize);
