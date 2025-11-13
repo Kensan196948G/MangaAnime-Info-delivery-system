@@ -21,6 +21,16 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 
+# カスタムJinja2フィルター
+@app.template_filter('strptime')
+def strptime_filter(date_string, format='%Y-%m-%d'):
+    """文字列を日付オブジェクトに変換するフィルター"""
+    from datetime import datetime
+    try:
+        return datetime.strptime(date_string, format)
+    except (ValueError, TypeError):
+        return None
+
 # Configuration
 DATABASE_PATH = "db.sqlite3"
 CONFIG_PATH = "config.json"
