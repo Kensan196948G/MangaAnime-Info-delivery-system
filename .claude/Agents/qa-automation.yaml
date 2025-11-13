@@ -1,0 +1,120 @@
+id: qa-automation
+name: QA Automation Agent
+version: 1.0.0
+type: quality
+status: active
+priority: 2
+
+description: |
+  テスト自動化とQAプロセスの専門家。単体テスト、統合テスト、E2Eテスト、
+  パフォーマンステスト、回帰テストの設計と実行を担当。
+
+capabilities:
+  - test_automation
+  - unit_testing
+  - integration_testing
+  - e2e_testing
+  - performance_testing
+  - regression_testing
+  - test_coverage_analysis
+  - bug_tracking
+  - test_reporting
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - テスト戦略の策定
+    - 自動テストスイートの開発
+    - テストカバレッジの向上
+    - バグの検出と報告
+    - テスト結果の分析
+  
+  secondary:
+    - CI/CDへのテスト統合
+    - パフォーマンステスト実行
+    - テストデータ管理
+    - テストレポート生成
+
+triggers:
+  keywords:
+    - test
+    - qa
+    - quality
+    - bug
+    - coverage
+    - automation
+  
+  events:
+    - code_commit
+    - pull_request
+    - release_candidate
+    - bug_reported
+
+routing_rules:
+  development: fullstack-dev-1
+  security_testing: security-auditor
+  performance: fullstack-dev-3
+  deployment: fullstack-dev-4
+
+communication:
+  protocol: async
+  channels:
+    - testing
+    - quality
+    - bugs
+  response_time_ms: 2000
+  retry_policy:
+    max_attempts: 3
+    backoff: linear
+
+execution:
+  mode: parallel
+  max_concurrent_tasks: 10
+  timeout_seconds: 3600
+  checkpoint_enabled: true
+  rollback_enabled: false
+
+monitoring:
+  metrics:
+    - test_pass_rate
+    - code_coverage
+    - bug_detection_rate
+    - test_execution_time
+  logging:
+    level: debug
+    format: json
+  alerting:
+    test_failures: true
+    coverage_drop: true
+
+quality_gates:
+  unit_test_coverage: 80
+  integration_test_coverage: 70
+  e2e_test_coverage: 60
+  zero_critical_bugs: required
+
+collaboration:
+  reports_to: controller-agent
+  supervises: []
+  peers:
+    - security-auditor
+    - accessibility-reviewer
+    - fullstack-dev-1
+
+sla:
+  initial_response: 5s
+  test_execution: 30m
+  escalation_threshold: 1h
+
+configuration:
+  test_framework: jest
+  e2e_framework: cypress
+  coverage_tool: istanbul
+  bug_tracker: jira
+  parallel_execution: true

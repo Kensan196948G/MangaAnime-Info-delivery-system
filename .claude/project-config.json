@@ -1,0 +1,81 @@
+{
+  "name": "Integrated-AI-Development-Environment",
+  "version": "1.0.0",
+  "description": "SubAgent + Claude-flow + Context7 + SerenaMCP統合開発環境",
+  "autoEnable": true,
+  "features": {
+    "subagent": {
+      "enabled": true,
+      "path": "~/.claude/agents/",
+      "parallelExecution": true,
+      "maxConcurrent": 10,
+      "autoDelegate": true
+    },
+    "claudeFlow": {
+      "enabled": true,
+      "swarmMode": true,
+      "alphaVersion": true,
+      "features": {
+        "hiveMind": {
+          "enabled": true,
+          "layers": ["cognitive", "reactive", "adaptive"],
+          "syncInterval": 100
+        },
+        "neuralEnhanced": {
+          "enabled": true,
+          "model": "advanced",
+          "learningRate": 0.001
+        },
+        "mcpTools": {
+          "enabled": true,
+          "toolCount": 87,
+          "autoLoad": true
+        },
+        "sqliteMemory": {
+          "enabled": true,
+          "persistentStorage": true,
+          "cacheSizeMB": 512
+        },
+        "githubIntegration": {
+          "enabled": true,
+          "autoSync": true,
+          "webhooks": true
+        },
+        "workflowAutomation": {
+          "enabled": true,
+          "triggers": ["commit", "push", "pr", "issue"]
+        },
+        "hookSystem": {
+          "enabled": true,
+          "globalHooks": true,
+          "localHooks": true
+        }
+      }
+    },
+    "context7": {
+      "enabled": true,
+      "layers": 7,
+      "contextWindow": 200000,
+      "multiModal": true,
+      "adaptiveContext": true
+    },
+    "serenaMCP": {
+      "enabled": true,
+      "protocol": "advanced",
+      "streaming": true,
+      "compression": true
+    }
+  },
+  "startup": {
+    "autoInit": true,
+    "preloadAgents": true,
+    "warmCache": true,
+    "connectServices": true
+  },
+  "performance": {
+    "parallelProcessing": true,
+    "gpuAcceleration": false,
+    "distributedComputing": true,
+    "caching": "aggressive"
+  }
+}

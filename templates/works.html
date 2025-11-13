@@ -1,0 +1,502 @@
+{% extends "base.html" %}
+
+{% block title %}作品一覧{% if current_type %} - {{ current_type|work_type_label }}{% endif %} - MangaAnime Info Delivery System{% endblock %}
+
+{% block meta_description %}
+アニメ・マンガ作品の一覧を表示。タイプ別フィルタリングと検索機能を提供。
+{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="bi bi-collection me-2" aria-hidden="true"></i>
+                    作品一覧
+                    {% if current_type %}
+                        <small class="text-muted">- {{ current_type|work_type_label }}</small>
+                    {% endif %}
+                </h1>
+                <p class="text-muted mb-0">
+                    {% if total_count %}
+                        {{ total_count }}件の作品が登録されています
+                    {% else %}
+                        登録された作品がありません
+                    {% endif %}
+                </p>
+            </div>
+            <div class="mt-2 mt-md-0">
+                <button class="btn btn-outline-secondary" onclick="toggleFilters()" 
+                        aria-expanded="false" aria-controls="filterSection">
+                    <i class="bi bi-funnel me-2" aria-hidden="true"></i>
+                    フィルター
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- フィルターセクション -->
+<div class="row mb-4" id="filterSection" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3" role="search" aria-label="作品検索フィルター">
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">
+                            <i class="bi bi-search me-1" aria-hidden="true"></i>
+                            作品名検索
+                        </label>
+                        <input type="text" class="form-control" id="search" name="q" 
+                               value="{{ search_query }}" 
+                               placeholder="作品名を入力..."
+                               aria-describedby="searchHelp">
+                        <div id="searchHelp" class="form-text">
+                            日本語タイトル、読み仮名、英語タイトルから検索できます
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="type" class="form-label">
+                            <i class="bi bi-tag me-1" aria-hidden="true"></i>
+                            作品種別
+                        </label>
+                        <select class="form-select" id="type" name="type" aria-describedby="typeHelp">
+                            <option value="">すべて</option>
+                            <option value="anime"{% if current_type == 'anime' %} selected{% endif %}>アニメ</option>
+                            <option value="manga"{% if current_type == 'manga' %} selected{% endif %}>マンガ</option>
+                        </select>
+                        <div id="typeHelp" class="form-text">
+                            作品の種別でフィルタリング
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="sort" class="form-label">
+                            <i class="bi bi-sort-down me-1" aria-hidden="true"></i>
+                            並び順
+                        </label>
+                        <select class="form-select" id="sort" name="sort">
+                            <option value="newest">新着順</option>
+                            <option value="title">タイトル順</option>
+                            <option value="releases">リリース数順</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="w-100">
+                            <button type="submit" class="btn btn-primary w-100 mb-2">
+                                <i class="bi bi-search me-1" aria-hidden="true"></i>
+                                検索
+                            </button>
+                            <a href="{{ url_for('works') }}" class="btn btn-outline-secondary w-100 btn-sm">
+                                リセット
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- クイックフィルター -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap gap-2">
+            <span class="align-self-center text-muted me-2">クイックフィルター:</span>
+            <a href="{{ url_for('works') }}" 
+               class="btn btn-sm {% if not current_type %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                すべて
+            </a>
+            <a href="{{ url_for('works', type='anime') }}" 
+               class="btn btn-sm {% if current_type == 'anime' %}btn-success{% else %}btn-outline-success{% endif %}">
+                <i class="bi bi-play-circle me-1" aria-hidden="true"></i>
+                アニメ
+            </a>
+            <a href="{{ url_for('works', type='manga') }}" 
+               class="btn btn-sm {% if current_type == 'manga' %}btn-info{% else %}btn-outline-info{% endif %}">
+                <i class="bi bi-book me-1" aria-hidden="true"></i>
+                マンガ
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 作品一覧 -->
+<div class="row">
+    {% if works %}
+        {% for work in works %}
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="card h-100 work-card" data-work-id="{{ work.id }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-{% if work.type == 'anime' %}success{% else %}info{% endif %} mb-2">
+                            <i class="bi bi-{% if work.type == 'anime' %}play-circle{% else %}book{% endif %} me-1" aria-hidden="true"></i>
+                            {{ work.type|work_type_label }}
+                        </span>
+                        {% if work.release_count %}
+                        <span class="badge bg-light text-dark">
+                            <i class="bi bi-collection me-1" aria-hidden="true"></i>
+                            {{ work.release_count }}件
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <h3 class="card-title h5 mb-2">
+                        <a href="{{ url_for('work_detail', work_id=work.id) }}" 
+                           class="text-decoration-none text-reset stretched-link">
+                            {{ work.title }}
+                        </a>
+                    </h3>
+                    
+                    {% if work.title_kana %}
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-quote me-1" aria-hidden="true"></i>
+                        {{ work.title_kana }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if work.title_en %}
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-translate me-1" aria-hidden="true"></i>
+                        {{ work.title_en }}
+                    </p>
+                    {% endif %}
+                    
+                    <div class="mt-auto">
+                        <div class="row g-2 small text-muted">
+                            <div class="col-6">
+                                <i class="bi bi-calendar-plus me-1" aria-hidden="true"></i>
+                                登録: {{ work.created_at|datetime_format('%Y-%m-%d') }}
+                            </div>
+                            {% if work.latest_release %}
+                            <div class="col-6 text-end">
+                                <i class="bi bi-calendar-event me-1" aria-hidden="true"></i>
+                                最新: {{ work.latest_release|datetime_format('%Y-%m-%d') }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if work.official_url %}
+                <div class="card-footer bg-transparent border-top-0 pt-0">
+                    <a href="{{ work.official_url }}" target="_blank" rel="noopener" 
+                       class="btn btn-sm btn-outline-primary w-100">
+                        <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>
+                        公式サイト
+                        <span class="visually-hidden">（新しいタブで開く）</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- ページネーション -->
+        {% if pagination.total_pages > 1 %}
+        <div class="col-12">
+            <nav aria-label="作品一覧ページネーション" class="d-flex justify-content-center">
+                <ul class="pagination pagination-lg">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('works', page=pagination.prev_page, type=current_type, q=search_query) }}" 
+                           aria-label="前のページ">
+                            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                            <span class="visually-hidden">前のページ</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-label="前のページ（無効）">
+                            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                        </span>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in range(1, pagination.total_pages + 1) %}
+                        {% if page_num <= 3 or page_num > pagination.total_pages - 3 or (page_num >= pagination.current_page - 1 and page_num <= pagination.current_page + 1) %}
+                            <li class="page-item {% if page_num == pagination.current_page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('works', page=page_num, type=current_type, q=search_query) }}"
+                                   {% if page_num == pagination.current_page %}aria-current="page"{% endif %}>
+                                    {{ page_num }}
+                                    {% if page_num == pagination.current_page %}
+                                        <span class="visually-hidden">（現在のページ）</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                        {% elif page_num == 4 and pagination.current_page > 5 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% elif page_num == pagination.total_pages - 3 and pagination.current_page < pagination.total_pages - 4 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('works', page=pagination.next_page, type=current_type, q=search_query) }}" 
+                           aria-label="次のページ">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                            <span class="visually-hidden">次のページ</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-label="次のページ（無効）">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                        </span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            
+            <!-- ページネーション情報 -->
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    {{ ((pagination.current_page - 1) * 20) + 1 }} - {{ min(pagination.current_page * 20, total_count) }} 件 
+                    （全 {{ total_count }} 件中）
+                </small>
+            </div>
+        </div>
+        {% endif %}
+        
+    {% else %}
+        <!-- 空の状態 -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted mb-3 d-block" aria-hidden="true"></i>
+                    
+                    {% if search_query or current_type %}
+                    <h3 class="h4 text-muted mb-3">検索条件に一致する作品が見つかりません</h3>
+                    <p class="text-muted mb-4">
+                        {% if search_query %}検索キーワード: <strong>{{ search_query }}</strong><br>{% endif %}
+                        {% if current_type %}作品種別: <strong>{{ current_type|work_type_label }}</strong>{% endif %}
+                    </p>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        <a href="{{ url_for('works') }}" class="btn btn-primary">
+                            <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>
+                            すべての作品を見る
+                        </a>
+                        <button onclick="clearSearch()" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-2" aria-hidden="true"></i>
+                            検索をクリア
+                        </button>
+                    </div>
+                    {% else %}
+                    <h3 class="h4 text-muted mb-3">まだ作品が登録されていません</h3>
+                    <p class="text-muted mb-4">
+                        データ収集を実行すると、アニメやマンガの作品情報がここに表示されます。
+                    </p>
+                    <a href="{{ url_for('config') }}" class="btn btn-primary">
+                        <i class="bi bi-gear me-2" aria-hidden="true"></i>
+                        設定を確認する
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.work-card {
+    transition: var(--transition-base);
+    position: relative;
+}
+
+.work-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.work-card .stretched-link::after {
+    z-index: 1;
+}
+
+.work-card .btn {
+    position: relative;
+    z-index: 2;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+@media (max-width: 768px) {
+    .pagination-lg .page-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* フィルターセクションのアニメーション */
+#filterSection {
+    transition: all 0.3s ease-in-out;
+}
+
+#filterSection.show {
+    display: block !important;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 検索フォームのフォーカス状態 */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--focus-color);
+    box-shadow: var(--focus-shadow);
+}
+
+/* アクセシビリティ: 高コントラストモード */
+@media (prefers-contrast: high) {
+    .work-card {
+        border: 2px solid currentColor;
+    }
+    
+    .badge {
+        border: 1px solid currentColor;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// フィルター表示切り替え
+function toggleFilters() {
+    const filterSection = document.getElementById('filterSection');
+    const isVisible = filterSection.style.display !== 'none';
+    
+    if (isVisible) {
+        filterSection.style.display = 'none';
+        document.querySelector('[onclick="toggleFilters()"]').setAttribute('aria-expanded', 'false');
+    } else {
+        filterSection.style.display = 'block';
+        filterSection.classList.add('show');
+        document.querySelector('[onclick="toggleFilters()"]').setAttribute('aria-expanded', 'true');
+        
+        // フィルター内の最初の入力フィールドにフォーカス
+        const firstInput = filterSection.querySelector('input, select');
+        if (firstInput) {
+            firstInput.focus();
+        }
+    }
+}
+
+// 検索クリア
+function clearSearch() {
+    const form = document.querySelector('form[role="search"]');
+    if (form) {
+        form.reset();
+        form.submit();
+    }
+}
+
+// キーボードショートカット
+document.addEventListener('keydown', function(e) {
+    if (e.altKey) {
+        switch(e.key.toLowerCase()) {
+            case 'f':
+                e.preventDefault();
+                toggleFilters();
+                break;
+            case 's':
+                e.preventDefault();
+                const searchInput = document.getElementById('search');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+                break;
+        }
+    }
+    
+    // Escキーでフィルターを閉じる
+    if (e.key === 'Escape') {
+        const filterSection = document.getElementById('filterSection');
+        if (filterSection.style.display !== 'none') {
+            toggleFilters();
+        }
+    }
+});
+
+// ページロード時の初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // URLパラメータからフィルターが設定されている場合、フィルターを表示
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('q') || urlParams.get('type')) {
+        const filterSection = document.getElementById('filterSection');
+        filterSection.style.display = 'block';
+        document.querySelector('[onclick="toggleFilters()"]').setAttribute('aria-expanded', 'true');
+    }
+    
+    // 無限スクロールのような効果を追加（オプション）
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in-up');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+    
+    // 全ての作品カードを監視
+    document.querySelectorAll('.work-card').forEach(card => {
+        observer.observe(card);
+    });
+    
+    // 作品カードのアクセシビリティ向上
+    document.querySelectorAll('.work-card').forEach(card => {
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const link = this.querySelector('.stretched-link');
+                if (link && !e.target.closest('.btn')) {
+                    e.preventDefault();
+                    link.click();
+                }
+            }
+        });
+        
+        // フォーカス可能にする
+        if (!card.hasAttribute('tabindex')) {
+            card.setAttribute('tabindex', '0');
+        }
+    });
+});
+
+// パフォーマンス: 画像遅延読み込み（将来の機能拡張用）
+if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
+            }
+        });
+    });
+    
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+    });
+}
+</script>
+{% endblock %}

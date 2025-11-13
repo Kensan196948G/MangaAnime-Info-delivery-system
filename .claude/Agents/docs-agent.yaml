@@ -1,0 +1,120 @@
+id: docs-agent
+name: Documentation Agent
+version: 1.0.0
+type: documentation
+status: active
+priority: 3
+
+description: |
+  技術文書とユーザーガイドの専門家。API仕様書、開発ドキュメント、
+  ユーザーマニュアル、チュートリアル、リリースノートの作成を担当。
+
+capabilities:
+  - technical_writing
+  - api_documentation
+  - user_guides
+  - tutorial_creation
+  - release_notes
+  - code_documentation
+  - diagram_creation
+  - markdown_formatting
+  - openapi_spec
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - API仕様書の作成と管理
+    - 技術ドキュメントの執筆
+    - ユーザーガイドの作成
+    - チュートリアル開発
+    - リリースノート作成
+  
+  secondary:
+    - コード内ドキュメント改善
+    - ダイアグラム作成
+    - ドキュメントサイト管理
+    - 多言語ドキュメント調整
+
+triggers:
+  keywords:
+    - documentation
+    - docs
+    - api-spec
+    - guide
+    - tutorial
+    - readme
+  
+  events:
+    - feature_completed
+    - api_changed
+    - release_planned
+    - documentation_request
+
+routing_rules:
+  api_details: fullstack-dev-1
+  ui_documentation: frontend-designer
+  translation: localization-agent
+  review: controller-agent
+
+communication:
+  protocol: async
+  channels:
+    - documentation
+    - updates
+    - review
+  response_time_ms: 3000
+  retry_policy:
+    max_attempts: 3
+    backoff: linear
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 5
+  timeout_seconds: 7200
+  checkpoint_enabled: true
+  rollback_enabled: false
+
+monitoring:
+  metrics:
+    - documentation_coverage
+    - update_frequency
+    - readability_score
+    - user_satisfaction
+  logging:
+    level: info
+    format: json
+  alerting:
+    outdated_docs: true
+    missing_docs: true
+
+quality_gates:
+  api_documented: required
+  examples_provided: required
+  reviewed: required
+  up_to_date: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - localization-agent
+    - frontend-designer
+    - fullstack-dev-1
+
+sla:
+  initial_response: 10s
+  documentation_delivery: 24h
+  escalation_threshold: 2h
+
+configuration:
+  doc_format: markdown
+  api_spec: openapi_3
+  doc_site: docusaurus
+  version_control: true
+  auto_generate: partial

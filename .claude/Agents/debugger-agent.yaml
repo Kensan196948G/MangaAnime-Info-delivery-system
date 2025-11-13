@@ -1,0 +1,120 @@
+id: debugger-agent
+name: Debugger Agent
+version: 1.0.0
+type: operations
+status: active
+priority: 2
+
+description: |
+  デバッグとトラブルシューティングの専門家。バグ特定、プロファイリング、
+  トレース分析、メモリリーク検出、パフォーマンス問題の診断を担当。
+
+capabilities:
+  - bug_diagnosis
+  - profiling
+  - trace_analysis
+  - memory_leak_detection
+  - performance_debugging
+  - log_analysis
+  - stack_trace_analysis
+  - remote_debugging
+  - core_dump_analysis
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - バグの特定と診断
+    - パフォーマンスプロファイリング
+    - メモリリーク検出
+    - ログ分析と相関
+    - 根本原因の特定
+  
+  secondary:
+    - デバッグツール設定
+    - トレース収集
+    - 修正提案
+    - デバッグガイド作成
+
+triggers:
+  keywords:
+    - debug
+    - bug
+    - error
+    - crash
+    - memory-leak
+    - trace
+  
+  events:
+    - bug_reported
+    - performance_issue
+    - application_crash
+    - memory_alert
+
+routing_rules:
+  fix_implementation: fullstack-dev-1
+  performance: fullstack-dev-3
+  incident: incident-responder
+  testing: qa-automation
+
+communication:
+  protocol: async
+  channels:
+    - debugging
+    - diagnostics
+    - fixes
+  response_time_ms: 1000
+  retry_policy:
+    max_attempts: 3
+    backoff: linear
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 3
+  timeout_seconds: 3600
+  checkpoint_enabled: true
+  rollback_enabled: false
+
+monitoring:
+  metrics:
+    - bug_resolution_time
+    - root_cause_accuracy
+    - performance_improvement
+    - debug_efficiency
+  logging:
+    level: trace
+    format: json
+  alerting:
+    critical_bugs: true
+    memory_issues: true
+
+quality_gates:
+  root_cause_identified: required
+  fix_validated: required
+  regression_tested: required
+  documentation_updated: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - incident-responder
+    - qa-automation
+    - fullstack-dev-1
+
+sla:
+  initial_response: 5s
+  diagnosis_completion: 2h
+  escalation_threshold: 30m
+
+configuration:
+  profiler: enabled
+  debugger: chrome_devtools
+  apm_tool: newrelic
+  log_aggregator: elasticsearch
+  trace_sampling: 100

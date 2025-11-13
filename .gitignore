@@ -87,14 +87,35 @@ coverage.xml
 docs/_build/
 site/
 
-# Claude Code specific
-.claude/
+# Claude Code specific (except important config directories)
+.claude/memory.db*
+.claude/reports/
 claude-*.log
+
+# Swarm memory databases
+.swarm/
 
 # System files
 *.pid
 *.seed
 *.pid.lock
+
+# Node.js dependencies
+node_modules/
+
+# Gmail authentication (個人情報)
+gmail_app_password.txt
+gmail_config.json
+
+# Database files
+*.db-shm
+*.db-wal
+
+# Integrity reports
+integrity_report_*.txt
+
+# Benchmark results
+benchmark_before.json
 
 # Runtime
 npm-debug.log*

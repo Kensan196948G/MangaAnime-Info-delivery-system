@@ -1,0 +1,158 @@
+{
+  "name": "Context7 Multi-Layer System",
+  "version": "2.0.0",
+  "enabled": true,
+  "autoInit": true,
+  
+  "layers": {
+    "layer1": {
+      "name": "Immediate Context",
+      "priority": 10,
+      "capacity": 8000,
+      "retention": "session",
+      "description": "Current task and immediate dependencies",
+      "features": {
+        "realtime": true,
+        "compression": false,
+        "indexing": true
+      }
+    },
+    "layer2": {
+      "name": "Working Memory",
+      "priority": 9,
+      "capacity": 32000,
+      "retention": "1hour",
+      "description": "Active project components and recent edits",
+      "features": {
+        "caching": true,
+        "versioning": true,
+        "deltaSync": true
+      }
+    },
+    "layer3": {
+      "name": "Project Context",
+      "priority": 8,
+      "capacity": 64000,
+      "retention": "24hours",
+      "description": "Full project structure and dependencies",
+      "features": {
+        "graphAnalysis": true,
+        "dependencyTree": true,
+        "semanticIndexing": true
+      }
+    },
+    "layer4": {
+      "name": "Domain Knowledge",
+      "priority": 7,
+      "capacity": 128000,
+      "retention": "7days",
+      "description": "Framework patterns and best practices",
+      "features": {
+        "patternRecognition": true,
+        "knowledgeGraph": true,
+        "aiInference": true
+      }
+    },
+    "layer5": {
+      "name": "Historical Context",
+      "priority": 6,
+      "capacity": 256000,
+      "retention": "30days",
+      "description": "Git history and evolution patterns",
+      "features": {
+        "gitIntegration": true,
+        "changeAnalysis": true,
+        "trendPrediction": true
+      }
+    },
+    "layer6": {
+      "name": "External Resources",
+      "priority": 5,
+      "capacity": 512000,
+      "retention": "90days",
+      "description": "Documentation, APIs, and external dependencies",
+      "features": {
+        "webCrawling": true,
+        "apiMonitoring": true,
+        "docsParsing": true
+      }
+    },
+    "layer7": {
+      "name": "Meta Context",
+      "priority": 4,
+      "capacity": 1024000,
+      "retention": "permanent",
+      "description": "Cross-project patterns and organizational knowledge",
+      "features": {
+        "crossReference": true,
+        "organizationalMemory": true,
+        "strategicPlanning": true
+      }
+    }
+  },
+  
+  "processing": {
+    "parallel": true,
+    "asyncLoading": true,
+    "lazyEvaluation": true,
+    "smartPrefetch": true,
+    "adaptivePriority": true
+  },
+  
+  "optimization": {
+    "compression": {
+      "enabled": true,
+      "algorithm": "zstd",
+      "level": 6
+    },
+    "deduplication": {
+      "enabled": true,
+      "method": "content-hash",
+      "scope": "global"
+    },
+    "pruning": {
+      "enabled": true,
+      "strategy": "lru-with-importance",
+      "threshold": 0.8
+    }
+  },
+  
+  "integration": {
+    "subagent": {
+      "shareContext": true,
+      "bidirectional": true
+    },
+    "claudeFlow": {
+      "syncLayers": [3, 4, 5],
+      "realtime": true
+    },
+    "serenaMCP": {
+      "protocol": "enhanced",
+      "streaming": true
+    }
+  },
+  
+  "multiModal": {
+    "enabled": true,
+    "types": ["text", "code", "images", "diagrams", "tables"],
+    "processing": {
+      "ocr": true,
+      "ast": true,
+      "semanticAnalysis": true
+    }
+  },
+  
+  "adaptiveContext": {
+    "enabled": true,
+    "learning": {
+      "userPatterns": true,
+      "projectEvolution": true,
+      "performanceMetrics": true
+    },
+    "adjustment": {
+      "automatic": true,
+      "threshold": 0.75,
+      "frequency": "5min"
+    }
+  }
+}

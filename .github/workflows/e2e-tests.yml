@@ -1,0 +1,339 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # 毎日午前2時（JST）に実行
+    - cron: '0 17 * * *'  # UTC 17:00 = JST 02:00
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'テスト対象ブラウザ'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - chromium
+        - firefox
+        - webkit
+      test_type:
+        description: 'テストの種類'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+        - smoke
+        - full
+      headed:
+        description: 'ヘッドレスモードを無効化'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  e2e-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: ${{ github.event.inputs.browser == 'all' && fromJson('["chromium", "firefox", "webkit"]') || fromJson('["' + github.event.inputs.browser + '"]') }}
+    
+    env:
+      TESTING: true
+      CI: true
+      NODE_ENV: test
+      DATABASE_URL: test_e2e_github.db
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flask sqlite3 requests python-dateutil
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Install Node.js dependencies
+      run: npm ci
+    
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+    
+    - name: Setup test database
+      run: |
+        python -c "
+        import sqlite3
+        
+        # テスト用データベース作成
+        conn = sqlite3.connect('test_e2e_github.db')
+        cursor = conn.cursor()
+        
+        # テーブル作成
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS works (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title TEXT NOT NULL,
+          title_kana TEXT,
+          title_en TEXT,
+          type TEXT CHECK(type IN ('anime','manga')),
+          official_url TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS releases (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          work_id INTEGER NOT NULL,
+          release_type TEXT CHECK(release_type IN ('episode','volume')),
+          number TEXT,
+          platform TEXT,
+          release_date DATE,
+          source TEXT,
+          source_url TEXT,
+          notified INTEGER DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(work_id, release_type, number, platform, release_date)
+        )
+        ''')
+        
+        # サンプルデータ投入
+        test_works = [
+          ('テストアニメ1', 'てすとあにめ1', 'Test Anime 1', 'anime', 'https://example.com/anime1'),
+          ('テストマンガ1', 'てすとまんが1', 'Test Manga 1', 'manga', 'https://example.com/manga1'),
+          ('GitHub Actions テストアニメ', 'ぎっとはぶあくしょんずてすとあにめ', 'GitHub Actions Test Anime', 'anime', 'https://example.com/gha-anime'),
+        ]
+        
+        for work in test_works:
+          cursor.execute('INSERT INTO works (title, title_kana, title_en, type, official_url) VALUES (?, ?, ?, ?, ?)', work)
+        
+        # リリースデータ
+        import datetime
+        today = datetime.date.today()
+        tomorrow = today + datetime.timedelta(days=1)
+        
+        test_releases = [
+          (1, 'episode', '1', 'Netflix', today.isoformat(), 'test_source', 'https://example.com/ep1', 0),
+          (1, 'episode', '2', 'Netflix', tomorrow.isoformat(), 'test_source', 'https://example.com/ep2', 0),
+          (2, 'volume', '1', 'BookWalker', today.isoformat(), 'test_source', 'https://example.com/vol1', 0),
+          (3, 'episode', '1', 'Amazon Prime', today.isoformat(), 'test_source', 'https://example.com/gha-ep1', 0),
+        ]
+        
+        for release in test_releases:
+          cursor.execute('INSERT INTO releases (work_id, release_type, number, platform, release_date, source, source_url, notified) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', release)
+        
+        conn.commit()
+        conn.close()
+        print('テスト用データベースとサンプルデータを作成しました')
+        "
+    
+    - name: Start application server
+      run: |
+        export FLASK_ENV=testing
+        export TESTING=true
+        export DATABASE_URL=test_e2e_github.db
+        python web_app.py &
+        echo $! > server.pid
+        
+        # サーバー起動待機
+        echo "Waiting for server to start..."
+        for i in {1..30}; do
+          if curl -s http://localhost:5000 > /dev/null; then
+            echo "Server is ready!"
+            break
+          fi
+          sleep 2
+          if [ $i -eq 30 ]; then
+            echo "Server failed to start"
+            exit 1
+          fi
+        done
+    
+    - name: Run Playwright E2E tests
+      run: |
+        BROWSER_ARG=""
+        if [ "${{ matrix.browser }}" != "all" ]; then
+          BROWSER_ARG="--project=${{ matrix.browser }}"
+        fi
+        
+        TEST_PATTERN=""
+        if [ "${{ github.event.inputs.test_type }}" = "smoke" ]; then
+          TEST_PATTERN="*navigation*"
+        fi
+        
+        HEADED_ARG=""
+        if [ "${{ github.event.inputs.headed }}" = "true" ]; then
+          HEADED_ARG="--headed"
+        fi
+        
+        npx playwright test $BROWSER_ARG $TEST_PATTERN $HEADED_ARG \
+          --reporter=html,junit,json \
+          --output-dir=tests/e2e/reports \
+          --workers=1 \
+          --timeout=60000 \
+          --retries=2
+    
+    - name: Stop application server
+      if: always()
+      run: |
+        if [ -f server.pid ]; then
+          kill $(cat server.pid) || true
+          rm server.pid
+        fi
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: e2e-test-results-${{ matrix.browser }}
+        path: |
+          tests/e2e/reports/
+          test-results/
+          playwright-report/
+        retention-days: 14
+    
+    - name: Upload screenshots on failure
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: e2e-screenshots-${{ matrix.browser }}
+        path: tests/e2e/test-results/
+        retention-days: 7
+    
+    - name: Comment test results on PR
+      uses: actions/github-script@v7
+      if: github.event_name == 'pull_request' && always()
+      with:
+        script: |
+          const fs = require('fs');
+          const path = 'tests/e2e/reports/test-results.json';
+          
+          if (!fs.existsSync(path)) {
+            console.log('テスト結果ファイルが見つかりません');
+            return;
+          }
+          
+          const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const stats = results.stats || {};
+          
+          const passed = stats.passed || 0;
+          const failed = stats.failed || 0;
+          const skipped = stats.skipped || 0;
+          const total = stats.total || 0;
+          const duration = Math.round((stats.duration || 0) / 1000);
+          
+          const successRate = total > 0 ? Math.round((passed / total) * 100) : 0;
+          const status = failed === 0 ? '✅' : '❌';
+          
+          const comment = `## ${status} E2Eテスト結果 (${{ matrix.browser }})
+          
+          | 項目 | 値 |
+          |------|-----|
+          | 合計テスト数 | ${total} |
+          | 成功 | ${passed} |
+          | 失敗 | ${failed} |
+          | スキップ | ${skipped} |
+          | 成功率 | ${successRate}% |
+          | 実行時間 | ${duration}秒 |
+          
+          ${failed > 0 ? '⚠️ 失敗したテストがあります。詳細はアーティファクトを確認してください。' : '🎉 すべてのテストが成功しました！'}
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: always()
+    
+    steps:
+    - name: Download all test artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: all-results
+    
+    - name: Generate test summary
+      run: |
+        echo "# E2Eテスト実行サマリー" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| ブラウザ | 状態 | アーティファクト |" >> $GITHUB_STEP_SUMMARY
+        echo "|---------|------|------------------|" >> $GITHUB_STEP_SUMMARY
+        
+        for browser in chromium firefox webkit; do
+          if [ -d "all-results/e2e-test-results-$browser" ]; then
+            echo "| $browser | ✅ 実行済み | [結果を表示](./all-results/e2e-test-results-$browser/) |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| $browser | ⏭️ スキップ | - |" >> $GITHUB_STEP_SUMMARY
+          fi
+        done
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 実行環境" >> $GITHUB_STEP_SUMMARY
+        echo "- Runner: ubuntu-latest" >> $GITHUB_STEP_SUMMARY
+        echo "- Node.js: 18" >> $GITHUB_STEP_SUMMARY
+        echo "- Python: 3.9" >> $GITHUB_STEP_SUMMARY
+        echo "- Playwright: latest" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "all-results/e2e-test-results-chromium/test-results.json" ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 詳細統計 (Chromium)" >> $GITHUB_STEP_SUMMARY
+          
+          node -e "
+          try {
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('all-results/e2e-test-results-chromium/test-results.json', 'utf8'));
+            const stats = results.stats || {};
+            
+            console.log(\`- 合計テスト数: \${stats.total || 0}\`);
+            console.log(\`- 成功: \${stats.passed || 0}\`);
+            console.log(\`- 失敗: \${stats.failed || 0}\`);
+            console.log(\`- 実行時間: \${Math.round((stats.duration || 0) / 1000)}秒\`);
+          } catch (e) {
+            console.log('統計情報の解析に失敗しました');
+          }
+          " >> $GITHUB_STEP_SUMMARY
+        fi
+        
+    - name: Check overall status
+      run: |
+        failed=false
+        for browser in chromium firefox webkit; do
+          if [ -f "all-results/e2e-test-results-$browser/test-results.json" ]; then
+            if grep -q '"failed":[^0]' "all-results/e2e-test-results-$browser/test-results.json"; then
+              echo "❌ $browser で失敗したテストがあります"
+              failed=true
+            else
+              echo "✅ $browser のテストは全て成功しました"
+            fi
+          fi
+        done
+        
+        if [ "$failed" = true ]; then
+          echo "::error::一部のE2Eテストが失敗しました"
+          exit 1
+        else
+          echo "::notice::すべてのE2Eテストが成功しました"
+        fi

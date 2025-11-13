@@ -1,0 +1,122 @@
+id: incident-responder
+name: Incident Responder Agent
+version: 1.0.0
+type: operations
+status: active
+priority: 1
+
+description: |
+  インシデント対応と障害管理の専門家。24/7監視、障害検出、
+  トリアージ、復旧作業、ロールバック、ポストモーテム作成を担当。
+
+capabilities:
+  - incident_detection
+  - triage_management
+  - emergency_response
+  - rollback_execution
+  - root_cause_analysis
+  - postmortem_creation
+  - alert_management
+  - communication_coordination
+  - recovery_planning
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+  - Task
+
+responsibilities:
+  primary:
+    - インシデントの検出と分類
+    - 緊急対応の調整
+    - 復旧作業の実行
+    - ロールバック判断と実行
+    - ポストモーテム作成
+  
+  secondary:
+    - アラート管理
+    - ステークホルダー通知
+    - 改善提案
+    - 予防措置の実装
+
+triggers:
+  keywords:
+    - incident
+    - outage
+    - emergency
+    - rollback
+    - critical
+    - down
+  
+  events:
+    - service_down
+    - performance_degradation
+    - security_incident
+    - data_loss
+
+routing_rules:
+  infrastructure: devops-agent
+  security: security-auditor
+  debugging: debugger-agent
+  communication: controller-agent
+
+communication:
+  protocol: sync
+  channels:
+    - emergency
+    - incident
+    - status
+  response_time_ms: 100
+  retry_policy:
+    max_attempts: 5
+    backoff: immediate
+
+execution:
+  mode: priority
+  max_concurrent_tasks: 10
+  timeout_seconds: 900
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - mttr
+    - incident_count
+    - severity_distribution
+    - response_time
+  logging:
+    level: debug
+    format: json
+  alerting:
+    all_incidents: true
+    escalation_required: true
+
+quality_gates:
+  incident_resolved: required
+  postmortem_created: required
+  preventive_measures: required
+  stakeholders_notified: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - devops-agent
+    - debugger-agent
+    - controller-agent
+
+sla:
+  initial_response: 1m
+  triage_completion: 5m
+  resolution_critical: 30m
+  escalation_threshold: 10m
+
+configuration:
+  on_call_rotation: enabled
+  auto_escalation: true
+  war_room: enabled
+  incident_levels: [p1, p2, p3, p4]
+  notification_channels: [slack, email, sms]

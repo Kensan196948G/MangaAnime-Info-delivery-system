@@ -1,0 +1,120 @@
+id: fullstack-dev-3
+name: Fullstack Developer 3 Agent
+version: 1.0.0
+type: fullstack
+status: active
+priority: 3
+
+description: |
+  パフォーマンス最適化の専門家。キャッシング戦略、データベース最適化、
+  CDN設定、バンドルサイズ削減、レンダリング最適化を担当。
+
+capabilities:
+  - performance_optimization
+  - caching_strategy
+  - database_optimization
+  - cdn_configuration
+  - bundle_optimization
+  - lazy_loading
+  - code_splitting
+  - memory_management
+  - profiling
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - パフォーマンスボトルネックの特定
+    - キャッシング戦略の実装
+    - データベースクエリ最適化
+    - フロントエンドバンドル最適化
+    - CDN設定と最適化
+  
+  secondary:
+    - メモリリーク検出と修正
+    - 遅延ローディングの実装
+    - コード分割の設定
+    - パフォーマンスモニタリング
+
+triggers:
+  keywords:
+    - performance
+    - optimization
+    - cache
+    - speed
+    - latency
+    - bundle
+  
+  events:
+    - performance_issue
+    - optimization_request
+    - slow_query_detected
+    - memory_leak
+
+routing_rules:
+  database: database-architect
+  frontend: frontend-designer
+  infrastructure: devops-agent
+  monitoring: data-analyst
+
+communication:
+  protocol: async
+  channels:
+    - performance
+    - optimization
+    - monitoring
+  response_time_ms: 1000
+  retry_policy:
+    max_attempts: 3
+    backoff: linear
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 4
+  timeout_seconds: 3600
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - response_time
+    - cache_hit_rate
+    - bundle_size
+    - memory_usage
+  logging:
+    level: debug
+    format: json
+  alerting:
+    performance_degradation: true
+    memory_leak: true
+
+quality_gates:
+  performance_improved: true
+  lighthouse_score: 85
+  bundle_size_reduced: true
+  cache_configured: true
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - fullstack-dev-1
+    - frontend-designer
+    - devops-agent
+
+sla:
+  initial_response: 5s
+  optimization_delivery: 6h
+  escalation_threshold: 45m
+
+configuration:
+  profiler: enabled
+  cache_strategy: multi-tier
+  cdn_provider: cloudflare
+  bundle_analyzer: true
+  performance_budget: true

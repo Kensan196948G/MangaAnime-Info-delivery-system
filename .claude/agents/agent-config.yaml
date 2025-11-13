@@ -1,0 +1,75 @@
+name: SubAgent Configuration
+version: 1.0.0
+enabled: true
+autoStart: true
+
+agents:
+  - id: code-analyzer
+    type: analyzer
+    capabilities:
+      - code_review
+      - complexity_analysis
+      - security_scan
+    parallel: true
+    priority: high
+    
+  - id: test-runner
+    type: tester
+    capabilities:
+      - unit_testing
+      - integration_testing
+      - performance_testing
+    parallel: true
+    priority: medium
+    
+  - id: doc-generator
+    type: documenter
+    capabilities:
+      - api_documentation
+      - readme_generation
+      - changelog_updates
+    parallel: true
+    priority: low
+    
+  - id: optimizer
+    type: performance
+    capabilities:
+      - code_optimization
+      - memory_profiling
+      - query_optimization
+    parallel: true
+    priority: high
+    
+  - id: architect
+    type: design
+    capabilities:
+      - system_design
+      - pattern_recognition
+      - architecture_review
+    parallel: true
+    priority: high
+
+parallelExecution:
+  enabled: true
+  maxConcurrent: 5
+  queueSize: 100
+  strategy: priority_based
+  
+delegation:
+  autoDelegate: true
+  rules:
+    - condition: task_type == "testing"
+      delegate_to: test-runner
+    - condition: task_type == "documentation"
+      delegate_to: doc-generator
+    - condition: task_type == "optimization"
+      delegate_to: optimizer
+    - condition: complexity > 8
+      delegate_to: architect
+      
+communication:
+  protocol: async
+  messageQueue: redis
+  retryPolicy:
+    maxRetries: 3
+    backoffMultiplier: 2

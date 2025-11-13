@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block title %}ホーム - MangaAnime Info Delivery System{% endblock %}
+
+{% block meta_description %}
+アニメ・マンガの最新リリース情報と統計データを表示。自動配信システムのメインダッシュボード。
+{% endblock %}
+
+{% block content %}
+<!-- ヘッダーセクション -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="card-title h2 mb-3">
+                    <i class="bi bi-broadcast me-2 text-primary" aria-hidden="true"></i>
+                    MangaAnime Info Delivery System
+                </h1>
+                <p class="card-text lead">
+                    アニメ・マンガの最新情報を自動で収集・配信する統合システム
+                </p>
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-8">
+                        <div class="row g-3 text-center">
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <i class="bi bi-collection-play fs-1 text-primary mb-2 d-block" aria-hidden="true"></i>
+                                    <h3 class="h4 mb-1" id="total-works">{{ stats.total_works if stats else 0 }}</h3>
+                                    <p class="text-muted mb-0">登録作品数</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <i class="bi bi-calendar-event fs-1 text-success mb-2 d-block" aria-hidden="true"></i>
+                                    <h3 class="h4 mb-1" id="total-releases">{{ stats.total_releases if stats else 0 }}</h3>
+                                    <p class="text-muted mb-0">配信情報数</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <i class="bi bi-bell fs-1 text-warning mb-2 d-block" aria-hidden="true"></i>
+                                    <h3 class="h4 mb-1" id="pending-notifications">{{ stats.pending_notifications if stats else 0 }}</h3>
+                                    <p class="text-muted mb-0">未通知</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- クイックアクションセクション -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="h4 mb-3">
+            <i class="bi bi-lightning-charge me-2" aria-hidden="true"></i>
+            クイックアクション
+        </h2>
+        <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
+                <a href="{{ url_for('works') }}" class="btn btn-outline-primary w-100 py-3 text-decoration-none">
+                    <i class="bi bi-collection d-block fs-3 mb-2" aria-hidden="true"></i>
+                    <span class="fw-semibold">作品一覧</span>
+                    <small class="d-block text-muted">すべての作品を表示</small>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="{{ url_for('works', type='anime') }}" class="btn btn-outline-success w-100 py-3 text-decoration-none">
+                    <i class="bi bi-play-circle d-block fs-3 mb-2" aria-hidden="true"></i>
+                    <span class="fw-semibold">アニメ</span>
+                    <small class="d-block text-muted">アニメ作品のみ</small>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="{{ url_for('works', type='manga') }}" class="btn btn-outline-info w-100 py-3 text-decoration-none">
+                    <i class="bi bi-book d-block fs-3 mb-2" aria-hidden="true"></i>
+                    <span class="fw-semibold">マンガ</span>
+                    <small class="d-block text-muted">マンガ作品のみ</small>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="{{ url_for('config') }}" class="btn btn-outline-secondary w-100 py-3 text-decoration-none">
+                    <i class="bi bi-gear d-block fs-3 mb-2" aria-hidden="true"></i>
+                    <span class="fw-semibold">設定</span>
+                    <small class="d-block text-muted">システム設定</small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 最新リリース情報 -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="card-title h5 mb-0">
+                    <i class="bi bi-calendar-week me-2" aria-hidden="true"></i>
+                    今後のリリース予定
+                </h2>
+                <a href="{{ url_for('works') }}" class="btn btn-sm btn-outline-primary">
+                    すべて見る
+                    <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if upcoming_releases %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" role="table" 
+                               aria-label="今後のリリース予定一覧">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="border-0">
+                                        <i class="bi bi-card-text me-1" aria-hidden="true"></i>
+                                        作品名
+                                    </th>
+                                    <th scope="col" class="border-0">
+                                        <i class="bi bi-tag me-1" aria-hidden="true"></i>
+                                        種別
+                                    </th>
+                                    <th scope="col" class="border-0">
+                                        <i class="bi bi-hash me-1" aria-hidden="true"></i>
+                                        話数・巻数
+                                    </th>
+                                    <th scope="col" class="border-0">
+                                        <i class="bi bi-tv me-1" aria-hidden="true"></i>
+                                        プラットフォーム
+                                    </th>
+                                    <th scope="col" class="border-0">
+                                        <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>
+                                        配信日
+                                    </th>
+                                    <th scope="col" class="border-0">
+                                        <i class="bi bi-bell me-1" aria-hidden="true"></i>
+                                        通知
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for release in upcoming_releases %}
+                                <tr class="{% if loop.index <= 3 %}table-warning{% endif %}">
+                                    <td class="align-middle">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-{% if release.type == 'anime' %}play-circle{% else %}book{% endif %} me-2 text-{% if release.type == 'anime' %}success{% else %}info{% endif %}" aria-hidden="true"></i>
+                                            <div>
+                                                <div class="fw-semibold">{{ release.title }}</div>
+                                                {% if release.source_url %}
+                                                    <a href="{{ release.source_url }}" target="_blank" rel="noopener" 
+                                                       class="text-decoration-none small text-muted">
+                                                        <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>
+                                                        詳細を見る
+                                                        <span class="visually-hidden">（新しいタブで開く）</span>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge bg-{% if release.type == 'anime' %}success{% else %}info{% endif %}">
+                                            {{ release.type|work_type_label }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle">
+                                        {% if release.number %}
+                                            <span class="fw-semibold">
+                                                第{{ release.number }}{{ release.release_type|release_type_label }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">
+                                        {% if release.platform %}
+                                            <span class="badge bg-light text-dark">{{ release.platform }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-date me-2 text-muted" aria-hidden="true"></i>
+                                            <time datetime="{{ release.release_date }}">
+                                                {{ release.release_date|datetime_format('%Y-%m-%d') }}
+                                            </time>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        {% if release.notified %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1" aria-hidden="true"></i>
+                                                通知済み
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-clock me-1" aria-hidden="true"></i>
+                                                未通知
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox display-1 text-muted mb-3 d-block" aria-hidden="true"></i>
+                        <h3 class="h5 text-muted mb-2">リリース情報がありません</h3>
+                        <p class="text-muted mb-3">新しい作品情報が追加されると、ここに表示されます。</p>
+                        <a href="{{ url_for('works') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>
+                            作品を確認する
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- システム状態インジケーター -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body py-3">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <div class="status-indicator me-3">
+                                <div class="spinner-grow spinner-grow-sm text-success" role="status" aria-hidden="true"></div>
+                            </div>
+                            <div>
+                                <span class="fw-semibold">システム状態: </span>
+                                <span class="text-success">正常稼働中</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                        <small class="text-muted">
+                            <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>
+                            最終更新: <time datetime="{{ now.isoformat() }}">{{ now.strftime('%Y-%m-%d %H:%M') }}</time>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 統計データの定期更新
+function updateStats() {
+    fetch('/api/stats')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 統計数値の更新
+            if (data.works_by_type) {
+                const totalWorks = Object.values(data.works_by_type).reduce((a, b) => a + b, 0);
+                document.getElementById('total-works').textContent = totalWorks;
+            }
+            
+            // アニメーション効果付きで数値を更新
+            animateCounter('total-works');
+            animateCounter('total-releases');
+            animateCounter('pending-notifications');
+        })
+        .catch(error => {
+            console.warn('統計データの取得に失敗しました:', error);
+        });
+}
+
+// カウンターアニメーション
+function animateCounter(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    element.style.transform = 'scale(1.1)';
+    element.style.transition = 'transform 0.2s ease-in-out';
+    
+    setTimeout(() => {
+        element.style.transform = 'scale(1)';
+    }, 200);
+}
+
+// ページロード時の初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // 初回統計データ取得
+    updateStats();
+    
+    // 5分ごとに統計データを更新
+    setInterval(updateStats, 5 * 60 * 1000);
+    
+    // リアルタイム時刻更新
+    function updateTime() {
+        const timeElements = document.querySelectorAll('time:not([datetime])');
+        const now = new Date();
+        timeElements.forEach(el => {
+            el.textContent = now.toLocaleString('ja-JP');
+        });
+    }
+    
+    setInterval(updateTime, 60000); // 1分ごとに時刻更新
+});
+
+// アクセシビリティ: テーブル行のクリック可能化
+document.addEventListener('DOMContentLoaded', function() {
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        const link = row.querySelector('a');
+        if (link) {
+            row.addEventListener('click', function() {
+                if (!window.getSelection().toString()) {
+                    link.click();
+                }
+            });
+            row.style.cursor = 'pointer';
+            row.setAttribute('tabindex', '0');
+            
+            row.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    link.click();
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
