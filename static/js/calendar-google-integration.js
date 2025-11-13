@@ -351,7 +351,7 @@
     }
 
     /**
-     * 日付詳細モーダルを表示（拡張版）
+     * 日付詳細モーダルを表示（拡張版 - チェックボックス付き）
      */
     window.showDayDetailsEnhanced = function(date) {
         const releases = getReleasesByDate(date);
@@ -373,8 +373,25 @@
 
         document.getElementById('modal-date').textContent = formattedDate;
 
-        // モーダルボディHTML生成
-        let html = '<div class="list-group list-group-flush">';
+        // 全選択/全解除ボタン
+        let html = `
+            <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+                <div>
+                    <strong>${releases.length}件のリリース</strong>
+                </div>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" onclick="selectAllReleases()">
+                        <i class="bi bi-check-all me-1"></i>全選択
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="deselectAllReleases()">
+                        <i class="bi bi-x-square me-1"></i>全解除
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // モーダルボディHTML生成（チェックボックス付き）
+        html += '<div class="list-group list-group-flush" id="releases-list">';
 
         releases.forEach((release, index) => {
             const typeIcon = release.type === 'anime' ? '🎬' : '📚';
@@ -383,10 +400,23 @@
             const platformIcon = getPlatformIconHelper(release.platform);
             const titleEmoji = getTitleEmoji(release.title);
             const releaseText = release.release_type === 'episode' ? '話' : '巻';
+            const releaseJson = JSON.stringify({...release, release_date: date}).replace(/"/g, '&quot;');
 
             html += `
                 <div class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex align-items-start">
+                        <!-- チェックボックス -->
+                        <div class="form-check me-3 mt-2">
+                            <input class="form-check-input release-checkbox"
+                                   type="checkbox"
+                                   id="release-${index}"
+                                   value="${index}"
+                                   data-release='${releaseJson}'
+                                   checked>
+                            <label class="form-check-label" for="release-${index}"></label>
+                        </div>
+
+                        <!-- リリース情報 -->
                         <div class="flex-grow-1">
                             <div class="d-flex align-items-center mb-2">
                                 <span class="badge bg-${typeClass} me-2">
@@ -405,13 +435,6 @@
                                     </a>
                                 </small>` : ''}
                         </div>
-                        <div>
-                            <button class="btn btn-sm btn-outline-primary"
-                                    onclick="GoogleCalendarIntegration.addSingleRelease(${JSON.stringify(release).replace(/"/g, '&quot;')})"
-                                    title="このリリースをGoogleカレンダーに追加">
-                                <i class="bi bi-calendar-plus"></i>
-                            </button>
-                        </div>
                     </div>
                 </div>
             `;
@@ -422,14 +445,89 @@
         // モーダルフッターのボタンを更新
         html += `
             <div class="d-grid gap-2 mt-3">
-                <button class="btn btn-primary" onclick="GoogleCalendarIntegration.addDayReleases(window.releasesData['${date}'])">
+                <button class="btn btn-success btn-lg" onclick="addSelectedToGoogleCalendar()">
                     <i class="bi bi-calendar-check me-2"></i>
-                    この日の全リリース（${releases.length}件）をGoogleカレンダーに登録
+                    選択した項目をGoogleカレンダーに登録
                 </button>
             </div>
         `;
 
         document.getElementById('modal-body').innerHTML = html;
+    };
+
+    /**
+     * 全選択
+     */
+    window.selectAllReleases = function() {
+        document.querySelectorAll('.release-checkbox').forEach(cb => cb.checked = true);
+    };
+
+    /**
+     * 全解除
+     */
+    window.deselectAllReleases = function() {
+        document.querySelectorAll('.release-checkbox').forEach(cb => cb.checked = false);
+    };
+
+    /**
+     * 選択した項目をGoogleカレンダーに追加
+     */
+    window.addSelectedToGoogleCalendar = function() {
+        const checkboxes = document.querySelectorAll('.release-checkbox:checked');
+
+        if (checkboxes.length === 0) {
+            alert('登録する項目を選択してください。');
+            return;
+        }
+
+        const selectedReleases = Array.from(checkboxes).map(cb => {
+            try {
+                return JSON.parse(cb.dataset.release.replace(/&quot;/g, '"'));
+            } catch (e) {
+                console.error('Parse error:', e);
+                return null;
+            }
+        }).filter(r => r !== null);
+
+        if (selectedReleases.length === 0) {
+            alert('選択された項目のデータを読み込めませんでした。');
+            return;
+        }
+
+        const confirmed = confirm(
+            `選択した${selectedReleases.length}件をGoogleカレンダーに個別登録しますか？\n\n` +
+            `📌 各リリースが別々のイベントとして登録されます\n` +
+            `⚠️ ${selectedReleases.length}個のタブが開きます\n` +
+            `💡 10件ずつバッチ処理で登録します`
+        );
+
+        if (!confirmed) return;
+
+        // バッチ処理
+        const batchSize = 10;
+        const batches = Math.ceil(selectedReleases.length / batchSize);
+
+        if (batches > 1) {
+            alert(
+                `📊 登録処理を開始します\n\n` +
+                `選択件数: ${selectedReleases.length}件\n` +
+                `バッチ数: ${batches}回\n` +
+                `まず最初の${Math.min(batchSize, selectedReleases.length)}件を開きます。`
+            );
+        }
+
+        // グローバル変数に保存
+        window.allReleasesForCalendar = selectedReleases;
+
+        // 最初のバッチを開く
+        const firstBatch = selectedReleases.slice(0, batchSize);
+        openReleaseBatch(firstBatch, 1, batches);
+
+        // モーダルを閉じる
+        setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('dayModal'));
+            if (modal) modal.hide();
+        }, 500);
     };
 
     // showDayDetailsのオーバーライド
