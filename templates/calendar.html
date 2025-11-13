@@ -159,7 +159,7 @@
         <div class="col-md-4">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="text-primary mb-0">{{ releases_by_date.values() | sum(attribute='__len__') | default(0) }}</h3>
+                    <h3 class="text-primary mb-0">{{ total_releases }}</h3>
                     <small class="text-muted">今月のリリース総数</small>
                 </div>
             </div>
@@ -175,7 +175,7 @@
         <div class="col-md-4">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h3 class="text-info mb-0">{{ (releases_by_date.values() | sum(attribute='__len__') / (releases_by_date.keys() | length | default(1))) | round(1) }}</h3>
+                    <h3 class="text-info mb-0">{{ ((total_releases / (releases_by_date.keys() | length)) | round(1)) if releases_by_date.keys() | length > 0 else 0 }}</h3>
                     <small class="text-muted">1日あたりの平均リリース数</small>
                 </div>
             </div>
