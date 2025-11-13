@@ -397,11 +397,13 @@ def calendar():
 
     # Organize releases by date
     releases_by_date = {}
+    total_releases = 0
     for release in releases_data:
         date_str = release["release_date"]
         if date_str not in releases_by_date:
             releases_by_date[date_str] = []
         releases_by_date[date_str].append(dict(release))
+        total_releases += 1
 
     return render_template(
         "calendar.html",
@@ -410,6 +412,7 @@ def calendar():
         current_year=year,
         first_weekday=first_weekday,
         days_in_month=days_in_month,
+        total_releases=total_releases,
     )
 
 
