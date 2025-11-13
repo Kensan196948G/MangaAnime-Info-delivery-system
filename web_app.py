@@ -1,4 +1,3 @@
-from datetime import datetime
 #!/usr/bin/env python3
 """
 Flask Web UI for Anime/Manga Information Delivery System
@@ -11,6 +10,7 @@ import json
 import sqlite3
 import requests
 import time
+from datetime import datetime
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 import logging
 
