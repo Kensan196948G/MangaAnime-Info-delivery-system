@@ -541,5 +541,78 @@
         console.error('Calendar Enhanced UI Error:', e.error);
     });
 
+    // === 21. グローバル関数として公開（チェックボックス機能用） ===
+    window.selectAllReleases = function() {
+        document.querySelectorAll('.release-checkbox').forEach(cb => cb.checked = true);
+    };
+
+    window.deselectAllReleases = function() {
+        document.querySelectorAll('.release-checkbox').forEach(cb => cb.checked = false);
+    };
+
+    window.addSelectedToGoogleCalendar = function() {
+        const checkboxes = document.querySelectorAll('.release-checkbox:checked');
+
+        if (checkboxes.length === 0) {
+            alert('登録する項目を選択してください。');
+            return;
+        }
+
+        const selectedReleases = Array.from(checkboxes).map(cb => {
+            try {
+                return JSON.parse(cb.dataset.release.replace(/&quot;/g, '"'));
+            } catch (e) {
+                console.error('Parse error:', e);
+                return null;
+            }
+        }).filter(r => r !== null);
+
+        if (selectedReleases.length === 0) {
+            alert('選択された項目のデータを読み込めませんでした。');
+            return;
+        }
+
+        const confirmed = confirm(
+            `選択した${selectedReleases.length}件をGoogleカレンダーに個別登録しますか？\n\n` +
+            `📌 各リリースが別々のイベントとして登録されます\n` +
+            `⚠️ ${selectedReleases.length}個のタブが開きます\n` +
+            `💡 ポップアップブロックを許可してください`
+        );
+
+        if (!confirmed) return;
+
+        // 各リリースを順次タブで開く
+        selectedReleases.forEach((release, index) => {
+            setTimeout(() => {
+                // GoogleCalendarIntegrationが利用可能か確認
+                if (window.GoogleCalendarIntegration && window.GoogleCalendarIntegration.generateCalendarUrl) {
+                    const url = window.GoogleCalendarIntegration.generateCalendarUrl(release);
+                    window.open(url, `gcal_${index}`, 'width=800,height=600');
+                } else {
+                    // フォールバック: 基本的なURL生成
+                    const url = generateBasicCalendarUrl(release);
+                    window.open(url, `gcal_${index}`, 'width=800,height=600');
+                }
+            }, index * 600); // 600ms間隔
+        });
+
+        // 完了メッセージ
+        setTimeout(() => {
+            alert(`✅ ${selectedReleases.length}件のGoogleカレンダー登録画面を開きました！\n\n各タブで「保存」をクリックしてください。`);
+        }, selectedReleases.length * 600 + 1000);
+    };
+
+    // 基本的なカレンダーURL生成（フォールバック用）
+    function generateBasicCalendarUrl(release) {
+        const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+        const typeIcon = release.type === 'anime' ? '🎬' : '📚';
+        const typeLabel = release.type === 'anime' ? 'アニメ' : 'マンガ';
+        const title = `${typeIcon}【${typeLabel}】${release.title} 第${release.number}${release.release_type === 'episode' ? '話' : '巻'} | ${release.platform}`;
+        const dateStr = (release.release_date || '').replace(/-/g, '');
+        const details = `作品: ${release.title}\nプラットフォーム: ${release.platform}\n${release.source_url ? 'URL: ' + release.source_url : ''}`;
+
+        return `${baseUrl}&text=${encodeURIComponent(title)}&dates=${dateStr}/${dateStr}&details=${encodeURIComponent(details)}`;
+    }
+
     console.log('Calendar Enhanced UI: Script loaded');
 })();
