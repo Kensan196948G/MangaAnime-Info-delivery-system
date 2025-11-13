@@ -1011,19 +1011,29 @@ def websocket_collection_status():
 @app.route("/api/test-notification", methods=["POST"])
 def api_test_notification():
     """API endpoint for sending test notifications"""
+    import smtplib
+    import ssl
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
+    from dotenv import load_dotenv
 
     try:
+        # .envファイル読み込み
+        load_dotenv()
+
         data = request.get_json() or {}
         message = data.get("message", "テスト通知です。システムが正常に動作しています。")
 
         logger.info(f"Test notification requested: {message}")
 
-        # 設定読み込み
+        # 環境変数から認証情報取得
+        gmail_address = os.getenv('GMAIL_ADDRESS')
+        gmail_password = os.getenv('GMAIL_APP_PASSWORD')
+
+        # 設定ファイルからメールアドレス取得
         config = load_config()
-        from_email = config.get('google', {}).get('gmail', {}).get('from_email') or config.get('notification_email', '')
-        to_email = config.get('google', {}).get('gmail', {}).get('to_email') or config.get('notification_email', '')
+        from_email = gmail_address or config.get('notification_email', '')
+        to_email = gmail_address or config.get('notification_email', '')
 
         if not from_email or not to_email:
             return jsonify({
@@ -1031,36 +1041,69 @@ def api_test_notification():
                 "error": "メールアドレスが設定されていません"
             }), 400
 
-        # テストメール本文生成
+        if not gmail_password:
+            return jsonify({
+                "success": False,
+                "error": "Gmailアプリパスワードが設定されていません（.envファイルを確認）"
+            }), 400
+
+        # テストメール作成
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = '【MangaAnime】テスト通知'
+        msg['Subject'] = '【MangaAnime】テスト通知 ✅'
         msg['From'] = from_email
         msg['To'] = to_email
 
         html_body = f"""
-        <html><body style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #0d6efd;">🎬 MangaAnime情報配信システム</h2>
-            <p>{message}</p><hr>
-            <h3>システム情報</h3>
-            <ul>
-                <li>送信元: {from_email}</li>
-                <li>送信先: {to_email}</li>
-                <li>日時: {datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')}</li>
-            </ul>
-            <p style="color: #6c757d;">このメールはテスト送信です。</p>
-        </body></html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; padding: 20px; }}
+                .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                h2 {{ color: #0d6efd; border-bottom: 3px solid #0d6efd; padding-bottom: 10px; }}
+                .info-box {{ background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0; }}
+                ul {{ list-style-type: none; padding-left: 0; }}
+                li {{ padding: 8px 0; border-bottom: 1px solid #eee; }}
+                .footer {{ text-align: center; color: #6c757d; font-size: 0.9em; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>🎬 MangaAnime情報配信システム</h2>
+                <div class="info-box">
+                    <p><strong>📧 {message}</strong></p>
+                </div>
+                <h3>📊 システム情報</h3>
+                <ul>
+                    <li><strong>送信元:</strong> {from_email}</li>
+                    <li><strong>送信先:</strong> {to_email}</li>
+                    <li><strong>送信日時:</strong> {datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')}</li>
+                    <li><strong>サーバー:</strong> Gmail SMTP</li>
+                </ul>
+                <div class="footer">
+                    <p>🤖 このメールはMangaAnime情報配信システムから自動送信されました</p>
+                    <p>システムが正常に動作しています ✅</p>
+                </div>
+            </div>
+        </body>
+        </html>
         """
         msg.attach(MIMEText(html_body, 'html'))
 
-        logger.info(f"Test email prepared: {from_email} -> {to_email}")
+        # Gmail SMTP経由で送信
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
+            server.login(from_email, gmail_password)
+            server.send_message(msg)
+
+        logger.info(f"✅ Test email sent successfully: {from_email} -> {to_email}")
 
         return jsonify({
             "success": True,
-            "message": f"テスト通知を準備しました（送信先: {to_email}）\n\n⚠️ 実際の送信にはGmail OAuth2認証が必要です",
+            "message": f"✅ テスト通知を送信しました！\n\n送信先: {to_email}\nメールボックスをご確認ください。",
             "details": {
                 "from": from_email,
                 "to": to_email,
-                "note": "Gmail認証設定後に実際のメール送信が可能になります"
+                "sent_at": datetime.now().isoformat()
             }
         })
 
