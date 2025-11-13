@@ -214,7 +214,21 @@
 <!-- リリースデータをJavaScriptに渡す -->
 <script>
     window.releasesData = {{ releases_by_date | tojson }};
+    // アイコン定義
+    window.PLATFORM_ICONS = {
+        'netflix': '🎬', 'amazon': '📺', 'prime': '📺',
+        'crunchyroll': '🌸', 'dアニメ': '🎭', 'bookwalker': '📚',
+        'kindle': '📖', 'ジャンプ': '⚡', 'マガポケ': '📱'
+    };
+    window.TITLE_EMOJIS = {
+        'one piece': '👒', 'ワンピース': '👒',
+        '呪術廻戦': '⚡', '鬼滅の刃': '⚔️',
+        '進撃の巨人': '🗡️', 'ヒーローアカデミア': '💥',
+        'チェンソーマン': '⛓️', 'スパイファミリー': '🕵️'
+    };
 </script>
 <!-- Calendar Enhanced JS -->
 <script src="{{ url_for('static', filename='js/calendar-enhanced.js') }}"></script>
+<!-- Google Calendar Integration JS -->
+<script src="{{ url_for('static', filename='js/calendar-google-integration.js') }}"></script>
 {% endblock %}
