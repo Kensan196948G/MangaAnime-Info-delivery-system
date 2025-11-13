@@ -169,6 +169,24 @@ def create_database():
                     else 0
                 )
 
+                # プラットフォーム別の実際のURL生成
+                platform_urls = {
+                    "Netflix": f"https://www.netflix.com/title/{work_id}",
+                    "Amazon Prime Video": f"https://www.amazon.co.jp/dp/{work_id}",
+                    "Crunchyroll": f"https://www.crunchyroll.com/series/{work_id}",
+                    "Funimation": f"https://www.funimation.com/shows/{work_id}",
+                    "dアニメストア": f"https://anime.dmkt-sp.jp/animestore/ci_pc?workId={work_id}",
+                    "ABEMA": f"https://abema.tv/video/title/{work_id}",
+                    "BookWalker": f"https://bookwalker.jp/series/{work_id}/",
+                    "Kindle": f"https://www.amazon.co.jp/dp/{work_id}",
+                    "楽天Kobo": f"https://books.rakuten.co.jp/rk/{work_id}/",
+                    "ComicWalker": f"https://comic-walker.com/contents/detail/{work_id}/",
+                    "マガポケ": f"https://pocket.shonenmagazine.com/episode/{work_id}",
+                    "ジャンプ+": f"https://shonenjumpplus.com/episode/{work_id}",
+                }
+
+                source_url = platform_urls.get(platform, f"https://example.com/{work_type}/{work_id}/{number}")
+
                 releases.append(
                     (
                         work_id,
@@ -176,8 +194,8 @@ def create_database():
                         number,
                         platform,
                         release_date.strftime("%Y-%m-%d"),
-                        "demo_source",
-                        f"https://example.com/{work_type}/{work_id}/{number}",
+                        platform,  # ソース名をプラットフォーム名に
+                        source_url,
                         notified,
                     )
                 )
