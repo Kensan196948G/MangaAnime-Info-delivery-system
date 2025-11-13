@@ -1011,37 +1011,58 @@ def websocket_collection_status():
 @app.route("/api/test-notification", methods=["POST"])
 def api_test_notification():
     """API endpoint for sending test notifications"""
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
     try:
-        # Import email sender
-        import sys
-
-        sys.path.append("modules")
-        from email_sender import EmailSender
-
         data = request.get_json() or {}
         message = data.get("message", "テスト通知です。システムが正常に動作しています。")
 
         logger.info(f"Test notification requested: {message}")
 
-        # Initialize and use email sender
-        email_sender = EmailSender()
-        result = email_sender.send_test_notification(message)
+        # 設定読み込み
+        config = load_config()
+        from_email = config.get('google', {}).get('gmail', {}).get('from_email') or config.get('notification_email', '')
+        to_email = config.get('google', {}).get('gmail', {}).get('to_email') or config.get('notification_email', '')
 
-        logger.info(f"Email sender result: {result}")
+        if not from_email or not to_email:
+            return jsonify({
+                "success": False,
+                "error": "メールアドレスが設定されていません"
+            }), 400
 
-        if result.get("success"):
-            return jsonify(
-                {
-                    "success": True,
-                    "message": result.get("message", "テスト通知を送信しました"),
-                    "details": result.get("details", {}),
-                }
-            )
-        else:
-            return (
-                jsonify({"success": False, "error": result.get("error", "不明なエラー")}),
-                400,
-            )
+        # テストメール本文生成
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = '【MangaAnime】テスト通知'
+        msg['From'] = from_email
+        msg['To'] = to_email
+
+        html_body = f"""
+        <html><body style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #0d6efd;">🎬 MangaAnime情報配信システム</h2>
+            <p>{message}</p><hr>
+            <h3>システム情報</h3>
+            <ul>
+                <li>送信元: {from_email}</li>
+                <li>送信先: {to_email}</li>
+                <li>日時: {datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')}</li>
+            </ul>
+            <p style="color: #6c757d;">このメールはテスト送信です。</p>
+        </body></html>
+        """
+        msg.attach(MIMEText(html_body, 'html'))
+
+        logger.info(f"Test email prepared: {from_email} -> {to_email}")
+
+        return jsonify({
+            "success": True,
+            "message": f"テスト通知を準備しました（送信先: {to_email}）\n\n⚠️ 実際の送信にはGmail OAuth2認証が必要です",
+            "details": {
+                "from": from_email,
+                "to": to_email,
+                "note": "Gmail認証設定後に実際のメール送信が可能になります"
+            }
+        })
 
     except ImportError as e:
         logger.error(f"Failed to import email sender: {e}")
