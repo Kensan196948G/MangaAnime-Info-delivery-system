@@ -2,87 +2,110 @@
 
 {% block title %}カレンダー - {{ super() }}{% endblock %}
 
+{% block head %}
+<!-- Calendar Enhanced CSS -->
+<link href="{{ url_for('static', filename='css/calendar-enhanced.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-md-8">
             <h2>
-                <i class="bi bi-calendar-event me-2"></i>リリースカレンダー
+                <i class="bi bi-calendar-event me-2" aria-hidden="true"></i>リリースカレンダー
             </h2>
-            <p class="text-muted">月別でアニメ・マンガのリリース予定を確認できます</p>
+            <p class="text-muted">月別でアニメ・マンガのリリース予定を確認できます。スワイプまたは矢印キー（Alt+←/→）で月移動できます。</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <div class="btn-group">
-                <a href="{{ url_for('calendar', year=current_year, month=current_month-1 if current_month > 1 else 12) }}" 
-                   class="btn btn-outline-primary">
-                    <i class="bi bi-chevron-left"></i> 前月
+            <div class="btn-group" role="group" aria-label="月移動ナビゲーション">
+                <a href="{{ url_for('calendar', year=current_year if current_month > 1 else current_year - 1, month=current_month-1 if current_month > 1 else 12) }}"
+                   class="btn btn-outline-primary calendar-nav-btn"
+                   aria-label="前月に移動">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i> 前月
                 </a>
-                <button class="btn btn-primary" disabled>
+                <button class="btn btn-primary calendar-nav-btn" disabled aria-current="page">
                     {{ current_year }}年{{ current_month }}月
                 </button>
-                <a href="{{ url_for('calendar', year=current_year, month=current_month+1 if current_month < 12 else 1) }}" 
-                   class="btn btn-outline-primary">
-                    次月 <i class="bi bi-chevron-right"></i>
+                <a href="{{ url_for('calendar', year=current_year if current_month < 12 else current_year + 1, month=current_month+1 if current_month < 12 else 1) }}"
+                   class="btn btn-outline-primary calendar-nav-btn"
+                   aria-label="次月に移動">
+                    次月 <i class="bi bi-chevron-right" aria-hidden="true"></i>
                 </a>
             </div>
         </div>
     </div>
 
     <!-- Calendar Grid -->
-    <div class="card">
+    <div class="card shadow-lg">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered calendar-table mb-0">
-                    <thead class="table-primary">
-                        <tr>
-                            <th class="text-center py-3">日</th>
-                            <th class="text-center py-3">月</th>
-                            <th class="text-center py-3">火</th>
-                            <th class="text-center py-3">水</th>
-                            <th class="text-center py-3">木</th>
-                            <th class="text-center py-3">金</th>
-                            <th class="text-center py-3">土</th>
+                <table class="table table-bordered calendar-table mb-0" role="grid" aria-label="リリースカレンダー">
+                    <thead>
+                        <tr role="row">
+                            <th class="text-center py-3" scope="col">日</th>
+                            <th class="text-center py-3" scope="col">月</th>
+                            <th class="text-center py-3" scope="col">火</th>
+                            <th class="text-center py-3" scope="col">水</th>
+                            <th class="text-center py-3" scope="col">木</th>
+                            <th class="text-center py-3" scope="col">金</th>
+                            <th class="text-center py-3" scope="col">土</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% set ns = namespace(day_count=0) %}
                         {% for week_num in range(6) %}
-                            <tr>
+                            <tr role="row">
                                 {% for day_num in range(7) %}
-                                    {% set day = week_num * 7 + day_num + 1 %}
-                                    {% if day <= 31 %}
+                                    {% set ns.day_count = ns.day_count + 1 %}
+                                    {% set day_of_week = day_num %}
+                                    {% set first_day_of_month = (current_year ~ '-' ~ '%02d' % current_month ~ '-01') | strptime('%Y-%m-%d') %}
+                                    {% set first_weekday = first_day_of_month.strftime('%w') | int %}
+                                    {% set day = ns.day_count - first_weekday %}
+
+                                    {% if day >= 1 and day <= 31 %}
                                         {% set date_str = '%04d-%02d-%02d' % (current_year, current_month, day) %}
-                                        <td class="calendar-day" data-date="{{ date_str }}">
+                                        {% set day_releases = releases_by_date.get(date_str, []) %}
+
+                                        <td class="calendar-day {% if day_releases|length == 0 %}empty{% endif %}"
+                                            data-date="{{ date_str }}"
+                                            role="gridcell"
+                                            aria-label="{{ date_str }}{% if day_releases|length > 0 %} - {{ day_releases|length }}件のリリース{% endif %}">
                                             <div class="day-header">
                                                 <span class="day-number">{{ day }}</span>
                                             </div>
-                                            
-                                            {% set day_releases = releases_by_date.get(date_str, []) %}
+
                                             {% if day_releases %}
                                                 <div class="releases-container">
-                                                    {% for release in day_releases[:3] %}
+                                                    {% for release in day_releases[:5] %}
                                                         <div class="release-item {% if release.type == 'anime' %}anime{% else %}manga{% endif %}"
-                                                             title="{{ release.title }} - {% if release.release_type == 'episode' %}第{{ release.number }}話{% else %}第{{ release.number }}巻{% endif %} ({{ release.platform }})">
+                                                             title="{{ release.title }} - {% if release.release_type == 'episode' %}第{{ release.number }}話{% else %}第{{ release.number }}巻{% endif %} ({{ release.platform }})"
+                                                             data-platform="{{ release.platform | lower }}"
+                                                             data-title="{{ release.title }}">
                                                             <div class="release-content">
-                                                                <div class="release-title">{{ release.title }}</div>
+                                                                <div class="release-title">
+                                                                    {{ release.title }}
+                                                                </div>
                                                                 <div class="release-details">
-                                                                    {% if release.release_type == 'episode' %}第{{ release.number }}話{% else %}第{{ release.number }}巻{% endif %}
+                                                                    {% if release.release_type == 'episode' %}第{{ release.number }}話{% else %}第{{ release.number }}巻{% endif %} · {{ release.platform }}
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     {% endfor %}
-                                                    
-                                                    {% if day_releases|length > 3 %}
-                                                        <div class="more-releases" data-bs-toggle="modal" data-bs-target="#dayModal"
-                                                             onclick="showDayDetails('{{ date_str }}')">
-                                                            +{{ day_releases|length - 3 }}件 もっと見る
+
+                                                    {% if day_releases|length > 5 %}
+                                                        <div class="more-releases"
+                                                             role="button"
+                                                             tabindex="0"
+                                                             aria-label="{{ day_releases|length - 5 }}件のリリースをさらに表示">
+                                                            +{{ day_releases|length - 5 }}件 もっと見る
                                                         </div>
                                                     {% endif %}
                                                 </div>
                                             {% endif %}
                                         </td>
                                     {% else %}
-                                        <td class="calendar-day text-muted"></td>
+                                        <td class="calendar-day empty" role="gridcell" aria-label="空のセル"></td>
                                     {% endif %}
                                 {% endfor %}
                             </tr>
@@ -93,45 +116,98 @@
         </div>
     </div>
 
-    <!-- Legend -->
-    <div class="row mt-3">
+    <!-- Enhanced Legend -->
+    <div class="row mt-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-body py-2">
-                    <div class="d-flex justify-content-center align-items-center">
-                        <span class="me-4">
-                            <span class="badge bg-primary me-1">■</span> アニメ
-                        </span>
-                        <span class="me-4">
-                            <span class="badge bg-secondary me-1">■</span> マンガ
-                        </span>
-                        <span class="text-muted">
-                            <small>各日付のボックスをクリックすると詳細を確認できます</small>
-                        </span>
+                <div class="card-body calendar-legend">
+                    <div class="d-flex flex-wrap justify-content-center align-items-center">
+                        <div class="legend-item">
+                            <div class="legend-color-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                            <span class="legend-label">アニメ</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color-box" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
+                            <span class="legend-label">マンガ</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color-box" style="background: linear-gradient(135deg, #e50914 0%, #b20710 100%);"></div>
+                            <span class="legend-label">Netflix 🎬</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color-box" style="background: linear-gradient(135deg, #00a8e1 0%, #0073bb 100%);"></div>
+                            <span class="legend-label">Prime Video 📺</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color-box" style="background: linear-gradient(135deg, #f78c2c 0%, #f47321 100%);"></div>
+                            <span class="legend-label">Crunchyroll 🌸</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color-box" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);"></div>
+                            <span class="legend-label">dアニメストア 🎭</span>
+                        </div>
                     </div>
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
+                            各日付をクリックまたはタップすると詳細を確認できます。
+                            キーボード操作: Alt+←（前月）、Alt+→（次月）
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="text-primary mb-0">{{ releases_by_date.values() | sum(attribute='__len__') | default(0) }}</h3>
+                    <small class="text-muted">今月のリリース総数</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="text-success mb-0">{{ releases_by_date.keys() | length }}</h3>
+                    <small class="text-muted">リリース予定日数</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="text-info mb-0">{{ (releases_by_date.values() | sum(attribute='__len__') / (releases_by_date.keys() | length | default(1))) | round(1) }}</h3>
+                    <small class="text-muted">1日あたりの平均リリース数</small>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Day Details Modal -->
+<!-- Enhanced Day Details Modal -->
 <div class="modal fade" id="dayModal" tabindex="-1" aria-labelledby="dayModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="dayModalLabel">
-                    <i class="bi bi-calendar-day me-2"></i><span id="modal-date"></span> のリリース予定
+                    <i class="bi bi-calendar-day me-2" aria-hidden="true"></i>
+                    <span id="modal-date"></span> のリリース予定
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
             </div>
             <div class="modal-body" id="modal-body">
                 <!-- Dynamic content will be loaded here -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1" aria-hidden="true"></i>閉じる
+                </button>
                 <button type="button" class="btn btn-primary" onclick="addToGoogleCalendar()">
-                    <i class="bi bi-calendar-plus"></i> Googleカレンダーに追加
+                    <i class="bi bi-calendar-plus me-1" aria-hidden="true"></i>Googleカレンダーに追加
                 </button>
             </div>
         </div>
@@ -139,200 +215,11 @@
 </div>
 {% endblock %}
 
-{% block head %}
-<style>
-.calendar-table {
-    min-height: 600px;
-}
-
-.calendar-day {
-    width: 14.28%;
-    height: 120px;
-    vertical-align: top;
-    position: relative;
-    padding: 0;
-}
-
-.day-header {
-    padding: 8px;
-    border-bottom: 1px solid #dee2e6;
-    background-color: rgba(0,0,0,0.03);
-}
-
-.day-number {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.releases-container {
-    padding: 4px;
-    max-height: 80px;
-    overflow: hidden;
-}
-
-.release-item {
-    margin-bottom: 2px;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-size: 0.75rem;
-    line-height: 1.2;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.release-item:hover {
-    opacity: 0.8;
-}
-
-.release-item.anime {
-    background-color: rgba(13, 110, 253, 0.1);
-    border-left: 3px solid #0d6efd;
-}
-
-.release-item.manga {
-    background-color: rgba(108, 117, 125, 0.1);
-    border-left: 3px solid #6c757d;
-}
-
-.release-title {
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100px;
-}
-
-.release-details {
-    color: #6c757d;
-    font-size: 0.7rem;
-}
-
-.more-releases {
-    text-align: center;
-    color: #0d6efd;
-    font-size: 0.7rem;
-    cursor: pointer;
-    padding: 2px;
-    border-radius: 3px;
-    margin-top: 2px;
-}
-
-.more-releases:hover {
-    background-color: rgba(13, 110, 253, 0.1);
-}
-
-/* Today highlight - will be applied by JavaScript */
-.calendar-day.today .day-header {
-    background-color: rgba(255, 193, 7, 0.2);
-    border-bottom-color: #ffc107;
-    font-weight: 700;
-}
-</style>
-{% endblock %}
-
 {% block scripts %}
+<!-- リリースデータをJavaScriptに渡す -->
 <script>
-let selectedDate = '';
-let selectedReleases = [];
-
-function showDayDetails(date) {
-    selectedDate = date;
-    const releases = getReleasesByDate(date);
-    selectedReleases = releases;
-    
-    // Format date for display
-    const dateObj = new Date(date);
-    const formattedDate = dateObj.toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long'
-    });
-    
-    document.getElementById('modal-date').textContent = formattedDate;
-    
-    // Generate modal content
-    let html = '';
-    if (releases.length === 0) {
-        html = '<p class="text-muted text-center">この日にリリース予定はありません。</p>';
-    } else {
-        html = '<div class="list-group">';
-        releases.forEach(release => {
-            const typeIcon = release.type === 'anime' ? 'tv' : 'book';
-            const typeLabel = release.type === 'anime' ? 'アニメ' : 'マンガ';
-            const typeClass = release.type === 'anime' ? 'primary' : 'secondary';
-            const releaseText = release.release_type === 'episode' ? '話' : '巻';
-            
-            html += `
-                <div class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="badge bg-${typeClass} me-2">
-                                    <i class="bi bi-${typeIcon}"></i> ${typeLabel}
-                                </span>
-                                <h6 class="mb-0">${release.title}</h6>
-                            </div>
-                            <p class="mb-1">第${release.number}${releaseText} · ${release.platform}</p>
-                            ${release.source_url ? `<small><a href="${release.source_url}" target="_blank" class="text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i>ソースを見る</a></small>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-        html += '</div>';
-    }
-    
-    document.getElementById('modal-body').innerHTML = html;
-}
-
-function getReleasesByDate(date) {
-    // This would be populated from the server data
-    const releasesData = {{ releases_by_date | tojson }};
-    return releasesData[date] || [];
-}
-
-function addToGoogleCalendar() {
-    if (selectedReleases.length === 0) {
-        alert('この日にリリース予定はありません。');
-        return;
-    }
-    
-    // Generate Google Calendar URL for multiple events
-    let calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
-    
-    // For simplicity, we'll create one event with all releases
-    const title = `${selectedReleases.length}件のリリース予定`;
-    let details = 'リリース予定:\n';
-    
-    selectedReleases.forEach(release => {
-        const releaseText = release.release_type === 'episode' ? '話' : '巻';
-        details += `• ${release.title} - 第${release.number}${releaseText} (${release.platform})\n`;
-    });
-    
-    calendarUrl += `&text=${encodeURIComponent(title)}`;
-    calendarUrl += `&dates=${selectedDate.replace(/-/g, '')}/${selectedDate.replace(/-/g, '')}`;
-    calendarUrl += `&details=${encodeURIComponent(details)}`;
-    
-    window.open(calendarUrl, '_blank');
-}
-
-// Make calendar days clickable
-document.addEventListener('DOMContentLoaded', function() {
-    const calendarDays = document.querySelectorAll('.calendar-day');
-    calendarDays.forEach(day => {
-        const date = day.dataset.date;
-        const releases = getReleasesByDate(date);
-        
-        if (releases.length > 0) {
-            day.style.cursor = 'pointer';
-            day.addEventListener('click', function() {
-                showDayDetails(date);
-                const modal = new bootstrap.Modal(document.getElementById('dayModal'));
-                modal.show();
-            });
-        }
-    });
-});
+    window.releasesData = {{ releases_by_date | tojson }};
 </script>
+<!-- Calendar Enhanced JS -->
+<script src="{{ url_for('static', filename='js/calendar-enhanced.js') }}"></script>
 {% endblock %}
