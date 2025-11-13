@@ -1285,6 +1285,84 @@ def api_test_configuration():
     )
 
 
+@app.route("/api/generate-ics", methods=["POST"])
+def generate_ics():
+    """選択されたリリースからiCalendarファイルを生成"""
+    from datetime import datetime as dt
+    import uuid
+    from flask import Response
+
+    try:
+        data = request.get_json()
+        releases = data.get('releases', [])
+
+        if not releases:
+            return jsonify({'error': '登録するリリースがありません'}), 400
+
+        # iCalendar形式のファイル生成
+        ics_content = ['BEGIN:VCALENDAR']
+        ics_content.append('VERSION:2.0')
+        ics_content.append('PRODID:-//MangaAnime Info System//Calendar//JP')
+        ics_content.append('CALSCALE:GREGORIAN')
+        ics_content.append('METHOD:PUBLISH')
+        ics_content.append('X-WR-CALNAME:アニメ・マンガリリース予定')
+        ics_content.append('X-WR-TIMEZONE:Asia/Tokyo')
+
+        for release in releases:
+            # イベントID生成
+            event_uid = str(uuid.uuid4())
+
+            # タイトル生成
+            type_icon = '🎬' if release.get('type') == 'anime' else '📚'
+            type_label = 'アニメ' if release.get('type') == 'anime' else 'マンガ'
+            release_text = '話' if release.get('release_type') == 'episode' else '巻'
+
+            title = f"{type_icon}【{type_label}】{release.get('title', '')} 第{release.get('number', '')}{release_text} | {release.get('platform', '')}"
+
+            # 詳細情報
+            description = f"作品: {release.get('title', '')}\\n"
+            description += f"タイプ: {type_label}\\n"
+            description += f"{release_text}: 第{release.get('number', '')}{release_text}\\n"
+            description += f"配信プラットフォーム: {release.get('platform', '')}\\n"
+            if release.get('source_url'):
+                description += f"ソースURL: {release.get('source_url')}\\n"
+            description += "\\n---\\n自動登録: MangaAnime情報配信システム"
+
+            # 日付（YYYYMMDD形式）
+            release_date = release.get('release_date', '')
+            date_str = release_date.replace('-', '')
+
+            # イベント作成
+            ics_content.append('BEGIN:VEVENT')
+            ics_content.append(f'UID:{event_uid}')
+            ics_content.append(f'DTSTAMP:{dt.now().strftime("%Y%m%dT%H%M%SZ")}')
+            ics_content.append(f'DTSTART;VALUE=DATE:{date_str}')
+            ics_content.append(f'DTEND;VALUE=DATE:{date_str}')
+            ics_content.append(f'SUMMARY:{title}')
+            ics_content.append(f'DESCRIPTION:{description}')
+            ics_content.append(f'LOCATION:{release.get("platform", "")}')
+            ics_content.append('STATUS:CONFIRMED')
+            ics_content.append('TRANSP:TRANSPARENT')
+            ics_content.append('END:VEVENT')
+
+        ics_content.append('END:VCALENDAR')
+
+        # レスポンス生成
+        ics_text = '\r\n'.join(ics_content)
+
+        return Response(
+            ics_text,
+            mimetype='text/calendar',
+            headers={
+                'Content-Disposition': f'attachment; filename=anime_manga_releases_{dt.now().strftime("%Y%m%d")}.ics'
+            }
+        )
+
+    except Exception as e:
+        logger.error(f'iCalendar生成エラー: {e}')
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == "__main__":
     # Initialize database if it doesn't exist
     if not os.path.exists(DATABASE_PATH):

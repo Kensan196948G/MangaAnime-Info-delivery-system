@@ -573,33 +573,51 @@
         }
 
         const confirmed = confirm(
-            `選択した${selectedReleases.length}件をGoogleカレンダーに個別登録しますか？\n\n` +
-            `📌 各リリースが別々のイベントとして登録されます\n` +
-            `⚠️ ${selectedReleases.length}個のタブが開きます\n` +
-            `💡 ポップアップブロックを許可してください`
+            `選択した${selectedReleases.length}件をGoogleカレンダーに登録しますか？\n\n` +
+            `📌 1つのファイルにまとめて登録されます\n` +
+            `💡 ダウンロードした.icsファイルをダブルクリックしてインポートしてください`
         );
 
         if (!confirmed) return;
 
-        // 各リリースを順次タブで開く
-        selectedReleases.forEach((release, index) => {
-            setTimeout(() => {
-                // GoogleCalendarIntegrationが利用可能か確認
-                if (window.GoogleCalendarIntegration && window.GoogleCalendarIntegration.generateCalendarUrl) {
-                    const url = window.GoogleCalendarIntegration.generateCalendarUrl(release);
-                    window.open(url, `gcal_${index}`, 'width=800,height=600');
-                } else {
-                    // フォールバック: 基本的なURL生成
-                    const url = generateBasicCalendarUrl(release);
-                    window.open(url, `gcal_${index}`, 'width=800,height=600');
-                }
-            }, index * 600); // 600ms間隔
-        });
+        // iCalendarファイルを生成してダウンロード
+        fetch('/api/generate-ics', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                releases: selectedReleases
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('iCalendar生成に失敗しました');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // ダウンロード
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `anime_manga_releases_${new Date().toISOString().split('T')[0]}.ics`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
 
-        // 完了メッセージ
-        setTimeout(() => {
-            alert(`✅ ${selectedReleases.length}件のGoogleカレンダー登録画面を開きました！\n\n各タブで「保存」をクリックしてください。`);
-        }, selectedReleases.length * 600 + 1000);
+            // 成功メッセージ
+            alert(
+                `✅ ${selectedReleases.length}件のカレンダーファイルをダウンロードしました！\n\n` +
+                `ダウンロードフォルダの「anime_manga_releases_YYYYMMDD.ics」を\n` +
+                `ダブルクリックしてGoogleカレンダーにインポートしてください。`
+            );
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('エラーが発生しました: ' + error.message);
+        });
     };
 
     // 基本的なカレンダーURL生成（フォールバック用）
