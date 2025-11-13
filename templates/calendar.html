@@ -53,17 +53,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% set ns = namespace(day_count=0) %}
                         {% for week_num in range(6) %}
                             <tr role="row">
                                 {% for day_num in range(7) %}
-                                    {% set ns.day_count = ns.day_count + 1 %}
-                                    {% set day_of_week = day_num %}
-                                    {% set first_day_of_month = (current_year ~ '-' ~ '%02d' % current_month ~ '-01') | strptime('%Y-%m-%d') %}
-                                    {% set first_weekday = first_day_of_month.strftime('%w') | int %}
-                                    {% set day = ns.day_count - first_weekday %}
+                                    {% set day = week_num * 7 + day_num - first_weekday + 1 %}
 
-                                    {% if day >= 1 and day <= 31 %}
+                                    {% if day >= 1 and day <= days_in_month %}
                                         {% set date_str = '%04d-%02d-%02d' % (current_year, current_month, day) %}
                                         {% set day_releases = releases_by_date.get(date_str, []) %}
 

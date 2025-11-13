@@ -366,8 +366,16 @@ def releases():
 @app.route("/calendar")
 def calendar():
     """Calendar view of releases"""
+    from calendar import monthrange
+
     month = request.args.get("month", datetime.now().month, type=int)
     year = request.args.get("year", datetime.now().year, type=int)
+
+    # 月の最初の日の曜日と日数を計算
+    first_weekday, days_in_month = monthrange(year, month)
+
+    # 月の最初の日
+    first_day = datetime(year, month, 1)
 
     # Get releases for the specified month with Japanese title priority
     conn = get_db_connection()
@@ -400,6 +408,8 @@ def calendar():
         releases_by_date=releases_by_date,
         current_month=month,
         current_year=year,
+        first_weekday=first_weekday,
+        days_in_month=days_in_month,
     )
 
 
