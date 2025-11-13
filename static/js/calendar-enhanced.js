@@ -409,7 +409,7 @@
         }, 5000);
     }
 
-    // === 17. モーダル表示関数の拡張（グローバル関数として定義） ===
+    // === 17. モーダル表示関数の拡張（チェックボックス対応） ===
     window.showDayDetails = function(date) {
         window.selectedDate = date;
         const releases = getReleasesByDate(date);
@@ -431,18 +431,48 @@
         if (releases.length === 0) {
             html = '<p class="text-muted text-center">この日にリリース予定はありません。</p>';
         } else {
-            html = '<div class="list-group">';
-            releases.forEach(release => {
+            // 全選択/全解除ボタン
+            html += `
+                <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+                    <div>
+                        <strong><i class="bi bi-list-check me-2"></i>${releases.length}件のリリース</strong>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" onclick="selectAllReleases()">
+                            <i class="bi bi-check-all me-1"></i>全選択
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="deselectAllReleases()">
+                            <i class="bi bi-x-square me-1"></i>全解除
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            html += '<div class="list-group list-group-flush" id="releases-list">';
+            releases.forEach((release, index) => {
                 const typeIcon = release.type === 'anime' ? '🎬' : '📚';
                 const typeLabel = release.type === 'anime' ? 'アニメ' : 'マンガ';
                 const typeClass = release.type === 'anime' ? 'primary' : 'success';
                 const releaseText = release.release_type === 'episode' ? '話' : '巻';
                 const platformIcon = getPlatformIcon(release.platform);
                 const titleEmoji = getTitleEmoji(release.title);
+                const releaseJson = JSON.stringify({...release, release_date: date}).replace(/"/g, '&quot;');
 
                 html += `
                     <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex align-items-start">
+                            <!-- チェックボックス -->
+                            <div class="form-check me-3 mt-2">
+                                <input class="form-check-input release-checkbox"
+                                       type="checkbox"
+                                       id="release-${index}"
+                                       value="${index}"
+                                       data-release='${releaseJson}'
+                                       checked>
+                                <label class="form-check-label" for="release-${index}"></label>
+                            </div>
+
+                            <!-- リリース情報 -->
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center mb-2">
                                     <span class="badge bg-${typeClass} me-2">
@@ -454,13 +484,23 @@
                                     <strong>第${release.number}${releaseText}</strong> ·
                                     ${platformIcon} ${release.platform}
                                 </p>
-                                ${release.source_url ? `<small><a href="${release.source_url}" target="_blank" class="text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i>ソースを見る</a></small>` : ''}
+                                ${release.source_url ? `<small><a href="${release.source_url}" target="_blank" class="text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i>${release.platform}で見る</a></small>` : ''}
                             </div>
                         </div>
                     </div>
                 `;
             });
             html += '</div>';
+
+            // 登録ボタン
+            html += `
+                <div class="d-grid gap-2 mt-3">
+                    <button class="btn btn-success btn-lg" onclick="addSelectedToGoogleCalendar()" id="add-selected-btn">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        選択した項目をGoogleカレンダーに登録
+                    </button>
+                </div>
+            `;
         }
 
         document.getElementById('modal-body').innerHTML = html;
