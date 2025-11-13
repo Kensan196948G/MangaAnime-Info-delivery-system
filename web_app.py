@@ -288,9 +288,9 @@ def releases():
 
     conn = get_db_connection()
 
-    # Build query with filters - Japanese title priority
+    # Build query with filters - proper title display
     query = """
-        SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
+        SELECT w.title as title, w.title as original_title,
                w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url, r.notified, r.created_at
         FROM releases r
@@ -377,18 +377,18 @@ def calendar():
     # 月の最初の日
     first_day = datetime(year, month, 1)
 
-    # Get releases for the specified month with Japanese title priority
+    # Get releases for the specified month with proper title display
     conn = get_db_connection()
     releases_data = conn.execute(
         """
-        SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
+        SELECT w.title as title, w.title as original_title,
                w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url
         FROM releases r
         JOIN works w ON r.work_id = w.id
         WHERE strftime('%Y', r.release_date) = ?
         AND strftime('%m', r.release_date) = ?
-        ORDER BY r.release_date, COALESCE(w.title_kana, w.title)
+        ORDER BY r.release_date, w.title
     """,
         [str(year), f"{month:02d}"],
     ).fetchall()
