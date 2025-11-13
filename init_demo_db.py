@@ -148,7 +148,7 @@ def create_database():
         platform_list = anime_platforms if work_type == "anime" else manga_platforms
 
         # Generate releases for the past month and next month
-        for days_offset in range(-30, 31, secrets.randbelow(1, 7)):
+        for days_offset in range(-30, 31, max(1, secrets.randbelow(7))):
             release_date = today + timedelta(days=days_offset)
 
             # Random chance of having a release on this day
@@ -158,9 +158,9 @@ def create_database():
 
                 # Generate episode/volume number
                 if release_type == "episode":
-                    number = str(secrets.randbelow(1, 24))
+                    number = str(secrets.randbelow(24) + 1)
                 else:
-                    number = str(secrets.randbelow(1, 30))
+                    number = str(secrets.randbelow(30) + 1)
 
                 # Notification status (70% notified for past releases)
                 notified = (
