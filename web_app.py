@@ -224,10 +224,10 @@ def dashboard():
     """Main dashboard showing recent releases"""
     conn = get_db_connection()
 
-    # Get recent releases (last 7 days) with Japanese title priority
+    # Get recent releases (last 7 days) with proper title display
     recent_releases = conn.execute(
         """
-        SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
+        SELECT w.title as title, w.title as original_title,
                w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url, r.notified
         FROM releases r
@@ -238,10 +238,10 @@ def dashboard():
     """
     ).fetchall()
 
-    # Get upcoming releases (next 7 days) with Japanese title priority
+    # Get upcoming releases (next 7 days) with proper title display
     upcoming_releases = conn.execute(
         """
-        SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
+        SELECT w.title as title, w.title as original_title,
                w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url
         FROM releases r
