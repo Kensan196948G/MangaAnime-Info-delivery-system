@@ -1,0 +1,180 @@
+{
+  "auto-error-detection-repair.yml": [
+    {
+      "scenario": "正常系",
+      "status": "SUCCESS",
+      "duration_minutes": 11.2,
+      "details": "全8ステップが正常に完了",
+      "issues_found": []
+    },
+    {
+      "scenario": "Python環境セットアップ失敗",
+      "status": "FAILURE",
+      "duration_minutes": 2.0,
+      "details": "Python環境セットアップで失敗",
+      "issues_found": [
+        "Python環境セットアップ失敗により、残り6ステップがスキップされます",
+        "以下のステップは実行されます: 修復結果サマリー作成, 修復ログをアーティファクトとして保存"
+      ]
+    },
+    {
+      "scenario": "依存関係インストール失敗",
+      "status": "FAILURE",
+      "duration_minutes": 5.0,
+      "details": "依存関係インストールでエラー",
+      "issues_found": [
+        "⚠ リトライメカニズムが設定されていません",
+        "✓ インストールステップにタイムアウト設定あり: 5分"
+      ]
+    },
+    {
+      "scenario": "修復ループタイムアウト",
+      "status": "TIMEOUT",
+      "duration_minutes": 15,
+      "details": "修復ループがタイムアウトしました",
+      "issues_found": [
+        "修復ループのタイムアウト: 15分",
+        "⚠ continue-on-error が未設定のため、ワークフロー全体が失敗します",
+        "✓ クリーンアップステップ(2個)は実行されます"
+      ]
+    },
+    {
+      "scenario": "並列実行競合",
+      "status": "QUEUED",
+      "duration_minutes": 0.5,
+      "details": "別のワークフロー実行が進行中",
+      "issues_found": [
+        "✓ 並列実行制御グループ: auto-repair-system",
+        "⚠ 実行中のワークフローは待機します（キューイング）"
+      ]
+    },
+    {
+      "scenario": "Issue作成失敗",
+      "status": "FAILURE",
+      "duration_minutes": 1.0,
+      "details": "GitHub API エラーによりIssue作成失敗",
+      "issues_found": [
+        "✓ '失敗時にIssue作成' は失敗時のみ実行されます",
+        "⚠ '失敗時にIssue作成' はGITHUB_TOKENの権限が必要です",
+        "✓ '成功時にIssueコメント' は成功時のみ実行されます",
+        "⚠ '成功時にIssueコメント' はGITHUB_TOKENの権限が必要です",
+        "✓ Issue作成時のエラーハンドリングが実装されています"
+      ]
+    },
+    {
+      "scenario": "アーティファクトアップロード失敗",
+      "status": "FAILURE",
+      "duration_minutes": 2.0,
+      "details": "ネットワークエラーによりアップロード失敗",
+      "issues_found": [
+        "アーティファクト '修復ログをアーティファクトとして保存' の保持期間: 30日",
+        "✓ '修復ログをアーティファクトとして保存' は失敗時も実行されます",
+        "⚠ アーティファクトサイズが大きい場合、アップロードに時間がかかります"
+      ]
+    }
+  ],
+  "auto-error-detection-repair-v2.yml": [
+    {
+      "scenario": "正常系",
+      "status": "SUCCESS",
+      "duration_minutes": 14.0,
+      "details": "全10ステップが正常に完了",
+      "issues_found": []
+    },
+    {
+      "scenario": "Python環境セットアップ失敗",
+      "status": "FAILURE",
+      "duration_minutes": 2.0,
+      "details": "Python環境セットアップで失敗",
+      "issues_found": [
+        "Python環境セットアップ失敗により、残り8ステップがスキップされます",
+        "以下のステップは実行されます: 修復ステータスを判定, 修復結果サマリー作成, 修復ログをアーティファクトとして保存, 修復結果に基づく終了判定"
+      ]
+    },
+    {
+      "scenario": "依存関係インストール失敗",
+      "status": "RETRY_SUCCESS",
+      "duration_minutes": 15.0,
+      "details": "依存関係インストールでエラー → リトライで成功",
+      "issues_found": [
+        "✓ リトライメカニズムが設定されています（最大3回試行）",
+        "✓ インストールステップにタイムアウト設定あり: 8分"
+      ]
+    },
+    {
+      "scenario": "修復ループタイムアウト",
+      "status": "TIMEOUT",
+      "duration_minutes": 18,
+      "details": "修復ループがタイムアウトしました",
+      "issues_found": [
+        "修復ループのタイムアウト: 18分",
+        "✓ continue-on-error が設定されており、後続ステップは実行されます",
+        "✓ クリーンアップステップ(4個)は実行されます"
+      ]
+    },
+    {
+      "scenario": "並列実行競合",
+      "status": "QUEUED",
+      "duration_minutes": 0.5,
+      "details": "別のワークフロー実行が進行中",
+      "issues_found": [
+        "✓ 並列実行制御グループ: auto-repair-system",
+        "⚠ 実行中のワークフローは待機します（キューイング）"
+      ]
+    },
+    {
+      "scenario": "Issue作成失敗",
+      "status": "FAILURE",
+      "duration_minutes": 1.0,
+      "details": "GitHub API エラーによりIssue作成失敗",
+      "issues_found": [
+        "⚠ '失敗時にIssue作成（クリティカルエラーのみ）' はGITHUB_TOKENの権限が必要です",
+        "⚠ '成功時にIssueコメント' はGITHUB_TOKENの権限が必要です",
+        "✓ Issue作成時のエラーハンドリングが実装されています"
+      ]
+    },
+    {
+      "scenario": "アーティファクトアップロード失敗",
+      "status": "FAILURE",
+      "duration_minutes": 2.0,
+      "details": "ネットワークエラーによりアップロード失敗",
+      "issues_found": [
+        "アーティファクト '修復ログをアーティファクトとして保存' の保持期間: 30日",
+        "✓ '修復ログをアーティファクトとして保存' は失敗時も実行されます",
+        "⚠ アーティファクトサイズが大きい場合、アップロードに時間がかかります"
+      ]
+    },
+    {
+      "scenario": "リトライメカニズム",
+      "status": "SUCCESS",
+      "duration_minutes": 15.333333333333334,
+      "details": "リトライメカニズムのシミュレーション",
+      "issues_found": [
+        "✓ '依存関係インストール（リトライ付き）': 最大3回試行",
+        "  - タイムアウト: 5分",
+        "  - 再試行間隔: 10秒",
+        "  - 最大実行時間: 15.3分"
+      ]
+    }
+  ],
+  "performance_analysis": {
+    "auto-error-detection-repair.yml": {
+      "total_scenarios": 7,
+      "success_count": 1,
+      "failure_count": 4,
+      "timeout_count": 1,
+      "avg_duration_minutes": 5.24,
+      "max_duration_minutes": 15,
+      "total_issues": 17
+    },
+    "auto-error-detection-repair-v2.yml": {
+      "total_scenarios": 8,
+      "success_count": 3,
+      "failure_count": 3,
+      "timeout_count": 1,
+      "avg_duration_minutes": 8.48,
+      "max_duration_minutes": 18,
+      "total_issues": 19
+    }
+  }
+}

@@ -1,0 +1,327 @@
+[
+  {
+    "workflow": "auto-error-detection-repair.yml",
+    "results": [
+      {
+        "category": "構文検証",
+        "test_name": "YAML構文",
+        "status": "PASS",
+        "message": "YAMLファイルは正常にパースできました",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "必須フィールド 'name'",
+        "status": "PASS",
+        "message": "'name' フィールドが存在します",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "必須フィールド 'on'",
+        "status": "FAIL",
+        "message": "'on' フィールドが存在しません",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "必須フィールド 'jobs'",
+        "status": "PASS",
+        "message": "'jobs' フィールドが存在します",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "ジョブ数",
+        "status": "PASS",
+        "message": "1個のジョブが定義されています",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - runs-on",
+        "status": "PASS",
+        "message": "runs-on: ubuntu-latest",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - steps",
+        "status": "PASS",
+        "message": "8個のステップが定義されています",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - timeout",
+        "status": "PASS",
+        "message": "タイムアウト: 30分",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ジョブレベル - 条件式",
+        "status": "PASS",
+        "message": "正しいイベント名チェックが含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '修復結果サマリー作成' - 条件式",
+        "status": "PASS",
+        "message": "常に実行が含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '修復ログをアーティファクトとして保存' - 条件式",
+        "status": "PASS",
+        "message": "常に実行が含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '失敗時にIssue作成' - 条件式",
+        "status": "PASS",
+        "message": "失敗検出が含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '成功時にIssueコメント' - 条件式",
+        "status": "PASS",
+        "message": "Issue番号参照が含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '成功時にIssueコメント' - 条件式",
+        "status": "PASS",
+        "message": "成功検出が含まれています",
+        "details": ""
+      },
+      {
+        "category": "セキュリティ検証",
+        "test_name": "シークレット使用",
+        "status": "PASS",
+        "message": "シークレットが使用されています",
+        "details": ""
+      },
+      {
+        "category": "セキュリティ検証",
+        "test_name": "GITHUB_TOKEN使用",
+        "status": "PASS",
+        "message": "GITHUB_TOKENが適切に使用されています",
+        "details": ""
+      },
+      {
+        "category": "パフォーマンス検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - キャッシュ",
+        "status": "PASS",
+        "message": "キャッシュが使用されています",
+        "details": ""
+      },
+      {
+        "category": "パフォーマンス検証",
+        "test_name": "総推定実行時間",
+        "status": "PASS",
+        "message": "最大30分（タイムアウト合計）",
+        "details": ""
+      },
+      {
+        "category": "パフォーマンス検証",
+        "test_name": "同時実行制御",
+        "status": "PASS",
+        "message": "グループ: auto-repair-system, cancel-in-progress: False",
+        "details": ""
+      },
+      {
+        "category": "エラーハンドリング検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - always()",
+        "status": "PASS",
+        "message": "常に実行されるステップが定義されています",
+        "details": ""
+      },
+      {
+        "category": "エラーハンドリング検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - failure()",
+        "status": "PASS",
+        "message": "失敗時の処理が定義されています",
+        "details": ""
+      },
+      {
+        "category": "GitHub式検証",
+        "test_name": "式の使用",
+        "status": "PASS",
+        "message": "5個の式が使用されています",
+        "details": ""
+      }
+    ]
+  },
+  {
+    "workflow": "auto-error-detection-repair-v2.yml",
+    "results": [
+      {
+        "category": "構文検証",
+        "test_name": "YAML構文",
+        "status": "PASS",
+        "message": "YAMLファイルは正常にパースできました",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "必須フィールド 'name'",
+        "status": "PASS",
+        "message": "'name' フィールドが存在します",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "必須フィールド 'on'",
+        "status": "FAIL",
+        "message": "'on' フィールドが存在しません",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "必須フィールド 'jobs'",
+        "status": "PASS",
+        "message": "'jobs' フィールドが存在します",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "ジョブ数",
+        "status": "PASS",
+        "message": "1個のジョブが定義されています",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - runs-on",
+        "status": "PASS",
+        "message": "runs-on: ubuntu-latest",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - steps",
+        "status": "PASS",
+        "message": "10個のステップが定義されています",
+        "details": ""
+      },
+      {
+        "category": "構造検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - timeout",
+        "status": "PASS",
+        "message": "タイムアウト: 25分",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ジョブレベル - 条件式",
+        "status": "PASS",
+        "message": "正しいイベント名チェックが含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "エラー継続設定 (エラー検知・修復ループ実行)",
+        "status": "PASS",
+        "message": "continue-on-error: True",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '修復ステータスを判定' - 条件式",
+        "status": "PASS",
+        "message": "常に実行が含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '修復結果サマリー作成' - 条件式",
+        "status": "PASS",
+        "message": "常に実行が含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '修復ログをアーティファクトとして保存' - 条件式",
+        "status": "PASS",
+        "message": "常に実行が含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '成功時にIssueコメント' - 条件式",
+        "status": "PASS",
+        "message": "Issue番号参照が含まれています",
+        "details": ""
+      },
+      {
+        "category": "ロジック検証",
+        "test_name": "ステップ '修復結果に基づく終了判定' - 条件式",
+        "status": "PASS",
+        "message": "常に実行が含まれています",
+        "details": ""
+      },
+      {
+        "category": "セキュリティ検証",
+        "test_name": "シークレット使用",
+        "status": "PASS",
+        "message": "シークレットが使用されています",
+        "details": ""
+      },
+      {
+        "category": "セキュリティ検証",
+        "test_name": "GITHUB_TOKEN使用",
+        "status": "PASS",
+        "message": "GITHUB_TOKENが適切に使用されています",
+        "details": ""
+      },
+      {
+        "category": "パフォーマンス検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - キャッシュ",
+        "status": "PASS",
+        "message": "キャッシュが使用されています",
+        "details": ""
+      },
+      {
+        "category": "パフォーマンス検証",
+        "test_name": "総推定実行時間",
+        "status": "PASS",
+        "message": "最大25分（タイムアウト合計）",
+        "details": ""
+      },
+      {
+        "category": "パフォーマンス検証",
+        "test_name": "同時実行制御",
+        "status": "PASS",
+        "message": "グループ: auto-repair-system, cancel-in-progress: False",
+        "details": ""
+      },
+      {
+        "category": "エラーハンドリング検証",
+        "test_name": "ジョブ 'error-detection-and-repair' - always()",
+        "status": "PASS",
+        "message": "常に実行されるステップが定義されています",
+        "details": ""
+      },
+      {
+        "category": "エラーハンドリング検証",
+        "test_name": "ステップ '依存関係インストール（リトライ付き）' - リトライ",
+        "status": "PASS",
+        "message": "リトライアクションが使用されています",
+        "details": ""
+      },
+      {
+        "category": "GitHub式検証",
+        "test_name": "式の使用",
+        "status": "PASS",
+        "message": "6個の式が使用されています",
+        "details": ""
+      }
+    ]
+  }
+]
