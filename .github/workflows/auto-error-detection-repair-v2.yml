@@ -111,24 +111,30 @@ EOL
           max_attempts: 3
           retry_wait_seconds: 10
           command: |
+            set -e
             pip install --upgrade pip
 
-            # 基本的な依存関係を必ずインストール
-            pip install requests PyYAML python-dotenv flask sqlalchemy
+            # 必須パッケージを直接インストール（確実に実行）
+            echo "📦 Installing core packages..."
+            pip install requests PyYAML python-dotenv flask sqlalchemy google-api-python-client google-auth feedparser
 
-            # requirements.txtがある場合は追加でインストール
+            # requirements.txtから追加パッケージをインストール
             if [ -f requirements.txt ]; then
-              echo "✓ requirements.txt found"
-              pip install -r requirements.txt
+              echo "✓ requirements.txt found, installing additional packages..."
+              pip install -r requirements.txt || echo "⚠ Some packages from requirements.txt failed"
             else
-              echo "⚠ requirements.txt not found, using basic dependencies"
+              echo "⚠ requirements.txt not found (should have been generated)"
             fi
 
-            # requirements-dev.txtがある場合はインストール（オプション）
+            # requirements-dev.txtから開発パッケージをインストール（エラーは無視）
             if [ -f requirements-dev.txt ]; then
-              echo "✓ requirements-dev.txt found"
-              pip install -r requirements-dev.txt || true
+              echo "✓ requirements-dev.txt found, installing dev packages..."
+              pip install -r requirements-dev.txt || echo "ℹ Dev packages skipped"
             fi
+
+            # インストール済みパッケージ確認
+            echo "📦 Installed packages:"
+            pip list | grep -E "requests|PyYAML|flask|sqlalchemy"
 
       - name: エラー検知・修復ループ実行
         id: repair-loop
