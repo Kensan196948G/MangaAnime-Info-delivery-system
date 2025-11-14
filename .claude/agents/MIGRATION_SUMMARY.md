@@ -208,8 +208,10 @@ triggers:
 ## Support and Resources
 
 - Agent documentation: `.claude/agents/README.md`
-- Migration guides: `.claude/agents/migration/`
-- Example workflows: `.claude/agents/examples/`
+- Technical documentation: `docs/technical/`
+- Development guides: `docs/development/`
+- Setup guides: `docs/setup/`
+- Reports: `docs/reports/`
 - Community support: GitHub discussions
 
 The new agent system represents a significant advancement in AI-assisted development, providing a more intuitive, powerful, and efficient way to accomplish complex tasks.

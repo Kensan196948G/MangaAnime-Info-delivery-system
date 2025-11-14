@@ -20,7 +20,7 @@ Web管理UIの設計と実装を担当するフロントエンド開発者。Pha
    - `logs.html` - ログビューア
 3. **スタイルシート** (`static/css/style.css`)
 4. **JavaScriptファイル** (`static/js/main.js`)
-5. **UI設計書** (`docs/ui_design.md`)
+5. **UI設計書** (`docs/development/ui_design_analysis.md`)
 
 ## 技術スタック
 - Flask 2.3+

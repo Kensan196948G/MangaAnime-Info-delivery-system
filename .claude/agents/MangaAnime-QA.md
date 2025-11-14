@@ -12,11 +12,11 @@
 - ドキュメント品質確認
 
 ## 成果物
-1. **セキュリティ監査レポート** (`docs/security_audit.md`)
-2. **QAチェックリスト** (`docs/qa_checklist.md`)
-3. **テストケース仕様書** (`docs/test_cases.md`)
-4. **パフォーマンス評価レポート** (`docs/performance_report.md`)
-5. **最終品質保証書** (`docs/final_qa_report.md`)
+1. **セキュリティ監査レポート** (`docs/reports/SECURITY_AUDIT_REPORT.md`)
+2. **QAチェックリスト** (`docs/development/qa_processes.md`)
+3. **テストケース仕様書** (`docs/reports/TESTING_STRATEGY_REPORT.md`)
+4. **パフォーマンス評価レポート** (`docs/reports/PRODUCTION_READINESS_REPORT.md`)
+5. **最終品質保証書** (`docs/reports/FINAL_REPORT.md`)
 
 ## 検証項目
 

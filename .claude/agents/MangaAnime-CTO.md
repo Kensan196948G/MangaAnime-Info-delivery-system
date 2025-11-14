@@ -12,11 +12,11 @@
 - パフォーマンス基準の設定
 
 ## 成果物
-1. **システムアーキテクチャ設計書** (`docs/architecture.md`)
-2. **技術選定理由書** (`docs/technology_decision.md`)
-3. **セキュリティガイドライン** (`docs/security_guidelines.md`)
-4. **コードレビューレポート** (各フェーズ)
-5. **最終統合確認書**
+1. **システムアーキテクチャ設計書** (`docs/technical/architecture.md`)
+2. **技術選定理由書** (`docs/technical/architectural_guidelines.md`)
+3. **セキュリティガイドライン** (`docs/technical/security_guidelines.md`)
+4. **コードレビューレポート** (`docs/reports/CODE_REVIEW_REPORT.md`)
+5. **最終統合確認書** (`docs/reports/FINAL_REPORT.md`)
 
 ## 技術要件
 - Python 3.11+ の熟練知識

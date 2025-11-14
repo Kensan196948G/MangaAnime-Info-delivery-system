@@ -199,17 +199,27 @@ claude "CLAUDE.mdの仕様を確認してプロジェクト構造を理解して
 
 ```
 project-root/
-├── .claude/agents/              # 各Agent定義ファイル
-│   ├── MangaAnime-CTO.md
-│   ├──MangaAnime-DevUI.md
-│   ├── MangaAnime-DevAPI.md
-│   ├── MangaAnime-QA.md
-│   └── MangaAnime-Tester.md
+├── .claude/Agents/              # 各Agent定義ファイル
+│   ├── core/
+│   │   ├── coder.md
+│   │   ├── planner.md
+│   │   ├── researcher.md
+│   │   ├── reviewer.md
+│   │   └── tester.md
+│   ├── github/
+│   │   ├── issue-tracker.md
+│   │   ├── pr-manager.md
+│   │   └── release-manager.md
+│   └── consensus/               # 分散合意系Agent
 ├── docs/                        # 仕様・設計ドキュメント群
-│   └── system_spec.md
-├── workflows/                   # ClaudeFlowワークフロー定義
+│   ├── technical/               # 技術仕様
+│   ├── setup/                   # セットアップガイド
+│   ├── operations/              # 運用手順
+│   ├── reports/                 # レポート
+│   └── troubleshooting/         # トラブルシューティング
+├── .claude/workflows/           # ClaudeFlowワークフロー定義
 │   └── batch.yaml
-├── settings.local.json          # 権限・環境設定
+├── .claude/settings.json        # 権限・環境設定
 └── run_claude_autoloop.sh       # 自動ループ実行用スクリプト
 ```
 
