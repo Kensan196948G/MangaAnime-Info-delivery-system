@@ -447,12 +447,15 @@ jobs:
             const emoji = statusEmojis[summaryData.final_status] || '❓';
             const timestamp = new Date().toISOString();
 
+            const eventName = '${{ github.event_name }}';
+            const runNumber = '${{ github.run_number }}';
+
             const issueBody = `
             ## ${emoji} 自動修復失敗レポート
 
             **実行日時**: ${timestamp}
-            **トリガー**: ${{ github.event_name }}
-            **ワークフローRun**: ${{ github.run_number }}
+            **トリガー**: ${eventName}
+            **ワークフロー実行番号**: ${runNumber}
 
             ### 📊 実行サマリー
 
