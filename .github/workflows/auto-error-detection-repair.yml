@@ -59,13 +59,14 @@ jobs:
               cp data/requirements.txt requirements.txt
             else
               echo "⚠️ Generating minimal requirements.txt"
-              cat > requirements.txt << 'EOL'
-requests>=2.31.0
-PyYAML>=6.0.1
-python-dotenv>=1.0.0
-flask>=3.0.0
-sqlalchemy>=2.0.0
-EOL
+              echo "requests>=2.31.0" > requirements.txt
+              echo "PyYAML>=6.0.1" >> requirements.txt
+              echo "python-dotenv>=1.0.0" >> requirements.txt
+              echo "flask>=3.0.0" >> requirements.txt
+              echo "sqlalchemy>=2.0.0" >> requirements.txt
+              echo "google-api-python-client>=2.100.0" >> requirements.txt
+              echo "google-auth>=2.23.0" >> requirements.txt
+              echo "feedparser>=6.0.10" >> requirements.txt
             fi
           fi
 
