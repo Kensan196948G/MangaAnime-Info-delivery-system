@@ -39,7 +39,7 @@ class PerformanceValidator:
     """システムパフォーマンス・運用性検証クラス"""
 
     def __init__(self):
-        self.project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+        self.project_root = Path(__file__).parent.resolve()
         self.db_path = self.project_root / "db.sqlite3"
         self.config_path = self.project_root / "config" / "config.json"
         self.results = {}

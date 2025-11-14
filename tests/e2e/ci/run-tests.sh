@@ -31,7 +31,7 @@ log_error() {
 }
 
 # 設定
-PROJECT_ROOT="/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 TEST_RESULTS_DIR="$PROJECT_ROOT/tests/e2e/reports"
 BROWSER_LIST="chromium firefox webkit"
 

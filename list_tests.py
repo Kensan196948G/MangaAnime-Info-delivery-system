@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
 
 # List everything in tests/ directory
 tests_path = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/tests"
@@ -32,7 +33,7 @@ else:
     print(f"❌ {tests_path} does not exist")
 
 # Also check if there are any test files in the root
-root_path = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+root_path = str(Path(__file__).parent.resolve())
 print(f"\n=== Checking for test files in root: {root_path} ===")
 for item in os.listdir(root_path):
     if item.startswith("test_") and item.endswith(".py"):

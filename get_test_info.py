@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 import os
 import sys
+from pathlib import Path
 
-# Add the project to Python path
-sys.path.insert(0, "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+# Get the project root directory dynamically
+project_root = Path(__file__).parent.resolve()
+sys.path.insert(0, str(project_root))
 
 print("=== Test File Analysis ===")
 
 # Check tests directory
-tests_dir = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/tests"
+tests_dir = project_root / "tests"
 print(f"Tests directory: {tests_dir}")
 print(f"Exists: {os.path.exists(tests_dir)}")
 
@@ -35,7 +37,7 @@ if os.path.exists(tests_dir):
 # Try to run pytest directly
 print("\n=== Running pytest directly ===")
 try:
-    os.chdir("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+    os.chdir(str(project_root))
 
     import subprocess
 
@@ -75,8 +77,8 @@ for module in modules_to_check:
         print(f"❌ {module}")
 
 # Check the main modules directory
-modules_dir = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/modules"
-if os.path.exists(modules_dir):
+modules_dir = project_root / "modules"
+if modules_dir.exists():
     print("\n=== modules/ directory ===")
     for item in os.listdir(modules_dir):
         if item.endswith(".py"):

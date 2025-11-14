@@ -27,7 +27,7 @@ echo "╚═══════════════════════�
 echo -e "${NC}"
 
 # プロジェクトディレクトリの確認
-PROJECT_DIR="/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 cd "$PROJECT_DIR" || {
     echo -e "${RED}❌ Error: プロジェクトディレクトリが見つかりません: $PROJECT_DIR${NC}"
     exit 1

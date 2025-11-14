@@ -8,12 +8,12 @@
 
 ```bash
 # 統合モードで起動 (推奨)
-./quick_start.sh integrated
+./scripts/operations/quick_start.sh integrated
 
 # または個別モード
-./quick_start.sh claude      # Claude Code (12 SubAgents)
-./quick_start.sh swarm       # Claude-Flow Swarm 並列開発
-./quick_start.sh context7    # Context7 分析モード
+./scripts/operations/quick_start.sh claude      # Claude Code (12 SubAgents)
+./scripts/operations/quick_start.sh swarm       # Claude-Flow Swarm 並列開発
+./scripts/operations/quick_start.sh context7    # Context7 分析モード
 ```
 
 ## 🔧 AI機能詳細
@@ -65,15 +65,15 @@
 │   └── config.json                # Context7統合設定
 ├── workflows/
 │   └── swarm-config.yaml          # Claude-Flow Swarm設定
-├── start_integrated_ai_development.sh  # 統合起動スクリプト
-└── quick_start.sh                 # クイックスタート
+├── scripts/development/start_integrated_ai_development.sh  # 統合起動スクリプト
+│   └── operations/quick_start.sh                # クイックスタート
 ```
 
 ## 🎛️ 起動モード
 
 ### 1. 統合モード (推奨)
 ```bash
-./quick_start.sh integrated
+./scripts/operations/quick_start.sh integrated
 ```
 - Claude Code + Swarm + Context7 のフル機能
 - 最高の開発効率
@@ -81,7 +81,7 @@
 
 ### 2. Claude Code モード
 ```bash
-./quick_start.sh claude
+./scripts/operations/quick_start.sh claude
 ```
 - 12 SubAgents による協調開発
 - 対話型開発
@@ -89,7 +89,7 @@
 
 ### 3. Swarm並列モード
 ```bash
-./quick_start.sh swarm
+./scripts/operations/quick_start.sh swarm
 ```
 - 12体エージェント並列開発
 - 自動化実装
@@ -97,7 +97,7 @@
 
 ### 4. Context7分析モード
 ```bash
-./quick_start.sh context7
+./scripts/operations/quick_start.sh context7
 ```
 - プロジェクト分析
 - 改善点特定

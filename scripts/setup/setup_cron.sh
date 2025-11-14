@@ -5,8 +5,8 @@ echo "================================================"
 echo "MangaAnime Info Delivery System - Cron Setup"
 echo "================================================"
 
-# プロジェクトディレクトリの取得
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# プロジェクトディレクトリの取得 (scripts/setup から ../../ でプロジェクトルートへ)
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PYTHON_PATH="$(which python3)"
 
 # cronジョブ設定

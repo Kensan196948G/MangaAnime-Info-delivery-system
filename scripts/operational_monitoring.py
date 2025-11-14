@@ -35,7 +35,7 @@ class OperationalMonitor:
     """運用監視クラス - 24時間365日システム監視"""
 
     def __init__(self):
-        self.project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+        self.project_root = Path(__file__).parent.resolve()
         self.config_path = self.project_root / "config" / "config.json"
         self.db_path = self.project_root / "db.sqlite3"
         self.monitoring_active = True

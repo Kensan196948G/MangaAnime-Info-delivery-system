@@ -16,7 +16,7 @@ def main():
     print("=" * 50)
 
     # Change to project directory
-    project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+    project_root = Path(__file__).parent.resolve()
     os.chdir(project_root)
 
     print(f"📁 Working directory: {project_root}")

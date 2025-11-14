@@ -296,7 +296,7 @@ def run_tests_and_get_failures(tests_dir):
 
 def main():
     """Main test fixing process"""
-    project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+    project_root = Path(__file__).parent.resolve()
     tests_dir = project_root / "tests"
 
     print("=== Comprehensive Test Fixing ===")

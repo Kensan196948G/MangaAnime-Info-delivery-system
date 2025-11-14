@@ -15,7 +15,7 @@ WHITE='\033[1;37m'
 NC='\033[0m' # No Color
 
 # プロジェクトルート設定
-PROJECT_ROOT="/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 cd "$PROJECT_ROOT"
 
 # ロゴ表示

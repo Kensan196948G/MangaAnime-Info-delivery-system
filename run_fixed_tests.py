@@ -11,7 +11,7 @@ from pathlib import Path
 
 def ensure_test_environment():
     """Ensure test environment is properly set up"""
-    project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+    project_root = Path(__file__).parent.resolve()
     tests_dir = project_root / "tests"
 
     # Ensure tests directory exists
@@ -41,7 +41,7 @@ def run_tests():
     print("🚀 Running Fixed Tests")
     print("=" * 30)
 
-    project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+    project_root = Path(__file__).parent.resolve()
     os.chdir(project_root)
 
     # Check environment

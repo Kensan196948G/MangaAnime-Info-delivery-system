@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 import requests
 
 # プロジェクトルートをパスに追加
-project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
+project_root = Path(__file__).parent.resolve()
 sys.path.insert(0, str(project_root))
 
 # ログ設定

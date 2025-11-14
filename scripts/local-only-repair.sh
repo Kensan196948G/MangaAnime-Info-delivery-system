@@ -5,7 +5,7 @@ set -euo pipefail
 
 # 設定
 REPO="Kensan196948G/MangaAnime-Info-delivery-system"
-WORK_DIR="/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+WORK_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 LOG_DIR="$WORK_DIR/logs/local-repair"
 STATE_FILE="$WORK_DIR/.github/repair-state/local-state.json"
 

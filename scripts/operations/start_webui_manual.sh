@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Manual WebUI startup script
-cd /mnt/Linux-ExHDD/MangaAnime-Info-delivery-system
+cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
 echo "🚀 MangaAnime WebUI を手動起動します..."
 

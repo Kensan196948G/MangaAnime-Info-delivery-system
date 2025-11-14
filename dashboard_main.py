@@ -10,13 +10,12 @@ import json
 import logging
 from datetime import datetime
 from modules.db import DatabaseManager
-from modules.anilist_api import AniListAPI
+from modules.anime_anilist import AniListCollector
 from modules.manga_rss import MangaRSSCollector
 from modules.filter_logic import ContentFilter
-from modules.mailer import MailSender
-from modules.calendar_manager import CalendarManager
+from modules.mailer import GmailNotifier
+from modules.calendar_integration import GoogleCalendarManager
 from modules.dashboard_integration import dashboard_integration, track_performance
-from modules.monitoring import PerformanceMonitor
 
 # ログ設定
 logging.basicConfig(
@@ -35,18 +34,17 @@ class DashboardEnabledReleaseNotifier:
 
     def __init__(self, config_path: str = "config.json"):
         self.config_path = config_path
-        self.performance_monitor = PerformanceMonitor()
 
         # 設定を読み込み
         self._load_config()
 
         # 各モジュールを初期化
         self.db_manager = DatabaseManager()
-        self.anilist_api = AniListAPI()
+        self.anilist_api = AniListCollector()
         self.manga_collector = MangaRSSCollector()
         self.content_filter = ContentFilter()
-        self.mail_sender = MailSender()
-        self.calendar_manager = CalendarManager()
+        self.mail_sender = GmailNotifier()
+        self.calendar_manager = GoogleCalendarManager()
 
         logger.info("Dashboard-enabled Release Notifier initialized")
 

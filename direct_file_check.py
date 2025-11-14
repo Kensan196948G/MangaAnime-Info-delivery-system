@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import os
 import glob
+from pathlib import Path
 
-base_path = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+base_path = str(Path(__file__).parent.resolve())
 
 print("=== Direct File System Check ===")
 print(f"Base path: {base_path}")

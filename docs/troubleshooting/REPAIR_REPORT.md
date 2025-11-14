@@ -72,7 +72,7 @@ retry_delay=5,  # Fixed: rate_limit is int, not dict
 - 最大5回のリトライ機能
 - バックアップファイル自動作成
 
-### 2. setup_env.sh
+### 2. scripts/setup/setup_env.sh
 - 環境変数設定スクリプト
 - Gmail設定の対話式セットアップ
 - .envファイル自動生成

@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # プロジェクトディレクトリ
-PROJECT_DIR="/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 LOG_DIR="$PROJECT_DIR/logs"
 PYTHON_ENV="$PROJECT_DIR/venv/bin/python"
 ERROR_NOTIFIER="$PROJECT_DIR/modules/error_notifier.py"

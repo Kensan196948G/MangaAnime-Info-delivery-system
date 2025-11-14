@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
 
 
 def check_project_structure():
     """Check the project structure and find test files"""
-    base_path = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+    base_path = str(Path(__file__).parent.resolve())
 
     print("=== Project Structure ===")
 
@@ -34,7 +35,7 @@ def check_project_structure():
 
 def check_main_modules():
     """Check if main modules exist"""
-    base_path = "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+    base_path = str(Path(__file__).parent.resolve())
 
     print("\n=== Main Modules ===")
 

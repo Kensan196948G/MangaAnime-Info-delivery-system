@@ -15,7 +15,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-PROJECT_DIR="/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 SERVICE_NAME="mangaanime-web"
 SERVICE_FILE="$PROJECT_DIR/mangaanime-web.service"
 
@@ -101,7 +101,7 @@ cat > "$PROJECT_DIR/start_webui_manual.sh" << 'EOF'
 #!/bin/bash
 
 # Manual WebUI startup script
-cd /mnt/Linux-ExHDD/MangaAnime-Info-delivery-system
+cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
 echo "🚀 MangaAnime WebUI を手動起動します..."
 

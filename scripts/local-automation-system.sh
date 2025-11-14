@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # 設定
-WORK_DIR="/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system"
+WORK_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 LOG_DIR="$WORK_DIR/logs/automation"
 STATE_FILE="$WORK_DIR/.automation-state.json"
 CYCLE_INTERVAL=1800  # 30分
