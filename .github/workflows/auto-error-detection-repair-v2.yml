@@ -90,6 +90,7 @@ jobs:
               echo "pytest-cov>=4.1.0" >> requirements-dev.txt
               echo "flake8>=6.1.0" >> requirements-dev.txt
               echo "black>=23.0.0" >> requirements-dev.txt
+              echo "autopep8>=2.0.4" >> requirements-dev.txt
             fi
           fi
 
