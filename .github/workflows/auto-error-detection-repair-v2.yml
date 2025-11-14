@@ -1,6 +1,12 @@
 name: 自動エラー検知・修復ループシステム v2（最適化版）
 
 on:
+  # テスト用pushトリガー（一時的）
+  push:
+    branches: [main, fix-requirements-in-workflows]
+    paths:
+      - '.github/workflows/auto-error-detection-repair-v2.yml'
+
   # 30分おきに自動実行
   schedule:
     - cron: '*/30 * * * *'  # 30分ごと
