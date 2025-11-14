@@ -1,0 +1,250 @@
+/**
+ * Dashboard Data Update Styles
+ * Additional styles for data refresh functionality
+ */
+
+/* Update Status Card */
+#update-status-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    transition: all 0.3s ease;
+}
+
+#update-status-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Refresh Button Animations */
+#refresh-data-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+#refresh-data-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#refresh-data-btn:active {
+    transform: translateY(0);
+}
+
+#refresh-data-btn .bi-arrow-clockwise {
+    transition: transform 0.3s ease;
+}
+
+#refresh-data-btn:hover .bi-arrow-clockwise {
+    transform: rotate(180deg);
+}
+
+#refresh-data-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Progress Bar Enhancements */
+#update-progress-bar {
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+#update-progress {
+    transition: width 0.4s ease;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Status Message */
+#update-status-message {
+    animation: slideDown 0.3s ease-out;
+    border-left: 4px solid currentColor;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Last Update Time */
+#last-update-time {
+    font-family: 'Courier New', monospace;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+/* Auto Refresh Toggle */
+.btn-outline-secondary:hover #auto-refresh-icon {
+    transform: scale(1.1);
+}
+
+#auto-refresh-icon {
+    transition: transform 0.2s ease;
+}
+
+/* Modal Enhancements */
+#autoRefreshModal .modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+#autoRefreshModal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+}
+
+#autoRefreshModal .modal-title {
+    font-weight: 600;
+}
+
+#autoRefreshModal .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+#autoRefreshModal #time-elapsed {
+    color: #667eea;
+    font-weight: bold;
+}
+
+/* Spinner Animation */
+.spinner-border-sm {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-width: 0.15em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #update-status-card .col-md-6:first-child {
+        margin-bottom: 0.5rem;
+    }
+
+    #update-status-card .text-md-end {
+        text-align: left !important;
+    }
+
+    #refresh-data-btn,
+    .btn-outline-secondary {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    #refresh-data-btn {
+        margin-right: 0 !important;
+    }
+}
+
+/* Accessibility Improvements */
+.btn:focus,
+.btn-close:focus {
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+}
+
+/* Loading State */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+.loading-spinner {
+    width: 4rem;
+    height: 4rem;
+    border: 0.4rem solid rgba(102, 126, 234, 0.2);
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success/Error States */
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    #update-status-card {
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        color: #e2e8f0;
+    }
+
+    #last-update-time {
+        color: #cbd5e0;
+    }
+
+    #update-progress-bar {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    #autoRefreshModal .modal-content {
+        background-color: #2d3748;
+        color: #e2e8f0;
+    }
+
+    .alert-info {
+        background-color: #2c5282;
+        border-color: #2b6cb0;
+        color: #bee3f8;
+    }
+}
+
+/* Print Styles */
+@media print {
+    #update-status-card,
+    #autoRefreshModal {
+        display: none !important;
+    }
+}

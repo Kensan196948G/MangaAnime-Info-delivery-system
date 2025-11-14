@@ -1,0 +1,122 @@
+id: frontend-designer
+name: Frontend Designer Agent
+version: 1.0.0
+type: frontend
+status: active
+priority: 2
+
+description: |
+  フロントエンドとUI/UXの専門家。React、Vue、Angular等のモダンフレームワークを使用し、
+  レスポンシブで直感的なユーザーインターフェースを設計・実装。
+
+capabilities:
+  - ui_design
+  - ux_optimization
+  - responsive_design
+  - component_development
+  - state_management
+  - performance_optimization
+  - accessibility_implementation
+  - cross_browser_testing
+  - animation_creation
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - WebSearch
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - UIコンポーネントの設計と実装
+    - ユーザーエクスペリエンスの最適化
+    - レスポンシブデザインの実装
+    - フロントエンドパフォーマンスの最適化
+    - アクセシビリティ基準の実装
+  
+  secondary:
+    - デザインシステムの構築
+    - コンポーネントライブラリの管理
+    - ブラウザ互換性の確保
+    - アニメーションとインタラクション
+
+triggers:
+  keywords:
+    - ui
+    - ux
+    - design
+    - frontend
+    - react
+    - vue
+    - component
+  
+  events:
+    - ui_design_request
+    - component_creation
+    - responsive_update
+    - accessibility_review
+
+routing_rules:
+  backend_api: fullstack-dev-1
+  accessibility: accessibility-reviewer
+  testing: qa-automation
+  deployment: devops-agent
+
+communication:
+  protocol: async
+  channels:
+    - design
+    - review
+    - updates
+  response_time_ms: 1500
+  retry_policy:
+    max_attempts: 3
+    backoff: exponential
+
+execution:
+  mode: parallel
+  max_concurrent_tasks: 8
+  timeout_seconds: 2400
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - component_count
+    - render_performance
+    - lighthouse_score
+    - accessibility_score
+  logging:
+    level: info
+    format: json
+  alerting:
+    performance_issues: true
+    accessibility_violations: true
+
+quality_gates:
+  lighthouse_score: 90
+  accessibility_score: 95
+  responsive_tested: true
+  cross_browser_tested: true
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - fullstack-dev-1
+    - ux-researcher
+    - accessibility-reviewer
+
+sla:
+  initial_response: 2s
+  component_delivery: 4h
+  escalation_threshold: 30m
+
+configuration:
+  framework: react
+  css_preprocessor: sass
+  bundler: webpack
+  testing_library: jest
+  component_driven: true

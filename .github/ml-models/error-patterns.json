@@ -1,0 +1,240 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-08-17T00:00:00Z",
+  "model_info": {
+    "type": "pattern_matching",
+    "algorithm": "similarity_scoring",
+    "confidence_threshold": 0.75,
+    "max_patterns": 1000
+  },
+  "error_categories": {
+    "dependency": {
+      "weight": 0.9,
+      "patterns": [
+        {
+          "id": "dep_001",
+          "name": "Package Not Found",
+          "pattern": "(?i)(package.*not found|module.*not found|import.*error)",
+          "features": ["import", "module", "package", "not found"],
+          "confidence": 0.85,
+          "success_rate": 0.92,
+          "repair_strategies": [
+            {
+              "action": "install_package",
+              "command": "pip install {package_name}",
+              "priority": 1
+            },
+            {
+              "action": "update_requirements",
+              "command": "pip freeze > requirements.txt",
+              "priority": 2
+            }
+          ],
+          "examples": [
+            "ModuleNotFoundError: No module named 'requests'",
+            "ImportError: cannot import name 'Beautiful Soup'"
+          ]
+        },
+        {
+          "id": "dep_002",
+          "name": "Version Conflict",
+          "pattern": "(?i)(version.*conflict|incompatible.*version|requirement.*conflict)",
+          "features": ["version", "conflict", "incompatible", "requirement"],
+          "confidence": 0.80,
+          "success_rate": 0.78,
+          "repair_strategies": [
+            {
+              "action": "pin_version",
+              "command": "pip install {package_name}=={version}",
+              "priority": 1
+            },
+            {
+              "action": "resolve_dependencies",
+              "command": "pip-tools compile requirements.in",
+              "priority": 2
+            }
+          ]
+        }
+      ]
+    },
+    "test": {
+      "weight": 0.8,
+      "patterns": [
+        {
+          "id": "test_001",
+          "name": "Test File Not Found",
+          "pattern": "(?i)(test.*not found|no tests ran|test file.*missing)",
+          "features": ["test", "not found", "missing", "no tests"],
+          "confidence": 0.90,
+          "success_rate": 0.95,
+          "repair_strategies": [
+            {
+              "action": "create_test_file",
+              "command": "touch test_*.py",
+              "priority": 1
+            },
+            {
+              "action": "update_test_config",
+              "command": "python -m pytest --collect-only",
+              "priority": 2
+            }
+          ]
+        },
+        {
+          "id": "test_002",
+          "name": "Test Assertion Failure",
+          "pattern": "(?i)(assertion.*error|test.*failed|assert.*false)",
+          "features": ["assertion", "failed", "assert", "error"],
+          "confidence": 0.75,
+          "success_rate": 0.68,
+          "repair_strategies": [
+            {
+              "action": "update_test_expectations",
+              "command": "python -m pytest --tb=short",
+              "priority": 1
+            },
+            {
+              "action": "mock_external_dependencies",
+              "command": "python -m pytest --mock",
+              "priority": 2
+            }
+          ]
+        }
+      ]
+    },
+    "build": {
+      "weight": 0.85,
+      "patterns": [
+        {
+          "id": "build_001",
+          "name": "Syntax Error",
+          "pattern": "(?i)(syntax.*error|invalid.*syntax|unexpected.*token)",
+          "features": ["syntax", "error", "invalid", "unexpected"],
+          "confidence": 0.95,
+          "success_rate": 0.88,
+          "repair_strategies": [
+            {
+              "action": "fix_syntax",
+              "command": "python -m py_compile {file}",
+              "priority": 1
+            },
+            {
+              "action": "auto_format",
+              "command": "black {file}",
+              "priority": 2
+            }
+          ]
+        },
+        {
+          "id": "build_002",
+          "name": "Permission Denied",
+          "pattern": "(?i)(permission.*denied|access.*denied|operation.*not permitted)",
+          "features": ["permission", "denied", "access", "operation"],
+          "confidence": 0.92,
+          "success_rate": 0.90,
+          "repair_strategies": [
+            {
+              "action": "fix_permissions",
+              "command": "chmod +x {file}",
+              "priority": 1
+            },
+            {
+              "action": "run_as_sudo",
+              "command": "sudo {command}",
+              "priority": 2
+            }
+          ]
+        }
+      ]
+    },
+    "type": {
+      "weight": 0.7,
+      "patterns": [
+        {
+          "id": "type_001",
+          "name": "Type Error",
+          "pattern": "(?i)(type.*error|expected.*type|wrong.*type)",
+          "features": ["type", "error", "expected", "wrong"],
+          "confidence": 0.82,
+          "success_rate": 0.72,
+          "repair_strategies": [
+            {
+              "action": "add_type_conversion",
+              "command": "str({variable})",
+              "priority": 1
+            },
+            {
+              "action": "update_type_hints",
+              "command": "mypy {file}",
+              "priority": 2
+            }
+          ]
+        }
+      ]
+    },
+    "network": {
+      "weight": 0.6,
+      "patterns": [
+        {
+          "id": "net_001",
+          "name": "Connection Error",
+          "pattern": "(?i)(connection.*error|timeout|network.*error|ssl.*error)",
+          "features": ["connection", "error", "timeout", "network", "ssl"],
+          "confidence": 0.88,
+          "success_rate": 0.65,
+          "repair_strategies": [
+            {
+              "action": "retry_with_backoff",
+              "command": "sleep 5 && retry_command",
+              "priority": 1
+            },
+            {
+              "action": "use_alternative_endpoint",
+              "command": "curl -k {alternative_url}",
+              "priority": 2
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "learning_config": {
+    "feature_extraction": {
+      "methods": ["keyword_matching", "regex_patterns", "context_analysis"],
+      "weights": [0.4, 0.3, 0.3]
+    },
+    "similarity_scoring": {
+      "algorithm": "cosine_similarity",
+      "min_threshold": 0.6,
+      "boost_factors": {
+        "exact_match": 1.5,
+        "keyword_density": 1.2,
+        "context_match": 1.1
+      }
+    },
+    "feedback_loop": {
+      "success_weight": 1.2,
+      "failure_weight": 0.8,
+      "update_frequency": "daily",
+      "retention_period": "30_days"
+    }
+  },
+  "repair_history": {
+    "successful_repairs": [],
+    "failed_repairs": [],
+    "pattern_matches": {},
+    "success_metrics": {
+      "total_attempts": 0,
+      "successful_repairs": 0,
+      "average_confidence": 0.0,
+      "pattern_accuracy": {}
+    }
+  },
+  "system_config": {
+    "max_repair_attempts": 3,
+    "cooldown_period": 300,
+    "parallel_repairs": false,
+    "backup_before_repair": true,
+    "notification_threshold": 0.9
+  }
+}

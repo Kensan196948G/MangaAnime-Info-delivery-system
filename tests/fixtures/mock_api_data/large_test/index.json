@@ -1,0 +1,16 @@
+{
+  "dataset_name": "large_test",
+  "created_at": "2025-08-09T14:25:09.606315",
+  "anilist_responses": 21,
+  "rss_feeds": 5,
+  "files": {
+    "anilist": "large_test/anilist_responses.json",
+    "rss_feeds": [
+      "large_test/rss_feeds/まんが王国.xml",
+      "large_test/rss_feeds/bookwalker.xml",
+      "large_test/rss_feeds/dmm_books.xml",
+      "large_test/rss_feeds/コミックシーモア.xml",
+      "large_test/rss_feeds/kindle.xml"
+    ]
+  }
+}

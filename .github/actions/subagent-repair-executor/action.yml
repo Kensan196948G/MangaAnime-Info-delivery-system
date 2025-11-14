@@ -1,0 +1,43 @@
+name: 'SubAgent Repair Executor'
+description: 'Executes repairs in parallel threads with 25-minute timeout enforcement'
+author: 'Claude Code SubAgent System'
+
+inputs:
+  repair-strategies:
+    description: 'JSON array of repair strategies to execute'
+    required: true
+  max-parallel:
+    description: 'Maximum parallel repair threads (default: 5)'
+    required: false
+    default: '5'
+  execution-timeout:
+    description: 'Total execution timeout in minutes (default: 25)'
+    required: false
+    default: '25'
+  dry-run:
+    description: 'Perform dry run without making changes (default: false)'
+    required: false
+    default: 'false'
+  github-token:
+    description: 'GitHub token for API operations'
+    required: true
+
+outputs:
+  execution-results:
+    description: 'JSON array of execution results for each repair'
+  success-count:
+    description: 'Number of successful repairs'
+  failure-count:
+    description: 'Number of failed repairs'
+  execution-duration:
+    description: 'Total execution duration in seconds'
+  progress-report:
+    description: 'Detailed progress report with timestamps'
+
+runs:
+  using: 'node20'
+  main: 'index.js'
+
+branding:
+  icon: 'tool'
+  color: 'green'

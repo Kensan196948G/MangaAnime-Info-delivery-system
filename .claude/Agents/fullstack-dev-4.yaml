@@ -1,0 +1,121 @@
+id: fullstack-dev-4
+name: Fullstack Developer 4 Agent
+version: 1.0.0
+type: fullstack
+status: active
+priority: 3
+
+description: |
+  CI/CDパイプラインの専門家。GitHub Actions、Docker、Kubernetes、
+  自動デプロイメント、環境管理、ビルドプロセス最適化を担当。
+
+capabilities:
+  - ci_cd_pipeline
+  - github_actions
+  - docker_configuration
+  - kubernetes_deployment
+  - build_automation
+  - environment_management
+  - deployment_strategies
+  - rollback_procedures
+  - container_orchestration
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - CI/CDパイプラインの構築
+    - GitHub Actionsワークフロー作成
+    - Dockerコンテナ化
+    - Kubernetes展開設定
+    - 自動デプロイメント実装
+  
+  secondary:
+    - ビルドプロセス最適化
+    - 環境変数管理
+    - ロールバック手順策定
+    - デプロイメント監視
+
+triggers:
+  keywords:
+    - ci
+    - cd
+    - pipeline
+    - docker
+    - kubernetes
+    - deploy
+    - github-actions
+  
+  events:
+    - pipeline_setup
+    - deployment_request
+    - build_failure
+    - rollback_needed
+
+routing_rules:
+  infrastructure: devops-agent
+  testing: qa-automation
+  security: security-auditor
+  monitoring: incident-responder
+
+communication:
+  protocol: async
+  channels:
+    - pipeline
+    - deployment
+    - build
+  response_time_ms: 1500
+  retry_policy:
+    max_attempts: 3
+    backoff: exponential
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 3
+  timeout_seconds: 7200
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - build_success_rate
+    - deployment_frequency
+    - lead_time
+    - mttr
+  logging:
+    level: info
+    format: json
+  alerting:
+    build_failure: true
+    deployment_failure: true
+
+quality_gates:
+  tests_passing: required
+  security_scan: required
+  build_successful: required
+  staging_tested: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - devops-agent
+    - qa-automation
+    - incident-responder
+
+sla:
+  initial_response: 5s
+  pipeline_setup: 2h
+  escalation_threshold: 30m
+
+configuration:
+  ci_platform: github_actions
+  container_platform: docker
+  orchestration: kubernetes
+  deployment_strategy: blue_green
+  auto_rollback: true

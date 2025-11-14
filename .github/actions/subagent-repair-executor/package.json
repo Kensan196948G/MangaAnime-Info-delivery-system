@@ -1,0 +1,16 @@
+{
+  "name": "subagent-repair-executor",
+  "version": "1.0.0",
+  "description": "SubAgent repair executor with parallel processing and timeout enforcement",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1"
+  },
+  "keywords": ["github-actions", "repair-execution", "parallel-processing"],
+  "author": "Claude Code SubAgent System",
+  "license": "MIT"
+}

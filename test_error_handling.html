@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Handling Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-case {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Error Handling Test Cases</h1>
+    <p>This page tests the error handling logic for different API response formats.</p>
+
+    <div class="test-case">
+        <h3>Test Case 1: New Format - Nested Error Object</h3>
+        <pre>{
+  "success": false,
+  "message": "データ更新中にエラーが発生しました",
+  "error": {
+    "message": "スクリプトが見つかりません",
+    "details": "insert_sample_data.py not found",
+    "code": "SCRIPT_NOT_FOUND"
+  }
+}</pre>
+        <button onclick="testCase1()">Test</button>
+        <div id="result1" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test Case 2: Old Format - String Error</h3>
+        <pre>{
+  "success": false,
+  "error": "データベース接続エラー"
+}</pre>
+        <button onclick="testCase2()">Test</button>
+        <div id="result2" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test Case 3: Success Response</h3>
+        <pre>{
+  "success": true,
+  "message": "データ更新が完了しました",
+  "data": {
+    "timestamp": "2025-11-14T12:00:00",
+    "stats": {}
+  }
+}</pre>
+        <button onclick="testCase3()">Test</button>
+        <div id="result3" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test Case 4: Multiple Error Fields</h3>
+        <pre>{
+  "success": false,
+  "error": {
+    "message": "主エラーメッセージ",
+    "details": "詳細情報"
+  },
+  "details": "旧形式の詳細",
+  "message": "旧形式のメッセージ"
+}</pre>
+        <button onclick="testCase4()">Test</button>
+        <div id="result4" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        // Copy of the error extraction logic from dashboard-update.js
+        function extractErrorMessage(data) {
+            if (data.error && typeof data.error === 'object') {
+                return data.error.message || data.error.details || JSON.stringify(data.error);
+            } else {
+                return data.error || data.details || data.message || 'サーバーがエラーを返しました';
+            }
+        }
+
+        function showResult(caseNum, errorMessage, isSuccess) {
+            const resultDiv = document.getElementById('result' + caseNum);
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result ' + (isSuccess ? 'success' : 'error');
+            resultDiv.innerHTML = '<strong>Extracted Message:</strong><br>' + errorMessage;
+        }
+
+        function testCase1() {
+            const data = {
+                "success": false,
+                "message": "データ更新中にエラーが発生しました",
+                "error": {
+                    "message": "スクリプトが見つかりません",
+                    "details": "insert_sample_data.py not found",
+                    "code": "SCRIPT_NOT_FOUND"
+                }
+            };
+            const errorMessage = extractErrorMessage(data);
+            showResult(1, errorMessage, false);
+            console.log('Test Case 1:', errorMessage);
+        }
+
+        function testCase2() {
+            const data = {
+                "success": false,
+                "error": "データベース接続エラー"
+            };
+            const errorMessage = extractErrorMessage(data);
+            showResult(2, errorMessage, false);
+            console.log('Test Case 2:', errorMessage);
+        }
+
+        function testCase3() {
+            const data = {
+                "success": true,
+                "message": "データ更新が完了しました",
+                "data": {
+                    "timestamp": "2025-11-14T12:00:00",
+                    "stats": {}
+                }
+            };
+            showResult(3, 'Success! No error extraction needed.', true);
+            console.log('Test Case 3: Success response');
+        }
+
+        function testCase4() {
+            const data = {
+                "success": false,
+                "error": {
+                    "message": "主エラーメッセージ",
+                    "details": "詳細情報"
+                },
+                "details": "旧形式の詳細",
+                "message": "旧形式のメッセージ"
+            };
+            const errorMessage = extractErrorMessage(data);
+            showResult(4, errorMessage, false);
+            console.log('Test Case 4:', errorMessage);
+        }
+
+        // Run all tests on load
+        window.addEventListener('load', () => {
+            console.log('=== Error Handling Tests ===');
+            testCase1();
+            testCase2();
+            testCase3();
+            testCase4();
+            console.log('=== Tests Complete ===');
+        });
+    </script>
+</body>
+</html>

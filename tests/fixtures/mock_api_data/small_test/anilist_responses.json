@@ -1,0 +1,599 @@
+{
+  "search_anime": {
+    "data": {
+      "Page": {
+        "media": [
+          {
+            "id": 1,
+            "title": {
+              "romaji": "ドラゴンボール",
+              "english": "ドラゴンボール",
+              "native": "ドラゴンボール"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 12,
+            "genres": [
+              "Horror",
+              "Thriller"
+            ],
+            "tags": [
+              {
+                "name": "Military"
+              },
+              {
+                "name": "Magic"
+              },
+              {
+                "name": "Demons"
+              }
+            ],
+            "description": "ドラゴンボールの説明文です。Supernatural作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 12,
+              "day": 9
+            },
+            "nextAiringEpisode": {
+              "episode": 5,
+              "airingAt": 1756704309
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/1/1"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/ドラゴンボール"
+          },
+          {
+            "id": 2,
+            "title": {
+              "romaji": "コードギアス",
+              "english": "コードギアス",
+              "native": "コードギアス"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 21,
+            "genres": [
+              "Adventure",
+              "Slice of Life",
+              "Drama",
+              "Sports",
+              "Comedy"
+            ],
+            "tags": [
+              {
+                "name": "Samurai"
+              },
+              {
+                "name": "Demons"
+              }
+            ],
+            "description": "コードギアスの説明文です。Comedy作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 7,
+              "day": 2
+            },
+            "nextAiringEpisode": {
+              "episode": 7,
+              "airingAt": 1755321909
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/2/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/2/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/2/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/2/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/2/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/コードギアス"
+          },
+          {
+            "id": 3,
+            "title": {
+              "romaji": "涼宮ハルヒの憂鬱",
+              "english": "涼宮ハルヒ No 憂鬱",
+              "native": "涼宮ハルヒの憂鬱"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 20,
+            "genres": [
+              "Sci-Fi",
+              "Fantasy",
+              "Horror"
+            ],
+            "tags": [
+              {
+                "name": "Shoujo"
+              },
+              {
+                "name": "Ninja"
+              }
+            ],
+            "description": "涼宮ハルヒの憂鬱の説明文です。Sci-Fi作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 4,
+              "day": 23
+            },
+            "nextAiringEpisode": {
+              "episode": 18,
+              "airingAt": 1755840309
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/3/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/3/2"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/涼宮ハルヒ-no-憂鬱"
+          },
+          {
+            "id": 4,
+            "title": {
+              "romaji": "呪術廻戦",
+              "english": "Jujutsu Kaisen",
+              "native": "呪術廻戦"
+            },
+            "type": "ANIME",
+            "format": "SPECIAL",
+            "status": "RELEASING",
+            "episodes": 21,
+            "genres": [
+              "Fantasy",
+              "Mystery",
+              "Supernatural"
+            ],
+            "tags": [
+              {
+                "name": "Military"
+              },
+              {
+                "name": "School"
+              },
+              {
+                "name": "Magic"
+              }
+            ],
+            "description": "呪術廻戦の説明文です。Comedy作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 5,
+              "day": 26
+            },
+            "nextAiringEpisode": null,
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/4/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/4/2"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/jujutsu-kaisen"
+          },
+          {
+            "id": 5,
+            "title": {
+              "romaji": "七つの大罪",
+              "english": "七つ No 大罪",
+              "native": "七つの大罪"
+            },
+            "type": "ANIME",
+            "format": "SPECIAL",
+            "status": "RELEASING",
+            "episodes": 17,
+            "genres": [
+              "Supernatural",
+              "Adventure"
+            ],
+            "tags": [
+              {
+                "name": "Shoujo"
+              },
+              {
+                "name": "Shounen"
+              },
+              {
+                "name": "School"
+              }
+            ],
+            "description": "七つの大罪の説明文です。Supernatural作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 5,
+              "day": 5
+            },
+            "nextAiringEpisode": {
+              "episode": 11,
+              "airingAt": 1754976309
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/5/1"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/七つ-no-大罪"
+          },
+          {
+            "id": 6,
+            "title": {
+              "romaji": "涼宮ハルヒの憂鬱 THE FINAL",
+              "english": "涼宮ハルヒ No 憂鬱",
+              "native": "涼宮ハルヒの憂鬱 THE FINAL"
+            },
+            "type": "ANIME",
+            "format": "SPECIAL",
+            "status": "RELEASING",
+            "episodes": 13,
+            "genres": [
+              "Horror",
+              "Drama",
+              "Adventure",
+              "Sci-Fi"
+            ],
+            "tags": [
+              {
+                "name": "Shoujo"
+              }
+            ],
+            "description": "涼宮ハルヒの憂鬱 THE FINALの説明文です。Slice of Life作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 6,
+              "day": 28
+            },
+            "nextAiringEpisode": {
+              "episode": 9,
+              "airingAt": 1756877109
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/6/1"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/涼宮ハルヒ-no-憂鬱"
+          }
+        ],
+        "pageInfo": {
+          "hasNextPage": false,
+          "currentPage": 1,
+          "lastPage": 1
+        }
+      }
+    }
+  },
+  "anime_1": {
+    "data": {
+      "Media": {
+        "id": 1,
+        "title": {
+          "romaji": "ドラゴンボール",
+          "english": "ドラゴンボール",
+          "native": "ドラゴンボール"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 12,
+        "genres": [
+          "Horror",
+          "Thriller"
+        ],
+        "tags": [
+          {
+            "name": "Military"
+          },
+          {
+            "name": "Magic"
+          },
+          {
+            "name": "Demons"
+          }
+        ],
+        "description": "ドラゴンボールの説明文です。Supernatural作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 12,
+          "day": 9
+        },
+        "nextAiringEpisode": {
+          "episode": 5,
+          "airingAt": 1756704309
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/1/1"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/ドラゴンボール"
+      }
+    }
+  },
+  "anime_2": {
+    "data": {
+      "Media": {
+        "id": 2,
+        "title": {
+          "romaji": "コードギアス",
+          "english": "コードギアス",
+          "native": "コードギアス"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 21,
+        "genres": [
+          "Adventure",
+          "Slice of Life",
+          "Drama",
+          "Sports",
+          "Comedy"
+        ],
+        "tags": [
+          {
+            "name": "Samurai"
+          },
+          {
+            "name": "Demons"
+          }
+        ],
+        "description": "コードギアスの説明文です。Comedy作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 7,
+          "day": 2
+        },
+        "nextAiringEpisode": {
+          "episode": 7,
+          "airingAt": 1755321909
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/2/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/2/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/2/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/2/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/2/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/コードギアス"
+      }
+    }
+  },
+  "anime_3": {
+    "data": {
+      "Media": {
+        "id": 3,
+        "title": {
+          "romaji": "涼宮ハルヒの憂鬱",
+          "english": "涼宮ハルヒ No 憂鬱",
+          "native": "涼宮ハルヒの憂鬱"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 20,
+        "genres": [
+          "Sci-Fi",
+          "Fantasy",
+          "Horror"
+        ],
+        "tags": [
+          {
+            "name": "Shoujo"
+          },
+          {
+            "name": "Ninja"
+          }
+        ],
+        "description": "涼宮ハルヒの憂鬱の説明文です。Sci-Fi作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 4,
+          "day": 23
+        },
+        "nextAiringEpisode": {
+          "episode": 18,
+          "airingAt": 1755840309
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/3/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/3/2"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/涼宮ハルヒ-no-憂鬱"
+      }
+    }
+  },
+  "anime_4": {
+    "data": {
+      "Media": {
+        "id": 4,
+        "title": {
+          "romaji": "呪術廻戦",
+          "english": "Jujutsu Kaisen",
+          "native": "呪術廻戦"
+        },
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "RELEASING",
+        "episodes": 21,
+        "genres": [
+          "Fantasy",
+          "Mystery",
+          "Supernatural"
+        ],
+        "tags": [
+          {
+            "name": "Military"
+          },
+          {
+            "name": "School"
+          },
+          {
+            "name": "Magic"
+          }
+        ],
+        "description": "呪術廻戦の説明文です。Comedy作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 5,
+          "day": 26
+        },
+        "nextAiringEpisode": null,
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/4/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/4/2"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/jujutsu-kaisen"
+      }
+    }
+  },
+  "anime_5": {
+    "data": {
+      "Media": {
+        "id": 5,
+        "title": {
+          "romaji": "七つの大罪",
+          "english": "七つ No 大罪",
+          "native": "七つの大罪"
+        },
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "RELEASING",
+        "episodes": 17,
+        "genres": [
+          "Supernatural",
+          "Adventure"
+        ],
+        "tags": [
+          {
+            "name": "Shoujo"
+          },
+          {
+            "name": "Shounen"
+          },
+          {
+            "name": "School"
+          }
+        ],
+        "description": "七つの大罪の説明文です。Supernatural作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 5,
+          "day": 5
+        },
+        "nextAiringEpisode": {
+          "episode": 11,
+          "airingAt": 1754976309
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/5/1"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/七つ-no-大罪"
+      }
+    }
+  },
+  "anime_6": {
+    "data": {
+      "Media": {
+        "id": 6,
+        "title": {
+          "romaji": "涼宮ハルヒの憂鬱 THE FINAL",
+          "english": "涼宮ハルヒ No 憂鬱",
+          "native": "涼宮ハルヒの憂鬱 THE FINAL"
+        },
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "RELEASING",
+        "episodes": 13,
+        "genres": [
+          "Horror",
+          "Drama",
+          "Adventure",
+          "Sci-Fi"
+        ],
+        "tags": [
+          {
+            "name": "Shoujo"
+          }
+        ],
+        "description": "涼宮ハルヒの憂鬱 THE FINALの説明文です。Slice of Life作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 6,
+          "day": 28
+        },
+        "nextAiringEpisode": {
+          "episode": 9,
+          "airingAt": 1756877109
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/6/1"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/涼宮ハルヒ-no-憂鬱"
+      }
+    }
+  }
+}

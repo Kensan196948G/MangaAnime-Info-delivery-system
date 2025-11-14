@@ -1,0 +1,191 @@
+{
+  "name": "MCP Tools Registry",
+  "version": "2.0.0",
+  "toolCount": 87,
+  "categories": {
+    "file-operations": [
+      "read-file",
+      "write-file",
+      "delete-file",
+      "copy-file",
+      "move-file",
+      "create-directory",
+      "list-directory",
+      "watch-file",
+      "file-stats",
+      "file-permissions"
+    ],
+    "code-analysis": [
+      "ast-parse",
+      "syntax-check",
+      "lint",
+      "format",
+      "complexity-analysis",
+      "dependency-graph",
+      "call-graph",
+      "type-check",
+      "security-scan",
+      "performance-profile"
+    ],
+    "database": [
+      "query-execute",
+      "schema-migrate",
+      "backup",
+      "restore",
+      "index-optimize",
+      "connection-pool",
+      "transaction-manage",
+      "cache-invalidate",
+      "replication-sync",
+      "partition-manage"
+    ],
+    "network": [
+      "http-request",
+      "websocket-connect",
+      "grpc-call",
+      "graphql-query",
+      "rest-api",
+      "tcp-socket",
+      "udp-socket",
+      "dns-lookup",
+      "proxy-tunnel",
+      "load-balance"
+    ],
+    "ai-ml": [
+      "model-inference",
+      "model-train",
+      "model-evaluate",
+      "feature-extract",
+      "data-preprocess",
+      "hyperparameter-tune",
+      "model-export",
+      "model-quantize",
+      "embedding-generate",
+      "similarity-search"
+    ],
+    "system": [
+      "process-spawn",
+      "process-kill",
+      "memory-monitor",
+      "cpu-monitor",
+      "disk-monitor",
+      "network-monitor",
+      "log-aggregate",
+      "metric-collect",
+      "alert-trigger",
+      "config-manage"
+    ],
+    "development": [
+      "compile",
+      "build",
+      "test-run",
+      "debug",
+      "profile",
+      "package",
+      "deploy",
+      "rollback",
+      "version-control",
+      "ci-cd-pipeline"
+    ],
+    "collaboration": [
+      "chat-send",
+      "notification-push",
+      "task-assign",
+      "review-request",
+      "comment-add",
+      "mention-user",
+      "share-resource",
+      "schedule-meeting",
+      "document-collaborate",
+      "screen-share"
+    ],
+    "security": [
+      "encrypt",
+      "decrypt",
+      "sign",
+      "verify",
+      "hash",
+      "certificate-manage",
+      "key-generate",
+      "token-validate",
+      "auth-check",
+      "permission-grant"
+    ]
+  },
+  "tools": {
+    "read-file": {
+      "category": "file-operations",
+      "description": "Read file contents",
+      "parameters": ["path", "encoding"],
+      "async": true
+    },
+    "ast-parse": {
+      "category": "code-analysis",
+      "description": "Parse code into AST",
+      "parameters": ["code", "language"],
+      "async": true
+    },
+    "model-inference": {
+      "category": "ai-ml",
+      "description": "Run AI model inference",
+      "parameters": ["model", "input", "options"],
+      "async": true
+    },
+    "http-request": {
+      "category": "network",
+      "description": "Make HTTP request",
+      "parameters": ["url", "method", "headers", "body"],
+      "async": true
+    },
+    "query-execute": {
+      "category": "database",
+      "description": "Execute database query",
+      "parameters": ["connection", "query", "parameters"],
+      "async": true
+    }
+  },
+  "configuration": {
+    "autoLoad": true,
+    "lazyInit": true,
+    "caching": true,
+    "retryPolicy": {
+      "maxRetries": 3,
+      "backoff": "exponential"
+    },
+    "timeout": {
+      "default": 30000,
+      "byCategory": {
+        "ai-ml": 300000,
+        "database": 60000,
+        "network": 45000
+      }
+    }
+  },
+  "middleware": [
+    {
+      "name": "auth",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "name": "rate-limit",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "name": "cache",
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "name": "logger",
+      "enabled": true,
+      "order": 4
+    },
+    {
+      "name": "metrics",
+      "enabled": true,
+      "order": 5
+    }
+  ]
+}

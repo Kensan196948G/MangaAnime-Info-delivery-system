@@ -1,0 +1,38 @@
+name: 'Parallel Error Analyzer'
+description: 'Analyzes multiple workflow errors simultaneously using matrix strategy'
+author: 'Claude Code SubAgent System'
+
+inputs:
+  error-logs:
+    description: 'JSON array of error logs to analyze'
+    required: true
+  max-concurrent:
+    description: 'Maximum concurrent analyses (default: 5)'
+    required: false
+    default: '5'
+  analysis-timeout:
+    description: 'Timeout for each analysis in seconds (default: 300)'
+    required: false
+    default: '300'
+  pattern-db-path:
+    description: 'Path to error pattern database'
+    required: false
+    default: '.github/repair-patterns.json'
+
+outputs:
+  repair-strategies:
+    description: 'JSON array of repair strategies for each error'
+  analysis-results:
+    description: 'Detailed analysis results with confidence scores'
+  pattern-matches:
+    description: 'Matched error patterns and their solutions'
+  concurrent-count:
+    description: 'Number of concurrent analyses performed'
+
+runs:
+  using: 'node20'
+  main: 'index.js'
+
+branding:
+  icon: 'zap'
+  color: 'blue'

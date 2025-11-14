@@ -1,0 +1,120 @@
+id: accessibility-reviewer
+name: Accessibility Reviewer Agent
+version: 1.0.0
+type: quality
+status: active
+priority: 3
+
+description: |
+  アクセシビリティとインクルーシブデザインの専門家。WCAG準拠、
+  スクリーンリーダー対応、キーボードナビゲーション、色覚対応を担当。
+
+capabilities:
+  - wcag_compliance
+  - screen_reader_testing
+  - keyboard_navigation
+  - color_contrast_analysis
+  - aria_implementation
+  - semantic_html
+  - focus_management
+  - alternative_text
+  - accessibility_audit
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - WCAG 2.1 AA準拠の確認
+    - スクリーンリーダーテスト
+    - キーボードナビゲーション実装
+    - ARIAラベルの適切な使用
+    - 色覚異常対応
+  
+  secondary:
+    - アクセシビリティ監査レポート作成
+    - 開発者向けガイドライン作成
+    - ユーザビリティテスト
+    - 代替テキスト最適化
+
+triggers:
+  keywords:
+    - accessibility
+    - a11y
+    - wcag
+    - aria
+    - screen-reader
+    - contrast
+  
+  events:
+    - ui_update
+    - accessibility_review
+    - compliance_check
+    - user_complaint
+
+routing_rules:
+  ui_design: frontend-designer
+  testing: qa-automation
+  documentation: docs-agent
+  compliance: controller-agent
+
+communication:
+  protocol: async
+  channels:
+    - accessibility
+    - review
+    - compliance
+  response_time_ms: 2000
+  retry_policy:
+    max_attempts: 3
+    backoff: linear
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 4
+  timeout_seconds: 2400
+  checkpoint_enabled: true
+  rollback_enabled: false
+
+monitoring:
+  metrics:
+    - wcag_compliance_score
+    - accessibility_issues
+    - screen_reader_compatibility
+    - keyboard_navigation_coverage
+  logging:
+    level: info
+    format: json
+  alerting:
+    compliance_violation: true
+    critical_issues: true
+
+quality_gates:
+  wcag_aa_compliant: required
+  keyboard_navigable: required
+  screen_reader_compatible: required
+  color_contrast_passed: required
+
+collaboration:
+  reports_to: controller-agent
+  supervises: []
+  peers:
+    - frontend-designer
+    - qa-automation
+    - docs-agent
+
+sla:
+  initial_response: 10s
+  review_completion: 4h
+  escalation_threshold: 1h
+
+configuration:
+  wcag_level: aa
+  testing_tools: axe
+  screen_readers: [nvda, jaws]
+  color_contrast_ratio: 4.5
+  focus_visible: true

@@ -1,0 +1,358 @@
+{
+  "name": "small_test",
+  "description": "Small dataset for unit tests",
+  "metadata": {
+    "created_at": "2025-08-09T14:25:09.344916",
+    "work_count": 10,
+    "release_count": 16
+  },
+  "works": [
+    {
+      "title": "ドラゴンボール",
+      "title_kana": "てててててーて",
+      "title_en": "ドラゴンボール",
+      "work_type": "anime",
+      "official_url": "https://example.com/anime/ドラゴンボール",
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "tags": [
+        "Military",
+        "Magic",
+        "Demons"
+      ],
+      "description": "ドラゴンボールの説明文です。Supernatural作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "コードギアス",
+      "title_kana": "てーててあて",
+      "title_en": "コードギアス",
+      "work_type": "anime",
+      "official_url": "https://example.com/anime/コードギアス",
+      "genres": [
+        "Adventure",
+        "Slice of Life",
+        "Drama",
+        "Sports",
+        "Comedy"
+      ],
+      "tags": [
+        "Samurai",
+        "Demons"
+      ],
+      "description": "コードギアスの説明文です。Comedy作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "涼宮ハルヒの憂鬱",
+      "title_kana": "ててててひのてて",
+      "title_en": "涼宮ハルヒ No 憂鬱",
+      "work_type": "anime",
+      "official_url": "https://example.com/anime/涼宮ハルヒ-no-憂鬱",
+      "genres": [
+        "Sci-Fi",
+        "Fantasy",
+        "Horror"
+      ],
+      "tags": [
+        "Shoujo",
+        "Ninja"
+      ],
+      "description": "涼宮ハルヒの憂鬱の説明文です。Sci-Fi作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "呪術廻戦",
+      "title_kana": "じゅじゅつかいせん",
+      "title_en": "Jujutsu Kaisen",
+      "work_type": "anime",
+      "official_url": "https://example.com/anime/jujutsu-kaisen",
+      "genres": [
+        "Fantasy",
+        "Mystery",
+        "Supernatural"
+      ],
+      "tags": [
+        "Military",
+        "School",
+        "Magic"
+      ],
+      "description": "呪術廻戦の説明文です。Comedy作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "七つの大罪",
+      "title_kana": "ててのてて",
+      "title_en": "七つ No 大罪",
+      "work_type": "anime",
+      "official_url": "https://example.com/anime/七つ-no-大罪",
+      "genres": [
+        "Supernatural",
+        "Adventure"
+      ],
+      "tags": [
+        "Shoujo",
+        "Shounen",
+        "School"
+      ],
+      "description": "七つの大罪の説明文です。Supernatural作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "涼宮ハルヒの憂鬱 THE FINAL",
+      "title_kana": "ててててひのてて",
+      "title_en": "涼宮ハルヒ No 憂鬱",
+      "work_type": "anime",
+      "official_url": "https://example.com/anime/涼宮ハルヒ-no-憂鬱",
+      "genres": [
+        "Horror",
+        "Drama",
+        "Adventure",
+        "Sci-Fi"
+      ],
+      "tags": [
+        "Shoujo"
+      ],
+      "description": "涼宮ハルヒの憂鬱 THE FINALの説明文です。Slice of Life作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "Dr.STONE",
+      "title_kana": "てててててててて",
+      "title_en": "Dr.Stone",
+      "work_type": "manga",
+      "official_url": "https://example.com/manga/dr.stone",
+      "genres": [
+        "Slice of Life",
+        "Drama",
+        "Sci-Fi",
+        "Horror"
+      ],
+      "tags": [
+        "Mecha",
+        "Josei",
+        "Demons"
+      ],
+      "description": "Dr.STONEの説明文です。Slice of Life作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "SPY×FAMILY",
+      "title_kana": "すぱいふぁみりー",
+      "title_en": "SPY x FAMILY",
+      "work_type": "manga",
+      "official_url": "https://example.com/manga/spy-x-family",
+      "genres": [
+        "Slice of Life",
+        "Supernatural",
+        "Action"
+      ],
+      "tags": [
+        "Josei",
+        "Demons"
+      ],
+      "description": "SPY×FAMILYの説明文です。Sci-Fi作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "推しの子",
+      "title_kana": "おしのこ",
+      "title_en": "Oshi no Ko",
+      "work_type": "manga",
+      "official_url": "https://example.com/manga/oshi-no-ko",
+      "genres": [
+        "Slice of Life",
+        "Supernatural",
+        "Action"
+      ],
+      "tags": [
+        "Military",
+        "Shoujo"
+      ],
+      "description": "推しの子の説明文です。Supernatural作品として人気を博している。",
+      "status": "RELEASING"
+    },
+    {
+      "title": "PLUTO",
+      "title_kana": "ててててて",
+      "title_en": "Pluto",
+      "work_type": "manga",
+      "official_url": "https://example.com/manga/pluto",
+      "genres": [
+        "Action",
+        "Adventure",
+        "Slice of Life",
+        "Romance"
+      ],
+      "tags": [
+        "Mecha"
+      ],
+      "description": "PLUTOの説明文です。Horror作品として人気を博している。",
+      "status": "RELEASING"
+    }
+  ],
+  "releases": [
+    {
+      "work_id": 1,
+      "release_type": "episode",
+      "number": "1",
+      "platform": "Crunchyroll",
+      "release_date": "2025-08-17",
+      "source": "manual",
+      "source_url": "https://example.com/source/1/episode/1",
+      "notified": 1
+    },
+    {
+      "work_id": 1,
+      "release_type": "episode",
+      "number": "2",
+      "platform": "Crunchyroll",
+      "release_date": "2025-09-01",
+      "source": "anilist",
+      "source_url": "https://example.com/source/1/episode/2",
+      "notified": 0
+    },
+    {
+      "work_id": 2,
+      "release_type": "episode",
+      "number": "1",
+      "platform": "Crunchyroll",
+      "release_date": "2025-07-23",
+      "source": "rss",
+      "source_url": "https://example.com/source/2/episode/1",
+      "notified": 1
+    },
+    {
+      "work_id": 2,
+      "release_type": "episode",
+      "number": "2",
+      "platform": "Amazon Prime Video",
+      "release_date": "2025-08-02",
+      "source": "rss",
+      "source_url": "https://example.com/source/2/episode/2",
+      "notified": 0
+    },
+    {
+      "work_id": 3,
+      "release_type": "episode",
+      "number": "1",
+      "platform": "Amazon Prime Video",
+      "release_date": "2025-08-06",
+      "source": "anilist",
+      "source_url": "https://example.com/source/3/episode/1",
+      "notified": 1
+    },
+    {
+      "work_id": 4,
+      "release_type": "episode",
+      "number": "1",
+      "platform": "Crunchyroll",
+      "release_date": "2025-07-26",
+      "source": "manual",
+      "source_url": "https://example.com/source/4/episode/1",
+      "notified": 0
+    },
+    {
+      "work_id": 4,
+      "release_type": "episode",
+      "number": "2",
+      "platform": "Crunchyroll",
+      "release_date": "2025-07-26",
+      "source": "manual",
+      "source_url": "https://example.com/source/4/episode/2",
+      "notified": 0
+    },
+    {
+      "work_id": 5,
+      "release_type": "episode",
+      "number": "1",
+      "platform": "dアニメストア",
+      "release_date": "2025-08-06",
+      "source": "anilist",
+      "source_url": "https://example.com/source/5/episode/1",
+      "notified": 0
+    },
+    {
+      "work_id": 5,
+      "release_type": "episode",
+      "number": "2",
+      "platform": "Crunchyroll",
+      "release_date": "2025-07-27",
+      "source": "anilist",
+      "source_url": "https://example.com/source/5/episode/2",
+      "notified": 1
+    },
+    {
+      "work_id": 6,
+      "release_type": "episode",
+      "number": "1",
+      "platform": "Amazon Prime Video",
+      "release_date": "2025-07-28",
+      "source": "manual",
+      "source_url": "https://example.com/source/6/episode/1",
+      "notified": 0
+    },
+    {
+      "work_id": 6,
+      "release_type": "episode",
+      "number": "2",
+      "platform": "Netflix",
+      "release_date": "2025-08-08",
+      "source": "anilist",
+      "source_url": "https://example.com/source/6/episode/2",
+      "notified": 1
+    },
+    {
+      "work_id": 7,
+      "release_type": "volume",
+      "number": "1",
+      "platform": "コミックシーモア",
+      "release_date": "2025-08-10",
+      "source": "anilist",
+      "source_url": "https://example.com/source/7/volume/1",
+      "notified": 1
+    },
+    {
+      "work_id": 8,
+      "release_type": "volume",
+      "number": "1",
+      "platform": "DMM Books",
+      "release_date": "2025-08-05",
+      "source": "manual",
+      "source_url": "https://example.com/source/8/volume/1",
+      "notified": 0
+    },
+    {
+      "work_id": 8,
+      "release_type": "volume",
+      "number": "2",
+      "platform": "BookWalker",
+      "release_date": "2025-08-08",
+      "source": "rss",
+      "source_url": "https://example.com/source/8/volume/2",
+      "notified": 0
+    },
+    {
+      "work_id": 9,
+      "release_type": "volume",
+      "number": "1",
+      "platform": "コミックシーモア",
+      "release_date": "2025-07-21",
+      "source": "anilist",
+      "source_url": "https://example.com/source/9/volume/1",
+      "notified": 1
+    },
+    {
+      "work_id": 10,
+      "release_type": "volume",
+      "number": "1",
+      "platform": "Kindle",
+      "release_date": "2025-07-20",
+      "source": "official",
+      "source_url": "https://example.com/source/10/volume/1",
+      "notified": 1
+    }
+  ]
+}

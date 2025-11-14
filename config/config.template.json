@@ -1,0 +1,142 @@
+{
+  "system": {
+    "name": "MangaAnime情報配信システム",
+    "version": "1.0.0",
+    "environment": "production",
+    "timezone": "Asia/Tokyo",
+    "log_level": "INFO"
+  },
+  "database": {
+    "path": "./db.sqlite3",
+    "backup_enabled": true,
+    "backup_retention_days": 30
+  },
+  "google": {
+    "credentials_file": "credentials.json",
+    "token_file": "token.json",
+    "service_account_file": "${GOOGLE_APPLICATION_CREDENTIALS}",
+    "gmail": {
+      "from_email": "${MANGA_ANIME_GMAIL_FROM}",
+      "to_email": "${MANGA_ANIME_GMAIL_TO}",
+      "app_password": "${GMAIL_APP_PASSWORD}",
+      "client_id": "${GMAIL_CLIENT_ID}",
+      "client_secret": "${GMAIL_CLIENT_SECRET}",
+      "rate_limit": {
+        "requests_per_minute": 250,
+        "retry_delay_seconds": 5
+      }
+    },
+    "calendar": {
+      "calendar_id": "${MANGA_ANIME_CALENDAR_ID}",
+      "client_id": "${CALENDAR_CLIENT_ID}",
+      "client_secret": "${CALENDAR_CLIENT_SECRET}",
+      "rate_limit": {
+        "requests_per_minute": 100,
+        "retry_delay_seconds": 3
+      }
+    },
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.send",
+      "https://www.googleapis.com/auth/calendar.events"
+    ]
+  },
+  "apis": {
+    "anilist": {
+      "graphql_url": "https://graphql.anilist.co",
+      "api_key": "${ANILIST_API_KEY}",
+      "rate_limit": {
+        "requests_per_minute": 90,
+        "retry_delay_seconds": 5
+      },
+      "timeout_seconds": 30
+    },
+    "syoboi": {
+      "base_url": "https://cal.syoboi.jp",
+      "api_key": "${SYOBOI_API_KEY}",
+      "rate_limit": {
+        "requests_per_minute": 60,
+        "retry_delay_seconds": 3
+      }
+    },
+    "rss": {
+      "sources": [
+        {
+          "name": "BookWalker",
+          "url": "https://bookwalker.jp/rss/",
+          "type": "manga"
+        },
+        {
+          "name": "dアニメストア",
+          "url": "https://anime.dmkt-sp.jp/animestore/CF/rss/",
+          "type": "anime"
+        }
+      ],
+      "user_agent": "MangaAnime-Info-delivery-system/1.0",
+      "timeout_seconds": 15
+    }
+  },
+  "security": {
+    "secret_key": "${MANGA_ANIME_SECRET_KEY}",
+    "encryption_key": "${MANGA_ANIME_ENCRYPTION_KEY}",
+    "token_encryption_enabled": true,
+    "secure_headers": true,
+    "rate_limiting": {
+      "enabled": true,
+      "max_requests_per_hour": 1000
+    }
+  },
+  "filters": {
+    "ng_keywords": [
+      "エロ",
+      "R18",
+      "成人向け",
+      "BL",
+      "百合",
+      "ボーイズラブ"
+    ],
+    "allowed_genres": [
+      "Action",
+      "Adventure",
+      "Comedy",
+      "Drama",
+      "Fantasy",
+      "Romance",
+      "Sci-Fi",
+      "Slice of Life"
+    ]
+  },
+  "notifications": {
+    "email": {
+      "enabled": true,
+      "template_path": "./templates/email/",
+      "batch_size": 10,
+      "retry_attempts": 3
+    },
+    "calendar": {
+      "enabled": true,
+      "reminder_minutes": [60, 10],
+      "event_colors": {
+        "anime": "7",
+        "manga": "2",
+        "episode": "9",
+        "volume": "10",
+        "default": "1"
+      }
+    }
+  },
+  "logging": {
+    "file_path": "${MANGA_ANIME_LOG_PATH:-./logs/app.log}",
+    "max_file_size_mb": 10,
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "date_format": "%Y-%m-%d %H:%M:%S",
+    "enable_console": true,
+    "enable_file": true
+  },
+  "scheduling": {
+    "collection_interval_hours": 1,
+    "notification_time": "08:00",
+    "cleanup_interval_hours": 24,
+    "timezone": "Asia/Tokyo"
+  }
+}

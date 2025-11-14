@@ -1,0 +1,2117 @@
+{
+  "search_anime": {
+    "data": {
+      "Page": {
+        "media": [
+          {
+            "id": 1,
+            "title": {
+              "romaji": "呪術廻戦 劇場版",
+              "english": "Jujutsu Kaisen",
+              "native": "呪術廻戦 劇場版"
+            },
+            "type": "ANIME",
+            "format": "SPECIAL",
+            "status": "RELEASING",
+            "episodes": 20,
+            "genres": [
+              "Romance",
+              "Adventure",
+              "Fantasy"
+            ],
+            "tags": [
+              {
+                "name": "Time Travel"
+              },
+              {
+                "name": "Pirates"
+              }
+            ],
+            "description": "呪術廻戦 劇場版の説明文です。Horror作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 2,
+              "day": 13
+            },
+            "nextAiringEpisode": {
+              "episode": 10,
+              "airingAt": 1756963509
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/1/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/1/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/1/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/1/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/1/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/jujutsu-kaisen"
+          },
+          {
+            "id": 2,
+            "title": {
+              "romaji": "鬼滅の刃",
+              "english": "Demon Slayer",
+              "native": "鬼滅の刃"
+            },
+            "type": "ANIME",
+            "format": "OVA",
+            "status": "RELEASING",
+            "episodes": 21,
+            "genres": [
+              "Comedy",
+              "Horror",
+              "Action",
+              "Adventure",
+              "Slice of Life"
+            ],
+            "tags": [
+              {
+                "name": "Isekai"
+              }
+            ],
+            "description": "鬼滅の刃の説明文です。Slice of Life作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 4,
+              "day": 23
+            },
+            "nextAiringEpisode": {
+              "episode": 22,
+              "airingAt": 1755321909
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/2/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/2/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/2/3"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/demon-slayer"
+          },
+          {
+            "id": 3,
+            "title": {
+              "romaji": "機動戦士ガンダム",
+              "english": "機動Sen士ガンダム",
+              "native": "機動戦士ガンダム"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 15,
+            "genres": [
+              "Thriller",
+              "Fantasy"
+            ],
+            "tags": [
+              {
+                "name": "Time Travel"
+              }
+            ],
+            "description": "機動戦士ガンダムの説明文です。Slice of Life作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 2,
+              "day": 13
+            },
+            "nextAiringEpisode": {
+              "episode": 21,
+              "airingAt": 1756963509
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/3/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/3/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/3/3"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/機動sen士ガンダム"
+          },
+          {
+            "id": 4,
+            "title": {
+              "romaji": "呪術廻戦",
+              "english": "Jujutsu Kaisen",
+              "native": "呪術廻戦"
+            },
+            "type": "ANIME",
+            "format": "MOVIE",
+            "status": "RELEASING",
+            "episodes": 17,
+            "genres": [
+              "Supernatural",
+              "Sports",
+              "Slice of Life",
+              "Fantasy"
+            ],
+            "tags": [
+              {
+                "name": "Shoujo"
+              }
+            ],
+            "description": "呪術廻戦の説明文です。Fantasy作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 6,
+              "day": 7
+            },
+            "nextAiringEpisode": {
+              "episode": 23,
+              "airingAt": 1757222709
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/4/1"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/jujutsu-kaisen"
+          },
+          {
+            "id": 5,
+            "title": {
+              "romaji": "約束のネバーランド",
+              "english": "約束 No ネバーランド",
+              "native": "約束のネバーランド"
+            },
+            "type": "ANIME",
+            "format": "MOVIE",
+            "status": "RELEASING",
+            "episodes": 20,
+            "genres": [
+              "Drama",
+              "Thriller"
+            ],
+            "tags": [
+              {
+                "name": "Shoujo"
+              },
+              {
+                "name": "School"
+              }
+            ],
+            "description": "約束のネバーランドの説明文です。Horror作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 12,
+              "day": 8
+            },
+            "nextAiringEpisode": {
+              "episode": 13,
+              "airingAt": 1755408309
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/5/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/5/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/5/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/5/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/5/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/約束-no-ネバーランド"
+          },
+          {
+            "id": 6,
+            "title": {
+              "romaji": "フェアリーテイル OVA",
+              "english": "フェアリーテイル",
+              "native": "フェアリーテイル OVA"
+            },
+            "type": "ANIME",
+            "format": "MOVIE",
+            "status": "RELEASING",
+            "episodes": 22,
+            "genres": [
+              "Horror",
+              "Action",
+              "Adventure",
+              "Mystery"
+            ],
+            "tags": [
+              {
+                "name": "Isekai"
+              },
+              {
+                "name": "Pirates"
+              }
+            ],
+            "description": "フェアリーテイル OVAの説明文です。Mystery作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 6,
+              "day": 27
+            },
+            "nextAiringEpisode": null,
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/6/1"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/フェアリーテイル"
+          },
+          {
+            "id": 7,
+            "title": {
+              "romaji": "涼宮ハルヒの憂鬱",
+              "english": "涼宮ハルヒ No 憂鬱",
+              "native": "涼宮ハルヒの憂鬱"
+            },
+            "type": "ANIME",
+            "format": "MOVIE",
+            "status": "RELEASING",
+            "episodes": 12,
+            "genres": [
+              "Sports",
+              "Action"
+            ],
+            "tags": [
+              {
+                "name": "Mecha"
+              },
+              {
+                "name": "Seinen"
+              }
+            ],
+            "description": "涼宮ハルヒの憂鬱の説明文です。Horror作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 6,
+              "day": 13
+            },
+            "nextAiringEpisode": {
+              "episode": 7,
+              "airingAt": 1757222709
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/7/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/7/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/7/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/7/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/7/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/涼宮ハルヒ-no-憂鬱"
+          },
+          {
+            "id": 8,
+            "title": {
+              "romaji": "コードギアス 完結編",
+              "english": "コードギアス",
+              "native": "コードギアス 完結編"
+            },
+            "type": "ANIME",
+            "format": "OVA",
+            "status": "RELEASING",
+            "episodes": 15,
+            "genres": [
+              "Drama",
+              "Mystery",
+              "Thriller"
+            ],
+            "tags": [
+              {
+                "name": "Mecha"
+              },
+              {
+                "name": "Demons"
+              }
+            ],
+            "description": "コードギアス 完結編の説明文です。Horror作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 11,
+              "day": 16
+            },
+            "nextAiringEpisode": {
+              "episode": 21,
+              "airingAt": 1755926709
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/8/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/8/2"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/コードギアス"
+          },
+          {
+            "id": 9,
+            "title": {
+              "romaji": "コードギアス",
+              "english": "コードギアス",
+              "native": "コードギアス"
+            },
+            "type": "ANIME",
+            "format": "OVA",
+            "status": "RELEASING",
+            "episodes": 14,
+            "genres": [
+              "Romance",
+              "Thriller",
+              "Slice of Life"
+            ],
+            "tags": [
+              {
+                "name": "Shounen"
+              },
+              {
+                "name": "Time Travel"
+              }
+            ],
+            "description": "コードギアスの説明文です。Mystery作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 4,
+              "day": 24
+            },
+            "nextAiringEpisode": {
+              "episode": 9,
+              "airingAt": 1756704309
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/9/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/9/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/9/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/9/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/9/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/コードギアス"
+          },
+          {
+            "id": 10,
+            "title": {
+              "romaji": "鬼滅の刃",
+              "english": "Demon Slayer",
+              "native": "鬼滅の刃"
+            },
+            "type": "ANIME",
+            "format": "SPECIAL",
+            "status": "RELEASING",
+            "episodes": 21,
+            "genres": [
+              "Sports",
+              "Slice of Life",
+              "Comedy",
+              "Horror",
+              "Action"
+            ],
+            "tags": [
+              {
+                "name": "Ninja"
+              },
+              {
+                "name": "Seinen"
+              }
+            ],
+            "description": "鬼滅の刃の説明文です。Horror作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 7,
+              "day": 12
+            },
+            "nextAiringEpisode": {
+              "episode": 5,
+              "airingAt": 1756099509
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/10/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/10/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/10/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/10/4"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/demon-slayer"
+          },
+          {
+            "id": 11,
+            "title": {
+              "romaji": "僕のヒーローアカデミア",
+              "english": "My Hero Academia",
+              "native": "僕のヒーローアカデミア"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 24,
+            "genres": [
+              "Adventure",
+              "Action",
+              "Mystery",
+              "Horror"
+            ],
+            "tags": [
+              {
+                "name": "Ninja"
+              }
+            ],
+            "description": "僕のヒーローアカデミアの説明文です。Supernatural作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 1,
+              "day": 28
+            },
+            "nextAiringEpisode": {
+              "episode": 21,
+              "airingAt": 1755149109
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/11/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/11/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/11/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/11/4"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/my-hero-academia"
+          },
+          {
+            "id": 12,
+            "title": {
+              "romaji": "けいおん！",
+              "english": "けいおん！",
+              "native": "けいおん！"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 18,
+            "genres": [
+              "Fantasy",
+              "Slice of Life",
+              "Romance"
+            ],
+            "tags": [
+              {
+                "name": "Shoujo"
+              },
+              {
+                "name": "Military"
+              },
+              {
+                "name": "School"
+              }
+            ],
+            "description": "けいおん！の説明文です。Sports作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 7,
+              "day": 20
+            },
+            "nextAiringEpisode": null,
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/12/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/12/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/12/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/12/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/12/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/けいおん！"
+          },
+          {
+            "id": 13,
+            "title": {
+              "romaji": "進撃の巨人 2期",
+              "english": "Attack on Titan",
+              "native": "進撃の巨人 2期"
+            },
+            "type": "ANIME",
+            "format": "OVA",
+            "status": "RELEASING",
+            "episodes": 20,
+            "genres": [
+              "Horror",
+              "Slice of Life",
+              "Adventure"
+            ],
+            "tags": [
+              {
+                "name": "Mecha"
+              }
+            ],
+            "description": "進撃の巨人 2期の説明文です。Slice of Life作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 1,
+              "day": 22
+            },
+            "nextAiringEpisode": null,
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/13/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/13/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/13/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/13/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/13/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/attack-on-titan"
+          },
+          {
+            "id": 14,
+            "title": {
+              "romaji": "ハンターxハンター THE FINAL",
+              "english": "ハンターXハンター",
+              "native": "ハンターxハンター THE FINAL"
+            },
+            "type": "ANIME",
+            "format": "OVA",
+            "status": "RELEASING",
+            "episodes": 24,
+            "genres": [
+              "Sci-Fi",
+              "Drama"
+            ],
+            "tags": [
+              {
+                "name": "Pirates"
+              },
+              {
+                "name": "Ninja"
+              },
+              {
+                "name": "Josei"
+              }
+            ],
+            "description": "ハンターxハンター THE FINALの説明文です。Sci-Fi作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 11,
+              "day": 11
+            },
+            "nextAiringEpisode": {
+              "episode": 14,
+              "airingAt": 1755149109
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/14/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/14/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/14/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/14/4"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/ハンターxハンター"
+          },
+          {
+            "id": 15,
+            "title": {
+              "romaji": "フェアリーテイル",
+              "english": "フェアリーテイル",
+              "native": "フェアリーテイル"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 23,
+            "genres": [
+              "Drama",
+              "Action"
+            ],
+            "tags": [
+              {
+                "name": "Magic"
+              },
+              {
+                "name": "Ninja"
+              }
+            ],
+            "description": "フェアリーテイルの説明文です。Action作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 12,
+              "day": 9
+            },
+            "nextAiringEpisode": null,
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/15/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/15/2"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/フェアリーテイル"
+          },
+          {
+            "id": 16,
+            "title": {
+              "romaji": "約束のネバーランド 完結編",
+              "english": "約束 No ネバーランド",
+              "native": "約束のネバーランド 完結編"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 22,
+            "genres": [
+              "Mystery",
+              "Action"
+            ],
+            "tags": [
+              {
+                "name": "Pirates"
+              }
+            ],
+            "description": "約束のネバーランド 完結編の説明文です。Thriller作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 5,
+              "day": 27
+            },
+            "nextAiringEpisode": {
+              "episode": 20,
+              "airingAt": 1755235509
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/16/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/16/2"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/約束-no-ネバーランド"
+          },
+          {
+            "id": 17,
+            "title": {
+              "romaji": "ブリーチ",
+              "english": "ブリーチ",
+              "native": "ブリーチ"
+            },
+            "type": "ANIME",
+            "format": "OVA",
+            "status": "RELEASING",
+            "episodes": 24,
+            "genres": [
+              "Romance",
+              "Action",
+              "Supernatural",
+              "Sci-Fi"
+            ],
+            "tags": [
+              {
+                "name": "Shounen"
+              },
+              {
+                "name": "Ninja"
+              }
+            ],
+            "description": "ブリーチの説明文です。Sci-Fi作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 3,
+              "day": 18
+            },
+            "nextAiringEpisode": null,
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/17/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/17/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/17/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/17/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/17/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/ブリーチ"
+          },
+          {
+            "id": 18,
+            "title": {
+              "romaji": "ワンピース 2期",
+              "english": "One Piece",
+              "native": "ワンピース 2期"
+            },
+            "type": "ANIME",
+            "format": "TV",
+            "status": "RELEASING",
+            "episodes": 21,
+            "genres": [
+              "Fantasy",
+              "Drama"
+            ],
+            "tags": [
+              {
+                "name": "Isekai"
+              }
+            ],
+            "description": "ワンピース 2期の説明文です。Fantasy作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 6,
+              "day": 16
+            },
+            "nextAiringEpisode": {
+              "episode": 12,
+              "airingAt": 1757136309
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/18/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/18/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/18/3"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/one-piece"
+          },
+          {
+            "id": 19,
+            "title": {
+              "romaji": "ナルト 完結編",
+              "english": "ナルト",
+              "native": "ナルト 完結編"
+            },
+            "type": "ANIME",
+            "format": "MOVIE",
+            "status": "RELEASING",
+            "episodes": 12,
+            "genres": [
+              "Horror",
+              "Sci-Fi",
+              "Comedy",
+              "Action",
+              "Sports"
+            ],
+            "tags": [
+              {
+                "name": "Shounen"
+              },
+              {
+                "name": "Josei"
+              }
+            ],
+            "description": "ナルト 完結編の説明文です。Fantasy作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 4,
+              "day": 19
+            },
+            "nextAiringEpisode": null,
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/19/1"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/ナルト"
+          },
+          {
+            "id": 20,
+            "title": {
+              "romaji": "ブリーチ",
+              "english": "ブリーチ",
+              "native": "ブリーチ"
+            },
+            "type": "ANIME",
+            "format": "SPECIAL",
+            "status": "RELEASING",
+            "episodes": 13,
+            "genres": [
+              "Sports",
+              "Drama",
+              "Horror",
+              "Slice of Life"
+            ],
+            "tags": [
+              {
+                "name": "Military"
+              },
+              {
+                "name": "Time Travel"
+              }
+            ],
+            "description": "ブリーチの説明文です。Drama作品として人気を博している。",
+            "startDate": {
+              "year": 2024,
+              "month": 9,
+              "day": 25
+            },
+            "nextAiringEpisode": {
+              "episode": 22,
+              "airingAt": 1756013109
+            },
+            "streamingEpisodes": [
+              {
+                "title": "Episode 1",
+                "url": "https://example.com/episode/20/1"
+              },
+              {
+                "title": "Episode 2",
+                "url": "https://example.com/episode/20/2"
+              },
+              {
+                "title": "Episode 3",
+                "url": "https://example.com/episode/20/3"
+              },
+              {
+                "title": "Episode 4",
+                "url": "https://example.com/episode/20/4"
+              },
+              {
+                "title": "Episode 5",
+                "url": "https://example.com/episode/20/5"
+              }
+            ],
+            "siteUrl": "https://example.com/anime/ブリーチ"
+          }
+        ],
+        "pageInfo": {
+          "hasNextPage": true,
+          "currentPage": 1,
+          "lastPage": 3
+        }
+      }
+    }
+  },
+  "anime_1": {
+    "data": {
+      "Media": {
+        "id": 1,
+        "title": {
+          "romaji": "呪術廻戦 劇場版",
+          "english": "Jujutsu Kaisen",
+          "native": "呪術廻戦 劇場版"
+        },
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "RELEASING",
+        "episodes": 20,
+        "genres": [
+          "Romance",
+          "Adventure",
+          "Fantasy"
+        ],
+        "tags": [
+          {
+            "name": "Time Travel"
+          },
+          {
+            "name": "Pirates"
+          }
+        ],
+        "description": "呪術廻戦 劇場版の説明文です。Horror作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 2,
+          "day": 13
+        },
+        "nextAiringEpisode": {
+          "episode": 10,
+          "airingAt": 1756963509
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/1/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/1/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/1/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/1/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/1/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/jujutsu-kaisen"
+      }
+    }
+  },
+  "anime_2": {
+    "data": {
+      "Media": {
+        "id": 2,
+        "title": {
+          "romaji": "鬼滅の刃",
+          "english": "Demon Slayer",
+          "native": "鬼滅の刃"
+        },
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "RELEASING",
+        "episodes": 21,
+        "genres": [
+          "Comedy",
+          "Horror",
+          "Action",
+          "Adventure",
+          "Slice of Life"
+        ],
+        "tags": [
+          {
+            "name": "Isekai"
+          }
+        ],
+        "description": "鬼滅の刃の説明文です。Slice of Life作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 4,
+          "day": 23
+        },
+        "nextAiringEpisode": {
+          "episode": 22,
+          "airingAt": 1755321909
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/2/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/2/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/2/3"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/demon-slayer"
+      }
+    }
+  },
+  "anime_3": {
+    "data": {
+      "Media": {
+        "id": 3,
+        "title": {
+          "romaji": "機動戦士ガンダム",
+          "english": "機動Sen士ガンダム",
+          "native": "機動戦士ガンダム"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 15,
+        "genres": [
+          "Thriller",
+          "Fantasy"
+        ],
+        "tags": [
+          {
+            "name": "Time Travel"
+          }
+        ],
+        "description": "機動戦士ガンダムの説明文です。Slice of Life作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 2,
+          "day": 13
+        },
+        "nextAiringEpisode": {
+          "episode": 21,
+          "airingAt": 1756963509
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/3/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/3/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/3/3"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/機動sen士ガンダム"
+      }
+    }
+  },
+  "anime_4": {
+    "data": {
+      "Media": {
+        "id": 4,
+        "title": {
+          "romaji": "呪術廻戦",
+          "english": "Jujutsu Kaisen",
+          "native": "呪術廻戦"
+        },
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "RELEASING",
+        "episodes": 17,
+        "genres": [
+          "Supernatural",
+          "Sports",
+          "Slice of Life",
+          "Fantasy"
+        ],
+        "tags": [
+          {
+            "name": "Shoujo"
+          }
+        ],
+        "description": "呪術廻戦の説明文です。Fantasy作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 6,
+          "day": 7
+        },
+        "nextAiringEpisode": {
+          "episode": 23,
+          "airingAt": 1757222709
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/4/1"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/jujutsu-kaisen"
+      }
+    }
+  },
+  "anime_5": {
+    "data": {
+      "Media": {
+        "id": 5,
+        "title": {
+          "romaji": "約束のネバーランド",
+          "english": "約束 No ネバーランド",
+          "native": "約束のネバーランド"
+        },
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "RELEASING",
+        "episodes": 20,
+        "genres": [
+          "Drama",
+          "Thriller"
+        ],
+        "tags": [
+          {
+            "name": "Shoujo"
+          },
+          {
+            "name": "School"
+          }
+        ],
+        "description": "約束のネバーランドの説明文です。Horror作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 12,
+          "day": 8
+        },
+        "nextAiringEpisode": {
+          "episode": 13,
+          "airingAt": 1755408309
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/5/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/5/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/5/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/5/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/5/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/約束-no-ネバーランド"
+      }
+    }
+  },
+  "anime_6": {
+    "data": {
+      "Media": {
+        "id": 6,
+        "title": {
+          "romaji": "フェアリーテイル OVA",
+          "english": "フェアリーテイル",
+          "native": "フェアリーテイル OVA"
+        },
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "RELEASING",
+        "episodes": 22,
+        "genres": [
+          "Horror",
+          "Action",
+          "Adventure",
+          "Mystery"
+        ],
+        "tags": [
+          {
+            "name": "Isekai"
+          },
+          {
+            "name": "Pirates"
+          }
+        ],
+        "description": "フェアリーテイル OVAの説明文です。Mystery作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 6,
+          "day": 27
+        },
+        "nextAiringEpisode": null,
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/6/1"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/フェアリーテイル"
+      }
+    }
+  },
+  "anime_7": {
+    "data": {
+      "Media": {
+        "id": 7,
+        "title": {
+          "romaji": "涼宮ハルヒの憂鬱",
+          "english": "涼宮ハルヒ No 憂鬱",
+          "native": "涼宮ハルヒの憂鬱"
+        },
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "RELEASING",
+        "episodes": 12,
+        "genres": [
+          "Sports",
+          "Action"
+        ],
+        "tags": [
+          {
+            "name": "Mecha"
+          },
+          {
+            "name": "Seinen"
+          }
+        ],
+        "description": "涼宮ハルヒの憂鬱の説明文です。Horror作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 6,
+          "day": 13
+        },
+        "nextAiringEpisode": {
+          "episode": 7,
+          "airingAt": 1757222709
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/7/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/7/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/7/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/7/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/7/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/涼宮ハルヒ-no-憂鬱"
+      }
+    }
+  },
+  "anime_8": {
+    "data": {
+      "Media": {
+        "id": 8,
+        "title": {
+          "romaji": "コードギアス 完結編",
+          "english": "コードギアス",
+          "native": "コードギアス 完結編"
+        },
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "RELEASING",
+        "episodes": 15,
+        "genres": [
+          "Drama",
+          "Mystery",
+          "Thriller"
+        ],
+        "tags": [
+          {
+            "name": "Mecha"
+          },
+          {
+            "name": "Demons"
+          }
+        ],
+        "description": "コードギアス 完結編の説明文です。Horror作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 11,
+          "day": 16
+        },
+        "nextAiringEpisode": {
+          "episode": 21,
+          "airingAt": 1755926709
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/8/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/8/2"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/コードギアス"
+      }
+    }
+  },
+  "anime_9": {
+    "data": {
+      "Media": {
+        "id": 9,
+        "title": {
+          "romaji": "コードギアス",
+          "english": "コードギアス",
+          "native": "コードギアス"
+        },
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "RELEASING",
+        "episodes": 14,
+        "genres": [
+          "Romance",
+          "Thriller",
+          "Slice of Life"
+        ],
+        "tags": [
+          {
+            "name": "Shounen"
+          },
+          {
+            "name": "Time Travel"
+          }
+        ],
+        "description": "コードギアスの説明文です。Mystery作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 4,
+          "day": 24
+        },
+        "nextAiringEpisode": {
+          "episode": 9,
+          "airingAt": 1756704309
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/9/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/9/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/9/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/9/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/9/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/コードギアス"
+      }
+    }
+  },
+  "anime_10": {
+    "data": {
+      "Media": {
+        "id": 10,
+        "title": {
+          "romaji": "鬼滅の刃",
+          "english": "Demon Slayer",
+          "native": "鬼滅の刃"
+        },
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "RELEASING",
+        "episodes": 21,
+        "genres": [
+          "Sports",
+          "Slice of Life",
+          "Comedy",
+          "Horror",
+          "Action"
+        ],
+        "tags": [
+          {
+            "name": "Ninja"
+          },
+          {
+            "name": "Seinen"
+          }
+        ],
+        "description": "鬼滅の刃の説明文です。Horror作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 7,
+          "day": 12
+        },
+        "nextAiringEpisode": {
+          "episode": 5,
+          "airingAt": 1756099509
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/10/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/10/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/10/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/10/4"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/demon-slayer"
+      }
+    }
+  },
+  "anime_11": {
+    "data": {
+      "Media": {
+        "id": 11,
+        "title": {
+          "romaji": "僕のヒーローアカデミア",
+          "english": "My Hero Academia",
+          "native": "僕のヒーローアカデミア"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 24,
+        "genres": [
+          "Adventure",
+          "Action",
+          "Mystery",
+          "Horror"
+        ],
+        "tags": [
+          {
+            "name": "Ninja"
+          }
+        ],
+        "description": "僕のヒーローアカデミアの説明文です。Supernatural作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 1,
+          "day": 28
+        },
+        "nextAiringEpisode": {
+          "episode": 21,
+          "airingAt": 1755149109
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/11/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/11/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/11/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/11/4"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/my-hero-academia"
+      }
+    }
+  },
+  "anime_12": {
+    "data": {
+      "Media": {
+        "id": 12,
+        "title": {
+          "romaji": "けいおん！",
+          "english": "けいおん！",
+          "native": "けいおん！"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 18,
+        "genres": [
+          "Fantasy",
+          "Slice of Life",
+          "Romance"
+        ],
+        "tags": [
+          {
+            "name": "Shoujo"
+          },
+          {
+            "name": "Military"
+          },
+          {
+            "name": "School"
+          }
+        ],
+        "description": "けいおん！の説明文です。Sports作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 7,
+          "day": 20
+        },
+        "nextAiringEpisode": null,
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/12/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/12/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/12/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/12/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/12/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/けいおん！"
+      }
+    }
+  },
+  "anime_13": {
+    "data": {
+      "Media": {
+        "id": 13,
+        "title": {
+          "romaji": "進撃の巨人 2期",
+          "english": "Attack on Titan",
+          "native": "進撃の巨人 2期"
+        },
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "RELEASING",
+        "episodes": 20,
+        "genres": [
+          "Horror",
+          "Slice of Life",
+          "Adventure"
+        ],
+        "tags": [
+          {
+            "name": "Mecha"
+          }
+        ],
+        "description": "進撃の巨人 2期の説明文です。Slice of Life作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 1,
+          "day": 22
+        },
+        "nextAiringEpisode": null,
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/13/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/13/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/13/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/13/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/13/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/attack-on-titan"
+      }
+    }
+  },
+  "anime_14": {
+    "data": {
+      "Media": {
+        "id": 14,
+        "title": {
+          "romaji": "ハンターxハンター THE FINAL",
+          "english": "ハンターXハンター",
+          "native": "ハンターxハンター THE FINAL"
+        },
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "RELEASING",
+        "episodes": 24,
+        "genres": [
+          "Sci-Fi",
+          "Drama"
+        ],
+        "tags": [
+          {
+            "name": "Pirates"
+          },
+          {
+            "name": "Ninja"
+          },
+          {
+            "name": "Josei"
+          }
+        ],
+        "description": "ハンターxハンター THE FINALの説明文です。Sci-Fi作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 11,
+          "day": 11
+        },
+        "nextAiringEpisode": {
+          "episode": 14,
+          "airingAt": 1755149109
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/14/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/14/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/14/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/14/4"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/ハンターxハンター"
+      }
+    }
+  },
+  "anime_15": {
+    "data": {
+      "Media": {
+        "id": 15,
+        "title": {
+          "romaji": "フェアリーテイル",
+          "english": "フェアリーテイル",
+          "native": "フェアリーテイル"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 23,
+        "genres": [
+          "Drama",
+          "Action"
+        ],
+        "tags": [
+          {
+            "name": "Magic"
+          },
+          {
+            "name": "Ninja"
+          }
+        ],
+        "description": "フェアリーテイルの説明文です。Action作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 12,
+          "day": 9
+        },
+        "nextAiringEpisode": null,
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/15/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/15/2"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/フェアリーテイル"
+      }
+    }
+  },
+  "anime_16": {
+    "data": {
+      "Media": {
+        "id": 16,
+        "title": {
+          "romaji": "約束のネバーランド 完結編",
+          "english": "約束 No ネバーランド",
+          "native": "約束のネバーランド 完結編"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 22,
+        "genres": [
+          "Mystery",
+          "Action"
+        ],
+        "tags": [
+          {
+            "name": "Pirates"
+          }
+        ],
+        "description": "約束のネバーランド 完結編の説明文です。Thriller作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 5,
+          "day": 27
+        },
+        "nextAiringEpisode": {
+          "episode": 20,
+          "airingAt": 1755235509
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/16/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/16/2"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/約束-no-ネバーランド"
+      }
+    }
+  },
+  "anime_17": {
+    "data": {
+      "Media": {
+        "id": 17,
+        "title": {
+          "romaji": "ブリーチ",
+          "english": "ブリーチ",
+          "native": "ブリーチ"
+        },
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "RELEASING",
+        "episodes": 24,
+        "genres": [
+          "Romance",
+          "Action",
+          "Supernatural",
+          "Sci-Fi"
+        ],
+        "tags": [
+          {
+            "name": "Shounen"
+          },
+          {
+            "name": "Ninja"
+          }
+        ],
+        "description": "ブリーチの説明文です。Sci-Fi作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 3,
+          "day": 18
+        },
+        "nextAiringEpisode": null,
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/17/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/17/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/17/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/17/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/17/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/ブリーチ"
+      }
+    }
+  },
+  "anime_18": {
+    "data": {
+      "Media": {
+        "id": 18,
+        "title": {
+          "romaji": "ワンピース 2期",
+          "english": "One Piece",
+          "native": "ワンピース 2期"
+        },
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": 21,
+        "genres": [
+          "Fantasy",
+          "Drama"
+        ],
+        "tags": [
+          {
+            "name": "Isekai"
+          }
+        ],
+        "description": "ワンピース 2期の説明文です。Fantasy作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 6,
+          "day": 16
+        },
+        "nextAiringEpisode": {
+          "episode": 12,
+          "airingAt": 1757136309
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/18/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/18/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/18/3"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/one-piece"
+      }
+    }
+  },
+  "anime_19": {
+    "data": {
+      "Media": {
+        "id": 19,
+        "title": {
+          "romaji": "ナルト 完結編",
+          "english": "ナルト",
+          "native": "ナルト 完結編"
+        },
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "RELEASING",
+        "episodes": 12,
+        "genres": [
+          "Horror",
+          "Sci-Fi",
+          "Comedy",
+          "Action",
+          "Sports"
+        ],
+        "tags": [
+          {
+            "name": "Shounen"
+          },
+          {
+            "name": "Josei"
+          }
+        ],
+        "description": "ナルト 完結編の説明文です。Fantasy作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 4,
+          "day": 19
+        },
+        "nextAiringEpisode": null,
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/19/1"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/ナルト"
+      }
+    }
+  },
+  "anime_20": {
+    "data": {
+      "Media": {
+        "id": 20,
+        "title": {
+          "romaji": "ブリーチ",
+          "english": "ブリーチ",
+          "native": "ブリーチ"
+        },
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "RELEASING",
+        "episodes": 13,
+        "genres": [
+          "Sports",
+          "Drama",
+          "Horror",
+          "Slice of Life"
+        ],
+        "tags": [
+          {
+            "name": "Military"
+          },
+          {
+            "name": "Time Travel"
+          }
+        ],
+        "description": "ブリーチの説明文です。Drama作品として人気を博している。",
+        "startDate": {
+          "year": 2024,
+          "month": 9,
+          "day": 25
+        },
+        "nextAiringEpisode": {
+          "episode": 22,
+          "airingAt": 1756013109
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Episode 1",
+            "url": "https://example.com/episode/20/1"
+          },
+          {
+            "title": "Episode 2",
+            "url": "https://example.com/episode/20/2"
+          },
+          {
+            "title": "Episode 3",
+            "url": "https://example.com/episode/20/3"
+          },
+          {
+            "title": "Episode 4",
+            "url": "https://example.com/episode/20/4"
+          },
+          {
+            "title": "Episode 5",
+            "url": "https://example.com/episode/20/5"
+          }
+        ],
+        "siteUrl": "https://example.com/anime/ブリーチ"
+      }
+    }
+  }
+}

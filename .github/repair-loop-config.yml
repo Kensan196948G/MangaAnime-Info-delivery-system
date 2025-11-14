@@ -1,0 +1,144 @@
+# Auto Repair Loop System Configuration
+# 7 attempts per cycle with 30-minute cooldown
+
+system:
+  name: "Auto Repair Loop 7x30"
+  version: "1.0.0"
+  enabled: true
+
+loop_parameters:
+  max_attempts_per_cycle: 7
+  cooldown_minutes: 30
+  max_cycles_before_escalation: 3
+  
+timing:
+  # 各修復試行の時間制限
+  repair_timeout_minutes: 5
+  
+  # スケジュール実行間隔
+  schedule_interval_minutes: 30
+  
+  # エスカレーションまでの最大時間
+  max_time_before_escalation_hours: 3
+
+repair_strategies:
+  cycle_1:
+    name: "Basic Fixes"
+    attempts: [1, 2, 3, 4, 5, 6, 7]
+    actions:
+      - "validate_config"
+      - "fix_syntax_errors"
+      - "update_dependencies"
+      - "fix_permissions"
+      - "clear_cache"
+      - "restart_services"
+      - "basic_validation"
+      
+  cycle_2:
+    name: "Advanced Fixes"
+    attempts: [8, 9, 10, 11, 12, 13, 14]
+    actions:
+      - "deep_config_repair"
+      - "workflow_regeneration"
+      - "dependency_reinstall"
+      - "security_fixes"
+      - "database_repair"
+      - "full_system_check"
+      - "integration_test"
+      
+  cycle_3:
+    name: "Deep Recovery"
+    attempts: [15, 16, 17, 18, 19, 20, 21]
+    actions:
+      - "complete_reset"
+      - "rollback_changes"
+      - "restore_from_backup"
+      - "manual_override"
+      - "force_repair"
+      - "nuclear_option"
+      - "final_attempt"
+
+escalation:
+  enabled: true
+  after_cycles: 3
+  
+  # エスカレーション通知
+  notifications:
+    - type: "github_mention"
+      users: ["@Kensan196948G"]
+    - type: "issue_label"
+      labels: ["needs-human-intervention", "priority:critical"]
+    - type: "issue_comment"
+      template: |
+        ## ⚠️ Escalation Required
+        
+        This issue has exceeded the automatic repair threshold:
+        - Cycles attempted: {cycles}
+        - Total attempts: {total_attempts}
+        - Time elapsed: {elapsed_time}
+        
+        Human intervention is required.
+
+monitoring:
+  # メトリクス収集
+  collect_metrics: true
+  metrics_file: ".repair-state/metrics.json"
+  
+  # 成功率の閾値
+  success_rate_threshold: 0.7
+  
+  # アラート設定
+  alerts:
+    low_success_rate:
+      enabled: true
+      threshold: 0.5
+    
+    repeated_failures:
+      enabled: true
+      threshold: 5
+    
+    long_running_repairs:
+      enabled: true
+      threshold_minutes: 60
+
+workflows_to_monitor:
+  - "Simple CI Pipeline"
+  - "Security Audit & Quality Assurance"
+  - "MangaAnime System Health Check"
+  - "MangaAnime Auto Deployment"
+  - "System Health Check (Fixed)"
+  - "Auto Error Detection & Fix System"
+  - "Issue Auto-Management & Response System"
+
+# Issue管理設定
+issue_management:
+  auto_create: true
+  auto_close_on_success: true
+  auto_comment: true
+  
+  # Issueラベル
+  labels:
+    primary: "auto-repair-7x"
+    error: "error"
+    automated: "automated"
+    escalation: "needs-human-intervention"
+    priority_high: "priority:critical"
+    
+  # Issue本文のテンプレート
+  use_template: true
+  template_path: ".github/ISSUE_TEMPLATE/auto-repair-7x.md"
+
+# ログ設定
+logging:
+  enabled: true
+  log_level: "INFO"
+  log_file: ".repair-state/repair.log"
+  max_log_size_mb: 10
+  backup_count: 5
+
+# デバッグモード
+debug:
+  enabled: false
+  verbose_output: false
+  dry_run: false
+  skip_cooldown: false  # テスト用：クールダウンをスキップ

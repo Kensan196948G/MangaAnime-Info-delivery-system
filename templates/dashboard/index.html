@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アニメ・マンガ情報配信システム - 監視ダッシュボード</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .metric-card {
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+        .status-healthy {
+            color: #28a745;
+        }
+        .status-warning {
+            color: #ffc107;
+        }
+        .status-error {
+            color: #dc3545;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        .last-updated {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+        .loading-spinner {
+            display: none;
+        }
+        .auto-refresh-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-chart-line me-2"></i>
+                システム監視ダッシュボード
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">
+                    <i class="fas fa-clock me-1"></i>
+                    <span id="lastUpdate">読み込み中...</span>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auto-refresh-indicator">
+        <div class="alert alert-info py-2 px-3" id="refreshIndicator" style="display: none;">
+            <i class="fas fa-sync fa-spin me-1"></i>
+            データ更新中...
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <!-- システム概要カード -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card metric-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-server fa-2x text-primary mb-2"></i>
+                        <h5 class="card-title">AniList API</h5>
+                        <h3 class="text-primary" id="anilistResponseTime">-</h3>
+                        <small class="text-muted">平均応答時間 (ms)</small>
+                        <div class="mt-2">
+                            <small class="text-success" id="anilistRequests">- リクエスト</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-rss fa-2x text-success mb-2"></i>
+                        <h5 class="card-title">RSS収集</h5>
+                        <h3 class="text-success" id="rssSuccessRate">-</h3>
+                        <small class="text-muted">成功率 (%)</small>
+                        <div class="mt-2">
+                            <small class="text-info" id="rssSourcesCount">- ソース</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-database fa-2x text-warning mb-2"></i>
+                        <h5 class="card-title">データベース</h5>
+                        <h3 class="text-warning" id="dbQueryTime">-</h3>
+                        <small class="text-muted">平均クエリ時間 (ms)</small>
+                        <div class="mt-2">
+                            <small class="text-info" id="dbQueriesCount">- クエリ</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-bell fa-2x text-info mb-2"></i>
+                        <h5 class="card-title">通知送信</h5>
+                        <h3 class="text-info" id="notificationCount">-</h3>
+                        <small class="text-muted">24時間内の通知数</small>
+                        <div class="mt-2">
+                            <small class="text-success">送信完了</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- システムヘルス状態 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-heartbeat me-2"></i>
+                            システムヘルス状態
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="systemHealth" class="row">
+                            <!-- システムヘルス情報が動的に挿入される -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- パフォーマンスグラフ -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>
+                            AniList API応答時間 (24時間)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="anilistChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-area me-2"></i>
+                            RSS収集成功率 (24時間)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="rssChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            データベースパフォーマンス (24時間)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="dbChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            通知送信統計 (7日間)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="notificationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // グローバル変数
+        let charts = {};
+        let refreshInterval;
+        let isLoading = false;
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadDashboardData();
+            startAutoRefresh();
+        });
+
+        // チャート初期化
+        function initializeCharts() {
+            // AniList応答時間チャート
+            const anilistCtx = document.getElementById('anilistChart').getContext('2d');
+            charts.anilist = new Chart(anilistCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '応答時間 (ms)',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // RSS成功率チャート
+            const rssCtx = document.getElementById('rssChart').getContext('2d');
+            charts.rss = new Chart(rssCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '成功率 (%)',
+                        data: [],
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // データベースパフォーマンスチャート
+            const dbCtx = document.getElementById('dbChart').getContext('2d');
+            charts.db = new Chart(dbCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'クエリ時間 (ms)',
+                        data: [],
+                        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 通知統計チャート
+            const notificationCtx = document.getElementById('notificationChart').getContext('2d');
+            charts.notification = new Chart(notificationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['成功', '失敗', '保留中'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(255, 206, 86, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // ダッシュボードデータ読み込み
+        async function loadDashboardData() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            showRefreshIndicator(true);
+
+            try {
+                // 概要データを取得
+                const overviewResponse = await fetch('/dashboard/api/overview');
+                const overview = await overviewResponse.json();
+                updateOverviewCards(overview);
+
+                // システムヘルスを取得
+                const healthResponse = await fetch('/dashboard/api/health');
+                const health = await healthResponse.json();
+                updateSystemHealth(health);
+
+                // チャートデータを更新
+                await updateCharts();
+
+                // 最終更新時刻を更新
+                document.getElementById('lastUpdate').textContent = 
+                    new Date().toLocaleTimeString('ja-JP');
+
+            } catch (error) {
+                console.error('データの読み込みに失敗しました:', error);
+                showError('データの読み込みに失敗しました');
+            } finally {
+                isLoading = false;
+                showRefreshIndicator(false);
+            }
+        }
+
+        // 概要カードの更新
+        function updateOverviewCards(data) {
+            // AniList統計
+            const anilist = data.anilist || {};
+            document.getElementById('anilistResponseTime').textContent = 
+                anilist.avg_response_time ? Math.round(anilist.avg_response_time) : '-';
+            document.getElementById('anilistRequests').textContent = 
+                `${anilist.total_requests || 0} リクエスト`;
+
+            // RSS統計
+            const rss = data.rss || {};
+            const successRate = rss.successes && rss.errors ? 
+                Math.round((rss.successes / (rss.successes + rss.errors)) * 100) : 0;
+            document.getElementById('rssSuccessRate').textContent = `${successRate}`;
+            document.getElementById('rssSourcesCount').textContent = 
+                `${rss.sources_checked || 0} ソース`;
+
+            // データベース統計
+            const db = data.database || {};
+            document.getElementById('dbQueryTime').textContent = 
+                db.avg_query_time ? Math.round(db.avg_query_time) : '-';
+            document.getElementById('dbQueriesCount').textContent = 
+                `${db.total_queries || 0} クエリ`;
+
+            // 通知統計
+            const notifications = data.notifications || {};
+            document.getElementById('notificationCount').textContent = 
+                notifications.total_notifications || '0';
+        }
+
+        // システムヘルス表示の更新
+        function updateSystemHealth(data) {
+            const healthContainer = document.getElementById('systemHealth');
+            healthContainer.innerHTML = '';
+
+            const components = data.components || [];
+            if (components.length === 0) {
+                healthContainer.innerHTML = '<div class="col-12 text-center text-muted">データがありません</div>';
+                return;
+            }
+
+            components.forEach(component => {
+                const statusClass = `status-${component.status}`;
+                const statusIcon = component.status === 'healthy' ? 'fa-check-circle' :
+                                 component.status === 'warning' ? 'fa-exclamation-triangle' :
+                                 'fa-times-circle';
+
+                const componentHtml = `
+                    <div class="col-md-3 mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas ${statusIcon} ${statusClass} me-2"></i>
+                            <div>
+                                <div class="fw-bold">${component.component}</div>
+                                <small class="text-muted">${component.last_check}</small>
+                                ${component.error_message ? `<div class="text-danger small">${component.error_message}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                healthContainer.innerHTML += componentHtml;
+            });
+        }
+
+        // チャートデータ更新
+        async function updateCharts() {
+            try {
+                // AniListチャート更新
+                const anilistData = await fetch('/dashboard/api/chart/anilist_response_time');
+                const anilistJson = await anilistData.json();
+                updateChart(charts.anilist, anilistJson);
+
+                // RSSチャート更新 (成功率計算)
+                const rssData = await fetch('/dashboard/api/chart/rss_success_rate');
+                const rssJson = await rssData.json();
+                updateChart(charts.rss, rssJson);
+
+                // データベースチャート更新
+                const dbData = await fetch('/dashboard/api/chart/db_query_time');
+                const dbJson = await dbData.json();
+                updateChart(charts.db, dbJson);
+
+            } catch (error) {
+                console.error('チャートデータの更新に失敗しました:', error);
+            }
+        }
+
+        // チャート更新ヘルパー
+        function updateChart(chart, data) {
+            if (!data.labels || !data.datasets) return;
+            
+            chart.data.labels = data.labels.map(label => 
+                new Date(label).toLocaleTimeString('ja-JP', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                })
+            );
+            chart.data.datasets = data.datasets;
+            chart.update();
+        }
+
+        // 自動更新開始
+        function startAutoRefresh() {
+            refreshInterval = setInterval(loadDashboardData, 30000); // 30秒間隔
+        }
+
+        // リフレッシュインジケーター表示
+        function showRefreshIndicator(show) {
+            const indicator = document.getElementById('refreshIndicator');
+            indicator.style.display = show ? 'block' : 'none';
+        }
+
+        // エラー表示
+        function showError(message) {
+            // Bootstrap toast またはアラート表示
+            console.error(message);
+        }
+
+        // ページ離脱時のクリーンアップ
+        window.addEventListener('beforeunload', function() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

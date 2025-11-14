@@ -1,0 +1,540 @@
+/**
+ * Google Calendar Integration - 全リリース個別登録機能
+ * 各リリースを個別のGoogleカレンダーイベントとして登録
+ */
+
+(function() {
+    'use strict';
+
+    // グローバルに公開
+    window.GoogleCalendarIntegration = {
+        addSingleRelease,
+        addAllReleases,
+        addDayReleases,
+        generateCalendarUrl
+    };
+
+    /**
+     * 単一リリースをGoogleカレンダーに追加
+     */
+    function addSingleRelease(release) {
+        const url = generateCalendarUrl(release);
+        window.open(url, '_blank', 'width=800,height=600');
+    }
+
+    /**
+     * 1日のリリース全てをGoogleカレンダーに追加
+     */
+    function addDayReleases(releases) {
+        if (!releases || releases.length === 0) {
+            alert('リリース情報がありません。');
+            return;
+        }
+
+        const confirmed = confirm(
+            `この日の${releases.length}件のリリースを個別にGoogleカレンダーに登録しますか？\n\n` +
+            `各リリースが別々のタブで開かれます。\n` +
+            `ブラウザのポップアップブロックを許可してください。`
+        );
+
+        if (!confirmed) return;
+
+        // 各リリースを順次開く（500ms間隔）
+        releases.forEach((release, index) => {
+            setTimeout(() => {
+                const url = generateCalendarUrl(release);
+                window.open(url, `_blank_${index}`, 'width=800,height=600');
+            }, index * 500);
+        });
+
+        // 完了メッセージ
+        setTimeout(() => {
+            alert(`${releases.length}件のGoogleカレンダー登録画面を開きました。\n各タブで「保存」をクリックしてください。`);
+        }, releases.length * 500 + 500);
+    }
+
+    /**
+     * 月の全リリースをGoogleカレンダーに追加
+     */
+    function addAllReleases() {
+        if (!window.releasesData) {
+            alert('リリースデータが読み込まれていません。');
+            return;
+        }
+
+        // 全リリースを配列にまとめる
+        const allReleases = [];
+        Object.keys(window.releasesData).forEach(date => {
+            window.releasesData[date].forEach(release => {
+                allReleases.push({...release, release_date: date});
+            });
+        });
+
+        if (allReleases.length === 0) {
+            alert('登録するリリースがありません。');
+            return;
+        }
+
+        // グローバル変数に保存（バッチ処理用）
+        window.allReleasesForCalendar = allReleases;
+
+        const confirmed = confirm(
+            `今月の全リリース ${allReleases.length}件をGoogleカレンダーに個別登録しますか？\n\n` +
+            `📌 各リリースが別々のイベントとして登録されます\n` +
+            `⚠️ ${allReleases.length}個のタブが開きます\n` +
+            `💡 10件ずつバッチ処理で登録します\n\n` +
+            `続行しますか？`
+        );
+
+        if (!confirmed) return;
+
+        // 確認: 一度に開く件数を制限
+        const batchSize = 10;
+        const batches = Math.ceil(allReleases.length / batchSize);
+
+        alert(
+            `📊 登録処理を開始します\n\n` +
+            `総件数: ${allReleases.length}件\n` +
+            `バッチ数: ${batches}回\n` +
+            `1バッチ: 最大10件\n\n` +
+            `まず最初の${Math.min(batchSize, allReleases.length)}件を開きます。`
+        );
+
+        // 最初のバッチを開く
+        const firstBatch = allReleases.slice(0, batchSize);
+        openReleaseBatch(firstBatch, 1, batches);
+    }
+
+    /**
+     * リリースのバッチを開く
+     */
+    function openReleaseBatch(releases, currentBatch, totalBatches) {
+        releases.forEach((release, index) => {
+            setTimeout(() => {
+                const url = generateCalendarUrl(release);
+                window.open(url, `_blank_batch${currentBatch}_${index}`, 'width=800,height=600');
+            }, index * 500);
+        });
+
+        // 次のバッチの確認
+        if (currentBatch < totalBatches) {
+            setTimeout(() => {
+                const nextBatch = confirm(
+                    `バッチ ${currentBatch}/${totalBatches} 完了。\n\n` +
+                    `次の10件を登録しますか？`
+                );
+
+                if (nextBatch) {
+                    const batchSize = 10;
+                    const start = currentBatch * batchSize;
+                    const nextReleases = window.allReleasesForCalendar.slice(start, start + batchSize);
+                    openReleaseBatch(nextReleases, currentBatch + 1, totalBatches);
+                }
+            }, releases.length * 500 + 1000);
+        }
+    }
+
+    /**
+     * Googleカレンダー登録URL生成
+     */
+    function generateCalendarUrl(release) {
+        const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+
+        // タイトル生成（絵文字付き）
+        const typeIcon = release.type === 'anime' ? '🎬' : '📚';
+        const typeLabel = release.type === 'anime' ? 'アニメ' : 'マンガ';
+        const platformIcon = getPlatformIcon(release.platform);
+        const titleEmoji = getTitleEmoji(release.title);
+
+        const title = `${typeIcon}【${typeLabel}】${titleEmoji}${release.title} ` +
+                     `第${release.number}${release.release_type === 'episode' ? '話' : '巻'} | ` +
+                     `${platformIcon}${release.platform}`;
+
+        // 説明文生成
+        const details = [
+            `作品: ${release.title}`,
+            `タイプ: ${typeLabel}`,
+            `${release.release_type === 'episode' ? 'エピソード' : '巻'}: 第${release.number}${release.release_type === 'episode' ? '話' : '巻'}`,
+            `配信プラットフォーム: ${release.platform}`,
+            release.source_url ? `\nソースURL: ${release.source_url}` : '',
+            release.official_url ? `公式サイト: ${release.official_url}` : '',
+            `\n---`,
+            `自動登録: MangaAnime情報配信システム`
+        ].filter(Boolean).join('\n');
+
+        // 日付フォーマット（YYYYMMDD）
+        const dateStr = (release.release_date || release.date || '').replace(/-/g, '');
+
+        // URL生成
+        let url = baseUrl;
+        url += `&text=${encodeURIComponent(title)}`;
+        url += `&dates=${dateStr}/${dateStr}`;
+        url += `&details=${encodeURIComponent(details)}`;
+        url += `&location=${encodeURIComponent(release.platform)}`;
+
+        // アニメとマンガで色を変える（オプション、一部ブラウザのみ対応）
+        if (release.type === 'anime') {
+            url += '&ctz=Asia/Tokyo';
+        }
+
+        return url;
+    }
+
+    /**
+     * プラットフォームアイコン取得
+     */
+    function getPlatformIcon(platform) {
+        if (!platform) return '';
+
+        const key = platform.toLowerCase();
+        for (const [keyword, icon] of Object.entries(window.PLATFORM_ICONS || {})) {
+            if (key.includes(keyword.toLowerCase())) {
+                return icon;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * タイトル絵文字取得
+     */
+    function getTitleEmoji(title) {
+        if (!title) return '';
+
+        const titleLower = title.toLowerCase();
+        for (const [keyword, emoji] of Object.entries(window.TITLE_EMOJIS || {})) {
+            if (titleLower.includes(keyword.toLowerCase()) ||
+                title.includes(keyword)) {
+                return emoji;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * ヘルパー: プラットフォーム別アイコン
+     */
+    const getPlatformIconHelper = (platform) => {
+        const icons = {
+            'netflix': '🎬',
+            'amazon': '📺',
+            'prime': '📺',
+            'crunchyroll': '🌸',
+            'dアニメ': '🎭',
+            'bookwalker': '📚',
+            'kindle': '📖',
+            'ジャンプ': '⚡',
+            'マガポケ': '📱',
+            'hulu': '📹',
+            'disney': '🎪',
+            'abema': '📡',
+            'funimation': '🎞️',
+            'kobo': '📕'
+        };
+
+        const platformLower = (platform || '').toLowerCase();
+        for (const [key, icon] of Object.entries(icons)) {
+            if (platformLower.includes(key)) {
+                return icon;
+            }
+        }
+        return '📺';
+    };
+
+    /**
+     * データから日付別リリース取得
+     */
+    function getReleasesByDate(date) {
+        return window.releasesData && window.releasesData[date] ? window.releasesData[date] : [];
+    }
+
+    // === 5. その他のUI強化関数（既存のcalendar-enhanced.jsから移動） ===
+
+    function addTodayHighlight() {
+        const today = new Date().toISOString().split('T')[0];
+        const todayCell = document.querySelector(`[data-date="${today}"]`);
+        if (todayCell) {
+            todayCell.classList.add('today');
+        }
+    }
+
+    function enhanceReleaseItems() {
+        const releaseItems = document.querySelectorAll('.release-item');
+
+        releaseItems.forEach(item => {
+            const platform = item.dataset.platform;
+            const title = item.dataset.title;
+
+            if (platform) {
+                const icon = getPlatformIconHelper(platform);
+                const titleDiv = item.querySelector('.release-title');
+                if (titleDiv && icon) {
+                    titleDiv.textContent = `${icon} ${titleDiv.textContent}`;
+                }
+            }
+
+            if (title) {
+                const emoji = getTitleEmoji(title);
+                if (emoji) {
+                    const titleDiv = item.querySelector('.release-title');
+                    if (titleDiv) {
+                        titleDiv.textContent = `${emoji}${titleDiv.textContent.replace(/^[🎬📺🌸🎭📚📖⚡📱📹🎪📡🎞️📕]\s*/, '')}`;
+                    }
+                }
+            }
+        });
+    }
+
+    function addSwipeNavigation() {
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            const swipeThreshold = 100;
+
+            if (touchEndX < touchStartX - swipeThreshold) {
+                // 左スワイプ - 次月
+                const nextBtn = document.querySelector('a[href*="month="]');
+                if (nextBtn && nextBtn.textContent.includes('次月')) {
+                    window.location.href = nextBtn.href;
+                }
+            }
+
+            if (touchEndX > touchStartX + swipeThreshold) {
+                // 右スワイプ - 前月
+                const prevBtn = document.querySelector('a[href*="month="]');
+                if (prevBtn && prevBtn.textContent.includes('前月')) {
+                    window.location.href = prevBtn.href;
+                }
+            }
+        }
+    }
+
+    function addKeyboardNavigation() {
+        document.addEventListener('keydown', e => {
+            if (e.altKey) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    const prevBtn = document.querySelector('a.btn-outline-primary');
+                    if (prevBtn) prevBtn.click();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    const nextBtns = document.querySelectorAll('a.btn-outline-primary');
+                    if (nextBtns[1]) nextBtns[1].click();
+                }
+            }
+        });
+    }
+
+    function addTooltips() {
+        const releaseItems = document.querySelectorAll('.release-item');
+        releaseItems.forEach(item => {
+            if (!item.hasAttribute('title')) {
+                const title = item.dataset.title || '';
+                const platform = item.dataset.platform || '';
+                if (title && platform) {
+                    item.setAttribute('title', `${title} - ${platform}`);
+                }
+            }
+        });
+    }
+
+    /**
+     * 日付詳細モーダルを表示（拡張版 - チェックボックス付き）
+     */
+    window.showDayDetailsEnhanced = function(date) {
+        const releases = getReleasesByDate(date);
+
+        if (releases.length === 0) {
+            document.getElementById('modal-body').innerHTML =
+                '<p class="text-muted text-center">この日にリリース予定はありません。</p>';
+            return;
+        }
+
+        // フォーマット済み日付
+        const dateObj = new Date(date + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('ja-JP', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+        });
+
+        document.getElementById('modal-date').textContent = formattedDate;
+
+        // 全選択/全解除ボタン
+        let html = `
+            <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+                <div>
+                    <strong>${releases.length}件のリリース</strong>
+                </div>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" onclick="selectAllReleases()">
+                        <i class="bi bi-check-all me-1"></i>全選択
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="deselectAllReleases()">
+                        <i class="bi bi-x-square me-1"></i>全解除
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // モーダルボディHTML生成（チェックボックス付き）
+        html += '<div class="list-group list-group-flush" id="releases-list">';
+
+        releases.forEach((release, index) => {
+            const typeIcon = release.type === 'anime' ? '🎬' : '📚';
+            const typeLabel = release.type === 'anime' ? 'アニメ' : 'マンガ';
+            const typeClass = release.type === 'anime' ? 'primary' : 'success';
+            const platformIcon = getPlatformIconHelper(release.platform);
+            const titleEmoji = getTitleEmoji(release.title);
+            const releaseText = release.release_type === 'episode' ? '話' : '巻';
+            const releaseJson = JSON.stringify({...release, release_date: date}).replace(/"/g, '&quot;');
+
+            html += `
+                <div class="list-group-item">
+                    <div class="d-flex align-items-start">
+                        <!-- チェックボックス -->
+                        <div class="form-check me-3 mt-2">
+                            <input class="form-check-input release-checkbox"
+                                   type="checkbox"
+                                   id="release-${index}"
+                                   value="${index}"
+                                   data-release='${releaseJson}'
+                                   checked>
+                            <label class="form-check-label" for="release-${index}"></label>
+                        </div>
+
+                        <!-- リリース情報 -->
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-${typeClass} me-2">
+                                    ${typeIcon} ${typeLabel}
+                                </span>
+                                <h6 class="mb-0">${titleEmoji}${release.title}</h6>
+                            </div>
+                            <p class="mb-1">
+                                <strong>第${release.number}${releaseText}</strong> ·
+                                ${platformIcon}${release.platform}
+                            </p>
+                            ${release.source_url ?
+                                `<small>
+                                    <a href="${release.source_url}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>${release.platform}で見る
+                                    </a>
+                                </small>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+
+        // モーダルフッターのボタンを更新
+        html += `
+            <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-success btn-lg" onclick="addSelectedToGoogleCalendar()">
+                    <i class="bi bi-calendar-check me-2"></i>
+                    選択した項目をGoogleカレンダーに登録
+                </button>
+            </div>
+        `;
+
+        document.getElementById('modal-body').innerHTML = html;
+    };
+
+    /**
+     * 全選択
+     */
+    window.selectAllReleases = function() {
+        document.querySelectorAll('.release-checkbox').forEach(cb => cb.checked = true);
+    };
+
+    /**
+     * 全解除
+     */
+    window.deselectAllReleases = function() {
+        document.querySelectorAll('.release-checkbox').forEach(cb => cb.checked = false);
+    };
+
+    /**
+     * 選択した項目をGoogleカレンダーに追加
+     */
+    window.addSelectedToGoogleCalendar = function() {
+        const checkboxes = document.querySelectorAll('.release-checkbox:checked');
+
+        if (checkboxes.length === 0) {
+            alert('登録する項目を選択してください。');
+            return;
+        }
+
+        const selectedReleases = Array.from(checkboxes).map(cb => {
+            try {
+                return JSON.parse(cb.dataset.release.replace(/&quot;/g, '"'));
+            } catch (e) {
+                console.error('Parse error:', e);
+                return null;
+            }
+        }).filter(r => r !== null);
+
+        if (selectedReleases.length === 0) {
+            alert('選択された項目のデータを読み込めませんでした。');
+            return;
+        }
+
+        const confirmed = confirm(
+            `選択した${selectedReleases.length}件をGoogleカレンダーに個別登録しますか？\n\n` +
+            `📌 各リリースが別々のイベントとして登録されます\n` +
+            `⚠️ ${selectedReleases.length}個のタブが開きます\n` +
+            `💡 10件ずつバッチ処理で登録します`
+        );
+
+        if (!confirmed) return;
+
+        // バッチ処理
+        const batchSize = 10;
+        const batches = Math.ceil(selectedReleases.length / batchSize);
+
+        if (batches > 1) {
+            alert(
+                `📊 登録処理を開始します\n\n` +
+                `選択件数: ${selectedReleases.length}件\n` +
+                `バッチ数: ${batches}回\n` +
+                `まず最初の${Math.min(batchSize, selectedReleases.length)}件を開きます。`
+            );
+        }
+
+        // グローバル変数に保存
+        window.allReleasesForCalendar = selectedReleases;
+
+        // 最初のバッチを開く
+        const firstBatch = selectedReleases.slice(0, batchSize);
+        openReleaseBatch(firstBatch, 1, batches);
+
+        // モーダルを閉じる
+        setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('dayModal'));
+            if (modal) modal.hide();
+        }, 500);
+    };
+
+    // showDayDetailsのオーバーライド
+    if (typeof window.showDayDetails === 'undefined') {
+        window.showDayDetails = window.showDayDetailsEnhanced;
+    }
+
+    console.log('Google Calendar Integration: Loaded');
+
+})();

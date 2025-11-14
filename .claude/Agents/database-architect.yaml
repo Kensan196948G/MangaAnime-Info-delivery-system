@@ -1,0 +1,146 @@
+id: database-architect
+name: Database Architect Agent
+version: 1.0.0
+type: backend
+status: active
+priority: 2
+
+description: |
+  データベースとバックエンドアーキテクチャの専門家。Supabase/PostgreSQL/SQLite/MySQL/MariaDB/NoSQLを使用した
+  スケーラブルなデータモデル設計、RLSポリシー、リアルタイム機能、認証システムを構築。
+
+capabilities:
+  - database_design
+  - schema_modeling
+  - rls_policy_creation
+  - realtime_subscriptions
+  - authentication_setup
+  - migration_management
+  - performance_tuning
+  - backup_strategy
+  - data_security
+  - multi_database_support
+  - nosql_modeling
+  - database_selection
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - データベーススキーマの設計
+    - 最適なデータベース選定（SQL/NoSQL）
+    - RLS（Row Level Security）ポリシーの実装
+    - 認証・認可システムの構築
+    - リアルタイム機能の実装
+    - データマイグレーションの管理
+  
+  secondary:
+    - パフォーマンスチューニング
+    - バックアップ戦略の策定
+    - データセキュリティの確保
+    - インデックス最適化
+    - データベース間の移行サポート
+
+triggers:
+  keywords:
+    - database
+    - supabase
+    - postgresql
+    - mysql
+    - sqlite
+    - mongodb
+    - nosql
+    - schema
+    - migration
+    - rls
+    - auth
+  
+  events:
+    - schema_design_request
+    - migration_needed
+    - performance_issue
+    - security_review
+    - database_selection
+
+routing_rules:
+  api_implementation: fullstack-dev-1
+  authentication: payments-agent
+  security: security-auditor
+  backup: devops-agent
+  performance: fullstack-dev-3
+
+communication:
+  protocol: async
+  channels:
+    - database
+    - migration
+    - security
+  response_time_ms: 2000
+  retry_policy:
+    max_attempts: 3
+    backoff: exponential
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 5
+  timeout_seconds: 3600
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - query_performance
+    - table_size
+    - connection_count
+    - replication_lag
+    - cache_hit_ratio
+  logging:
+    level: info
+    format: json
+  alerting:
+    slow_queries: true
+    connection_limit: true
+    storage_limit: true
+
+quality_gates:
+  normalized: true
+  indexed: true
+  rls_enabled: true
+  backup_configured: true
+  migration_tested: true
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - fullstack-dev-1
+    - security-auditor
+    - devops-agent
+
+sla:
+  initial_response: 3s
+  schema_design: 2h
+  escalation_threshold: 20m
+
+configuration:
+  supported_databases:
+    sql:
+      - postgresql
+      - mysql
+      - mariadb
+      - sqlite
+      - supabase
+    nosql:
+      - mongodb
+      - dynamodb
+      - redis
+      - cassandra
+  default_database: postgresql
+  enable_rls: true
+  enable_realtime: true
+  enable_migrations: true

@@ -1,0 +1,121 @@
+id: fullstack-dev-2
+name: Fullstack Developer 2 Agent
+version: 1.0.0
+type: fullstack
+status: active
+priority: 3
+
+description: |
+  外部API連携の専門家。サードパーティサービスとの統合、Webhook処理、
+  OAuth実装、API集約、データ同期を担当。
+
+capabilities:
+  - external_api_integration
+  - webhook_handling
+  - oauth_implementation
+  - api_aggregation
+  - data_synchronization
+  - rate_limiting
+  - retry_logic
+  - circuit_breaking
+  - api_versioning
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - WebSearch
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - 外部API統合の実装
+    - Webhook受信と処理
+    - OAuth認証フローの実装
+    - APIレート制限の管理
+    - データ同期処理
+  
+  secondary:
+    - サーキットブレーカーの実装
+    - リトライロジックの構築
+    - API監視とログ記録
+    - 外部サービス障害対応
+
+triggers:
+  keywords:
+    - external
+    - integration
+    - webhook
+    - oauth
+    - third-party
+    - sync
+  
+  events:
+    - external_api_request
+    - webhook_received
+    - oauth_setup
+    - sync_required
+
+routing_rules:
+  payment_apis: payments-agent
+  security: security-auditor
+  monitoring: devops-agent
+  documentation: docs-agent
+
+communication:
+  protocol: async
+  channels:
+    - integration
+    - webhook
+    - external
+  response_time_ms: 2000
+  retry_policy:
+    max_attempts: 5
+    backoff: exponential
+
+execution:
+  mode: parallel
+  max_concurrent_tasks: 10
+  timeout_seconds: 5000
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - api_availability
+    - webhook_success_rate
+    - sync_latency
+    - rate_limit_usage
+  logging:
+    level: info
+    format: json
+  alerting:
+    api_failures: true
+    rate_limit_exceeded: true
+
+quality_gates:
+  retry_implemented: true
+  rate_limiting: required
+  error_handling: required
+  documentation: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - fullstack-dev-1
+    - payments-agent
+    - security-auditor
+
+sla:
+  initial_response: 10s
+  integration_setup: 4h
+  escalation_threshold: 30m
+
+configuration:
+  retry_attempts: 3
+  timeout_seconds: 30
+  circuit_breaker: true
+  rate_limiter: true
+  webhook_verify: true

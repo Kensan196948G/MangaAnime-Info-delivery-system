@@ -1,0 +1,15 @@
+{
+  "name": "repair-state-manager",
+  "version": "1.0.0",
+  "description": "State management for SubAgent repair system with pattern learning",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0"
+  },
+  "keywords": ["github-actions", "state-management", "pattern-learning"],
+  "author": "Claude Code SubAgent System",
+  "license": "MIT"
+}

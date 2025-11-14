@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Kindle 新刊情報</title>
+        <description>Kindleの新刊マンガ配信情報</description>
+        <link>https://example.com/kindle/rss</link>
+        <language>ja</language>
+        <lastBuildDate>Sat, 09 Aug 2025 14:25:09 +0000</lastBuildDate>
+        <atom:link href="https://example.com/kindle/rss" rel="self" type="application/rss+xml" />
+        
+    </channel>
+</rss>

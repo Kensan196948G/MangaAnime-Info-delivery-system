@@ -1,0 +1,11 @@
+{
+  "repairs": [],
+  "statistics": {
+    "total_attempts": 0,
+    "successful": 0,
+    "failed": 0,
+    "in_progress": 0,
+    "success_rate": 0
+  },
+  "last_updated": "2025-08-17T08:40:00Z"
+}

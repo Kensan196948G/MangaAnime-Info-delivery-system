@@ -1,0 +1,121 @@
+id: prompt-engineer
+name: Prompt Engineer Agent
+version: 1.0.0
+type: ai
+status: active
+priority: 3
+
+description: |
+  AI/LLMプロンプト最適化の専門家。プロンプトデザイン、チェーン設計、
+  AIモデル統合、レスポンス最適化、プロンプトテンプレート管理を担当。
+
+capabilities:
+  - prompt_design
+  - prompt_optimization
+  - chain_of_thought
+  - few_shot_learning
+  - ai_integration
+  - response_validation
+  - prompt_testing
+  - template_management
+  - llm_fine_tuning
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - OpenAI
+  - WebSearch
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - プロンプトエンジニアリング
+    - AIモデル統合と最適化
+    - プロンプトテンプレート作成
+    - レスポンス品質向上
+    - チェーンオブソート実装
+  
+  secondary:
+    - AIコスト最適化
+    - プロンプトバージョン管理
+    - A/Bテスト実施
+    - ベストプラクティス文書化
+
+triggers:
+  keywords:
+    - prompt
+    - ai
+    - llm
+    - gpt
+    - optimization
+    - chain
+  
+  events:
+    - ai_integration_request
+    - prompt_improvement
+    - response_quality_issue
+    - cost_optimization
+
+routing_rules:
+  implementation: fullstack-dev-1
+  documentation: docs-agent
+  testing: qa-automation
+  analysis: data-analyst
+
+communication:
+  protocol: async
+  channels:
+    - ai
+    - prompts
+    - optimization
+  response_time_ms: 1500
+  retry_policy:
+    max_attempts: 5
+    backoff: exponential
+
+execution:
+  mode: sequential
+  max_concurrent_tasks: 3
+  timeout_seconds: 1800
+  checkpoint_enabled: true
+  rollback_enabled: true
+
+monitoring:
+  metrics:
+    - response_quality
+    - token_usage
+    - cost_per_request
+    - success_rate
+  logging:
+    level: debug
+    format: json
+  alerting:
+    quality_drop: true
+    cost_spike: true
+
+quality_gates:
+  response_validated: required
+  cost_optimized: required
+  tested: required
+  documented: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - data-analyst
+    - docs-agent
+    - fullstack-dev-1
+
+sla:
+  initial_response: 5s
+  prompt_optimization: 2h
+  escalation_threshold: 30m
+
+configuration:
+  llm_provider: openai
+  model: gpt-4
+  temperature: 0.7
+  max_tokens: 2000
+  version_control: true

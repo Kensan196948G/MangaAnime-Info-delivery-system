@@ -1,0 +1,65 @@
+{
+  "patterns": {
+    "dependency": {
+      "count": 0,
+      "success_rate": 0,
+      "common_fixes": [
+        "npm audit fix",
+        "pip install --upgrade",
+        "composer update"
+      ]
+    },
+    "syntax": {
+      "count": 0,
+      "success_rate": 0,
+      "common_fixes": [
+        "autopep8 formatting",
+        "prettier formatting",
+        "eslint auto-fix"
+      ]
+    },
+    "permission": {
+      "count": 0,
+      "success_rate": 0,
+      "common_fixes": [
+        "chmod +x scripts",
+        "file permission correction"
+      ]
+    },
+    "network": {
+      "count": 0,
+      "success_rate": 0,
+      "common_fixes": [
+        "retry with exponential backoff",
+        "network timeout adjustment"
+      ]
+    },
+    "test": {
+      "count": 0,
+      "success_rate": 0,
+      "common_fixes": [
+        "test timeout adjustment",
+        "test environment setup"
+      ]
+    },
+    "build": {
+      "count": 0,
+      "success_rate": 0,
+      "common_fixes": [
+        "cache clearing",
+        "dependency reinstallation"
+      ]
+    }
+  },
+  "last_updated": "",
+  "learning_data": {
+    "successful_patterns": [],
+    "failed_patterns": [],
+    "improvement_suggestions": []
+  },
+  "metadata": {
+    "created_at": "2025-08-17T00:00:00Z",
+    "version": "1.0",
+    "description": "Machine learning database for error pattern recognition and repair strategy optimization"
+  }
+}

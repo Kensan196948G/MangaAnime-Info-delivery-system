@@ -1,0 +1,120 @@
+id: localization-agent
+name: Localization Agent
+version: 1.0.0
+type: i18n
+status: active
+priority: 3
+
+description: |
+  国際化とローカライゼーションの専門家。多言語対応、文化適応、
+  翻訳管理、地域別設定、日付・通貨フォーマット対応を担当。
+
+capabilities:
+  - translation_management
+  - i18n_implementation
+  - cultural_adaptation
+  - locale_configuration
+  - format_localization
+  - content_adaptation
+  - translation_validation
+  - language_detection
+  - rtl_support
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+  - TodoWrite
+
+responsibilities:
+  primary:
+    - 多言語翻訳の管理
+    - i18n実装とテスト
+    - 文化的適応の確認
+    - 地域別設定の実装
+    - 翻訳品質保証
+  
+  secondary:
+    - 翻訳メモリ管理
+    - 用語集メンテナンス
+    - RTL言語サポート
+    - 地域別コンテンツ管理
+
+triggers:
+  keywords:
+    - localization
+    - i18n
+    - translation
+    - locale
+    - language
+    - multilingual
+  
+  events:
+    - translation_request
+    - new_locale_added
+    - content_update
+    - release_localization
+
+routing_rules:
+  ui_text: frontend-designer
+  documentation: docs-agent
+  content: prompt-engineer
+  testing: qa-automation
+
+communication:
+  protocol: async
+  channels:
+    - localization
+    - translation
+    - i18n
+  response_time_ms: 3000
+  retry_policy:
+    max_attempts: 3
+    backoff: linear
+
+execution:
+  mode: parallel
+  max_concurrent_tasks: 10
+  timeout_seconds: 7200
+  checkpoint_enabled: true
+  rollback_enabled: false
+
+monitoring:
+  metrics:
+    - translation_coverage
+    - locale_support
+    - translation_quality
+    - update_lag
+  logging:
+    level: info
+    format: json
+  alerting:
+    missing_translations: true
+    quality_issues: true
+
+quality_gates:
+  translation_complete: required
+  culturally_appropriate: required
+  format_correct: required
+  tested: required
+
+collaboration:
+  reports_to: cto-agent
+  supervises: []
+  peers:
+    - docs-agent
+    - frontend-designer
+    - accessibility-reviewer
+
+sla:
+  initial_response: 15s
+  translation_delivery: 48h
+  escalation_threshold: 4h
+
+configuration:
+  supported_locales: [en, ja, zh, ko, es, fr]
+  translation_service: deepl
+  fallback_locale: en
+  format_library: intl
+  enable_auto_translation: false

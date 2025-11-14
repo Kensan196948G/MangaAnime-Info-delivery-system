@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Update Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .log-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            word-wrap: break-word;
+        }
+        .log-info { color: #4fc3f7; }
+        .log-success { color: #81c784; }
+        .log-error { color: #e57373; }
+        .log-warning { color: #ffb74d; }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">
+            <i class="bi bi-clipboard-check"></i>
+            Dashboard Update Test Suite
+        </h1>
+
+        <!-- Test Controls -->
+        <div class="test-section">
+            <h3>Test Controls</h3>
+            <div class="test-controls">
+                <button class="btn btn-primary" id="test-success">
+                    <i class="bi bi-check-circle"></i> Test Success Response
+                </button>
+                <button class="btn btn-danger" id="test-error">
+                    <i class="bi bi-x-circle"></i> Test Error Response
+                </button>
+                <button class="btn btn-warning" id="test-timeout">
+                    <i class="bi bi-clock"></i> Test Timeout
+                </button>
+                <button class="btn btn-secondary" id="test-network-error">
+                    <i class="bi bi-wifi-off"></i> Test Network Error
+                </button>
+                <button class="btn btn-info" id="test-invalid-json">
+                    <i class="bi bi-file-earmark-x"></i> Test Invalid JSON
+                </button>
+                <button class="btn btn-dark" id="clear-logs">
+                    <i class="bi bi-trash"></i> Clear Logs
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="test-section">
+            <h3>Progress</h3>
+            <div id="update-progress-bar" style="display: none;">
+                <div class="progress">
+                    <div id="update-progress" class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+            </div>
+            <div id="update-status-message" style="display: none;">
+                <p id="update-status-text"></p>
+            </div>
+        </div>
+
+        <!-- Log Output -->
+        <div class="test-section">
+            <h3>Console Logs</h3>
+            <div class="log-output" id="log-output">
+                <div class="log-entry log-info">テストを開始するには、上のボタンをクリックしてください。</div>
+            </div>
+        </div>
+
+        <!-- Expected Results -->
+        <div class="test-section">
+            <h3>Expected Results</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Test Case</th>
+                        <th>Expected Behavior</th>
+                        <th>Log Pattern</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Success Response</strong></td>
+                        <td>
+                            - Progress bar: 10% → 50% → 80% → 100%<br>
+                            - Success message displayed<br>
+                            - Page reload after 1.5s
+                        </td>
+                        <td>
+                            <code>[Dashboard Update] データ更新成功</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Error Response</strong></td>
+                        <td>
+                            - Progress bar resets to 0%<br>
+                            - Error message displayed<br>
+                            - Button re-enabled
+                        </td>
+                        <td>
+                            <code>[Dashboard Update] サーバーエラー</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Timeout</strong></td>
+                        <td>
+                            - Timeout error after 60s<br>
+                            - Progress bar hidden<br>
+                            - Specific timeout message
+                        </td>
+                        <td>
+                            <code>[Dashboard Update] タイムアウトエラー</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Network Error</strong></td>
+                        <td>
+                            - Network error message<br>
+                            - "サーバーに接続できません"
+                        </td>
+                        <td>
+                            <code>[Dashboard Update] ネットワークエラー</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Invalid JSON</strong></td>
+                        <td>
+                            - Invalid response format error<br>
+                            - Content-Type validation
+                        </td>
+                        <td>
+                            <code>[Dashboard Update] 無効なContent-Type</code>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mock Console Logger
+        const logOutput = document.getElementById('log-output');
+
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logOutput.appendChild(entry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        // Override console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(' '), 'info');
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(' '), 'error');
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(' '), 'warning');
+        };
+
+        // Mock Fetch Function
+        let mockFetchBehavior = 'success';
+
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            if (url.includes('/api/refresh-data')) {
+                addLog('Fetch intercepted: ' + url, 'warning');
+
+                switch (mockFetchBehavior) {
+                    case 'success':
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            statusText: 'OK',
+                            headers: new Headers({ 'content-type': 'application/json; charset=utf-8' }),
+                            clone: function() {
+                                return this;
+                            },
+                            json: () => Promise.resolve({
+                                success: true,
+                                message: 'データ更新が完了しました',
+                                timestamp: new Date().toISOString(),
+                                data: {
+                                    stats: { total_works: 10, total_releases: 20 }
+                                }
+                            })
+                        });
+
+                    case 'error':
+                        return Promise.resolve({
+                            ok: false,
+                            status: 500,
+                            statusText: 'Internal Server Error',
+                            headers: new Headers({ 'content-type': 'application/json; charset=utf-8' }),
+                            clone: function() {
+                                return this;
+                            },
+                            json: () => Promise.resolve({
+                                success: false,
+                                message: 'データ更新中にエラーが発生しました',
+                                error: {
+                                    message: 'データ更新中にエラーが発生しました',
+                                    details: 'スクリプト実行エラー',
+                                    code: 'UPDATE_FAILED'
+                                }
+                            })
+                        });
+
+                    case 'timeout':
+                        return new Promise(() => {
+                            // Never resolve - will trigger timeout
+                        });
+
+                    case 'network-error':
+                        return Promise.reject(new TypeError('Failed to fetch'));
+
+                    case 'invalid-json':
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            statusText: 'OK',
+                            headers: new Headers({ 'content-type': 'text/html' }),
+                            clone: function() {
+                                return this;
+                            },
+                            json: () => Promise.reject(new Error('Invalid JSON'))
+                        });
+
+                    default:
+                        return originalFetch.apply(this, arguments);
+                }
+            }
+            return originalFetch.apply(this, arguments);
+        };
+
+        // Test Button Handlers
+        document.getElementById('test-success').addEventListener('click', () => {
+            mockFetchBehavior = 'success';
+            addLog('Test Case: SUCCESS RESPONSE', 'success');
+            refreshDashboardData();
+        });
+
+        document.getElementById('test-error').addEventListener('click', () => {
+            mockFetchBehavior = 'error';
+            addLog('Test Case: ERROR RESPONSE', 'error');
+            refreshDashboardData();
+        });
+
+        document.getElementById('test-timeout').addEventListener('click', () => {
+            mockFetchBehavior = 'timeout';
+            addLog('Test Case: TIMEOUT (will take 60 seconds)', 'warning');
+            refreshDashboardData();
+        });
+
+        document.getElementById('test-network-error').addEventListener('click', () => {
+            mockFetchBehavior = 'network-error';
+            addLog('Test Case: NETWORK ERROR', 'error');
+            refreshDashboardData();
+        });
+
+        document.getElementById('test-invalid-json').addEventListener('click', () => {
+            mockFetchBehavior = 'invalid-json';
+            addLog('Test Case: INVALID JSON', 'error');
+            refreshDashboardData();
+        });
+
+        document.getElementById('clear-logs').addEventListener('click', () => {
+            logOutput.innerHTML = '<div class="log-entry log-info">ログをクリアしました。</div>';
+        });
+
+        // Dashboard Update Function (from dashboard-update.js)
+        let isUpdating = false;
+
+        function showProgressBar() {
+            const progressBar = document.getElementById('update-progress-bar');
+            if (progressBar) {
+                progressBar.style.display = 'block';
+            }
+        }
+
+        function hideProgressBar() {
+            const progressBar = document.getElementById('update-progress-bar');
+            if (progressBar) {
+                progressBar.style.display = 'none';
+            }
+        }
+
+        function updateProgress(percentage) {
+            const progress = document.getElementById('update-progress');
+            if (progress) {
+                progress.style.width = percentage + '%';
+                progress.setAttribute('aria-valuenow', percentage);
+            }
+        }
+
+        function showStatusMessage(message, type) {
+            const messageElement = document.getElementById('update-status-message');
+            const textElement = document.getElementById('update-status-text');
+
+            if (messageElement && textElement) {
+                textElement.textContent = message;
+                messageElement.className = 'alert alert-' + type + ' mt-3 mb-0 py-2';
+                messageElement.style.display = 'block';
+            }
+        }
+
+        function refreshDashboardData() {
+            if (isUpdating) {
+                showStatusMessage('既にデータ更新中です...', 'warning');
+                return;
+            }
+
+            isUpdating = true;
+
+            showProgressBar();
+            updateProgress(10);
+            showStatusMessage('データ更新を開始しています...', 'info');
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+            console.log('[Dashboard Update] データ更新リクエスト開始');
+
+            fetch('/api/refresh-data', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                signal: controller.signal
+            })
+                .then(response => {
+                    clearTimeout(timeoutId);
+                    updateProgress(50);
+
+                    console.log('[Dashboard Update] レスポンス受信:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        ok: response.ok,
+                        headers: {
+                            'content-type': response.headers.get('content-type')
+                        }
+                    });
+
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        console.error('[Dashboard Update] 無効なContent-Type:', contentType);
+                        throw new Error('サーバーから無効なレスポンス形式が返されました (expected JSON, got ' + contentType + ')');
+                    }
+
+                    return response.clone().json().then(data => {
+                        console.log('[Dashboard Update] JSONパース成功:', data);
+
+                        if (!response.ok) {
+                            console.error('[Dashboard Update] HTTP error:', {
+                                status: response.status,
+                                statusText: response.statusText,
+                                data: data
+                            });
+
+                            let errorMessage;
+                            if (data.error && typeof data.error === 'object') {
+                                errorMessage = data.error.message || data.error.details || JSON.stringify(data.error);
+                            } else {
+                                errorMessage = data.error || data.details || data.message || response.statusText;
+                            }
+                            throw new Error('HTTP ' + response.status + ': ' + errorMessage);
+                        }
+
+                        return data;
+                    });
+                })
+                .then(data => {
+                    updateProgress(80);
+
+                    console.log('[Dashboard Update] データ検証中:', {
+                        success: data.success,
+                        hasMessage: !!data.message,
+                        hasError: !!data.error,
+                        timestamp: data.timestamp
+                    });
+
+                    if (data.success === true) {
+                        console.log('[Dashboard Update] データ更新成功');
+                        showStatusMessage('データ更新が完了しました。ページをリロードしています...', 'success');
+                        updateProgress(100);
+
+                        setTimeout(() => {
+                            console.log('[Dashboard Update] ページをリロードします');
+                            showStatusMessage('テストモード: リロードをスキップ', 'info');
+                        }, 1500);
+                    } else if (data.success === false) {
+                        let errorDetail;
+                        if (data.error && typeof data.error === 'object') {
+                            errorDetail = data.error.message || data.error.details || JSON.stringify(data.error);
+                        } else {
+                            errorDetail = data.error || data.details || 'サーバーがエラーを返しました';
+                        }
+                        console.error('[Dashboard Update] サーバーエラー:', errorDetail);
+                        throw new Error(errorDetail);
+                    } else {
+                        console.error('[Dashboard Update] 予期しないレスポンス形式:', data);
+                        throw new Error('サーバーから予期しないレスポンスが返されました (success フィールドが存在しません)');
+                    }
+
+                    isUpdating = false;
+                })
+                .catch(error => {
+                    clearTimeout(timeoutId);
+
+                    let errorMessage;
+                    let errorType = 'unknown';
+
+                    if (error.name === 'AbortError') {
+                        errorType = 'timeout';
+                        errorMessage = 'データ更新がタイムアウトしました (60秒以上応答なし)';
+                        console.error('[Dashboard Update] タイムアウトエラー');
+                    } else if (error instanceof TypeError) {
+                        errorType = 'network';
+                        errorMessage = 'ネットワークエラー: サーバーに接続できません';
+                        console.error('[Dashboard Update] ネットワークエラー:', error);
+                    } else {
+                        errorType = 'server';
+                        errorMessage = error.message || '不明なエラーが発生しました';
+                        console.error('[Dashboard Update] サーバーエラー:', error);
+                    }
+
+                    console.error('[Dashboard Update] エラー詳細:', {
+                        type: errorType,
+                        message: errorMessage,
+                        error: error,
+                        stack: error.stack
+                    });
+
+                    showStatusMessage('データ更新に失敗しました: ' + errorMessage, 'danger');
+                    updateProgress(0);
+                    hideProgressBar();
+
+                    isUpdating = false;
+                });
+        }
+    </script>
+</body>
+</html>

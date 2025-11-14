@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オフライン - アニメ・マンガ情報配信システム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .offline-container {
+            max-width: 500px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .offline-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .offline-message {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .offline-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: rgba(13, 110, 253, 0.8);
+            border-color: #0d6efd;
+        }
+        
+        .btn-primary:hover {
+            background: rgba(13, 110, 253, 1);
+        }
+        
+        .status-indicator {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            background: #ffc107;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.online {
+            background: #28a745;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .cached-data {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .cached-data h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .cached-data p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 480px) {
+            .offline-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .offline-title {
+                font-size: 1.5rem;
+            }
+            
+            .offline-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">🔌</div>
+        
+        <h1 class="offline-title">オフライン</h1>
+        
+        <p class="offline-message">
+            インターネット接続を確認してください。<br>
+            接続が復活すると、自動的に最新情報に更新されます。
+        </p>
+        
+        <div class="offline-actions">
+            <button class="btn btn-primary" onclick="retry()">
+                再試行
+            </button>
+            <button class="btn" onclick="goHome()">
+                ホームに戻る
+            </button>
+        </div>
+        
+        <div class="status-indicator">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="connection-status">接続状況を確認中...</span>
+        </div>
+        
+        <div class="cached-data" id="cached-data" style="display: none;">
+            <h3>キャッシュされたデータ</h3>
+            <p>一部の情報はオフラインでも利用できます。ネットワークが復旧すると最新情報に更新されます。</p>
+        </div>
+    </div>
+
+    <script>
+        let isOnline = navigator.onLine;
+        let retryCount = 0;
+        const maxRetries = 5;
+        
+        function updateConnectionStatus() {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('connection-status');
+            
+            if (navigator.onLine) {
+                statusDot.className = 'status-dot online';
+                statusText.textContent = 'オンライン - 再接続中...';
+                
+                // Auto-retry when back online
+                setTimeout(() => {
+                    retry();
+                }, 1000);
+            } else {
+                statusDot.className = 'status-dot';
+                statusText.textContent = 'オフライン - 接続を待機中...';
+            }
+        }
+        
+        function retry() {
+            if (retryCount >= maxRetries) {
+                alert('接続に失敗しました。しばらく時間をおいてから再度お試しください。');
+                return;
+            }
+            
+            retryCount++;
+            
+            const statusText = document.getElementById('connection-status');
+            statusText.textContent = `再接続を試行中... (${retryCount}/${maxRetries})`;
+            
+            // Try to reload the original page
+            if (document.referrer) {
+                window.location.href = document.referrer;
+            } else {
+                window.location.href = '/';
+            }
+        }
+        
+        function goHome() {
+            window.location.href = '/';
+        }
+        
+        // Check if we have cached data available
+        function checkCachedData() {
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    if (cacheNames.length > 0) {
+                        document.getElementById('cached-data').style.display = 'block';
+                    }
+                });
+            }
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', () => {
+            isOnline = true;
+            updateConnectionStatus();
+        });
+        
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            updateConnectionStatus();
+        });
+        
+        // Listen for service worker messages
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data && event.data.type === 'CACHE_UPDATED') {
+                    // Cache has been updated, we can retry
+                    retry();
+                }
+            });
+        }
+        
+        // Initialize
+        updateConnectionStatus();
+        checkCachedData();
+        
+        // Auto-check connection every 30 seconds
+        setInterval(() => {
+            if (!navigator.onLine) {
+                updateConnectionStatus();
+            }
+        }, 30000);
+        
+        // Show retry button after 5 seconds if still offline
+        setTimeout(() => {
+            if (!navigator.onLine) {
+                const retryBtn = document.querySelector('.btn-primary');
+                retryBtn.style.animation = 'pulse 1s infinite';
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

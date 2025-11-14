@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-11-11T21:05:46.970200",
+  "duration_seconds": 21.731861,
+  "total_loops": 1,
+  "max_loops": 1,
+  "successful_repairs": 1,
+  "failed_repairs": 0,
+  "detected_errors": [
+    {
+      "type": "LintError",
+      "message": "280個のLintエラー",
+      "details": "modules/anime_anilist.py:33:1: E303 too many blank lines (3)\nmodules/anime_anilist.py:38:1: E303 too many blank lines (3)\nmodules/anime_anilist.py:43:1: E303 too many blank lines (3)\nmodules/anime_anilist.py:529:121: E501 line too long (122 > 120 characters)\nmodules/anime_anilist.py:1409:121: E501 line too long (128 > 120 characters)\nmodules/anime_syoboi.py:33:1: E303 too many blank lines (3)\nmodules/anime_syoboi.py:38:1: E303 too many blank lines (3)\nmodules/backend_validator.py:327:17: F841 lo",
+      "severity": "low"
+    }
+  ],
+  "repair_attempts": [
+    {
+      "timestamp": "2025-11-11T21:05:46.969400",
+      "error_type": "LintError",
+      "action": "autopep8 auto-fix",
+      "success": true,
+      "output": "コードスタイルを自動修正"
+    }
+  ],
+  "final_status": "failed",
+  "recommendations": [
+    "最大ループ回数に達しました。エラーログを確認してください"
+  ]
+}

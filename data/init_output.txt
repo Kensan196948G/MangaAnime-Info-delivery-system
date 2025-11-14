@@ -1,0 +1,23 @@
+============================================================
+デモデータベース初期化スクリプト
+============================================================
+
+Traceback (most recent call last):
+  File "D:\MangaAnime-Info-delivery-system\init_demo_db.py", line 256, in main
+    create_database()
+    ~~~~~~~~~~~~~~~^^
+  File "D:\MangaAnime-Info-delivery-system\init_demo_db.py", line 199, in create_database
+    print(f"\u2705 データベース作成完了: {len(sample_works)}作品、{len(releases)}リリースを追加しました")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'cp932' codec can't encode character '\u2705' in position 0: illegal multibyte sequence
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MangaAnime-Info-delivery-system\init_demo_db.py", line 278, in <module>
+    exit(main())
+         ~~~~^^
+  File "D:\MangaAnime-Info-delivery-system\init_demo_db.py", line 271, in main
+    print(f"\u274c エラーが発生しました: {e}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'cp932' codec can't encode character '\u274c' in position 0: illegal multibyte sequence

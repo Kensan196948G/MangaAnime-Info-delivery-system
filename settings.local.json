@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(pytest:*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)"
+    ],
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(sudo:*)",
+      "Bash(chmod:+x:*)"
+    ]
+  },
+  "claude_flow": {
+    "max_iterations": 10,
+    "mode": "full-auto",
+    "skip_permissions": true,
+    "docs_path": "./docs/*.md",
+    "agents_path": "./.claude/agents/"
+  },
+  "project_config": {
+    "python_version": "3.11+",
+    "test_framework": "pytest",
+    "database": "sqlite3",
+    "logging_level": "INFO"
+  }
+}

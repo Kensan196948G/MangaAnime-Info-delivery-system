@@ -1,0 +1,19 @@
+[Unit]
+Description=MangaAnime Info Delivery System Web UI
+After=network.target
+
+[Service]
+Type=simple
+User=kensan
+Group=kensan
+WorkingDirectory=/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system
+Environment=PATH=/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/venv/bin
+ExecStart=/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/venv/bin/python web_app.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mangaanime-web
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block title %}
+エラー{% if error_code %} {{ error_code }}{% endif %} - MangaAnime Info Delivery System
+{% endblock %}
+
+{% block meta_description %}
+システムエラーが発生しました。問題の解決方法と対処法を確認してください。
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <!-- エラーアイコン -->
+                <div class="error-icon mb-4">
+                    {% if error_code == 404 %}
+                        <i class="bi bi-search display-1 text-warning" aria-hidden="true"></i>
+                    {% elif error_code == 403 %}
+                        <i class="bi bi-shield-x display-1 text-danger" aria-hidden="true"></i>
+                    {% elif error_code == 500 %}
+                        <i class="bi bi-exclamation-triangle display-1 text-danger" aria-hidden="true"></i>
+                    {% else %}
+                        <i class="bi bi-exclamation-circle display-1 text-warning" aria-hidden="true"></i>
+                    {% endif %}
+                </div>
+                
+                <!-- エラーメッセージ -->
+                <h1 class="h2 mb-3">
+                    {% if error_code == 404 %}
+                        ページが見つかりません
+                    {% elif error_code == 403 %}
+                        アクセスが拒否されました
+                    {% elif error_code == 500 %}
+                        サーバーエラーが発生しました
+                    {% else %}
+                        エラーが発生しました
+                    {% endif %}
+                </h1>
+                
+                <div class="mb-4">
+                    {% if error_code %}
+                        <span class="badge bg-{% if error_code == 404 %}warning{% else %}danger{% endif %} fs-6 mb-3">
+                            エラーコード: {{ error_code }}
+                        </span>
+                    {% endif %}
+                    
+                    <p class="text-muted">
+                        {% if error_message %}
+                            {{ error_message }}
+                        {% elif error_code == 404 %}
+                            お探しのページは存在しないか、移動した可能性があります。
+                        {% elif error_code == 403 %}
+                            このページにアクセスする権限がありません。
+                        {% elif error_code == 500 %}
+                            サーバーで問題が発生しました。しばらく時間をおいてからもう一度お試しください。
+                        {% else %}
+                            予期しないエラーが発生しました。
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <!-- 対処方法 -->
+                <div class="mb-4">
+                    <h2 class="h5 mb-3">対処方法</h2>
+                    <div class="list-group list-group-flush">
+                        {% if error_code == 404 %}
+                            <div class="list-group-item border-0 bg-transparent px-0">
+                                <i class="bi bi-arrow-left text-primary me-2" aria-hidden="true"></i>
+                                ブラウザの戻るボタンで前のページに戻る
+                            </div>
+                            <div class="list-group-item border-0 bg-transparent px-0">
+                                <i class="bi bi-house text-primary me-2" aria-hidden="true"></i>
+                                ホームページから目的のページを探す
+                            </div>
+                            <div class="list-group-item border-0 bg-transparent px-0">
+                                <i class="bi bi-search text-primary me-2" aria-hidden="true"></i>
+                                作品一覧から検索する
+                            </div>
+                        {% elif error_code == 500 %}
+                            <div class="list-group-item border-0 bg-transparent px-0">
+                                <i class="bi bi-arrow-clockwise text-primary me-2" aria-hidden="true"></i>
+                                ページを再読み込みする
+                            </div>
+                            <div class="list-group-item border-0 bg-transparent px-0">
+                                <i class="bi bi-clock text-primary me-2" aria-hidden="true"></i>
+                                しばらく時間をおいてから再度アクセスする
+                            </div>
+                            <div class="list-group-item border-0 bg-transparent px-0">
+                                <i class="bi bi-bug text-primary me-2" aria-hidden="true"></i>
+                                問題が続く場合は管理者に連絡する
+                            </div>
+                        {% else %}
+                            <div class="list-group-item border-0 bg-transparent px-0">
+                                <i class="bi bi-arrow-clockwise text-primary me-2" aria-hidden="true"></i>
+                                ページを再読み込みしてください
+                            </div>
+                            <div class="list-group-item border-0 bg-transparent px-0">
+                                <i class="bi bi-house text-primary me-2" aria-hidden="true"></i>
+                                ホームページに戻ってやり直してください
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- アクションボタン -->
+                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="bi bi-house me-2" aria-hidden="true"></i>
+                        ホームに戻る
+                    </a>
+                    
+                    {% if error_code == 404 %}
+                        <a href="{{ url_for('works') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-collection me-2" aria-hidden="true"></i>
+                            作品一覧を見る
+                        </a>
+                    {% else %}
+                        <button onclick="history.back()" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>
+                            前のページに戻る
+                        </button>
+                    {% endif %}
+                    
+                    <button onclick="location.reload()" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-clockwise me-2" aria-hidden="true"></i>
+                        再読み込み
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 技術情報 -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="card-title h6 mb-0">
+                    <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
+                    技術情報
+                </h3>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-sm-4">発生時刻:</dt>
+                    <dd class="col-sm-8">
+                        <time datetime="{{ now.isoformat() }}">
+                            {{ now.strftime('%Y-%m-%d %H:%M:%S') }}
+                        </time>
+                    </dd>
+                    
+                    {% if error_code %}
+                    <dt class="col-sm-4">エラーコード:</dt>
+                    <dd class="col-sm-8">{{ error_code }}</dd>
+                    {% endif %}
+                    
+                    <dt class="col-sm-4">リクエストURL:</dt>
+                    <dd class="col-sm-8 text-break">{{ request.url if request else '不明' }}</dd>
+                    
+                    <dt class="col-sm-4">参照元:</dt>
+                    <dd class="col-sm-8 text-break">
+                        {% if request and request.referrer %}
+                            {{ request.referrer }}
+                        {% else %}
+                            なし
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <!-- よくある質問 -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="card-title h6 mb-0">
+                    <i class="bi bi-question-circle me-2" aria-hidden="true"></i>
+                    よくある質問
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="faqAccordion">
+                    {% if error_code == 404 %}
+                        <div class="accordion-item">
+                            <h4 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#faq1" 
+                                        aria-expanded="false" aria-controls="faq1">
+                                    なぜページが見つからないのですか？
+                                </button>
+                            </h4>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>以下の原因が考えられます：</p>
+                                    <ul>
+                                        <li>URLが間違っている</li>
+                                        <li>ページが削除または移動された</li>
+                                        <li>リンクが古くなっている</li>
+                                        <li>一時的にページが利用できない状態</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif error_code == 500 %}
+                        <div class="accordion-item">
+                            <h4 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#faq1" 
+                                        aria-expanded="false" aria-controls="faq1">
+                                    サーバーエラーの原因は何ですか？
+                                </button>
+                            </h4>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>一時的なサーバーの問題が考えられます：</p>
+                                    <ul>
+                                        <li>データベース接続の問題</li>
+                                        <li>サーバーの過負荷</li>
+                                        <li>メンテナンス作業中</li>
+                                        <li>設定ファイルの問題</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="accordion-item">
+                        <h4 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" 
+                                    data-bs-toggle="collapse" data-bs-target="#faq2" 
+                                    aria-expanded="false" aria-controls="faq2">
+                                問題が解決しない場合はどうすればよいですか？
+                            </button>
+                        </h4>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>以下の手順をお試しください：</p>
+                                <ol>
+                                    <li>ブラウザのキャッシュをクリアする</li>
+                                    <li>別のブラウザで試してみる</li>
+                                    <li>しばらく時間をおいてから再度アクセスする</li>
+                                    <li>システム管理者に問題を報告する</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.error-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.list-group-item:hover {
+    background-color: var(--bg-secondary) !important;
+    transition: var(--transition-base);
+}
+
+.accordion-button {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--bg-secondary);
+    color: var(--bs-primary);
+}
+
+.accordion-button:focus {
+    box-shadow: var(--focus-shadow);
+    border-color: var(--focus-color);
+}
+
+.accordion-item {
+    border-color: var(--border-color);
+    background-color: var(--bg-primary);
+}
+
+/* モーション軽減モード対応 */
+@media (prefers-reduced-motion: reduce) {
+    .error-icon {
+        animation: none;
+    }
+}
+
+/* 高コントラストモード対応 */
+@media (prefers-contrast: high) {
+    .card,
+    .accordion-item {
+        border: 2px solid currentColor;
+    }
+    
+    .badge {
+        border: 1px solid currentColor;
+    }
+}
+
+/* 印刷スタイル */
+@media print {
+    .btn,
+    .accordion {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000;
+        box-shadow: none;
+        break-inside: avoid;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// エラー報告機能
+function reportError() {
+    const errorDetails = {
+        code: {{ error_code if error_code else 'null' }},
+        message: '{{ error_message|e if error_message else "" }}',
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent
+    };
+    
+    // 将来の実装: エラー報告システムにデータを送信
+    console.log('Error Report:', errorDetails);
+    
+    // ユーザーに報告完了メッセージを表示
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
+    alertDiv.innerHTML = `
+        <i class="bi bi-check-circle me-2"></i>
+        エラー情報を記録しました。ご協力ありがとうございます。
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="閉じる"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    if (container) {
+        container.appendChild(alertDiv);
+    }
+}
+
+// キーボードショートカット
+document.addEventListener('keydown', function(e) {
+    switch(e.key.toLowerCase()) {
+        case 'h':
+            if (e.altKey) {
+                e.preventDefault();
+                window.location.href = '{{ url_for("index") }}';
+            }
+            break;
+        case 'r':
+            if (e.altKey) {
+                e.preventDefault();
+                location.reload();
+            }
+            break;
+        case 'b':
+            if (e.altKey) {
+                e.preventDefault();
+                history.back();
+            }
+            break;
+    }
+});
+
+// ページロード時の初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // エラー詳細の自動隠し（プライバシー保護）
+    const technicalInfo = document.querySelector('.card:nth-of-type(2)');
+    if (technicalInfo) {
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'btn btn-sm btn-outline-secondary mt-2';
+        toggleButton.innerHTML = '<i class="bi bi-eye-slash me-1"></i> 技術情報を隠す';
+        toggleButton.onclick = function() {
+            const cardBody = technicalInfo.querySelector('.card-body');
+            if (cardBody.style.display === 'none') {
+                cardBody.style.display = 'block';
+                this.innerHTML = '<i class="bi bi-eye-slash me-1"></i> 技術情報を隠す';
+            } else {
+                cardBody.style.display = 'none';
+                this.innerHTML = '<i class="bi bi-eye me-1"></i> 技術情報を表示';
+            }
+        };
+        
+        technicalInfo.querySelector('.card-body').appendChild(toggleButton);
+    }
+    
+    // アクセシビリティ: フォーカス管理
+    const mainHeading = document.querySelector('h1');
+    if (mainHeading) {
+        mainHeading.focus();
+        mainHeading.setAttribute('tabindex', '-1');
+    }
+    
+    // 自動リロード機能（500エラーの場合のみ）
+    {% if error_code == 500 %}
+    let autoReloadTimer;
+    let countdown = 30;
+    
+    function startAutoReload() {
+        const countdownElement = document.createElement('div');
+        countdownElement.className = 'alert alert-info mt-3';
+        countdownElement.innerHTML = `
+            <i class="bi bi-clock me-2"></i>
+            <span id="countdown-text">${countdown}秒後に自動的に再読み込みします。</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="cancelAutoReload()">
+                キャンセル
+            </button>
+        `;
+        
+        document.querySelector('.container').appendChild(countdownElement);
+        
+        autoReloadTimer = setInterval(() => {
+            countdown--;
+            document.getElementById('countdown-text').textContent = `${countdown}秒後に自動的に再読み込みします。`;
+            
+            if (countdown <= 0) {
+                location.reload();
+            }
+        }, 1000);
+    }
+    
+    function cancelAutoReload() {
+        if (autoReloadTimer) {
+            clearInterval(autoReloadTimer);
+            const countdownElement = document.querySelector('.alert-info');
+            if (countdownElement) {
+                countdownElement.remove();
+            }
+        }
+    }
+    
+    // 30秒後に自動リロード開始
+    setTimeout(startAutoReload, 5000);
+    
+    // グローバルに関数を公開
+    window.cancelAutoReload = cancelAutoReload;
+    {% endif %}
+});
+
+// パフォーマンス監視
+if ('PerformanceObserver' in window) {
+    const observer = new PerformanceObserver((list) => {
+        list.getEntries().forEach(entry => {
+            if (entry.entryType === 'navigation') {
+                console.log('Navigation timing:', entry.toJSON());
+            }
+        });
+    });
+    observer.observe({entryTypes: ['navigation']});
+}
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+# 開発・テスト用依存関係
+
+# 基本要件を含む
+-r requirements.txt
+
+# Web UI (オプション)
+Flask>=2.3.0
+Flask-Bootstrap>=3.3.7.1
+
+# テスト関連
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+pytest-html>=3.1.0
+pytest-xdist>=3.0.0
+pytest-timeout>=2.1.0
+pytest-benchmark>=4.0.0
+
+# コード品質
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+
+# セキュリティスキャン
+bandit>=1.7.5
+safety>=2.3.0
+
+# パフォーマンス
+memory-profiler>=0.61.0
+
+# テストデータ生成
+faker>=19.0.0
+
+# ドキュメント生成
+sphinx>=5.0.0
+sphinx-rtd-theme>=1.2.0
+
+# 自動修復用
+autopep8>=2.0.4

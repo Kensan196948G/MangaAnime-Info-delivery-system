@@ -1,0 +1,175 @@
+name: 自動エラー検知・修復ループシステム（本番）
+
+on:
+  # 1時間おきに自動実行（本番設定）
+  schedule:
+    - cron: '0 * * * *'  # 毎時0分実行
+
+  # 手動実行も可能
+  workflow_dispatch:
+    inputs:
+      max_loops:
+        description: '最大ループ回数'
+        required: false
+        default: '10'
+
+  # Issueコメントでトリガー
+  issue_comment:
+    types: [created]
+
+# 同時実行を防ぐ
+concurrency:
+  group: auto-repair-system
+  cancel-in-progress: false
+
+jobs:
+  error-detection-and-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30  # 本番用: 最大30分でタイムアウト
+    # Issueコメントが@auto-repairの場合のみ実行
+    if: |
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@auto-repair'))
+
+    env:
+      MAX_LOOPS: ${{ github.event.inputs.max_loops || '10' }}
+      REPAIR_INTERVAL: 60  # 秒（本番設定: 各ループ間隔）
+      PRODUCTION_MODE: 'true'  # 本番モードフラグ
+
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Python環境セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 依存関係インストール
+        timeout-minutes: 5
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: エラー検知・修復ループ実行
+        id: repair-loop
+        timeout-minutes: 15
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          python scripts/auto_error_repair_loop.py \
+            --max-loops "$MAX_LOOPS" \
+            --interval "$REPAIR_INTERVAL" \
+            --issue-number "${ISSUE_NUMBER:-}" \
+            --create-issue-on-failure
+
+      - name: 修復結果サマリー作成
+        if: always()
+        run: |
+          echo "## 🔧 自動修復ループ実行結果" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f repair_summary.json ]; then
+            python scripts/generate_repair_summary.py repair_summary.json >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ 修復サマリーが生成されませんでした" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 修復ログをアーティファクトとして保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repair-logs-${{ github.run_number }}
+          path: |
+            repair_summary.json
+            logs/auto_repair_*.log
+          retention-days: 30
+
+      - name: 失敗時にIssue作成
+        if: failure() && steps.repair-loop.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let summary = '修復サマリーファイルが見つかりません';
+
+            try {
+              if (fs.existsSync('repair_summary.json')) {
+                const data = JSON.parse(fs.readFileSync('repair_summary.json', 'utf8'));
+                summary = `
+            ## 🚨 自動修復失敗レポート
+
+            **実行日時**: ${data.timestamp || new Date().toISOString()}
+            **実行ループ数**: ${data.total_loops || 0} / ${process.env.MAX_LOOPS}
+            **成功した修復**: ${data.successful_repairs || 0}
+            **失敗した修復**: ${data.failed_repairs || 0}
+
+            ### 検出されたエラー
+            ${data.detected_errors?.map(e => `- ${e.type}: ${e.message}`).join('\n') || 'なし'}
+
+            ### 修復試行履歴
+            ${data.repair_attempts?.map((a, i) => `
+            #### ループ ${i + 1}
+            - **時刻**: ${a.timestamp}
+            - **アクション**: ${a.action}
+            - **結果**: ${a.success ? '✅ 成功' : '❌ 失敗'}
+            ${a.error ? `- **エラー**: ${a.error}` : ''}
+            `).join('\n') || 'なし'}
+
+            ### 推奨アクション
+            ${data.recommendations?.map(r => `- ${r}`).join('\n') || '手動での確認が必要です'}
+
+            ---
+            🤖 この Issue は自動生成されました
+            `;
+              }
+            } catch (error) {
+              console.error('修復サマリー読み込みエラー:', error);
+            }
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 自動修復失敗 - ${new Date().toISOString().split('T')[0]}`,
+              body: summary,
+              labels: ['auto-repair', 'bug', '要確認']
+            });
+
+      - name: 成功時にIssueコメント
+        if: success() && github.event.issue.number
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '✅ 自動修復が完了しました';
+
+            try {
+              if (fs.existsSync('repair_summary.json')) {
+                const data = JSON.parse(fs.readFileSync('repair_summary.json', 'utf8'));
+                comment = `
+            ## ✅ 自動修復完了
+
+            **実行ループ数**: ${data.total_loops || 0} / ${process.env.MAX_LOOPS}
+            **成功した修復**: ${data.successful_repairs || 0}
+            **検出エラー数**: ${data.detected_errors?.length || 0}
+
+            すべてのエラーが修復されました 🎉
+            `;
+              }
+            } catch (error) {
+              console.error('サマリー読み込みエラー:', error);
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });

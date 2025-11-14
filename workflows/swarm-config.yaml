@@ -1,0 +1,90 @@
+# Claude-Flow Swarm Configuration for MangaAnime System
+swarm_config:
+  version: "2.0.0-alpha.88"
+  project_name: "MangaAnime-Info-delivery-system"
+  max_agents: 12
+  coordination_mode: "hierarchical"
+  
+strategies:
+  development:
+    enabled: true
+    parallel_execution: true
+    coordination_pattern: "hub_and_spoke"
+    leader_agent: "subagent-01-cto"
+    
+  research:
+    enabled: true
+    web_access: true
+    max_depth: 3
+    
+  testing:
+    enabled: true
+    auto_regression: true
+    coverage_threshold: 85
+    
+  optimization:
+    enabled: true
+    performance_monitoring: true
+    memory_optimization: true
+
+agent_mapping:
+  # Management Layer
+  coordinator_primary: "subagent-01-cto"
+  coordinator_secondary: "subagent-02-pm" 
+  qa_lead: "subagent-03-qa-lead"
+  
+  # Development Layer
+  backend_api: "subagent-04-api-dev"
+  data_collector: "subagent-05-data-collector"
+  notification_engine: "subagent-06-notification"
+  filter_logic: "subagent-07-filter-logic"
+  
+  # Frontend Layer
+  ui_developer: "subagent-08-ui-dev"
+  ux_designer: "subagent-09-ux-designer"
+  
+  # Quality Layer
+  test_automation: "subagent-10-test-automation"
+  security_specialist: "subagent-11-security"
+  devops_engineer: "subagent-12-devops"
+
+execution_rules:
+  sequential_phases:
+    - name: "planning"
+      agents: ["subagent-01-cto", "subagent-02-pm"]
+      duration: "5min"
+      
+    - name: "parallel_development"
+      agents: ["subagent-04-api-dev", "subagent-05-data-collector", 
+               "subagent-06-notification", "subagent-07-filter-logic",
+               "subagent-08-ui-dev"]
+      duration: "30min"
+      parallel: true
+      
+    - name: "integration_testing"
+      agents: ["subagent-10-test-automation", "subagent-11-security"]
+      duration: "15min"
+      depends_on: ["parallel_development"]
+      
+    - name: "quality_review"
+      agents: ["subagent-03-qa-lead", "subagent-01-cto"]
+      duration: "10min"
+      depends_on: ["integration_testing"]
+
+communication:
+  sync_interval: 300  # 5分
+  status_broadcast: true
+  error_escalation: "immediate"
+  progress_reporting: "real_time"
+  
+monitoring:
+  performance_tracking: true
+  resource_usage: true
+  task_completion_rate: true
+  bottleneck_detection: true
+
+output_management:
+  aggregated_reports: true
+  individual_agent_logs: true
+  consolidated_artifacts: true
+  final_summary: true

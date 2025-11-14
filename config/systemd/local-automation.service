@@ -1,0 +1,16 @@
+[Unit]
+Description=Local Automation System for MangaAnime Info Delivery
+After=network.target
+
+[Service]
+Type=simple
+User=$USER
+WorkingDirectory=/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system
+ExecStart=/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/scripts/local-automation-system.sh start
+Restart=on-failure
+RestartSec=60
+StandardOutput=append:/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/logs/automation/service.log
+StandardError=append:/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/logs/automation/service-error.log
+
+[Install]
+WantedBy=multi-user.target

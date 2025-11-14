@@ -1,0 +1,1125 @@
+/* 
+ * Custom CSS for Anime/Manga Information Delivery System
+ * This file contains custom styles and responsive design enhancements
+ */
+
+/* =============================================================================
+   Variables and Base Styles
+   ============================================================================= */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --dark-color: #212529;
+    --light-color: #f8f9fa;
+    
+    /* Custom colors for anime/manga */
+    --anime-color: #0d6efd;
+    --manga-color: #6c757d;
+    
+    /* Spacing */
+    --section-padding: 2rem;
+    --card-padding: 1.5rem;
+    
+    /* Shadows */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    
+    /* Border radius */
+    --border-radius-sm: 0.25rem;
+    --border-radius-md: 0.375rem;
+    --border-radius-lg: 0.5rem;
+}
+
+/* =============================================================================
+   Global Enhancements
+   ============================================================================= */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 
+                'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #212529;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--light-color);
+    border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-color);
+}
+
+/* =============================================================================
+   Navigation Enhancements
+   ============================================================================= */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.navbar-nav .nav-link.active {
+    color: rgba(255, 255, 255, 1) !important;
+    font-weight: 600;
+}
+
+/* Status indicator animation */
+#status-indicator .bi-circle-fill {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* =============================================================================
+   Card Enhancements
+   ============================================================================= */
+.card {
+    border: none;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    border-radius: var(--border-radius-lg);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    font-weight: 600;
+}
+
+/* Colored cards for statistics */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-info {
+    box-shadow: var(--shadow-md);
+}
+
+.card.bg-primary:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.card.bg-success:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.card.bg-warning:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.card.bg-info:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+/* =============================================================================
+   Release Item Styles
+   ============================================================================= */
+.release-item {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.release-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: translateX(5px);
+}
+
+/* Badge enhancements */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+/* Type-specific styling */
+.badge.bg-primary {
+    background-color: var(--anime-color) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--manga-color) !important;
+}
+
+/* =============================================================================
+   Table Enhancements
+   ============================================================================= */
+.table {
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    transform: scale(1.01);
+    transition: all 0.3s ease;
+}
+
+/* Sticky table header */
+.table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--light-color);
+}
+
+/* =============================================================================
+   Calendar Styles
+   ============================================================================= */
+.calendar-table {
+    min-height: 600px;
+    table-layout: fixed;
+}
+
+.calendar-day {
+    width: 14.28%;
+    height: 120px;
+    vertical-align: top;
+    position: relative;
+    padding: 0;
+    transition: background-color 0.3s ease;
+}
+
+.calendar-day:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.day-header {
+    padding: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.05) 100%);
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.releases-container {
+    padding: 4px;
+    max-height: 80px;
+    overflow: hidden;
+}
+
+.release-item {
+    margin-bottom: 2px;
+    padding: 2px 4px;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.release-item:hover {
+    opacity: 0.8;
+    transform: translateX(2px);
+}
+
+.release-item.anime {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-left: 3px solid var(--anime-color);
+}
+
+.release-item.manga {
+    background-color: rgba(var(--bs-secondary-rgb), 0.1);
+    border-left: 3px solid var(--manga-color);
+}
+
+.release-title {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+}
+
+.release-details {
+    color: var(--secondary-color);
+    font-size: 0.7rem;
+}
+
+.more-releases {
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: var(--border-radius-sm);
+    margin-top: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.more-releases:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+/* Today highlight */
+.calendar-day[data-date] .day-header {
+    background: linear-gradient(135deg, rgba(var(--bs-warning-rgb), 0.2) 0%, rgba(var(--bs-warning-rgb), 0.1) 100%);
+    border-bottom-color: var(--warning-color);
+}
+
+/* =============================================================================
+   Form Enhancements
+   ============================================================================= */
+.form-control,
+.form-select {
+    border-radius: var(--border-radius-md);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Button enhancements */
+.btn {
+    font-weight: 500;
+    border-radius: var(--border-radius-md);
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* =============================================================================
+   Loading and Animation States
+   ============================================================================= */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* =============================================================================
+   Log Viewer Enhancements
+   ============================================================================= */
+.log-container {
+    max-height: 600px;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d30 100%);
+    color: #d4d4d4;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.85rem;
+    border-radius: var(--border-radius-md);
+}
+
+.log-content {
+    padding: 1rem;
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+/* Log level colors with better contrast */
+.log-content .error {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+.log-content .warning {
+    color: #ffa726;
+    font-weight: 500;
+}
+
+.log-content .info {
+    color: #42a5f5;
+}
+
+.log-content .debug {
+    color: #adb5bd;
+}
+
+.log-content .success {
+    color: #66bb6a;
+}
+
+/* Enhanced scrollbar for log container */
+.log-container::-webkit-scrollbar {
+    width: 12px;
+}
+
+.log-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--border-radius-sm);
+}
+
+.log-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-sm);
+}
+
+.log-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* =============================================================================
+   Pagination Enhancements
+   ============================================================================= */
+.pagination {
+    margin: 0;
+}
+
+.page-link {
+    border-radius: var(--border-radius-md) !important;
+    margin: 0 2px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+/* =============================================================================
+   Modal Enhancements
+   ============================================================================= */
+.modal-content {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* =============================================================================
+   Responsive Design
+   ============================================================================= */
+@media (max-width: 768px) {
+    .calendar-day {
+        height: 80px;
+    }
+    
+    .releases-container {
+        max-height: 50px;
+    }
+    
+    .release-item {
+        font-size: 0.7rem;
+        padding: 1px 2px;
+    }
+    
+    .day-header {
+        padding: 4px;
+    }
+    
+    .day-number {
+        font-size: 0.8rem;
+    }
+    
+    /* Stack cards vertically on mobile */
+    .row > [class^="col-"] {
+        margin-bottom: 1rem;
+    }
+    
+    /* Adjust table for mobile */
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    /* Compact buttons on mobile */
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .calendar-day {
+        height: 60px;
+    }
+    
+    .releases-container {
+        max-height: 35px;
+    }
+    
+    /* Hide some less important columns on very small screens */
+    .table-responsive .d-none-mobile {
+        display: none !important;
+    }
+    
+    /* Make cards more compact */
+    .card-body {
+        padding: 1rem;
+    }
+    
+    /* Smaller font sizes */
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h5 {
+        font-size: 1.1rem;
+    }
+}
+
+/* =============================================================================
+   Print Styles
+   ============================================================================= */
+@media print {
+    .navbar,
+    .btn,
+    .card-footer,
+    .pagination,
+    .modal {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+    }
+    
+    .table {
+        font-size: 0.8rem;
+    }
+    
+    .log-container {
+        background: white;
+        color: black;
+        max-height: none;
+        overflow: visible;
+    }
+}
+
+/* =============================================================================
+   Accessibility Enhancements
+   ============================================================================= */
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .card {
+        border: 2px solid #000;
+    }
+    
+    .btn-outline-primary {
+        border: 2px solid var(--primary-color);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus indicators */
+.btn:focus,
+.form-control:focus,
+.form-select:focus,
+.nav-link:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* =============================================================================
+   Utility Classes
+   ============================================================================= */
+.text-anime {
+    color: var(--anime-color);
+}
+
+.text-manga {
+    color: var(--manga-color);
+}
+
+.bg-anime {
+    background-color: var(--anime-color);
+}
+
+.bg-manga {
+    background-color: var(--manga-color);
+}
+
+.shadow-custom {
+    box-shadow: var(--shadow-md);
+}
+
+.border-radius-custom {
+    border-radius: var(--border-radius-lg);
+}
+
+/* Loading spinner */
+.spinner-custom {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 0.2rem solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner 0.75s linear infinite;
+}
+
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
+
+/* =============================================================================
+   Phase 2: Collection Dashboard Mobile Enhancements
+   ============================================================================= */
+
+/* Collection Status Cards */
+.collection-status-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+    margin-bottom: 1rem;
+}
+
+.collection-status-card.status-running {
+    border-left-color: var(--success-color);
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+.collection-status-card.status-error {
+    border-left-color: var(--danger-color);
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+.collection-status-card.status-idle {
+    border-left-color: var(--secondary-color);
+    background-color: rgba(108, 117, 125, 0.05);
+}
+
+/* Progress Rings for Mobile */
+.progress-ring {
+    transform: rotate(-90deg);
+    width: 40px;
+    height: 40px;
+}
+
+.progress-ring-circle {
+    stroke: #e9ecef;
+    fill: transparent;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+}
+
+.progress-ring-circle.active {
+    stroke: var(--primary-color);
+}
+
+/* Connection Indicators */
+.connection-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.connection-indicator.connected {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: var(--success-color);
+}
+
+.connection-indicator.disconnected {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--danger-color);
+}
+
+.connection-indicator.testing {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--warning-color);
+}
+
+/* Data Browser Enhancements */
+.work-card {
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.work-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.work-card.anime {
+    border-left: 4px solid var(--anime-color);
+}
+
+.work-card.manga {
+    border-left: 4px solid var(--manga-color);
+}
+
+.genre-tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 10px;
+    margin: 0.1rem;
+    background-color: var(--light-color);
+    color: var(--secondary-color);
+    border: 1px solid #dee2e6;
+    display: inline-block;
+}
+
+.platform-badge {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.3rem;
+    border-radius: 4px;
+    background-color: var(--info-color);
+    color: white;
+}
+
+.quality-score {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.75rem;
+    color: white;
+}
+
+.quality-score.excellent {
+    background: linear-gradient(135deg, var(--success-color), #20c997);
+}
+
+.quality-score.good {
+    background: linear-gradient(135deg, var(--primary-color), #6610f2);
+}
+
+.quality-score.fair {
+    background: linear-gradient(135deg, var(--warning-color), #fd7e14);
+}
+
+.quality-score.poor {
+    background: linear-gradient(135deg, var(--danger-color), #e83e8c);
+}
+
+/* Chart Containers */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 1rem 0;
+}
+
+/* Activity Heatmap */
+.activity-heatmap {
+    display: grid;
+    grid-template-columns: repeat(53, 1fr);
+    gap: 1px;
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.heatmap-cell {
+    min-width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background-color: #ebedf0;
+    transition: background-color 0.2s;
+}
+
+.heatmap-cell.level-1 { background-color: #9be9a8; }
+.heatmap-cell.level-2 { background-color: #40c463; }
+.heatmap-cell.level-3 { background-color: #30a14e; }
+.heatmap-cell.level-4 { background-color: #216e39; }
+
+/* Collection Settings Enhancements */
+.source-config-card {
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.source-config-card.enabled {
+    border-left: 4px solid var(--success-color);
+    background-color: rgba(25, 135, 84, 0.02);
+}
+
+.source-config-card.disabled {
+    border-left: 4px solid var(--secondary-color);
+    background-color: rgba(108, 117, 125, 0.02);
+}
+
+.source-config-card.error {
+    border-left: 4px solid var(--danger-color);
+    background-color: rgba(220, 53, 69, 0.02);
+}
+
+.keyword-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--light-color);
+    border: 1px solid #dee2e6;
+    border-radius: 15px;
+    padding: 0.2rem 0.6rem;
+    margin: 0.1rem;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.keyword-tag:hover {
+    background: #e9ecef;
+}
+
+.keyword-tag .remove-keyword {
+    cursor: pointer;
+    color: var(--danger-color);
+    font-weight: bold;
+    padding: 0 4px;
+    border-radius: 50%;
+    line-height: 1;
+}
+
+.keyword-tag .remove-keyword:hover {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* Schedule Items */
+.schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 0.5rem;
+    background: var(--light-color);
+    transition: all 0.2s ease;
+}
+
+.schedule-item:hover {
+    background: #e9ecef;
+}
+
+.schedule-item.active {
+    border-color: var(--success-color);
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+/* =============================================================================
+   Mobile-Specific Responsive Enhancements
+   ============================================================================= */
+@media (max-width: 768px) {
+    /* Collection Dashboard Mobile */
+    .collection-status-card {
+        margin-bottom: 0.75rem;
+    }
+    
+    .progress-ring {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .connection-indicator {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+    
+    /* Data Browser Mobile */
+    .work-card {
+        margin-bottom: 0.75rem;
+    }
+    
+    .genre-tag {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.3rem;
+        margin: 0.05rem;
+    }
+    
+    .quality-score {
+        width: 30px;
+        height: 30px;
+        font-size: 0.7rem;
+    }
+    
+    .platform-badge {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.25rem;
+    }
+    
+    /* Charts Mobile */
+    .chart-container {
+        height: 250px;
+        margin: 0.5rem 0;
+    }
+    
+    /* Activity Heatmap Mobile */
+    .activity-heatmap {
+        grid-template-columns: repeat(53, 8px);
+        gap: 1px;
+        padding: 5px;
+    }
+    
+    .heatmap-cell {
+        width: 8px;
+        height: 8px;
+        min-width: 8px;
+    }
+    
+    /* Collection Settings Mobile */
+    .source-config-card {
+        margin-bottom: 0.75rem;
+    }
+    
+    .schedule-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    .keyword-tag {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.4rem;
+    }
+    
+    /* Navigation Dropdown Mobile */
+    .navbar-nav .dropdown-menu {
+        background-color: var(--primary-color);
+        border: none;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .navbar-nav .dropdown-item {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 0.5rem 1rem;
+    }
+    
+    .navbar-nav .dropdown-item:hover,
+    .navbar-nav .dropdown-item:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+    
+    .navbar-nav .dropdown-item.active {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-weight: 600;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Extra small screens */
+    .progress-ring {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .quality-score {
+        width: 25px;
+        height: 25px;
+        font-size: 0.65rem;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+    
+    .activity-heatmap {
+        grid-template-columns: repeat(53, 6px);
+    }
+    
+    .heatmap-cell {
+        width: 6px;
+        height: 6px;
+        min-width: 6px;
+    }
+    
+    /* Compact form controls */
+    .form-control,
+    .form-select {
+        font-size: 0.9rem;
+        padding: 0.375rem 0.5rem;
+    }
+    
+    /* Smaller buttons */
+    .btn-sm {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    /* Tab navigation mobile */
+    .nav-tabs .nav-link {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* =============================================================================
+   Touch and Gesture Enhancements
+   ============================================================================= */
+@media (hover: none) and (pointer: coarse) {
+    /* Touch devices */
+    .btn,
+    .card,
+    .list-group-item {
+        transition: none;
+    }
+    
+    .btn:hover,
+    .card:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    /* Larger touch targets */
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .nav-link {
+        padding: 0.75rem 1rem;
+    }
+    
+    .form-control,
+    .form-select {
+        min-height: 44px;
+    }
+    
+    /* Connection indicators larger for touch */
+    .connection-indicator {
+        min-height: 40px;
+        padding: 8px 12px;
+    }
+    
+    /* Keyword tags easier to tap */
+    .keyword-tag {
+        min-height: 32px;
+        padding: 0.25rem 0.75rem;
+    }
+    
+    .keyword-tag .remove-keyword {
+        min-width: 24px;
+        min-height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* =============================================================================
+   Dark Mode Support (Future Enhancement)
+   ============================================================================= */
+@media (prefers-color-scheme: dark) {
+    /* This section would be expanded for full dark mode support */
+    .collection-status-card,
+    .source-config-card {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #f8f9fa;
+    }
+    
+    .genre-tag {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #f8f9fa;
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* =============================================================================
+   Performance Optimizations
+   ============================================================================= */
+/* Reduce animations on low-end devices */
+@media (prefers-reduced-data: reduce) {
+    .chart-container {
+        display: none;
+    }
+    
+    .activity-heatmap {
+        display: none;
+    }
+}
+
+/* GPU acceleration for smooth animations */
+.work-card,
+.collection-status-card,
+.source-config-card {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* Optimize for battery saving */
+@media (prefers-reduced-motion: reduce) {
+    .progress-ring-circle,
+    .pulse-dot {
+        animation: none;
+    }
+}

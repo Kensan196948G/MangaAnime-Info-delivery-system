@@ -1,0 +1,35 @@
+{
+  "project": "MangaAnime-Info-delivery-system",
+  "version": "1.0.0",
+  "type": "web",
+  "description": "アニメ・マンガの最新情報を自動で収集し、Gmail通知とGoogleカレンダー統合により、リアルタイムでユーザーに配信する完全自動化システムです。",
+  "mcp_enabled": true,
+  "mcp_server": "claude-flow",
+  "mcp_tools_count": 87,
+  "agents_count": 20,
+  "language": "ja",
+  "output_style": "explanatory",
+  "pipeline": {
+    "enabled": true,
+    "stages": [
+      "intake",
+      "plan",
+      "build",
+      "integrate",
+      "quality",
+      "docs",
+      "release",
+      "observe"
+    ]
+  },
+  "features": {
+    "context7": true,
+    "sub_agents": true,
+    "claude_flow": true,
+    "routing": true,
+    "japanese": true
+  },
+  "created_at": "2025-08-15T17:48:30+09:00",
+  "updated_at": "2025-08-15T17:48:30+09:00",
+  "relocated_at": "2025-08-15T17:51:34+09:00"
+}
