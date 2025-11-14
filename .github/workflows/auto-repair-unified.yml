@@ -449,6 +449,7 @@ jobs:
 
             const eventName = '${{ github.event_name }}';
             const runNumber = '${{ github.run_number }}';
+            const maxLoops = '${{ needs.pre-check.outputs.max_loops }}';
 
             const issueBody = `
             ## ${emoji} 自動修復失敗レポート
@@ -462,7 +463,7 @@ jobs:
             | 項目 | 値 |
             |------|-----|
             | 最終ステータス | ${summaryData.final_status} |
-            | 実行ループ数 | ${summaryData.total_loops || 0} / ${{ needs.pre-check.outputs.max_loops }} |
+            | 実行ループ数 | ${summaryData.total_loops || 0} / ${maxLoops} |
             | 成功した修復 | ${summaryData.successful_repairs || 0} |
             | 失敗した修復 | ${summaryData.failed_repairs || 0} |
             | エラー削減率 | ${(summaryData.error_reduction_rate || 0).toFixed(1)}% |
