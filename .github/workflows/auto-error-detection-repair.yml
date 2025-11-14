@@ -75,10 +75,10 @@ EOL
               cp data/requirements-dev.txt requirements-dev.txt
             else
               echo "⚠️ Generating minimal requirements-dev.txt"
-              cat > requirements-dev.txt << 'EOL'
-pytest>=7.4.0
-flake8>=6.1.0
-EOL
+              echo "pytest>=7.4.0" > requirements-dev.txt
+              echo "pytest-cov>=4.1.0" >> requirements-dev.txt
+              echo "flake8>=6.1.0" >> requirements-dev.txt
+              echo "black>=23.0.0" >> requirements-dev.txt
             fi
           fi
 

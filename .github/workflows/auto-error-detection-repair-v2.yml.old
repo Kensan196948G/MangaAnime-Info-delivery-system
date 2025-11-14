@@ -1,12 +1,6 @@
 name: 自動エラー検知・修復ループシステム v2（最適化版）
 
 on:
-  # テスト用pushトリガー（一時的）
-  push:
-    branches: [main, fix-requirements-in-workflows]
-    paths:
-      - '.github/workflows/auto-error-detection-repair-v2.yml'
-
   # 30分おきに自動実行
   schedule:
     - cron: '*/30 * * * *'  # 30分ごと
@@ -18,7 +12,6 @@ on:
         description: '最大ループ回数'
         required: false
         default: '10'
-        type: string
       force_full_repair:
         description: '完全修復を強制（警告も修復）'
         required: false
@@ -45,9 +38,8 @@ jobs:
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@auto-repair'))
 
     env:
-      MAX_LOOPS: ${{ inputs.max_loops || '10' }}
-      REPAIR_INTERVAL: '30'  # 秒（GitHub Actions用に短縮）
-      FORCE_FULL_REPAIR: ${{ inputs.force_full_repair || 'false' }}
+      MAX_LOOPS: ${{ github.event.inputs.max_loops || '10' }}
+      REPAIR_INTERVAL: 30  # 秒（GitHub Actions用に短縮）
 
     steps:
       - name: チェックアウト
@@ -55,49 +47,6 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: ファイル構造確認とrequirements準備
-        run: |
-          echo "📂 Current directory: $(pwd)"
-          echo "📂 List root files:"
-          ls -la
-
-          # requirements.txtが見つからない場合、data/からコピー
-          if [ ! -f requirements.txt ]; then
-            if [ -f data/requirements.txt ]; then
-              echo "✓ Copying requirements.txt from data/"
-              cp data/requirements.txt requirements.txt
-            else
-              echo "⚠️ Generating minimal requirements.txt"
-              echo "requests>=2.31.0" > requirements.txt
-              echo "PyYAML>=6.0.1" >> requirements.txt
-              echo "python-dotenv>=1.0.0" >> requirements.txt
-              echo "flask>=3.0.0" >> requirements.txt
-              echo "sqlalchemy>=2.0.0" >> requirements.txt
-              echo "google-api-python-client>=2.100.0" >> requirements.txt
-              echo "google-auth>=2.23.0" >> requirements.txt
-              echo "feedparser>=6.0.10" >> requirements.txt
-            fi
-          fi
-
-          if [ ! -f requirements-dev.txt ]; then
-            if [ -f data/requirements-dev.txt ]; then
-              echo "✓ Copying requirements-dev.txt from data/"
-              cp data/requirements-dev.txt requirements-dev.txt
-            else
-              echo "⚠️ Generating minimal requirements-dev.txt"
-              echo "pytest>=7.4.0" > requirements-dev.txt
-              echo "pytest-cov>=4.1.0" >> requirements-dev.txt
-              echo "flake8>=6.1.0" >> requirements-dev.txt
-              echo "black>=23.0.0" >> requirements-dev.txt
-            fi
-          fi
-
-          # 最終確認
-          echo "📂 Final check:"
-          ls -la requirements*.txt
-          echo "📂 requirements.txt content:"
-          head -5 requirements.txt
 
       - name: Python環境セットアップ
         uses: actions/setup-python@v5
@@ -107,36 +56,15 @@ jobs:
 
       - name: 依存関係インストール（リトライ付き）
         timeout-minutes: 8
-        uses: nick-fields/retry-action@v3
+        uses: nick-invision/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 10
           command: |
-            set -e
             pip install --upgrade pip
-
-            # 必須パッケージを直接インストール（確実に実行）
-            echo "📦 Installing core packages..."
-            pip install requests PyYAML python-dotenv flask sqlalchemy google-api-python-client google-auth feedparser
-
-            # requirements.txtから追加パッケージをインストール
-            if [ -f requirements.txt ]; then
-              echo "✓ requirements.txt found, installing additional packages..."
-              pip install -r requirements.txt || echo "⚠ Some packages from requirements.txt failed"
-            else
-              echo "⚠ requirements.txt not found (should have been generated)"
-            fi
-
-            # requirements-dev.txtから開発パッケージをインストール（エラーは無視）
-            if [ -f requirements-dev.txt ]; then
-              echo "✓ requirements-dev.txt found, installing dev packages..."
-              pip install -r requirements-dev.txt || echo "ℹ Dev packages skipped"
-            fi
-
-            # インストール済みパッケージ確認
-            echo "📦 Installed packages:"
-            pip list | grep -E "requests|PyYAML|flask|sqlalchemy"
+            pip install -r requirements.txt
+            pip install -r requirements-dev.txt
 
       - name: エラー検知・修復ループ実行
         id: repair-loop
@@ -144,77 +72,53 @@ jobs:
         continue-on-error: true  # 失敗しても次のステップへ
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number || '' }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          if [ -f scripts/auto_error_repair_loop.py ]; then
-            python scripts/auto_error_repair_loop.py \
-              --max-loops "$MAX_LOOPS" \
-              --interval "$REPAIR_INTERVAL" \
-              --issue-number "${ISSUE_NUMBER}" \
-              --create-issue-on-failure \
-              $( [ "$FORCE_FULL_REPAIR" = "true" ] && echo "--force-full-repair" || echo "" )
-          else
-            echo "⚠️ スクリプトが見つかりません: scripts/auto_error_repair_loop.py"
-            echo "repair_status=script_not_found" >> "$GITHUB_OUTPUT"
-            exit 1
-          fi
+          python scripts/auto_error_repair_loop.py \
+            --max-loops "$MAX_LOOPS" \
+            --interval "$REPAIR_INTERVAL" \
+            --issue-number "${ISSUE_NUMBER:-}" \
+            --create-issue-on-failure
 
       - name: 修復ステータスを判定
         id: check-status
         if: always()
         run: |
           if [ -f repair_summary.json ]; then
-            # jqがインストールされているか確認
-            if ! command -v jq &> /dev/null; then
-              echo "⚠️ jqがインストールされていません。デフォルト値を使用します"
-              echo "final_status=unknown" >> "$GITHUB_OUTPUT"
-              echo "error_reduction=0" >> "$GITHUB_OUTPUT"
-              echo "critical_errors=999" >> "$GITHUB_OUTPUT"
-              echo "result=failed" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-
             FINAL_STATUS=$(jq -r '.final_status // "unknown"' repair_summary.json)
             ERROR_REDUCTION=$(jq -r '.error_reduction_rate // 0' repair_summary.json)
             CRITICAL_ERRORS=$(jq -r '.critical_errors // 999' repair_summary.json)
 
-            echo "final_status=$FINAL_STATUS" >> "$GITHUB_OUTPUT"
-            echo "error_reduction=$ERROR_REDUCTION" >> "$GITHUB_OUTPUT"
-            echo "critical_errors=$CRITICAL_ERRORS" >> "$GITHUB_OUTPUT"
+            echo "final_status=$FINAL_STATUS" >> $GITHUB_OUTPUT
+            echo "error_reduction=$ERROR_REDUCTION" >> $GITHUB_OUTPUT
+            echo "critical_errors=$CRITICAL_ERRORS" >> $GITHUB_OUTPUT
 
             # 成功判定ロジック
             if [ "$FINAL_STATUS" = "success" ] || [ "$FINAL_STATUS" = "partial_success" ]; then
-              echo "result=success" >> "$GITHUB_OUTPUT"
+              echo "result=success" >> $GITHUB_OUTPUT
             elif [ "$FINAL_STATUS" = "improved" ] && [ "$CRITICAL_ERRORS" -eq 0 ]; then
-              echo "result=success" >> "$GITHUB_OUTPUT"
+              echo "result=success" >> $GITHUB_OUTPUT
             elif [ "$FINAL_STATUS" = "attempted" ]; then
-              echo "result=partial" >> "$GITHUB_OUTPUT"
+              echo "result=partial" >> $GITHUB_OUTPUT
             else
-              echo "result=failed" >> "$GITHUB_OUTPUT"
+              echo "result=failed" >> $GITHUB_OUTPUT
             fi
           else
-            echo "final_status=error" >> "$GITHUB_OUTPUT"
-            echo "result=failed" >> "$GITHUB_OUTPUT"
+            echo "final_status=error" >> $GITHUB_OUTPUT
+            echo "result=failed" >> $GITHUB_OUTPUT
           fi
 
       - name: 修復結果サマリー作成
         if: always()
         run: |
-          echo "## 🔧 自動修復ループ実行結果 v2" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## 🔧 自動修復ループ実行結果 v2" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ -f repair_summary.json ]; then
-            # jqがインストールされているか確認
-            if ! command -v jq &> /dev/null; then
-              echo "⚠️ jqがインストールされていません" >> "$GITHUB_STEP_SUMMARY"
-              cat repair_summary.json >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
-
             # JSON から情報を抽出
             FINAL_STATUS=$(jq -r '.final_status // "unknown"' repair_summary.json)
             TOTAL_LOOPS=$(jq -r '.total_loops // 0' repair_summary.json)
-            MAX_LOOPS_VAL=$(jq -r '.max_loops // 0' repair_summary.json)
+            MAX_LOOPS=$(jq -r '.max_loops // 0' repair_summary.json)
             SUCCESS_COUNT=$(jq -r '.successful_repairs // 0' repair_summary.json)
             FAILED_COUNT=$(jq -r '.failed_repairs // 0' repair_summary.json)
             ERROR_REDUCTION=$(jq -r '.error_reduction_rate // 0' repair_summary.json)
@@ -240,23 +144,23 @@ jobs:
                 ;;
             esac
 
-            echo "### $BADGE" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "| 項目 | 値 |" >> "$GITHUB_STEP_SUMMARY"
-            echo "|------|-----|" >> "$GITHUB_STEP_SUMMARY"
-            echo "| ループ数 | $TOTAL_LOOPS / $MAX_LOOPS_VAL |" >> "$GITHUB_STEP_SUMMARY"
-            echo "| 成功した修復 | $SUCCESS_COUNT |" >> "$GITHUB_STEP_SUMMARY"
-            echo "| 失敗した修復 | $FAILED_COUNT |" >> "$GITHUB_STEP_SUMMARY"
-            echo "| エラー削減率 | ${ERROR_REDUCTION}% |" >> "$GITHUB_STEP_SUMMARY"
-            echo "| クリティカルエラー | $CRITICAL_ERRORS |" >> "$GITHUB_STEP_SUMMARY"
-            echo "| 警告レベルエラー | $WARNING_ERRORS |" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### $BADGE" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| 項目 | 値 |" >> $GITHUB_STEP_SUMMARY
+            echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+            echo "| ループ数 | $TOTAL_LOOPS / $MAX_LOOPS |" >> $GITHUB_STEP_SUMMARY
+            echo "| 成功した修復 | $SUCCESS_COUNT |" >> $GITHUB_STEP_SUMMARY
+            echo "| 失敗した修復 | $FAILED_COUNT |" >> $GITHUB_STEP_SUMMARY
+            echo "| エラー削減率 | ${ERROR_REDUCTION}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| クリティカルエラー | $CRITICAL_ERRORS |" >> $GITHUB_STEP_SUMMARY
+            echo "| 警告レベルエラー | $WARNING_ERRORS |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
 
             # 推奨アクション
-            echo "### 📝 推奨アクション" >> "$GITHUB_STEP_SUMMARY"
-            jq -r '.recommendations[]? | "- \(.)"' repair_summary.json >> "$GITHUB_STEP_SUMMARY" || echo "- 情報なし" >> "$GITHUB_STEP_SUMMARY"
+            echo "### 📝 推奨アクション" >> $GITHUB_STEP_SUMMARY
+            jq -r '.recommendations[] | "- \(.)"' repair_summary.json >> $GITHUB_STEP_SUMMARY
           else
-            echo "⚠️ 修復サマリーが生成されませんでした" >> "$GITHUB_STEP_SUMMARY"
+            echo "⚠️ 修復サマリーが生成されませんでした" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: 修復ログをアーティファクトとして保存
@@ -268,7 +172,6 @@ jobs:
             repair_summary.json
             logs/auto_repair_*.log
           retention-days: 30
-          if-no-files-found: warn
 
       - name: 失敗時にIssue作成（クリティカルエラーのみ）
         if: steps.check-status.outputs.result == 'failed' && steps.check-status.outputs.critical_errors != '0'
@@ -307,10 +210,10 @@ jobs:
             - **警告**: ${data.warning_errors || 0}
 
             ### 検出されたエラー
-            ${data.detected_errors?.filter(e => e.severity === 'high').map(e => \`- **\${e.type}**: \${e.message}\`).join('\\n') || 'なし'}
+            ${data.detected_errors?.filter(e => e.severity === 'high').map(e => `- **${e.type}**: ${e.message}`).join('\n') || 'なし'}
 
             ### 推奨アクション
-            ${data.recommendations?.map(r => \`- \${r}\`).join('\\n') || '手動での確認が必要です'}
+            ${data.recommendations?.map(r => `- ${r}`).join('\n') || '手動での確認が必要です'}
 
             ---
             🤖 この Issue は自動生成されました（v2: 段階的成功判定）
@@ -333,7 +236,7 @@ jobs:
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: \`🚨 自動修復失敗 - \${new Date().toISOString().split('T')[0]}\`,
+                title: `🚨 自動修復失敗 - ${new Date().toISOString().split('T')[0]}`,
                 body: summary,
                 labels: ['auto-repair', 'bug', '要確認', 'critical']
               });
@@ -352,17 +255,17 @@ jobs:
             try {
               if (fs.existsSync('repair_summary.json')) {
                 const data = JSON.parse(fs.readFileSync('repair_summary.json', 'utf8'));
-                comment = \`
+                comment = `
             ## ✅ 自動修復完了 v2
 
-            **最終ステータス**: \${data.final_status}
-            **実行ループ数**: \${data.total_loops || 0} / \${data.max_loops}
-            **成功した修復**: \${data.successful_repairs || 0}
-            **エラー削減率**: \${(data.error_reduction_rate || 0).toFixed(1)}%
-            **残存エラー**: クリティカル=\${data.critical_errors || 0}, 警告=\${data.warning_errors || 0}
+            **最終ステータス**: ${data.final_status}
+            **実行ループ数**: ${data.total_loops || 0} / ${data.max_loops}
+            **成功した修復**: ${data.successful_repairs || 0}
+            **エラー削減率**: ${(data.error_reduction_rate || 0).toFixed(1)}%
+            **残存エラー**: クリティカル=${data.critical_errors || 0}, 警告=${data.warning_errors || 0}
 
             すべてのクリティカルエラーが修復されました 🎉
-            \`;
+            `;
               }
             } catch (error) {
               console.error('サマリー読み込みエラー:', error);
