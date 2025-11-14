@@ -65,11 +65,22 @@ jobs:
           retry_wait_seconds: 10
           command: |
             pip install --upgrade pip
+
+            # 基本的な依存関係を必ずインストール
+            pip install requests PyYAML python-dotenv flask sqlalchemy
+
+            # requirements.txtがある場合は追加でインストール
             if [ -f requirements.txt ]; then
+              echo "✓ requirements.txt found"
               pip install -r requirements.txt
+            else
+              echo "⚠ requirements.txt not found, using basic dependencies"
             fi
+
+            # requirements-dev.txtがある場合はインストール（オプション）
             if [ -f requirements-dev.txt ]; then
-              pip install -r requirements-dev.txt
+              echo "✓ requirements-dev.txt found"
+              pip install -r requirements-dev.txt || true
             fi
 
       - name: エラー検知・修復ループ実行

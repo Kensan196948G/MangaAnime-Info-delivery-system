@@ -55,11 +55,22 @@ jobs:
         timeout-minutes: 5
         run: |
           pip install --upgrade pip
+
+          # 基本的な依存関係をインストール
+          pip install requests PyYAML python-dotenv
+
+          # requirements.txtがある場合は追加でインストール
           if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
+            echo "✓ requirements.txt found, installing..."
+            pip install -r requirements.txt || echo "⚠ requirements.txt installation failed, continuing with basic dependencies"
+          else
+            echo "⚠ requirements.txt not found, using basic dependencies only"
           fi
+
+          # requirements-dev.txtがある場合はインストール
           if [ -f requirements-dev.txt ]; then
-            pip install -r requirements-dev.txt
+            echo "✓ requirements-dev.txt found, installing..."
+            pip install -r requirements-dev.txt || echo "⚠ requirements-dev.txt installation skipped"
           fi
 
       - name: エラー検知・修復ループ実行
