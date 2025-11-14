@@ -48,23 +48,45 @@ jobs:
       - name: ファイル構造確認とrequirements準備
         run: |
           echo "📂 Current directory: $(pwd)"
+          echo "📂 Git branch: $(git branch --show-current)"
           echo "📂 List root files:"
           ls -la
 
-          # requirements.txtが見つからない場合、data/からコピー
-          if [ ! -f requirements.txt ] && [ -f data/requirements.txt ]; then
-            echo "✓ Copying requirements.txt from data/"
-            cp data/requirements.txt requirements.txt
+          # requirements.txtが見つからない場合、複数のフォールバック
+          if [ ! -f requirements.txt ]; then
+            if [ -f data/requirements.txt ]; then
+              echo "✓ Copying requirements.txt from data/"
+              cp data/requirements.txt requirements.txt
+            else
+              echo "⚠️ Generating minimal requirements.txt"
+              cat > requirements.txt << 'EOL'
+requests>=2.31.0
+PyYAML>=6.0.1
+python-dotenv>=1.0.0
+flask>=3.0.0
+sqlalchemy>=2.0.0
+EOL
+            fi
           fi
 
-          if [ ! -f requirements-dev.txt ] && [ -f data/requirements-dev.txt ]; then
-            echo "✓ Copying requirements-dev.txt from data/"
-            cp data/requirements-dev.txt requirements-dev.txt
+          if [ ! -f requirements-dev.txt ]; then
+            if [ -f data/requirements-dev.txt ]; then
+              echo "✓ Copying requirements-dev.txt from data/"
+              cp data/requirements-dev.txt requirements-dev.txt
+            else
+              echo "⚠️ Generating minimal requirements-dev.txt"
+              cat > requirements-dev.txt << 'EOL'
+pytest>=7.4.0
+flake8>=6.1.0
+EOL
+            fi
           fi
 
           # 最終確認
           echo "📂 Final check:"
-          ls -la requirements*.txt 2>&1 || echo "⚠️ Still no requirements files"
+          ls -la requirements*.txt
+          echo "📂 requirements.txt content:"
+          head -5 requirements.txt
 
       - name: Python環境セットアップ
         uses: actions/setup-python@v5
