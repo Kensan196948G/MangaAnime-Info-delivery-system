@@ -222,8 +222,8 @@ gh issue edit 123 --add-label "auto-repair"
 
 ## 📚 関連ドキュメント
 
-- [DevOps改善レポート](DEVOPS_IMPROVEMENTS.md) - 詳細な改善内容
-- [システム仕様書](../CLAUDE.md) - 全体仕様
+- [DevOps改善レポート](./DEVOPS_IMPROVEMENTS.md) - 詳細な改善内容
+- [システム仕様書](../../CLAUDE.md) - 全体仕様
 - [CI/CD設定](../.github/workflows/) - Workflow設定
 
 ---

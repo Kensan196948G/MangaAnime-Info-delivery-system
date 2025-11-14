@@ -307,10 +307,10 @@ python scripts/issue_manager.py --close-old 0
 
 ## 📚 関連ドキュメント
 
-- [自動修復システム詳細](AUTO_ERROR_REPAIR_SYSTEM.md)
-- [DevOps改善内容](docs/DEVOPS_IMPROVEMENTS.md)
-- [クイックスタート](docs/DEVOPS_QUICKSTART.md)
-- [最終レポート](FINAL_REPORT.md)
+- [自動修復システム詳細](../operations/AUTO_ERROR_REPAIR_SYSTEM.md)
+- [DevOps改善内容](../operations/DEVOPS_IMPROVEMENTS.md)
+- [クイックスタート](../operations/DEVOPS_QUICKSTART.md)
+- [最終レポート](../reports/FINAL_REPORT.md)
 
 ---
 

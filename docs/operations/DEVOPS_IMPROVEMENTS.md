@@ -447,7 +447,7 @@ gh secret set SLACK_WEBHOOK_URL
 
 ### 関連ドキュメント
 
-- [CLAUDE.md](../CLAUDE.md) - システム仕様書
+- [CLAUDE.md](../../CLAUDE.md) - システム仕様書
 - [CI/CD設定](.github/workflows/) - Workflow設定
 - [テスト仕様](tests/) - テストコード
 

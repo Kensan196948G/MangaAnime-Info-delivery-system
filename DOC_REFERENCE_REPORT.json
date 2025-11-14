@@ -1,0 +1,4644 @@
+{
+  "summary": {
+    "total_md_files": 251,
+    "total_references": 370,
+    "broken_links": 209,
+    "integrity": "43.5%"
+  },
+  "broken_links": [
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 28,
+      "link": "/coordination/init.md",
+      "text": "直接参照: /coordination/init.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /coordination/init.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 28,
+      "link": "coordinator-swarm-init.md",
+      "text": "直接参照: coordinator-swarm-init.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: coordinator-swarm-init.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 29,
+      "link": "/coordination/spawn.md",
+      "text": "直接参照: /coordination/spawn.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /coordination/spawn.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 29,
+      "link": "coordinator-agent-spawn.md",
+      "text": "直接参照: coordinator-agent-spawn.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: coordinator-agent-spawn.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 30,
+      "link": "/coordination/orchestrate.md",
+      "text": "直接参照: /coordination/orchestrate.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /coordination/orchestrate.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 30,
+      "link": "orchestrator-task.md",
+      "text": "直接参照: orchestrator-task.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: orchestrator-task.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 36,
+      "link": "/github/pr-manager.md",
+      "text": "直接参照: /github/pr-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /github/pr-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 36,
+      "link": "github-pr-manager.md",
+      "text": "直接参照: github-pr-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: github-pr-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 37,
+      "link": "/github/code-review-swarm.md",
+      "text": "直接参照: /github/code-review-swarm.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /github/code-review-swarm.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 37,
+      "link": "github-code-reviewer.md",
+      "text": "直接参照: github-code-reviewer.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: github-code-reviewer.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 38,
+      "link": "/github/release-manager.md",
+      "text": "直接参照: /github/release-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /github/release-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 38,
+      "link": "github-release-manager.md",
+      "text": "直接参照: github-release-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: github-release-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 39,
+      "link": "/github/issue-tracker.md",
+      "text": "直接参照: /github/issue-tracker.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /github/issue-tracker.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 39,
+      "link": "github-issue-tracker.md",
+      "text": "直接参照: github-issue-tracker.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: github-issue-tracker.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 45,
+      "link": "/sparc/orchestrator.md",
+      "text": "直接参照: /sparc/orchestrator.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/orchestrator.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 45,
+      "link": "sparc-coordinator.md",
+      "text": "直接参照: sparc-coordinator.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: sparc-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 46,
+      "link": "/sparc/coder.md",
+      "text": "直接参照: /sparc/coder.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/coder.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 46,
+      "link": "implementer-sparc-coder.md",
+      "text": "直接参照: implementer-sparc-coder.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: implementer-sparc-coder.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 47,
+      "link": "/sparc/tester.md",
+      "text": "直接参照: /sparc/tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/tester.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 47,
+      "link": "qa-sparc-tester.md",
+      "text": "直接参照: qa-sparc-tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: qa-sparc-tester.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 48,
+      "link": "/sparc/designer.md",
+      "text": "直接参照: /sparc/designer.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/designer.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 48,
+      "link": "architect-sparc-designer.md",
+      "text": "直接参照: architect-sparc-designer.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: architect-sparc-designer.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 49,
+      "link": "/sparc/documenter.md",
+      "text": "直接参照: /sparc/documenter.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/documenter.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 49,
+      "link": "docs-sparc-documenter.md",
+      "text": "直接参照: docs-sparc-documenter.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs-sparc-documenter.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 55,
+      "link": "/analysis/performance-bottlenecks.md",
+      "text": "直接参照: /analysis/performance-bottlenecks.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /analysis/performance-bottlenecks.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 55,
+      "link": "performance-analyzer.md",
+      "text": "直接参照: performance-analyzer.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: performance-analyzer.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 56,
+      "link": "/analysis/token-efficiency.md",
+      "text": "直接参照: /analysis/token-efficiency.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /analysis/token-efficiency.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 56,
+      "link": "analyst-token-efficiency.md",
+      "text": "直接参照: analyst-token-efficiency.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: analyst-token-efficiency.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 57,
+      "link": "/analysis/COMMAND_COMPLIANCE_REPORT.md",
+      "text": "直接参照: /analysis/COMMAND_COMPLIANCE_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /analysis/COMMAND_COMPLIANCE_REPORT.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 57,
+      "link": "analyst-compliance-checker.md",
+      "text": "直接参照: analyst-compliance-checker.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: analyst-compliance-checker.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 63,
+      "link": "/memory/usage.md",
+      "text": "直接参照: /memory/usage.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /memory/usage.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 63,
+      "link": "memory-coordinator.md",
+      "text": "直接参照: memory-coordinator.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: memory-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 64,
+      "link": "/memory/neural.md",
+      "text": "直接参照: /memory/neural.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /memory/neural.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 64,
+      "link": "ai-neural-patterns.md",
+      "text": "直接参照: ai-neural-patterns.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ai-neural-patterns.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 70,
+      "link": "/automation/smart-agents.md",
+      "text": "直接参照: /automation/smart-agents.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /automation/smart-agents.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 70,
+      "link": "automation-smart-agent.md",
+      "text": "直接参照: automation-smart-agent.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: automation-smart-agent.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 71,
+      "link": "/automation/self-healing.md",
+      "text": "直接参照: /automation/self-healing.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /automation/self-healing.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 71,
+      "link": "reliability-self-healing.md",
+      "text": "直接参照: reliability-self-healing.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: reliability-self-healing.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 72,
+      "link": "/automation/session-memory.md",
+      "text": "直接参照: /automation/session-memory.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /automation/session-memory.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 72,
+      "link": "memory-session-manager.md",
+      "text": "直接参照: memory-session-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: memory-session-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 78,
+      "link": "/optimization/parallel-execution.md",
+      "text": "直接参照: /optimization/parallel-execution.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /optimization/parallel-execution.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 78,
+      "link": "optimizer-parallel-exec.md",
+      "text": "直接参照: optimizer-parallel-exec.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: optimizer-parallel-exec.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 79,
+      "link": "/optimization/auto-topology.md",
+      "text": "直接参照: /optimization/auto-topology.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /optimization/auto-topology.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 79,
+      "link": "optimizer-topology.md",
+      "text": "直接参照: optimizer-topology.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: optimizer-topology.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-CTO.md",
+      "line": 15,
+      "link": "docs/architecture.md",
+      "text": "直接参照: docs/architecture.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/architecture.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-CTO.md",
+      "line": 16,
+      "link": "docs/technology_decision.md",
+      "text": "直接参照: docs/technology_decision.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/technology_decision.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-CTO.md",
+      "line": 17,
+      "link": "docs/security_guidelines.md",
+      "text": "直接参照: docs/security_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/security_guidelines.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-DevUI.md",
+      "line": 23,
+      "link": "docs/ui_design.md",
+      "text": "直接参照: docs/ui_design.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/ui_design.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 15,
+      "link": "docs/security_audit.md",
+      "text": "直接参照: docs/security_audit.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/security_audit.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 16,
+      "link": "docs/qa_checklist.md",
+      "text": "直接参照: docs/qa_checklist.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/qa_checklist.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 17,
+      "link": "docs/test_cases.md",
+      "text": "直接参照: docs/test_cases.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/test_cases.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 18,
+      "link": "docs/performance_report.md",
+      "text": "直接参照: docs/performance_report.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/performance_report.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 19,
+      "link": "docs/final_qa_report.md",
+      "text": "直接参照: docs/final_qa_report.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/final_qa_report.md"
+    },
+    {
+      "source": ".claude\\Agents\\README.md",
+      "line": 12,
+      "link": "agent-types.md",
+      "text": "直接参照: agent-types.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: agent-types.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\release-swarm.md",
+      "line": 186,
+      "link": "CHANGELOG.md",
+      "text": "直接参照: CHANGELOG.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: CHANGELOG.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 312,
+      "link": "sparc-modes.md",
+      "text": "直接参照: sparc-modes.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: sparc-modes.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 313,
+      "link": "coder.md",
+      "text": "直接参照: coder.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: coder.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 314,
+      "link": "tester.md",
+      "text": "直接参照: tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: tester.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 316,
+      "link": "coordination.md",
+      "text": "直接参照: coordination.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: coordination.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 317,
+      "link": "orchestration.md",
+      "text": "直接参照: orchestration.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: orchestration.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 319,
+      "link": "issue.md",
+      "text": "直接参照: issue.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: issue.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 320,
+      "link": "pr.md",
+      "text": "直接参照: pr.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: pr.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 321,
+      "link": "project.md",
+      "text": "直接参照: project.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: project.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\swarm-pr.md",
+      "line": 197,
+      "link": ".github/pull_request_template.md",
+      "text": "直接参照: .github/pull_request_template.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .github/pull_request_template.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\sync-coordinator.md",
+      "line": 97,
+      "link": "repo/contents/ruv-swarm/docs/CLAUDE.md",
+      "text": "直接参照: repo/contents/ruv-swarm/docs/CLAUDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: repo/contents/ruv-swarm/docs/CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\sync-coordinator.md",
+      "line": 104,
+      "link": "repo/contents/claude-code-flow/claude-code-flow/CLAUDE.md",
+      "text": "直接参照: repo/contents/claude-code-flow/claude-code-flow/CLAUDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: repo/contents/claude-code-flow/claude-code-flow/CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 62,
+      "link": ".claude/commands/coordination/init.md",
+      "text": "直接参照: .claude/commands/coordination/init.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/coordination/init.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 94,
+      "link": ".claude/commands/coordination/spawn.md",
+      "text": "直接参照: .claude/commands/coordination/spawn.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/coordination/spawn.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 126,
+      "link": ".claude/commands/coordination/orchestrate.md",
+      "text": "直接参照: .claude/commands/coordination/orchestrate.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/coordination/orchestrate.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 164,
+      "link": ".claude/commands/github/pr-manager.md",
+      "text": "直接参照: .claude/commands/github/pr-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/github/pr-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 200,
+      "link": ".claude/commands/github/code-review-swarm.md",
+      "text": "直接参照: .claude/commands/github/code-review-swarm.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/github/code-review-swarm.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 236,
+      "link": ".claude/commands/github/release-manager.md",
+      "text": "直接参照: .claude/commands/github/release-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/github/release-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 273,
+      "link": ".claude/commands/sparc/orchestrator.md",
+      "text": "直接参照: .claude/commands/sparc/orchestrator.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/sparc/orchestrator.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 310,
+      "link": ".claude/commands/sparc/coder.md",
+      "text": "直接参照: .claude/commands/sparc/coder.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/sparc/coder.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 345,
+      "link": ".claude/commands/sparc/tester.md",
+      "text": "直接参照: .claude/commands/sparc/tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/sparc/tester.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 382,
+      "link": ".claude/commands/analysis/performance-bottlenecks.md",
+      "text": "直接参照: .claude/commands/analysis/performance-bottlenecks.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/analysis/performance-bottlenecks.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 418,
+      "link": ".claude/commands/analysis/token-efficiency.md",
+      "text": "直接参照: .claude/commands/analysis/token-efficiency.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/analysis/token-efficiency.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 455,
+      "link": ".claude/commands/memory/usage.md",
+      "text": "直接参照: .claude/commands/memory/usage.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/memory/usage.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 490,
+      "link": ".claude/commands/memory/neural.md",
+      "text": "直接参照: .claude/commands/memory/neural.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/memory/neural.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 527,
+      "link": ".claude/commands/automation/smart-agents.md",
+      "text": "直接参照: .claude/commands/automation/smart-agents.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/automation/smart-agents.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 562,
+      "link": ".claude/commands/automation/self-healing.md",
+      "text": "直接参照: .claude/commands/automation/self-healing.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/automation/self-healing.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 598,
+      "link": ".claude/commands/optimization/parallel-execution.md",
+      "text": "直接参照: .claude/commands/optimization/parallel-execution.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/optimization/parallel-execution.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 632,
+      "link": ".claude/commands/optimization/auto-topology.md",
+      "text": "直接参照: .claude/commands/optimization/auto-topology.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/optimization/auto-topology.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 669,
+      "link": ".claude/commands/monitoring/status.md",
+      "text": "直接参照: .claude/commands/monitoring/status.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/monitoring/status.md"
+    },
+    {
+      "source": ".claude\\commands\\README.md",
+      "line": 100,
+      "link": "test.md",
+      "text": "直接参照: test.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: test.md"
+    },
+    {
+      "source": ".claude\\commands\\README.md",
+      "line": 105,
+      "link": ".claude/commands/test.md",
+      "text": "直接参照: .claude/commands/test.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/test.md"
+    },
+    {
+      "source": ".claude\\commands\\claude-flow-swarm.md",
+      "line": 205,
+      "link": "//github.com/ruvnet/claude-code-flow/docs/swarm-system.md",
+      "text": "直接参照: //github.com/ruvnet/claude-code-flow/docs/swarm-system.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: //github.com/ruvnet/claude-code-flow/docs/swarm-system.md"
+    },
+    {
+      "source": ".claude\\commands\\sparc\\spec-pseudocode.md",
+      "line": 12,
+      "link": "phase_number_name.md",
+      "text": "直接参照: phase_number_name.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: phase_number_name.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 203,
+      "link": "MangaAnime-CTO.md",
+      "text": "直接参照: MangaAnime-CTO.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: MangaAnime-CTO.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 205,
+      "link": "MangaAnime-DevAPI.md",
+      "text": "直接参照: MangaAnime-DevAPI.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: MangaAnime-DevAPI.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 206,
+      "link": "MangaAnime-QA.md",
+      "text": "直接参照: MangaAnime-QA.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: MangaAnime-QA.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 207,
+      "link": "MangaAnime-Tester.md",
+      "text": "直接参照: MangaAnime-Tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: MangaAnime-Tester.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 209,
+      "link": "system_spec.md",
+      "text": "直接参照: system_spec.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: system_spec.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 104,
+      "link": "docs/システム概要.md",
+      "text": "📄 システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/システム概要.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 105,
+      "link": "docs/利用手順書.md",
+      "text": "📄 利用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/利用手順書.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 106,
+      "link": "docs/運用手順書.md",
+      "text": "📄 運用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/運用手順書.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 109,
+      "link": "docs/技術仕様書.md",
+      "text": "📄 技術仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/技術仕様書.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 110,
+      "link": "docs/システム構成図.md",
+      "text": "📄 システム構成図",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/システム構成図.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 111,
+      "link": "docs/トラブルシューティングガイド.md",
+      "text": "📄 トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/トラブルシューティングガイド.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 276,
+      "link": "docs/トラブルシューティングガイド.md",
+      "text": "📄 トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/トラブルシューティングガイド.md"
+    },
+    {
+      "source": "docs\\operations\\AUTO_SYSTEM_GUIDE.md",
+      "line": 380,
+      "link": "ERROR_NOTIFICATION_GUIDE.md",
+      "text": "直接参照: ERROR_NOTIFICATION_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ERROR_NOTIFICATION_GUIDE.md"
+    },
+    {
+      "source": "docs\\operations\\DEVOPS_IMPROVEMENTS.md",
+      "line": 450,
+      "link": "../CLAUDE.md",
+      "text": "CLAUDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ../CLAUDE.md"
+    },
+    {
+      "source": "docs\\operations\\DEVOPS_QUICKSTART.md",
+      "line": 226,
+      "link": "../CLAUDE.md",
+      "text": "システム仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ../CLAUDE.md"
+    },
+    {
+      "source": "docs\\operations\\GITHUB_NOTIFICATION_DISABLE_GUIDE.md",
+      "line": 263,
+      "link": "ERROR_NOTIFICATION_GUIDE.md",
+      "text": "直接参照: ERROR_NOTIFICATION_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ERROR_NOTIFICATION_GUIDE.md"
+    },
+    {
+      "source": "docs\\operations\\運用マニュアル.md",
+      "line": 610,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "docs\\operations\\運用マニュアル.md",
+      "line": 611,
+      "link": "./設定ガイド.md",
+      "text": "設定ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./設定ガイド.md"
+    },
+    {
+      "source": "docs\\operations\\運用マニュアル.md",
+      "line": 612,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "docs\\reports\\DEVELOPMENT_SUMMARY.md",
+      "line": 121,
+      "link": "DEPLOYMENT_GUIDE.md",
+      "text": "直接参照: DEPLOYMENT_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: DEPLOYMENT_GUIDE.md"
+    },
+    {
+      "source": "docs\\reports\\DEVOPS_SUMMARY.md",
+      "line": 222,
+      "link": "docs/DEVOPS_IMPROVEMENTS.md",
+      "text": "直接参照: docs/DEVOPS_IMPROVEMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\DEVOPS_SUMMARY.md",
+      "line": 227,
+      "link": "docs/DEVOPS_QUICKSTART.md",
+      "text": "直接参照: docs/DEVOPS_QUICKSTART.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\reports\\E2E_TEST_IMPLEMENTATION_REPORT.md",
+      "line": 248,
+      "link": "./tests/e2e/README.md",
+      "text": "E2Eテスト実行ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./tests/e2e/README.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 46,
+      "link": "docs/TEST_FIX_REPORT.md",
+      "text": "直接参照: docs/TEST_FIX_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/TEST_FIX_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 86,
+      "link": "docs/DEVOPS_IMPROVEMENTS.md",
+      "text": "直接参照: docs/DEVOPS_IMPROVEMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 87,
+      "link": "docs/DEVOPS_QUICKSTART.md",
+      "text": "直接参照: docs/DEVOPS_QUICKSTART.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 181,
+      "link": "QUICK_START_GUIDE.md",
+      "text": "直接参照: QUICK_START_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: QUICK_START_GUIDE.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 182,
+      "link": "GIT_SETUP_GUIDE.md",
+      "text": "直接参照: GIT_SETUP_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: GIT_SETUP_GUIDE.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 183,
+      "link": "INSTALL_GITHUB_CLI.md",
+      "text": "直接参照: INSTALL_GITHUB_CLI.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: INSTALL_GITHUB_CLI.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 184,
+      "link": "docs/AUTO_ERROR_REPAIR_SYSTEM.md",
+      "text": "直接参照: docs/AUTO_ERROR_REPAIR_SYSTEM.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/AUTO_ERROR_REPAIR_SYSTEM.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 185,
+      "link": "docs/TEST_FIX_REPORT.md",
+      "text": "直接参照: docs/TEST_FIX_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/TEST_FIX_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 186,
+      "link": "docs/DEVOPS_IMPROVEMENTS.md",
+      "text": "直接参照: docs/DEVOPS_IMPROVEMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 187,
+      "link": "docs/DEVOPS_QUICKSTART.md",
+      "text": "直接参照: docs/DEVOPS_QUICKSTART.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 45,
+      "link": "AGENT_TASK_ASSIGNMENTS.md",
+      "text": "直接参照: AGENT_TASK_ASSIGNMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: AGENT_TASK_ASSIGNMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 50,
+      "link": "TECHNICAL_PRIORITIES_ROADMAP.md",
+      "text": "直接参照: TECHNICAL_PRIORITIES_ROADMAP.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: TECHNICAL_PRIORITIES_ROADMAP.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 83,
+      "link": "docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "text": "直接参照: docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/UI_UX_IMPROVEMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 135,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 136,
+      "link": "BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "text": "直接参照: BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: BACKEND_ENHANCEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 278,
+      "link": "AGENT_TASK_ASSIGNMENTS.md",
+      "text": "直接参照: AGENT_TASK_ASSIGNMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: AGENT_TASK_ASSIGNMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 279,
+      "link": "TECHNICAL_PRIORITIES_ROADMAP.md",
+      "text": "直接参照: TECHNICAL_PRIORITIES_ROADMAP.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: TECHNICAL_PRIORITIES_ROADMAP.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 280,
+      "link": "docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "text": "直接参照: docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/UI_UX_IMPROVEMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 281,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 282,
+      "link": "BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "text": "直接参照: BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: BACKEND_ENHANCEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 441,
+      "link": "docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "text": "直接参照: docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/UI_UX_IMPROVEMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 442,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\cto_architecture_summary.md",
+      "line": 120,
+      "link": "/docs/architectural_guidelines.md",
+      "text": "直接参照: /docs/architectural_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /docs/architectural_guidelines.md"
+    },
+    {
+      "source": "docs\\reports\\cto_architecture_summary.md",
+      "line": 121,
+      "link": "/docs/cto_architecture_summary.md",
+      "text": "直接参照: /docs/cto_architecture_summary.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /docs/cto_architecture_summary.md"
+    },
+    {
+      "source": "docs\\reports\\database_optimization_report.md",
+      "line": 201,
+      "link": "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/backup_strategy.md",
+      "text": "直接参照: /mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/backup_strategy.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/backup_strategy.md"
+    },
+    {
+      "source": "docs\\setup\\DEPLOYMENT_GUIDE.md",
+      "line": 248,
+      "link": "./docs/FAQ.md",
+      "text": "FAQ",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./docs/FAQ.md"
+    },
+    {
+      "source": "docs\\setup\\PRODUCTION_CONFIG.md",
+      "line": 310,
+      "link": "AUTO_ERROR_REPAIR_SYSTEM.md",
+      "text": "自動修復システム詳細",
+      "valid": false,
+      "message": "ファイルが見つかりません: AUTO_ERROR_REPAIR_SYSTEM.md"
+    },
+    {
+      "source": "docs\\setup\\PRODUCTION_CONFIG.md",
+      "line": 311,
+      "link": "docs/DEVOPS_IMPROVEMENTS.md",
+      "text": "DevOps改善内容",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\setup\\PRODUCTION_CONFIG.md",
+      "line": 312,
+      "link": "docs/DEVOPS_QUICKSTART.md",
+      "text": "クイックスタート",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\setup\\PRODUCTION_CONFIG.md",
+      "line": 313,
+      "link": "FINAL_REPORT.md",
+      "text": "最終レポート",
+      "valid": false,
+      "message": "ファイルが見つかりません: FINAL_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 226,
+      "link": "INTEGRATION_REPORT.md",
+      "text": "直接参照: INTEGRATION_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: INTEGRATION_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 227,
+      "link": "CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "text": "直接参照: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 228,
+      "link": "docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "text": "直接参照: docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/UI_UX_IMPROVEMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 229,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 230,
+      "link": "CODE_REVIEW_REPORT.md",
+      "text": "直接参照: CODE_REVIEW_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: CODE_REVIEW_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 231,
+      "link": "SECURITY_AUDIT_REPORT.md",
+      "text": "直接参照: SECURITY_AUDIT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: SECURITY_AUDIT_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 232,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 252,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\設定ガイド.md",
+      "line": 399,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "docs\\setup\\設定ガイド.md",
+      "line": 400,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "docs\\setup\\設定ガイド.md",
+      "line": 401,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "docs\\technical\\AGENT_TASK_ASSIGNMENTS.md",
+      "line": 1134,
+      "link": "CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "text": "直接参照: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 30,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 216,
+      "link": "BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 426,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\technical\\メール配信システム概要.md",
+      "line": 176,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "docs\\technical\\メール配信システム概要.md",
+      "line": 178,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 13,
+      "link": "./メール配信システム概要.md",
+      "text": "メール配信システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./メール配信システム概要.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 14,
+      "link": "./設定ガイド.md",
+      "text": "設定ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./設定ガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 15,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 16,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 17,
+      "link": "./運用手順書.md",
+      "text": "運用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用手順書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 20,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 21,
+      "link": "./技術仕様書.md",
+      "text": "技術仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./技術仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 22,
+      "link": "./architecture.md",
+      "text": "architecture.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architecture.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 23,
+      "link": "./システム構成図.md",
+      "text": "システム構成図",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./システム構成図.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 24,
+      "link": "./architectural_guidelines.md",
+      "text": "architectural_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architectural_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 27,
+      "link": "./UI_ARCHITECTURE.md",
+      "text": "UI_ARCHITECTURE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./UI_ARCHITECTURE.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 28,
+      "link": "./ui_design_analysis.md",
+      "text": "ui_design_analysis.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./ui_design_analysis.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 29,
+      "link": "./frontend_enhancement_plan.md",
+      "text": "frontend_enhancement_plan.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./frontend_enhancement_plan.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 30,
+      "link": "./WEB_UI_README.md",
+      "text": "WEB_UI_README.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./WEB_UI_README.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 33,
+      "link": "./SECURITY_CONFIGURATION.md",
+      "text": "SECURITY_CONFIGURATION.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./SECURITY_CONFIGURATION.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 34,
+      "link": "./security_guidelines.md",
+      "text": "security_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./security_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 37,
+      "link": "./qa_processes.md",
+      "text": "qa_processes.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./qa_processes.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 38,
+      "link": "./トラブルシューティングガイド.md",
+      "text": "トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティングガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 48,
+      "link": "./メール配信システム概要.md",
+      "text": "メール配信システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./メール配信システム概要.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 49,
+      "link": "./システム概要.md",
+      "text": "システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./システム概要.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 50,
+      "link": "./architecture.md",
+      "text": "architecture.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architecture.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 51,
+      "link": "./技術仕様書.md",
+      "text": "技術仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./技術仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 52,
+      "link": "./システム構成図.md",
+      "text": "システム構成図",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./システム構成図.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 53,
+      "link": "./cto_architecture_summary.md",
+      "text": "cto_architecture_summary.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./cto_architecture_summary.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 54,
+      "link": "./architectural_guidelines.md",
+      "text": "architectural_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architectural_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 60,
+      "link": "./設定ガイド.md",
+      "text": "設定ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./設定ガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 61,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 62,
+      "link": "./運用手順書.md",
+      "text": "運用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用手順書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 63,
+      "link": "./利用手順書.md",
+      "text": "利用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./利用手順書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 64,
+      "link": "./development_schedule.md",
+      "text": "development_schedule.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./development_schedule.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 70,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 71,
+      "link": "./トラブルシューティングガイド.md",
+      "text": "トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティングガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 77,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 83,
+      "link": "./UI_ARCHITECTURE.md",
+      "text": "UI_ARCHITECTURE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./UI_ARCHITECTURE.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 84,
+      "link": "./ui_design_analysis.md",
+      "text": "ui_design_analysis.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./ui_design_analysis.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 85,
+      "link": "./frontend_enhancement_plan.md",
+      "text": "frontend_enhancement_plan.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./frontend_enhancement_plan.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 86,
+      "link": "./WEB_UI_README.md",
+      "text": "WEB_UI_README.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./WEB_UI_README.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 92,
+      "link": "./SECURITY_CONFIGURATION.md",
+      "text": "SECURITY_CONFIGURATION.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./SECURITY_CONFIGURATION.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 93,
+      "link": "./security_guidelines.md",
+      "text": "security_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./security_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 99,
+      "link": "./qa_processes.md",
+      "text": "qa_processes.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./qa_processes.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 108,
+      "link": "./メール配信システム概要.md",
+      "text": "メール配信システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./メール配信システム概要.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 111,
+      "link": "./設定ガイド.md",
+      "text": "設定ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./設定ガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 114,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 117,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 122,
+      "link": "./architecture.md",
+      "text": "architecture.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architecture.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 123,
+      "link": "./技術仕様書.md",
+      "text": "技術仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./技術仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 126,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 129,
+      "link": "./architectural_guidelines.md",
+      "text": "architectural_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architectural_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 134,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 135,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 177,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    }
+  ],
+  "all_references": [
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 28,
+      "link": "/coordination/init.md",
+      "text": "直接参照: /coordination/init.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /coordination/init.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 28,
+      "link": "coordinator-swarm-init.md",
+      "text": "直接参照: coordinator-swarm-init.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: coordinator-swarm-init.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 29,
+      "link": "/coordination/spawn.md",
+      "text": "直接参照: /coordination/spawn.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /coordination/spawn.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 29,
+      "link": "coordinator-agent-spawn.md",
+      "text": "直接参照: coordinator-agent-spawn.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: coordinator-agent-spawn.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 30,
+      "link": "/coordination/orchestrate.md",
+      "text": "直接参照: /coordination/orchestrate.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /coordination/orchestrate.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 30,
+      "link": "orchestrator-task.md",
+      "text": "直接参照: orchestrator-task.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: orchestrator-task.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 36,
+      "link": "/github/pr-manager.md",
+      "text": "直接参照: /github/pr-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /github/pr-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 36,
+      "link": "github-pr-manager.md",
+      "text": "直接参照: github-pr-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: github-pr-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 37,
+      "link": "/github/code-review-swarm.md",
+      "text": "直接参照: /github/code-review-swarm.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /github/code-review-swarm.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 37,
+      "link": "github-code-reviewer.md",
+      "text": "直接参照: github-code-reviewer.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: github-code-reviewer.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 38,
+      "link": "/github/release-manager.md",
+      "text": "直接参照: /github/release-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /github/release-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 38,
+      "link": "github-release-manager.md",
+      "text": "直接参照: github-release-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: github-release-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 39,
+      "link": "/github/issue-tracker.md",
+      "text": "直接参照: /github/issue-tracker.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /github/issue-tracker.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 39,
+      "link": "github-issue-tracker.md",
+      "text": "直接参照: github-issue-tracker.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: github-issue-tracker.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 45,
+      "link": "/sparc/orchestrator.md",
+      "text": "直接参照: /sparc/orchestrator.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/orchestrator.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 45,
+      "link": "sparc-coordinator.md",
+      "text": "直接参照: sparc-coordinator.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: sparc-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 46,
+      "link": "/sparc/coder.md",
+      "text": "直接参照: /sparc/coder.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/coder.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 46,
+      "link": "implementer-sparc-coder.md",
+      "text": "直接参照: implementer-sparc-coder.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: implementer-sparc-coder.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 47,
+      "link": "/sparc/tester.md",
+      "text": "直接参照: /sparc/tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/tester.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 47,
+      "link": "qa-sparc-tester.md",
+      "text": "直接参照: qa-sparc-tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: qa-sparc-tester.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 48,
+      "link": "/sparc/designer.md",
+      "text": "直接参照: /sparc/designer.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/designer.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 48,
+      "link": "architect-sparc-designer.md",
+      "text": "直接参照: architect-sparc-designer.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: architect-sparc-designer.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 49,
+      "link": "/sparc/documenter.md",
+      "text": "直接参照: /sparc/documenter.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /sparc/documenter.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 49,
+      "link": "docs-sparc-documenter.md",
+      "text": "直接参照: docs-sparc-documenter.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs-sparc-documenter.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 55,
+      "link": "/analysis/performance-bottlenecks.md",
+      "text": "直接参照: /analysis/performance-bottlenecks.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /analysis/performance-bottlenecks.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 55,
+      "link": "performance-analyzer.md",
+      "text": "直接参照: performance-analyzer.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: performance-analyzer.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 56,
+      "link": "/analysis/token-efficiency.md",
+      "text": "直接参照: /analysis/token-efficiency.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /analysis/token-efficiency.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 56,
+      "link": "analyst-token-efficiency.md",
+      "text": "直接参照: analyst-token-efficiency.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: analyst-token-efficiency.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 57,
+      "link": "/analysis/COMMAND_COMPLIANCE_REPORT.md",
+      "text": "直接参照: /analysis/COMMAND_COMPLIANCE_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /analysis/COMMAND_COMPLIANCE_REPORT.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 57,
+      "link": "analyst-compliance-checker.md",
+      "text": "直接参照: analyst-compliance-checker.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: analyst-compliance-checker.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 63,
+      "link": "/memory/usage.md",
+      "text": "直接参照: /memory/usage.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /memory/usage.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 63,
+      "link": "memory-coordinator.md",
+      "text": "直接参照: memory-coordinator.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: memory-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 64,
+      "link": "/memory/neural.md",
+      "text": "直接参照: /memory/neural.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /memory/neural.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 64,
+      "link": "ai-neural-patterns.md",
+      "text": "直接参照: ai-neural-patterns.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ai-neural-patterns.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 70,
+      "link": "/automation/smart-agents.md",
+      "text": "直接参照: /automation/smart-agents.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /automation/smart-agents.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 70,
+      "link": "automation-smart-agent.md",
+      "text": "直接参照: automation-smart-agent.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: automation-smart-agent.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 71,
+      "link": "/automation/self-healing.md",
+      "text": "直接参照: /automation/self-healing.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /automation/self-healing.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 71,
+      "link": "reliability-self-healing.md",
+      "text": "直接参照: reliability-self-healing.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: reliability-self-healing.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 72,
+      "link": "/automation/session-memory.md",
+      "text": "直接参照: /automation/session-memory.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /automation/session-memory.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 72,
+      "link": "memory-session-manager.md",
+      "text": "直接参照: memory-session-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: memory-session-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 78,
+      "link": "/optimization/parallel-execution.md",
+      "text": "直接参照: /optimization/parallel-execution.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /optimization/parallel-execution.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 78,
+      "link": "optimizer-parallel-exec.md",
+      "text": "直接参照: optimizer-parallel-exec.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: optimizer-parallel-exec.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 79,
+      "link": "/optimization/auto-topology.md",
+      "text": "直接参照: /optimization/auto-topology.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /optimization/auto-topology.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 79,
+      "link": "optimizer-topology.md",
+      "text": "直接参照: optimizer-topology.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: optimizer-topology.md"
+    },
+    {
+      "source": ".claude\\Agents\\MIGRATION_SUMMARY.md",
+      "line": 210,
+      "link": ".claude/agents/README.md",
+      "text": "直接参照: .claude/agents/README.md",
+      "valid": true,
+      "message": ".claude\\Agents\\README.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-CTO.md",
+      "line": 15,
+      "link": "docs/architecture.md",
+      "text": "直接参照: docs/architecture.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/architecture.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-CTO.md",
+      "line": 16,
+      "link": "docs/technology_decision.md",
+      "text": "直接参照: docs/technology_decision.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/technology_decision.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-CTO.md",
+      "line": 17,
+      "link": "docs/security_guidelines.md",
+      "text": "直接参照: docs/security_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/security_guidelines.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-DevUI.md",
+      "line": 23,
+      "link": "docs/ui_design.md",
+      "text": "直接参照: docs/ui_design.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/ui_design.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 15,
+      "link": "docs/security_audit.md",
+      "text": "直接参照: docs/security_audit.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/security_audit.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 16,
+      "link": "docs/qa_checklist.md",
+      "text": "直接参照: docs/qa_checklist.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/qa_checklist.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 17,
+      "link": "docs/test_cases.md",
+      "text": "直接参照: docs/test_cases.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/test_cases.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 18,
+      "link": "docs/performance_report.md",
+      "text": "直接参照: docs/performance_report.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/performance_report.md"
+    },
+    {
+      "source": ".claude\\Agents\\MangaAnime-QA.md",
+      "line": 19,
+      "link": "docs/final_qa_report.md",
+      "text": "直接参照: docs/final_qa_report.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/final_qa_report.md"
+    },
+    {
+      "source": ".claude\\Agents\\README.md",
+      "line": 9,
+      "link": "README.md",
+      "text": "直接参照: README.md",
+      "valid": true,
+      "message": ".claude\\Agents\\README.md"
+    },
+    {
+      "source": ".claude\\Agents\\README.md",
+      "line": 12,
+      "link": "agent-types.md",
+      "text": "直接参照: agent-types.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: agent-types.md"
+    },
+    {
+      "source": ".claude\\Agents\\base-template-generator.md",
+      "line": 11,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\consensus\\README.md",
+      "line": 11,
+      "link": "byzantine-coordinator.md",
+      "text": "直接参照: byzantine-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\consensus\\byzantine-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\consensus\\README.md",
+      "line": 20,
+      "link": "raft-manager.md",
+      "text": "直接参照: raft-manager.md",
+      "valid": true,
+      "message": ".claude\\Agents\\consensus\\raft-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\consensus\\README.md",
+      "line": 29,
+      "link": "gossip-coordinator.md",
+      "text": "直接参照: gossip-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\consensus\\gossip-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\consensus\\README.md",
+      "line": 40,
+      "link": "security-manager.md",
+      "text": "直接参照: security-manager.md",
+      "valid": true,
+      "message": ".claude\\Agents\\consensus\\security-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\consensus\\README.md",
+      "line": 51,
+      "link": "crdt-synchronizer.md",
+      "text": "直接参照: crdt-synchronizer.md",
+      "valid": true,
+      "message": ".claude\\Agents\\consensus\\crdt-synchronizer.md"
+    },
+    {
+      "source": ".claude\\Agents\\consensus\\README.md",
+      "line": 62,
+      "link": "performance-benchmarker.md",
+      "text": "直接参照: performance-benchmarker.md",
+      "valid": true,
+      "message": ".claude\\Agents\\consensus\\performance-benchmarker.md"
+    },
+    {
+      "source": ".claude\\Agents\\consensus\\README.md",
+      "line": 71,
+      "link": "quorum-manager.md",
+      "text": "直接参照: quorum-manager.md",
+      "valid": true,
+      "message": ".claude\\Agents\\consensus\\quorum-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\code-review-swarm.md",
+      "line": 538,
+      "link": "./swarm-pr.md",
+      "text": "swarm-pr.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\swarm-pr.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\code-review-swarm.md",
+      "line": 538,
+      "link": "./workflow-automation.md",
+      "text": "workflow-automation.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\workflow-automation.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\multi-repo-swarm.md",
+      "line": 553,
+      "link": "./swarm-pr.md",
+      "text": "swarm-pr.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\swarm-pr.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\multi-repo-swarm.md",
+      "line": 553,
+      "link": "./project-board-sync.md",
+      "text": "project-board-sync.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\project-board-sync.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\project-board-sync.md",
+      "line": 509,
+      "link": "./swarm-issue.md",
+      "text": "swarm-issue.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\swarm-issue.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\project-board-sync.md",
+      "line": 509,
+      "link": "./multi-repo-swarm.md",
+      "text": "multi-repo-swarm.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\multi-repo-swarm.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\release-manager.md",
+      "line": 153,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\release-swarm.md",
+      "line": 186,
+      "link": "CHANGELOG.md",
+      "text": "直接参照: CHANGELOG.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: CHANGELOG.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\release-swarm.md",
+      "line": 583,
+      "link": "./workflow-automation.md",
+      "text": "workflow-automation.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\workflow-automation.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\release-swarm.md",
+      "line": 583,
+      "link": "./multi-repo-swarm.md",
+      "text": "multi-repo-swarm.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\multi-repo-swarm.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 127,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 159,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 307,
+      "link": "github-modes.md",
+      "text": "直接参照: github-modes.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\github-modes.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 308,
+      "link": "pr-manager.md",
+      "text": "直接参照: pr-manager.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\pr-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 309,
+      "link": "issue-tracker.md",
+      "text": "直接参照: issue-tracker.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\issue-tracker.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 310,
+      "link": "sync-coordinator.md",
+      "text": "直接参照: sync-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\sync-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 312,
+      "link": "sparc-modes.md",
+      "text": "直接参照: sparc-modes.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: sparc-modes.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 313,
+      "link": "coder.md",
+      "text": "直接参照: coder.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: coder.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 314,
+      "link": "tester.md",
+      "text": "直接参照: tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: tester.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 316,
+      "link": "coordination.md",
+      "text": "直接参照: coordination.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: coordination.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 317,
+      "link": "orchestration.md",
+      "text": "直接参照: orchestration.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: orchestration.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 319,
+      "link": "issue.md",
+      "text": "直接参照: issue.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: issue.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 320,
+      "link": "pr.md",
+      "text": "直接参照: pr.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: pr.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\repo-architect.md",
+      "line": 321,
+      "link": "project.md",
+      "text": "直接参照: project.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: project.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\swarm-issue.md",
+      "line": 573,
+      "link": "./swarm-pr.md",
+      "text": "swarm-pr.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\swarm-pr.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\swarm-issue.md",
+      "line": 573,
+      "link": "./sync-coordinator.md",
+      "text": "sync-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\sync-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\swarm-issue.md",
+      "line": 573,
+      "link": "./workflow-automation.md",
+      "text": "workflow-automation.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\workflow-automation.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\swarm-pr.md",
+      "line": 197,
+      "link": ".github/pull_request_template.md",
+      "text": "直接参照: .github/pull_request_template.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .github/pull_request_template.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\swarm-pr.md",
+      "line": 428,
+      "link": "./swarm-issue.md",
+      "text": "swarm-issue.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\swarm-issue.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\swarm-pr.md",
+      "line": 428,
+      "link": "./sync-coordinator.md",
+      "text": "sync-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\sync-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\swarm-pr.md",
+      "line": 428,
+      "link": "./workflow-automation.md",
+      "text": "workflow-automation.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\workflow-automation.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\sync-coordinator.md",
+      "line": 95,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\sync-coordinator.md",
+      "line": 97,
+      "link": "repo/contents/ruv-swarm/docs/CLAUDE.md",
+      "text": "直接参照: repo/contents/ruv-swarm/docs/CLAUDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: repo/contents/ruv-swarm/docs/CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\sync-coordinator.md",
+      "line": 99,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\sync-coordinator.md",
+      "line": 104,
+      "link": "repo/contents/claude-code-flow/claude-code-flow/CLAUDE.md",
+      "text": "直接参照: repo/contents/claude-code-flow/claude-code-flow/CLAUDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: repo/contents/claude-code-flow/claude-code-flow/CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\sync-coordinator.md",
+      "line": 106,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\sync-coordinator.md",
+      "line": 160,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\workflow-automation.md",
+      "line": 635,
+      "link": "./swarm-pr.md",
+      "text": "swarm-pr.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\swarm-pr.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\workflow-automation.md",
+      "line": 635,
+      "link": "./swarm-issue.md",
+      "text": "swarm-issue.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\swarm-issue.md"
+    },
+    {
+      "source": ".claude\\Agents\\github\\workflow-automation.md",
+      "line": 635,
+      "link": "./sync-coordinator.md",
+      "text": "sync-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\github\\sync-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\optimization\\README.md",
+      "line": 7,
+      "link": "load-balancer.md",
+      "text": "直接参照: load-balancer.md",
+      "valid": true,
+      "message": ".claude\\Agents\\optimization\\load-balancer.md"
+    },
+    {
+      "source": ".claude\\Agents\\optimization\\README.md",
+      "line": 16,
+      "link": "performance-monitor.md",
+      "text": "直接参照: performance-monitor.md",
+      "valid": true,
+      "message": ".claude\\Agents\\optimization\\performance-monitor.md"
+    },
+    {
+      "source": ".claude\\Agents\\optimization\\README.md",
+      "line": 25,
+      "link": "topology-optimizer.md",
+      "text": "直接参照: topology-optimizer.md",
+      "valid": true,
+      "message": ".claude\\Agents\\optimization\\topology-optimizer.md"
+    },
+    {
+      "source": ".claude\\Agents\\optimization\\README.md",
+      "line": 34,
+      "link": "resource-allocator.md",
+      "text": "直接参照: resource-allocator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\optimization\\resource-allocator.md"
+    },
+    {
+      "source": ".claude\\Agents\\optimization\\README.md",
+      "line": 43,
+      "link": "benchmark-suite.md",
+      "text": "直接参照: benchmark-suite.md",
+      "valid": true,
+      "message": ".claude\\Agents\\optimization\\benchmark-suite.md"
+    },
+    {
+      "source": ".claude\\Agents\\swarm\\README.md",
+      "line": 7,
+      "link": "hierarchical-coordinator.md",
+      "text": "直接参照: hierarchical-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\swarm\\hierarchical-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\swarm\\README.md",
+      "line": 13,
+      "link": "mesh-coordinator.md",
+      "text": "直接参照: mesh-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\swarm\\mesh-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\swarm\\README.md",
+      "line": 19,
+      "link": "adaptive-coordinator.md",
+      "text": "直接参照: adaptive-coordinator.md",
+      "valid": true,
+      "message": ".claude\\Agents\\swarm\\adaptive-coordinator.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 62,
+      "link": ".claude/commands/coordination/init.md",
+      "text": "直接参照: .claude/commands/coordination/init.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/coordination/init.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 94,
+      "link": ".claude/commands/coordination/spawn.md",
+      "text": "直接参照: .claude/commands/coordination/spawn.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/coordination/spawn.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 126,
+      "link": ".claude/commands/coordination/orchestrate.md",
+      "text": "直接参照: .claude/commands/coordination/orchestrate.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/coordination/orchestrate.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 164,
+      "link": ".claude/commands/github/pr-manager.md",
+      "text": "直接参照: .claude/commands/github/pr-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/github/pr-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 200,
+      "link": ".claude/commands/github/code-review-swarm.md",
+      "text": "直接参照: .claude/commands/github/code-review-swarm.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/github/code-review-swarm.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 236,
+      "link": ".claude/commands/github/release-manager.md",
+      "text": "直接参照: .claude/commands/github/release-manager.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/github/release-manager.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 273,
+      "link": ".claude/commands/sparc/orchestrator.md",
+      "text": "直接参照: .claude/commands/sparc/orchestrator.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/sparc/orchestrator.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 310,
+      "link": ".claude/commands/sparc/coder.md",
+      "text": "直接参照: .claude/commands/sparc/coder.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/sparc/coder.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 345,
+      "link": ".claude/commands/sparc/tester.md",
+      "text": "直接参照: .claude/commands/sparc/tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/sparc/tester.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 382,
+      "link": ".claude/commands/analysis/performance-bottlenecks.md",
+      "text": "直接参照: .claude/commands/analysis/performance-bottlenecks.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/analysis/performance-bottlenecks.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 418,
+      "link": ".claude/commands/analysis/token-efficiency.md",
+      "text": "直接参照: .claude/commands/analysis/token-efficiency.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/analysis/token-efficiency.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 455,
+      "link": ".claude/commands/memory/usage.md",
+      "text": "直接参照: .claude/commands/memory/usage.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/memory/usage.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 490,
+      "link": ".claude/commands/memory/neural.md",
+      "text": "直接参照: .claude/commands/memory/neural.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/memory/neural.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 527,
+      "link": ".claude/commands/automation/smart-agents.md",
+      "text": "直接参照: .claude/commands/automation/smart-agents.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/automation/smart-agents.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 562,
+      "link": ".claude/commands/automation/self-healing.md",
+      "text": "直接参照: .claude/commands/automation/self-healing.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/automation/self-healing.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 598,
+      "link": ".claude/commands/optimization/parallel-execution.md",
+      "text": "直接参照: .claude/commands/optimization/parallel-execution.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/optimization/parallel-execution.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 632,
+      "link": ".claude/commands/optimization/auto-topology.md",
+      "text": "直接参照: .claude/commands/optimization/auto-topology.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/optimization/auto-topology.md"
+    },
+    {
+      "source": ".claude\\Agents\\templates\\migration-plan.md",
+      "line": 669,
+      "link": ".claude/commands/monitoring/status.md",
+      "text": "直接参照: .claude/commands/monitoring/status.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/monitoring/status.md"
+    },
+    {
+      "source": ".claude\\CLAUDE.md",
+      "line": 1,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": ".claude\\CLAUDE.md"
+    },
+    {
+      "source": ".claude\\CLAUDE.md",
+      "line": 28,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": ".claude\\CLAUDE.md"
+    },
+    {
+      "source": ".claude\\commands\\README.md",
+      "line": 100,
+      "link": "test.md",
+      "text": "直接参照: test.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: test.md"
+    },
+    {
+      "source": ".claude\\commands\\README.md",
+      "line": 105,
+      "link": ".claude/commands/test.md",
+      "text": "直接参照: .claude/commands/test.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: .claude/commands/test.md"
+    },
+    {
+      "source": ".claude\\commands\\agents\\README.md",
+      "line": 7,
+      "link": "./agent-types.md",
+      "text": "agent-types",
+      "valid": true,
+      "message": ".claude\\commands\\agents\\agent-types.md"
+    },
+    {
+      "source": ".claude\\commands\\agents\\README.md",
+      "line": 8,
+      "link": "./agent-capabilities.md",
+      "text": "agent-capabilities",
+      "valid": true,
+      "message": ".claude\\commands\\agents\\agent-capabilities.md"
+    },
+    {
+      "source": ".claude\\commands\\agents\\README.md",
+      "line": 9,
+      "link": "./agent-coordination.md",
+      "text": "agent-coordination",
+      "valid": true,
+      "message": ".claude\\commands\\agents\\agent-coordination.md"
+    },
+    {
+      "source": ".claude\\commands\\agents\\README.md",
+      "line": 10,
+      "link": "./agent-spawning.md",
+      "text": "agent-spawning",
+      "valid": true,
+      "message": ".claude\\commands\\agents\\agent-spawning.md"
+    },
+    {
+      "source": ".claude\\commands\\analysis\\README.md",
+      "line": 7,
+      "link": "./bottleneck-detect.md",
+      "text": "bottleneck-detect",
+      "valid": true,
+      "message": ".claude\\commands\\analysis\\bottleneck-detect.md"
+    },
+    {
+      "source": ".claude\\commands\\analysis\\README.md",
+      "line": 8,
+      "link": "./token-usage.md",
+      "text": "token-usage",
+      "valid": true,
+      "message": ".claude\\commands\\analysis\\token-usage.md"
+    },
+    {
+      "source": ".claude\\commands\\analysis\\README.md",
+      "line": 9,
+      "link": "./performance-report.md",
+      "text": "performance-report",
+      "valid": true,
+      "message": ".claude\\commands\\analysis\\performance-report.md"
+    },
+    {
+      "source": ".claude\\commands\\automation\\README.md",
+      "line": 7,
+      "link": "./auto-agent.md",
+      "text": "auto-agent",
+      "valid": true,
+      "message": ".claude\\commands\\automation\\auto-agent.md"
+    },
+    {
+      "source": ".claude\\commands\\automation\\README.md",
+      "line": 8,
+      "link": "./smart-spawn.md",
+      "text": "smart-spawn",
+      "valid": true,
+      "message": ".claude\\commands\\automation\\smart-spawn.md"
+    },
+    {
+      "source": ".claude\\commands\\automation\\README.md",
+      "line": 9,
+      "link": "./workflow-select.md",
+      "text": "workflow-select",
+      "valid": true,
+      "message": ".claude\\commands\\automation\\workflow-select.md"
+    },
+    {
+      "source": ".claude\\commands\\claude-flow-swarm.md",
+      "line": 205,
+      "link": "//github.com/ruvnet/claude-code-flow/docs/swarm-system.md",
+      "text": "直接参照: //github.com/ruvnet/claude-code-flow/docs/swarm-system.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: //github.com/ruvnet/claude-code-flow/docs/swarm-system.md"
+    },
+    {
+      "source": ".claude\\commands\\coordination\\README.md",
+      "line": 7,
+      "link": "./swarm-init.md",
+      "text": "swarm-init",
+      "valid": true,
+      "message": ".claude\\commands\\coordination\\swarm-init.md"
+    },
+    {
+      "source": ".claude\\commands\\coordination\\README.md",
+      "line": 8,
+      "link": "./agent-spawn.md",
+      "text": "agent-spawn",
+      "valid": true,
+      "message": ".claude\\commands\\coordination\\agent-spawn.md"
+    },
+    {
+      "source": ".claude\\commands\\coordination\\README.md",
+      "line": 9,
+      "link": "./task-orchestrate.md",
+      "text": "task-orchestrate",
+      "valid": true,
+      "message": ".claude\\commands\\coordination\\task-orchestrate.md"
+    },
+    {
+      "source": ".claude\\commands\\github\\README.md",
+      "line": 7,
+      "link": "./github-swarm.md",
+      "text": "github-swarm",
+      "valid": true,
+      "message": ".claude\\commands\\github\\github-swarm.md"
+    },
+    {
+      "source": ".claude\\commands\\github\\README.md",
+      "line": 8,
+      "link": "./repo-analyze.md",
+      "text": "repo-analyze",
+      "valid": true,
+      "message": ".claude\\commands\\github\\repo-analyze.md"
+    },
+    {
+      "source": ".claude\\commands\\github\\README.md",
+      "line": 9,
+      "link": "./pr-enhance.md",
+      "text": "pr-enhance",
+      "valid": true,
+      "message": ".claude\\commands\\github\\pr-enhance.md"
+    },
+    {
+      "source": ".claude\\commands\\github\\README.md",
+      "line": 10,
+      "link": "./issue-triage.md",
+      "text": "issue-triage",
+      "valid": true,
+      "message": ".claude\\commands\\github\\issue-triage.md"
+    },
+    {
+      "source": ".claude\\commands\\github\\README.md",
+      "line": 11,
+      "link": "./code-review.md",
+      "text": "code-review",
+      "valid": true,
+      "message": ".claude\\commands\\github\\code-review.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 7,
+      "link": "./hive-mind.md",
+      "text": "hive-mind",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 8,
+      "link": "./hive-mind-init.md",
+      "text": "hive-mind-init",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-init.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 9,
+      "link": "./hive-mind-spawn.md",
+      "text": "hive-mind-spawn",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-spawn.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 10,
+      "link": "./hive-mind-status.md",
+      "text": "hive-mind-status",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-status.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 11,
+      "link": "./hive-mind-resume.md",
+      "text": "hive-mind-resume",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-resume.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 12,
+      "link": "./hive-mind-stop.md",
+      "text": "hive-mind-stop",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-stop.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 13,
+      "link": "./hive-mind-sessions.md",
+      "text": "hive-mind-sessions",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-sessions.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 14,
+      "link": "./hive-mind-consensus.md",
+      "text": "hive-mind-consensus",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-consensus.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 15,
+      "link": "./hive-mind-memory.md",
+      "text": "hive-mind-memory",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-memory.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 16,
+      "link": "./hive-mind-metrics.md",
+      "text": "hive-mind-metrics",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-metrics.md"
+    },
+    {
+      "source": ".claude\\commands\\hive-mind\\README.md",
+      "line": 17,
+      "link": "./hive-mind-wizard.md",
+      "text": "hive-mind-wizard",
+      "valid": true,
+      "message": ".claude\\commands\\hive-mind\\hive-mind-wizard.md"
+    },
+    {
+      "source": ".claude\\commands\\hooks\\README.md",
+      "line": 7,
+      "link": "./pre-task.md",
+      "text": "pre-task",
+      "valid": true,
+      "message": ".claude\\commands\\hooks\\pre-task.md"
+    },
+    {
+      "source": ".claude\\commands\\hooks\\README.md",
+      "line": 8,
+      "link": "./post-task.md",
+      "text": "post-task",
+      "valid": true,
+      "message": ".claude\\commands\\hooks\\post-task.md"
+    },
+    {
+      "source": ".claude\\commands\\hooks\\README.md",
+      "line": 9,
+      "link": "./pre-edit.md",
+      "text": "pre-edit",
+      "valid": true,
+      "message": ".claude\\commands\\hooks\\pre-edit.md"
+    },
+    {
+      "source": ".claude\\commands\\hooks\\README.md",
+      "line": 10,
+      "link": "./post-edit.md",
+      "text": "post-edit",
+      "valid": true,
+      "message": ".claude\\commands\\hooks\\post-edit.md"
+    },
+    {
+      "source": ".claude\\commands\\hooks\\README.md",
+      "line": 11,
+      "link": "./session-end.md",
+      "text": "session-end",
+      "valid": true,
+      "message": ".claude\\commands\\hooks\\session-end.md"
+    },
+    {
+      "source": ".claude\\commands\\memory\\README.md",
+      "line": 7,
+      "link": "./memory-usage.md",
+      "text": "memory-usage",
+      "valid": true,
+      "message": ".claude\\commands\\memory\\memory-usage.md"
+    },
+    {
+      "source": ".claude\\commands\\memory\\README.md",
+      "line": 8,
+      "link": "./memory-persist.md",
+      "text": "memory-persist",
+      "valid": true,
+      "message": ".claude\\commands\\memory\\memory-persist.md"
+    },
+    {
+      "source": ".claude\\commands\\memory\\README.md",
+      "line": 9,
+      "link": "./memory-search.md",
+      "text": "memory-search",
+      "valid": true,
+      "message": ".claude\\commands\\memory\\memory-search.md"
+    },
+    {
+      "source": ".claude\\commands\\monitoring\\README.md",
+      "line": 7,
+      "link": "./swarm-monitor.md",
+      "text": "swarm-monitor",
+      "valid": true,
+      "message": ".claude\\commands\\monitoring\\swarm-monitor.md"
+    },
+    {
+      "source": ".claude\\commands\\monitoring\\README.md",
+      "line": 8,
+      "link": "./agent-metrics.md",
+      "text": "agent-metrics",
+      "valid": true,
+      "message": ".claude\\commands\\monitoring\\agent-metrics.md"
+    },
+    {
+      "source": ".claude\\commands\\monitoring\\README.md",
+      "line": 9,
+      "link": "./real-time-view.md",
+      "text": "real-time-view",
+      "valid": true,
+      "message": ".claude\\commands\\monitoring\\real-time-view.md"
+    },
+    {
+      "source": ".claude\\commands\\optimization\\README.md",
+      "line": 7,
+      "link": "./topology-optimize.md",
+      "text": "topology-optimize",
+      "valid": true,
+      "message": ".claude\\commands\\optimization\\topology-optimize.md"
+    },
+    {
+      "source": ".claude\\commands\\optimization\\README.md",
+      "line": 8,
+      "link": "./parallel-execute.md",
+      "text": "parallel-execute",
+      "valid": true,
+      "message": ".claude\\commands\\optimization\\parallel-execute.md"
+    },
+    {
+      "source": ".claude\\commands\\optimization\\README.md",
+      "line": 9,
+      "link": "./cache-manage.md",
+      "text": "cache-manage",
+      "valid": true,
+      "message": ".claude\\commands\\optimization\\cache-manage.md"
+    },
+    {
+      "source": ".claude\\commands\\sparc\\spec-pseudocode.md",
+      "line": 12,
+      "link": "phase_number_name.md",
+      "text": "直接参照: phase_number_name.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: phase_number_name.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 7,
+      "link": "./swarm.md",
+      "text": "swarm",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 8,
+      "link": "./swarm-init.md",
+      "text": "swarm-init",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm-init.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 9,
+      "link": "./swarm-spawn.md",
+      "text": "swarm-spawn",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm-spawn.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 10,
+      "link": "./swarm-status.md",
+      "text": "swarm-status",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm-status.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 11,
+      "link": "./swarm-monitor.md",
+      "text": "swarm-monitor",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm-monitor.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 12,
+      "link": "./swarm-strategies.md",
+      "text": "swarm-strategies",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm-strategies.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 13,
+      "link": "./swarm-modes.md",
+      "text": "swarm-modes",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm-modes.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 14,
+      "link": "./swarm-background.md",
+      "text": "swarm-background",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm-background.md"
+    },
+    {
+      "source": ".claude\\commands\\swarm\\README.md",
+      "line": 15,
+      "link": "./swarm-analysis.md",
+      "text": "swarm-analysis",
+      "valid": true,
+      "message": ".claude\\commands\\swarm\\swarm-analysis.md"
+    },
+    {
+      "source": ".claude\\commands\\training\\README.md",
+      "line": 7,
+      "link": "./neural-train.md",
+      "text": "neural-train",
+      "valid": true,
+      "message": ".claude\\commands\\training\\neural-train.md"
+    },
+    {
+      "source": ".claude\\commands\\training\\README.md",
+      "line": 8,
+      "link": "./pattern-learn.md",
+      "text": "pattern-learn",
+      "valid": true,
+      "message": ".claude\\commands\\training\\pattern-learn.md"
+    },
+    {
+      "source": ".claude\\commands\\training\\README.md",
+      "line": 9,
+      "link": "./model-update.md",
+      "text": "model-update",
+      "valid": true,
+      "message": ".claude\\commands\\training\\model-update.md"
+    },
+    {
+      "source": ".claude\\commands\\workflows\\README.md",
+      "line": 7,
+      "link": "./workflow-create.md",
+      "text": "workflow-create",
+      "valid": true,
+      "message": ".claude\\commands\\workflows\\workflow-create.md"
+    },
+    {
+      "source": ".claude\\commands\\workflows\\README.md",
+      "line": 8,
+      "link": "./workflow-execute.md",
+      "text": "workflow-execute",
+      "valid": true,
+      "message": ".claude\\commands\\workflows\\workflow-execute.md"
+    },
+    {
+      "source": ".claude\\commands\\workflows\\README.md",
+      "line": 9,
+      "link": "./workflow-export.md",
+      "text": "workflow-export",
+      "valid": true,
+      "message": ".claude\\commands\\workflows\\workflow-export.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 1,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 203,
+      "link": "MangaAnime-CTO.md",
+      "text": "直接参照: MangaAnime-CTO.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: MangaAnime-CTO.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 205,
+      "link": "MangaAnime-DevAPI.md",
+      "text": "直接参照: MangaAnime-DevAPI.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: MangaAnime-DevAPI.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 206,
+      "link": "MangaAnime-QA.md",
+      "text": "直接参照: MangaAnime-QA.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: MangaAnime-QA.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 207,
+      "link": "MangaAnime-Tester.md",
+      "text": "直接参照: MangaAnime-Tester.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: MangaAnime-Tester.md"
+    },
+    {
+      "source": "CLAUDE.md",
+      "line": 209,
+      "link": "system_spec.md",
+      "text": "直接参照: system_spec.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: system_spec.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 104,
+      "link": "docs/システム概要.md",
+      "text": "📄 システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/システム概要.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 105,
+      "link": "docs/利用手順書.md",
+      "text": "📄 利用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/利用手順書.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 106,
+      "link": "docs/運用手順書.md",
+      "text": "📄 運用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/運用手順書.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 109,
+      "link": "docs/技術仕様書.md",
+      "text": "📄 技術仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/技術仕様書.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 110,
+      "link": "docs/システム構成図.md",
+      "text": "📄 システム構成図",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/システム構成図.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 111,
+      "link": "docs/トラブルシューティングガイド.md",
+      "text": "📄 トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/トラブルシューティングガイド.md"
+    },
+    {
+      "source": "README日本語版.md",
+      "line": 276,
+      "link": "docs/トラブルシューティングガイド.md",
+      "text": "📄 トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/トラブルシューティングガイド.md"
+    },
+    {
+      "source": "docs\\operations\\AUTO_SYSTEM_GUIDE.md",
+      "line": 378,
+      "link": "GITHUB_ACTIONS_GUIDE.md",
+      "text": "直接参照: GITHUB_ACTIONS_GUIDE.md",
+      "valid": true,
+      "message": "docs\\operations\\GITHUB_ACTIONS_GUIDE.md"
+    },
+    {
+      "source": "docs\\operations\\AUTO_SYSTEM_GUIDE.md",
+      "line": 379,
+      "link": "GITHUB_SECRETS_SETUP.md",
+      "text": "直接参照: GITHUB_SECRETS_SETUP.md",
+      "valid": true,
+      "message": "docs\\operations\\GITHUB_SECRETS_SETUP.md"
+    },
+    {
+      "source": "docs\\operations\\AUTO_SYSTEM_GUIDE.md",
+      "line": 380,
+      "link": "ERROR_NOTIFICATION_GUIDE.md",
+      "text": "直接参照: ERROR_NOTIFICATION_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ERROR_NOTIFICATION_GUIDE.md"
+    },
+    {
+      "source": "docs\\operations\\DEVOPS_IMPROVEMENTS.md",
+      "line": 450,
+      "link": "../CLAUDE.md",
+      "text": "CLAUDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ../CLAUDE.md"
+    },
+    {
+      "source": "docs\\operations\\DEVOPS_QUICKSTART.md",
+      "line": 225,
+      "link": "DEVOPS_IMPROVEMENTS.md",
+      "text": "DevOps改善レポート",
+      "valid": true,
+      "message": "docs\\operations\\DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\operations\\DEVOPS_QUICKSTART.md",
+      "line": 226,
+      "link": "../CLAUDE.md",
+      "text": "システム仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ../CLAUDE.md"
+    },
+    {
+      "source": "docs\\operations\\GITHUB_NOTIFICATION_DISABLE_GUIDE.md",
+      "line": 261,
+      "link": "AUTO_SYSTEM_GUIDE.md",
+      "text": "直接参照: AUTO_SYSTEM_GUIDE.md",
+      "valid": true,
+      "message": "docs\\operations\\AUTO_SYSTEM_GUIDE.md"
+    },
+    {
+      "source": "docs\\operations\\GITHUB_NOTIFICATION_DISABLE_GUIDE.md",
+      "line": 262,
+      "link": "GITHUB_SECRETS_SETUP.md",
+      "text": "直接参照: GITHUB_SECRETS_SETUP.md",
+      "valid": true,
+      "message": "docs\\operations\\GITHUB_SECRETS_SETUP.md"
+    },
+    {
+      "source": "docs\\operations\\GITHUB_NOTIFICATION_DISABLE_GUIDE.md",
+      "line": 263,
+      "link": "ERROR_NOTIFICATION_GUIDE.md",
+      "text": "直接参照: ERROR_NOTIFICATION_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ERROR_NOTIFICATION_GUIDE.md"
+    },
+    {
+      "source": "docs\\operations\\運用マニュアル.md",
+      "line": 610,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "docs\\operations\\運用マニュアル.md",
+      "line": 611,
+      "link": "./設定ガイド.md",
+      "text": "設定ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./設定ガイド.md"
+    },
+    {
+      "source": "docs\\operations\\運用マニュアル.md",
+      "line": 612,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "docs\\reports\\BACKEND_DEVELOPMENT_REPORT.md",
+      "line": 467,
+      "link": "BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\CTO_ARCHITECTURE_VALIDATION_REPORT.md",
+      "line": 12,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": "docs\\reports\\DEVELOPMENT_SUMMARY.md",
+      "line": 121,
+      "link": "DEPLOYMENT_GUIDE.md",
+      "text": "直接参照: DEPLOYMENT_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: DEPLOYMENT_GUIDE.md"
+    },
+    {
+      "source": "docs\\reports\\DEVELOPMENT_SUMMARY.md",
+      "line": 122,
+      "link": "PRODUCTION_READINESS_REPORT.md",
+      "text": "直接参照: PRODUCTION_READINESS_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\PRODUCTION_READINESS_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\DEVELOPMENT_SUMMARY.md",
+      "line": 123,
+      "link": "README.md",
+      "text": "直接参照: README.md",
+      "valid": true,
+      "message": "README.md"
+    },
+    {
+      "source": "docs\\reports\\DEVOPS_SUMMARY.md",
+      "line": 222,
+      "link": "docs/DEVOPS_IMPROVEMENTS.md",
+      "text": "直接参照: docs/DEVOPS_IMPROVEMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\DEVOPS_SUMMARY.md",
+      "line": 227,
+      "link": "docs/DEVOPS_QUICKSTART.md",
+      "text": "直接参照: docs/DEVOPS_QUICKSTART.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\reports\\DEVOPS_SUMMARY.md",
+      "line": 405,
+      "link": "../operations/DEVOPS_IMPROVEMENTS.md",
+      "text": "詳細改善レポート",
+      "valid": true,
+      "message": "docs\\operations\\DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\DEVOPS_SUMMARY.md",
+      "line": 406,
+      "link": "../operations/DEVOPS_QUICKSTART.md",
+      "text": "クイックスタートガイド",
+      "valid": true,
+      "message": "docs\\operations\\DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\reports\\DEVOPS_SUMMARY.md",
+      "line": 407,
+      "link": "../../CLAUDE.md",
+      "text": "システム仕様書",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": "docs\\reports\\E2E_TEST_IMPLEMENTATION_REPORT.md",
+      "line": 220,
+      "link": "tests/e2e/README.md",
+      "text": "直接参照: tests/e2e/README.md",
+      "valid": true,
+      "message": "tests\\e2e\\README.md"
+    },
+    {
+      "source": "docs\\reports\\E2E_TEST_IMPLEMENTATION_REPORT.md",
+      "line": 248,
+      "link": "./tests/e2e/README.md",
+      "text": "E2Eテスト実行ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./tests/e2e/README.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 46,
+      "link": "docs/TEST_FIX_REPORT.md",
+      "text": "直接参照: docs/TEST_FIX_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/TEST_FIX_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 86,
+      "link": "docs/DEVOPS_IMPROVEMENTS.md",
+      "text": "直接参照: docs/DEVOPS_IMPROVEMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 87,
+      "link": "docs/DEVOPS_QUICKSTART.md",
+      "text": "直接参照: docs/DEVOPS_QUICKSTART.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 88,
+      "link": "DEVOPS_SUMMARY.md",
+      "text": "直接参照: DEVOPS_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\reports\\DEVOPS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 118,
+      "link": "CODE_QUALITY_REPORT.md",
+      "text": "直接参照: CODE_QUALITY_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CODE_QUALITY_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 119,
+      "link": "LINT_FIX_SUMMARY.md",
+      "text": "直接参照: LINT_FIX_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\reports\\LINT_FIX_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 180,
+      "link": "INTEGRATION_REPORT.md",
+      "text": "直接参照: INTEGRATION_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\INTEGRATION_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 181,
+      "link": "QUICK_START_GUIDE.md",
+      "text": "直接参照: QUICK_START_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: QUICK_START_GUIDE.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 182,
+      "link": "GIT_SETUP_GUIDE.md",
+      "text": "直接参照: GIT_SETUP_GUIDE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: GIT_SETUP_GUIDE.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 183,
+      "link": "INSTALL_GITHUB_CLI.md",
+      "text": "直接参照: INSTALL_GITHUB_CLI.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: INSTALL_GITHUB_CLI.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 184,
+      "link": "docs/AUTO_ERROR_REPAIR_SYSTEM.md",
+      "text": "直接参照: docs/AUTO_ERROR_REPAIR_SYSTEM.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/AUTO_ERROR_REPAIR_SYSTEM.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 185,
+      "link": "docs/TEST_FIX_REPORT.md",
+      "text": "直接参照: docs/TEST_FIX_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/TEST_FIX_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 186,
+      "link": "docs/DEVOPS_IMPROVEMENTS.md",
+      "text": "直接参照: docs/DEVOPS_IMPROVEMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 187,
+      "link": "docs/DEVOPS_QUICKSTART.md",
+      "text": "直接参照: docs/DEVOPS_QUICKSTART.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 188,
+      "link": "CODE_QUALITY_REPORT.md",
+      "text": "直接参照: CODE_QUALITY_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CODE_QUALITY_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 189,
+      "link": "LINT_FIX_SUMMARY.md",
+      "text": "直接参照: LINT_FIX_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\reports\\LINT_FIX_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 190,
+      "link": "DEVOPS_SUMMARY.md",
+      "text": "直接参照: DEVOPS_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\reports\\DEVOPS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 191,
+      "link": "FINAL_REPORT.md",
+      "text": "直接参照: FINAL_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\FINAL_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\FINAL_REPORT.md",
+      "line": 195,
+      "link": ".claude/commands/commit-push-pr.md",
+      "text": "直接参照: .claude/commands/commit-push-pr.md",
+      "valid": true,
+      "message": ".claude\\commands\\commit-push-pr.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 41,
+      "link": "CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "text": "直接参照: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 45,
+      "link": "AGENT_TASK_ASSIGNMENTS.md",
+      "text": "直接参照: AGENT_TASK_ASSIGNMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: AGENT_TASK_ASSIGNMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 50,
+      "link": "TECHNICAL_PRIORITIES_ROADMAP.md",
+      "text": "直接参照: TECHNICAL_PRIORITIES_ROADMAP.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: TECHNICAL_PRIORITIES_ROADMAP.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 83,
+      "link": "docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "text": "直接参照: docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/UI_UX_IMPROVEMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 135,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 136,
+      "link": "BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "text": "直接参照: BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: BACKEND_ENHANCEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 168,
+      "link": "CODE_REVIEW_REPORT.md",
+      "text": "直接参照: CODE_REVIEW_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CODE_REVIEW_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 173,
+      "link": "SECURITY_AUDIT_REPORT.md",
+      "text": "直接参照: SECURITY_AUDIT_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\SECURITY_AUDIT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 229,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 234,
+      "link": "TEST_IMPROVEMENTS_SUMMARY.md",
+      "text": "直接参照: TEST_IMPROVEMENTS_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\reports\\TEST_IMPROVEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 277,
+      "link": "CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "text": "直接参照: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 278,
+      "link": "AGENT_TASK_ASSIGNMENTS.md",
+      "text": "直接参照: AGENT_TASK_ASSIGNMENTS.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: AGENT_TASK_ASSIGNMENTS.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 279,
+      "link": "TECHNICAL_PRIORITIES_ROADMAP.md",
+      "text": "直接参照: TECHNICAL_PRIORITIES_ROADMAP.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: TECHNICAL_PRIORITIES_ROADMAP.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 280,
+      "link": "docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "text": "直接参照: docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/UI_UX_IMPROVEMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 281,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 282,
+      "link": "BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "text": "直接参照: BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: BACKEND_ENHANCEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 283,
+      "link": "CODE_REVIEW_REPORT.md",
+      "text": "直接参照: CODE_REVIEW_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CODE_REVIEW_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 284,
+      "link": "SECURITY_AUDIT_REPORT.md",
+      "text": "直接参照: SECURITY_AUDIT_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\SECURITY_AUDIT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 285,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 286,
+      "link": "TEST_IMPROVEMENTS_SUMMARY.md",
+      "text": "直接参照: TEST_IMPROVEMENTS_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\reports\\TEST_IMPROVEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 287,
+      "link": "INTEGRATION_REPORT.md",
+      "text": "直接参照: INTEGRATION_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\INTEGRATION_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 440,
+      "link": "CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "text": "直接参照: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 441,
+      "link": "docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "text": "直接参照: docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/UI_UX_IMPROVEMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 442,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 443,
+      "link": "CODE_REVIEW_REPORT.md",
+      "text": "直接参照: CODE_REVIEW_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CODE_REVIEW_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 443,
+      "link": "SECURITY_AUDIT_REPORT.md",
+      "text": "直接参照: SECURITY_AUDIT_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\SECURITY_AUDIT_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\INTEGRATION_REPORT.md",
+      "line": 444,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\LINT_FIX_SUMMARY.md",
+      "line": 120,
+      "link": "CODE_QUALITY_REPORT.md",
+      "text": "直接参照: CODE_QUALITY_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\CODE_QUALITY_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\SETUP_REPORT_20250815_174754.md",
+      "line": 30,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": "docs\\reports\\TESTING_STRATEGY_REPORT.md",
+      "line": 203,
+      "link": "README.md",
+      "text": "直接参照: README.md",
+      "valid": true,
+      "message": "README.md"
+    },
+    {
+      "source": "docs\\reports\\TEST_IMPROVEMENTS_SUMMARY.md",
+      "line": 101,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\TEST_IMPROVEMENTS_SUMMARY.md",
+      "line": 180,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": true,
+      "message": "docs\\reports\\TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\reports\\TEST_IMPROVEMENTS_SUMMARY.md",
+      "line": 181,
+      "link": "TEST_IMPROVEMENTS_SUMMARY.md",
+      "text": "直接参照: TEST_IMPROVEMENTS_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\reports\\TEST_IMPROVEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\reports\\cto_architecture_summary.md",
+      "line": 5,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": "docs\\reports\\cto_architecture_summary.md",
+      "line": 10,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": "docs\\reports\\cto_architecture_summary.md",
+      "line": 120,
+      "link": "/docs/architectural_guidelines.md",
+      "text": "直接参照: /docs/architectural_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /docs/architectural_guidelines.md"
+    },
+    {
+      "source": "docs\\reports\\cto_architecture_summary.md",
+      "line": 121,
+      "link": "/docs/cto_architecture_summary.md",
+      "text": "直接参照: /docs/cto_architecture_summary.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /docs/cto_architecture_summary.md"
+    },
+    {
+      "source": "docs\\reports\\cto_architecture_summary.md",
+      "line": 199,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": "docs\\reports\\database_optimization_report.md",
+      "line": 201,
+      "link": "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/backup_strategy.md",
+      "text": "直接参照: /mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/backup_strategy.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: /mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/backup_strategy.md"
+    },
+    {
+      "source": "docs\\setup\\DEPLOYMENT_GUIDE.md",
+      "line": 248,
+      "link": "./docs/FAQ.md",
+      "text": "FAQ",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./docs/FAQ.md"
+    },
+    {
+      "source": "docs\\setup\\PRODUCTION_CONFIG.md",
+      "line": 310,
+      "link": "AUTO_ERROR_REPAIR_SYSTEM.md",
+      "text": "自動修復システム詳細",
+      "valid": false,
+      "message": "ファイルが見つかりません: AUTO_ERROR_REPAIR_SYSTEM.md"
+    },
+    {
+      "source": "docs\\setup\\PRODUCTION_CONFIG.md",
+      "line": 311,
+      "link": "docs/DEVOPS_IMPROVEMENTS.md",
+      "text": "DevOps改善内容",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_IMPROVEMENTS.md"
+    },
+    {
+      "source": "docs\\setup\\PRODUCTION_CONFIG.md",
+      "line": 312,
+      "link": "docs/DEVOPS_QUICKSTART.md",
+      "text": "クイックスタート",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/DEVOPS_QUICKSTART.md"
+    },
+    {
+      "source": "docs\\setup\\PRODUCTION_CONFIG.md",
+      "line": 313,
+      "link": "FINAL_REPORT.md",
+      "text": "最終レポート",
+      "valid": false,
+      "message": "ファイルが見つかりません: FINAL_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 226,
+      "link": "INTEGRATION_REPORT.md",
+      "text": "直接参照: INTEGRATION_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: INTEGRATION_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 227,
+      "link": "CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "text": "直接参照: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 228,
+      "link": "docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "text": "直接参照: docs/UI_UX_IMPROVEMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/UI_UX_IMPROVEMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 229,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 230,
+      "link": "CODE_REVIEW_REPORT.md",
+      "text": "直接参照: CODE_REVIEW_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: CODE_REVIEW_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 231,
+      "link": "SECURITY_AUDIT_REPORT.md",
+      "text": "直接参照: SECURITY_AUDIT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: SECURITY_AUDIT_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 232,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\QUICK_START_GUIDE.md",
+      "line": 252,
+      "link": "TEST_REPORT.md",
+      "text": "直接参照: TEST_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: TEST_REPORT.md"
+    },
+    {
+      "source": "docs\\setup\\README_AUTH_SETUP.md",
+      "line": 109,
+      "link": "README_AUTH_SETUP.md",
+      "text": "直接参照: README_AUTH_SETUP.md",
+      "valid": true,
+      "message": "docs\\setup\\README_AUTH_SETUP.md"
+    },
+    {
+      "source": "docs\\setup\\設定ガイド.md",
+      "line": 399,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "docs\\setup\\設定ガイド.md",
+      "line": 400,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "docs\\setup\\設定ガイド.md",
+      "line": 401,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "docs\\technical\\AGENT_TASK_ASSIGNMENTS.md",
+      "line": 1134,
+      "link": "CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "text": "直接参照: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: CTO_COMPREHENSIVE_ARCHITECTURE_REPORT.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 30,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 32,
+      "link": "BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "text": "直接参照: BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 216,
+      "link": "BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 218,
+      "link": "BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "text": "直接参照: BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "valid": true,
+      "message": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 426,
+      "link": "docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "text": "直接参照: docs/BACKEND_DEVELOPMENT_REPORT.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: docs/BACKEND_DEVELOPMENT_REPORT.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 427,
+      "link": "BACKEND_ENHANCEMENTS.md",
+      "text": "直接参照: BACKEND_ENHANCEMENTS.md",
+      "valid": true,
+      "message": "docs\\technical\\BACKEND_ENHANCEMENTS.md"
+    },
+    {
+      "source": "docs\\technical\\BACKEND_ENHANCEMENTS_SUMMARY.md",
+      "line": 428,
+      "link": "CLAUDE.md",
+      "text": "直接参照: CLAUDE.md",
+      "valid": true,
+      "message": "CLAUDE.md"
+    },
+    {
+      "source": "docs\\technical\\メール配信システム概要.md",
+      "line": 176,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "docs\\technical\\メール配信システム概要.md",
+      "line": 178,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "scripts\\README.md",
+      "line": 256,
+      "link": "README.md",
+      "text": "直接参照: README.md",
+      "valid": true,
+      "message": "scripts\\README.md"
+    },
+    {
+      "source": "tests\\README.md",
+      "line": 9,
+      "link": "README.md",
+      "text": "直接参照: README.md",
+      "valid": true,
+      "message": "tests\\README.md"
+    },
+    {
+      "source": "tests\\e2e\\README.md",
+      "line": 146,
+      "link": "README.md",
+      "text": "直接参照: README.md",
+      "valid": true,
+      "message": "tests\\e2e\\README.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 13,
+      "link": "./メール配信システム概要.md",
+      "text": "メール配信システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./メール配信システム概要.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 14,
+      "link": "./設定ガイド.md",
+      "text": "設定ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./設定ガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 15,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 16,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 17,
+      "link": "./運用手順書.md",
+      "text": "運用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用手順書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 20,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 21,
+      "link": "./技術仕様書.md",
+      "text": "技術仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./技術仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 22,
+      "link": "./architecture.md",
+      "text": "architecture.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architecture.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 23,
+      "link": "./システム構成図.md",
+      "text": "システム構成図",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./システム構成図.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 24,
+      "link": "./architectural_guidelines.md",
+      "text": "architectural_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architectural_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 27,
+      "link": "./UI_ARCHITECTURE.md",
+      "text": "UI_ARCHITECTURE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./UI_ARCHITECTURE.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 28,
+      "link": "./ui_design_analysis.md",
+      "text": "ui_design_analysis.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./ui_design_analysis.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 29,
+      "link": "./frontend_enhancement_plan.md",
+      "text": "frontend_enhancement_plan.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./frontend_enhancement_plan.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 30,
+      "link": "./WEB_UI_README.md",
+      "text": "WEB_UI_README.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./WEB_UI_README.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 33,
+      "link": "./SECURITY_CONFIGURATION.md",
+      "text": "SECURITY_CONFIGURATION.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./SECURITY_CONFIGURATION.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 34,
+      "link": "./security_guidelines.md",
+      "text": "security_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./security_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 37,
+      "link": "./qa_processes.md",
+      "text": "qa_processes.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./qa_processes.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 38,
+      "link": "./トラブルシューティングガイド.md",
+      "text": "トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティングガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 48,
+      "link": "./メール配信システム概要.md",
+      "text": "メール配信システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./メール配信システム概要.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 49,
+      "link": "./システム概要.md",
+      "text": "システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./システム概要.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 50,
+      "link": "./architecture.md",
+      "text": "architecture.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architecture.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 51,
+      "link": "./技術仕様書.md",
+      "text": "技術仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./技術仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 52,
+      "link": "./システム構成図.md",
+      "text": "システム構成図",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./システム構成図.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 53,
+      "link": "./cto_architecture_summary.md",
+      "text": "cto_architecture_summary.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./cto_architecture_summary.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 54,
+      "link": "./architectural_guidelines.md",
+      "text": "architectural_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architectural_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 60,
+      "link": "./設定ガイド.md",
+      "text": "設定ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./設定ガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 61,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 62,
+      "link": "./運用手順書.md",
+      "text": "運用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用手順書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 63,
+      "link": "./利用手順書.md",
+      "text": "利用手順書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./利用手順書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 64,
+      "link": "./development_schedule.md",
+      "text": "development_schedule.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./development_schedule.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 70,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 71,
+      "link": "./トラブルシューティングガイド.md",
+      "text": "トラブルシューティングガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティングガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 77,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 83,
+      "link": "./UI_ARCHITECTURE.md",
+      "text": "UI_ARCHITECTURE.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./UI_ARCHITECTURE.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 84,
+      "link": "./ui_design_analysis.md",
+      "text": "ui_design_analysis.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./ui_design_analysis.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 85,
+      "link": "./frontend_enhancement_plan.md",
+      "text": "frontend_enhancement_plan.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./frontend_enhancement_plan.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 86,
+      "link": "./WEB_UI_README.md",
+      "text": "WEB_UI_README.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./WEB_UI_README.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 92,
+      "link": "./SECURITY_CONFIGURATION.md",
+      "text": "SECURITY_CONFIGURATION.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./SECURITY_CONFIGURATION.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 93,
+      "link": "./security_guidelines.md",
+      "text": "security_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./security_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 99,
+      "link": "./qa_processes.md",
+      "text": "qa_processes.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./qa_processes.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 108,
+      "link": "./メール配信システム概要.md",
+      "text": "メール配信システム概要",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./メール配信システム概要.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 111,
+      "link": "./設定ガイド.md",
+      "text": "設定ガイド",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./設定ガイド.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 114,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 117,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 122,
+      "link": "./architecture.md",
+      "text": "architecture.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architecture.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 123,
+      "link": "./技術仕様書.md",
+      "text": "技術仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./技術仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 126,
+      "link": "./API仕様書.md",
+      "text": "API仕様書",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./API仕様書.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 129,
+      "link": "./architectural_guidelines.md",
+      "text": "architectural_guidelines.md",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./architectural_guidelines.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 134,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 135,
+      "link": "./運用マニュアル.md",
+      "text": "運用マニュアル",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./運用マニュアル.md"
+    },
+    {
+      "source": "ドキュメント目次.md",
+      "line": 177,
+      "link": "./トラブルシューティング.md",
+      "text": "トラブルシューティング",
+      "valid": false,
+      "message": "ファイルが見つかりません: ./トラブルシューティング.md"
+    }
+  ]
+}

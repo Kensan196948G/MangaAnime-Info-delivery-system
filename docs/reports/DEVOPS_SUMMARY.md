@@ -402,9 +402,9 @@ gh issue edit 123 --add-label "auto-repair"
 
 ## 📚 関連ドキュメント
 
-- [詳細改善レポート](docs/DEVOPS_IMPROVEMENTS.md)
-- [クイックスタートガイド](docs/DEVOPS_QUICKSTART.md)
-- [システム仕様書](CLAUDE.md)
+- [詳細改善レポート](../operations/DEVOPS_IMPROVEMENTS.md)
+- [クイックスタートガイド](../operations/DEVOPS_QUICKSTART.md)
+- [システム仕様書](../../CLAUDE.md)
 - [Workflow設定](.github/workflows/)
 
 ---
