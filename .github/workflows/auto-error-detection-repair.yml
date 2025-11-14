@@ -59,13 +59,13 @@ jobs:
               cp data/requirements.txt requirements.txt
             else
               echo "⚠️ Generating minimal requirements.txt"
-              cat > requirements.txt << 'EOL'
-requests>=2.31.0
-PyYAML>=6.0.1
-python-dotenv>=1.0.0
-flask>=3.0.0
-sqlalchemy>=2.0.0
-EOL
+              cat > requirements.txt << 'EOF'
+          requests>=2.31.0
+          PyYAML>=6.0.1
+          python-dotenv>=1.0.0
+          flask>=3.0.0
+          sqlalchemy>=2.0.0
+          EOF
             fi
           fi
 
@@ -75,10 +75,10 @@ EOL
               cp data/requirements-dev.txt requirements-dev.txt
             else
               echo "⚠️ Generating minimal requirements-dev.txt"
-              cat > requirements-dev.txt << 'EOL'
-pytest>=7.4.0
-flake8>=6.1.0
-EOL
+              cat > requirements-dev.txt << 'EOF'
+          pytest>=7.4.0
+          flake8>=6.1.0
+          EOF
             fi
           fi
 
