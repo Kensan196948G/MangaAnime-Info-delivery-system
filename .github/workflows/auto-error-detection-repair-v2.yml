@@ -50,6 +50,16 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: ファイル構造確認（デバッグ）
+        run: |
+          echo "📂 Current directory: $(pwd)"
+          echo "📂 List root files:"
+          ls -la
+          echo "📂 Check for requirements files:"
+          ls -la requirements*.txt 2>&1 || echo "⚠️ No requirements files found"
+          echo "📂 Check data directory:"
+          ls -la data/requirements*.txt 2>&1 || echo "⚠️ No requirements in data/"
+
       - name: Python環境セットアップ
         uses: actions/setup-python@v5
         with:
