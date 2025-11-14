@@ -1,0 +1,28 @@
+# Core dependencies for MangaAnime Info Delivery System
+
+# API and HTTP libraries
+requests>=2.31.0
+httpx>=0.25.0
+
+# RSS Feed parsing
+feedparser>=6.0.10
+
+# Database
+sqlalchemy>=2.0.0
+
+# Google APIs
+google-api-python-client>=2.100.0
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.1
+
+# Data processing
+PyYAML>=6.0.1
+python-dateutil>=2.8.2
+
+# Logging and monitoring
+structlog>=23.1.0
+
+# Utilities
+python-dotenv>=1.0.0
+colorama>=0.4.6

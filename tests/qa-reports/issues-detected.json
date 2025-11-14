@@ -1,0 +1,247 @@
+{
+  "report_metadata": {
+    "generated_at": "2025-11-14T23:30:00Z",
+    "generated_by": "QA Agent",
+    "project": "MangaAnime-Info-delivery-system",
+    "total_workflows": 10,
+    "total_issues": 10,
+    "critical": 0,
+    "high": 1,
+    "medium": 5,
+    "low": 4
+  },
+  "issues": [
+    {
+      "id": "GHA-001",
+      "severity": "high",
+      "category": "syntax_error",
+      "file": ".github/workflows/e2e-tests.yml",
+      "line": 45,
+      "title": "GitHub Actions式構文エラー",
+      "description": "文字列結合演算子 '+' がGitHub Actions式構文でサポートされていない",
+      "impact": "ワークフロー実行時にエラーが発生する可能性が高い",
+      "current_code": "browser: ${{ github.event.inputs.browser == 'all' && fromJson('[\"chromium\", \"firefox\", \"webkit\"]') || fromJson('[\"' + github.event.inputs.browser + '\"]') }}",
+      "recommended_fix": "browser: ${{ github.event.inputs.browser == 'all' && fromJson('[\"chromium\", \"firefox\", \"webkit\"]') || fromJson(format('[\"{0}\"]', github.event.inputs.browser)) }}",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-21",
+      "status": "open"
+    },
+    {
+      "id": "GHA-002",
+      "severity": "medium",
+      "category": "outdated_action",
+      "file": ".github/workflows/auto-repair-7x-loop.yml",
+      "line": 170,
+      "title": "古いActionバージョンの使用",
+      "description": "actions/setup-python@v4 は Node.js 16 ランナーを使用しており、2024年9月30日に廃止予定",
+      "impact": "将来的にワークフローが動作しなくなる",
+      "current_code": "uses: actions/setup-python@v4",
+      "recommended_fix": "uses: actions/setup-python@v5",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    },
+    {
+      "id": "GHA-003",
+      "severity": "medium",
+      "category": "outdated_action",
+      "file": ".github/workflows/ci-pipeline.yml",
+      "line": 25,
+      "title": "古いActionバージョンの使用",
+      "description": "actions/setup-python@v4 は Node.js 16 ランナーを使用しており、2024年9月30日に廃止予定",
+      "impact": "将来的にワークフローが動作しなくなる",
+      "current_code": "uses: actions/setup-python@v4",
+      "recommended_fix": "uses: actions/setup-python@v5",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    },
+    {
+      "id": "GHA-004",
+      "severity": "medium",
+      "category": "outdated_action",
+      "file": ".github/workflows/claude-simple.yml",
+      "line": 18,
+      "title": "古いActionバージョンの使用",
+      "description": "actions/setup-python@v4 は Node.js 16 ランナーを使用しており、2024年9月30日に廃止予定",
+      "impact": "将来的にワークフローが動作しなくなる",
+      "current_code": "uses: actions/setup-python@v4",
+      "recommended_fix": "uses: actions/setup-python@v5",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    },
+    {
+      "id": "GHA-005",
+      "severity": "medium",
+      "category": "outdated_action",
+      "file": ".github/workflows/e2e-tests.yml",
+      "line": 64,
+      "title": "古いActionバージョンの使用",
+      "description": "actions/setup-python@v4 は Node.js 16 ランナーを使用しており、2024年9月30日に廃止予定",
+      "impact": "将来的にワークフローが動作しなくなる",
+      "current_code": "uses: actions/setup-python@v4",
+      "recommended_fix": "uses: actions/setup-python@v5",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    },
+    {
+      "id": "GHA-006",
+      "severity": "medium",
+      "category": "outdated_action",
+      "file": ".github/workflows/ci-pipeline-improved.yml",
+      "line": 104,
+      "title": "古いActionバージョンの使用",
+      "description": "codecov/codecov-action@v3 は古いバージョン",
+      "impact": "最新機能やセキュリティ修正が利用できない",
+      "current_code": "uses: codecov/codecov-action@v3",
+      "recommended_fix": "uses: codecov/codecov-action@v4",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    },
+    {
+      "id": "GHA-007",
+      "severity": "low",
+      "category": "missing_timeout",
+      "file": ".github/workflows/auto-repair-7x-loop.yml",
+      "line": null,
+      "title": "タイムアウト未設定",
+      "description": "execute-repair-loop ジョブにタイムアウトが設定されていない（複数ステップあり）",
+      "impact": "無限待機の可能性があり、リソースを浪費する可能性",
+      "current_code": "jobs:\n  execute-repair-loop:\n    ...",
+      "recommended_fix": "jobs:\n  execute-repair-loop:\n    timeout-minutes: 30\n    ...",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    },
+    {
+      "id": "GHA-008",
+      "severity": "low",
+      "category": "missing_timeout",
+      "file": ".github/workflows/ci-pipeline-improved.yml",
+      "line": null,
+      "title": "タイムアウト未設定",
+      "description": "lint および test ジョブにタイムアウトが設定されていない",
+      "impact": "無限待機の可能性があり、リソースを浪費する可能性",
+      "current_code": "jobs:\n  lint:\n    ...\n  test:\n    ...",
+      "recommended_fix": "jobs:\n  lint:\n    timeout-minutes: 10\n  test:\n    timeout-minutes: 15",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    },
+    {
+      "id": "GHA-009",
+      "severity": "low",
+      "category": "missing_timeout",
+      "file": ".github/workflows/ci-pipeline.yml",
+      "line": null,
+      "title": "タイムアウト未設定",
+      "description": "test ジョブにタイムアウトが設定されていない",
+      "impact": "無限待機の可能性があり、リソースを浪費する可能性",
+      "current_code": "jobs:\n  test:\n    ...",
+      "recommended_fix": "jobs:\n  test:\n    timeout-minutes: 15",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    },
+    {
+      "id": "GHA-010",
+      "severity": "low",
+      "category": "error_handling",
+      "file": ".github/workflows/ci-pipeline.yml",
+      "line": null,
+      "title": "エラーハンドリング不足",
+      "description": "continue-on-error やリトライ機構が実装されていない",
+      "impact": "一時的なエラーでワークフローが失敗する可能性",
+      "current_code": "...",
+      "recommended_fix": "continue-on-error: true の追加、またはリトライアクションの使用",
+      "assigned_to": "DevOps Agent",
+      "due_date": "2025-11-28",
+      "status": "open"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "immediate_action",
+      "title": "e2e-tests.yml の式構文エラー修正",
+      "description": "format() 関数を使用した文字列フォーマットへの置き換え",
+      "effort": "low",
+      "impact": "high"
+    },
+    {
+      "priority": "medium",
+      "category": "maintenance",
+      "title": "Actionバージョンの一括更新",
+      "description": "全ワークフローのActionバージョンを最新に更新",
+      "effort": "low",
+      "impact": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "reliability",
+      "title": "タイムアウトの全ジョブへの適用",
+      "description": "全てのジョブに適切なタイムアウトを設定",
+      "effort": "low",
+      "impact": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "optimization",
+      "title": "依存関係キャッシュの導入",
+      "description": "actions/cache@v3 を使用したPython依存関係のキャッシュ",
+      "effort": "medium",
+      "impact": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "reliability",
+      "title": "リトライ機構の追加",
+      "description": "ネットワーク依存処理へのリトライ機構の実装",
+      "effort": "medium",
+      "impact": "low"
+    },
+    {
+      "priority": "low",
+      "category": "testing",
+      "title": "act ツールによるローカルテスト環境の整備",
+      "description": "開発者がローカルでワークフローをテストできる環境の構築",
+      "effort": "high",
+      "impact": "high"
+    }
+  ],
+  "summary": {
+    "yaml_syntax": {
+      "status": "pass",
+      "files_checked": 10,
+      "files_passed": 10,
+      "files_failed": 0
+    },
+    "actionlint": {
+      "status": "warning",
+      "files_checked": 10,
+      "issues_found": 6,
+      "critical_issues": 0,
+      "warnings": 6
+    },
+    "logic_validation": {
+      "status": "pass",
+      "conditional_jobs": 7,
+      "undefined_variables": 0,
+      "missing_timeouts": 4
+    },
+    "performance": {
+      "status": "good",
+      "average_complexity": 28.0,
+      "average_job_count": 1.8,
+      "bottlenecks_detected": 0
+    },
+    "security": {
+      "status": "pass",
+      "hardcoded_secrets": 0,
+      "excessive_permissions": 0
+    }
+  }
+}

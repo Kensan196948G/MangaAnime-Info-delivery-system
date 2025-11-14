@@ -20,6 +20,7 @@ jobs:
   lint:
     name: 🔍 Code Quality Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
     - name: 📥 Checkout repository
@@ -64,6 +65,7 @@ jobs:
   test:
     name: 🧪 Tests (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -101,7 +103,7 @@ jobs:
       continue-on-error: true
 
     - name: 📊 Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: matrix.python-version == '3.13' && matrix.os == 'ubuntu-latest'
       with:
         files: ./coverage.xml

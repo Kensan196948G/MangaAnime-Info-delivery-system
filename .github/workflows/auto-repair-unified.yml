@@ -1,0 +1,655 @@
+name: 🔧 統合自動修復システム (Unified Auto-Repair System)
+
+# 3つのワークフロー（v2、本番版、7xループ）を統合し最適化したバージョン
+# - インテリジェントな修復戦略
+# - 段階的エスカレーション
+# - リソース効率化
+# - 包括的なエラーハンドリング
+
+on:
+  # 定期実行: 30分ごと（本番稼働時）
+  schedule:
+    - cron: '*/30 * * * *'
+
+  # 手動実行: カスタム設定可能
+  workflow_dispatch:
+    inputs:
+      max_loops:
+        description: '最大ループ回数'
+        required: false
+        default: '10'
+        type: string
+      repair_mode:
+        description: '修復モード'
+        required: true
+        default: 'standard'
+        type: choice
+        options:
+          - standard      # 標準モード（クリティカルエラーのみ）
+          - aggressive    # アグレッシブ（警告も含む）
+          - conservative  # 保守的（エラー検知のみ）
+      target_issue:
+        description: '対象Issue番号（オプション）'
+        required: false
+        type: string
+      dry_run:
+        description: 'ドライラン（実際の修復を実行しない）'
+        required: false
+        default: false
+        type: boolean
+
+  # Issueコメントトリガー: @auto-repair でトリガー
+  issue_comment:
+    types: [created]
+
+  # 他のワークフロー失敗時に自動起動
+  workflow_run:
+    workflows:
+      - "CI Pipeline"
+      - "Security Check"
+      - "Test Suite"
+    types: [completed]
+
+# 権限設定
+permissions:
+  contents: write
+  issues: write
+  actions: write
+  pull-requests: write
+  checks: read
+
+# 同時実行制御: 1つのみ実行
+concurrency:
+  group: auto-repair-unified
+  cancel-in-progress: false
+
+env:
+  # デフォルト設定
+  DEFAULT_MAX_LOOPS: 10
+  REPAIR_INTERVAL_SECONDS: 30
+  RETRY_MAX_ATTEMPTS: 3
+  RETRY_DELAY_SECONDS: 10
+
+  # ラベル設定
+  LABEL_AUTO_REPAIR: 'auto-repair'
+  LABEL_IN_PROGRESS: 'repair-in-progress'
+  LABEL_COMPLETED: 'repair-completed'
+  LABEL_FAILED: 'repair-failed'
+  LABEL_CRITICAL: 'critical'
+
+  # タイムアウト設定
+  TIMEOUT_CHECKOUT: 5
+  TIMEOUT_SETUP: 8
+  TIMEOUT_INSTALL: 10
+  TIMEOUT_REPAIR: 20
+
+jobs:
+  # ジョブ1: 事前チェックと初期化
+  pre-check:
+    name: 🔍 事前チェックと初期化
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    # 実行条件の詳細制御
+    if: |
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@auto-repair')) ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure')
+
+    outputs:
+      should_repair: ${{ steps.decision.outputs.should_repair }}
+      repair_mode: ${{ steps.decision.outputs.repair_mode }}
+      target_issue: ${{ steps.decision.outputs.target_issue }}
+      max_loops: ${{ steps.decision.outputs.max_loops }}
+      is_dry_run: ${{ steps.decision.outputs.is_dry_run }}
+
+    steps:
+      - name: 📥 リポジトリチェックアウト
+        uses: actions/checkout@v4
+        timeout-minutes: ${{ fromJSON(env.TIMEOUT_CHECKOUT) }}
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 既存修復Issueチェック
+        id: check-existing
+        run: |
+          # 進行中の修復Issueを検索
+          EXISTING_ISSUES=$(gh issue list \
+            --label "${{ env.LABEL_AUTO_REPAIR }}" \
+            --label "${{ env.LABEL_IN_PROGRESS }}" \
+            --state open \
+            --json number,createdAt \
+            --jq 'length')
+
+          echo "existing_count=$EXISTING_ISSUES" >> $GITHUB_OUTPUT
+
+          if [ "$EXISTING_ISSUES" -gt 0 ]; then
+            echo "⚠️ $EXISTING_ISSUES 個の進行中修復Issueが存在します"
+            OLDEST_ISSUE=$(gh issue list \
+              --label "${{ env.LABEL_AUTO_REPAIR }}" \
+              --label "${{ env.LABEL_IN_PROGRESS }}" \
+              --state open \
+              --json number,createdAt \
+              --jq 'sort_by(.createdAt) | .[0].number')
+            echo "oldest_issue=$OLDEST_ISSUE" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🎯 修復戦略決定
+        id: decision
+        run: |
+          # 修復モード決定
+          if [ "${{ github.event.inputs.repair_mode }}" != "" ]; then
+            REPAIR_MODE="${{ github.event.inputs.repair_mode }}"
+          else
+            REPAIR_MODE="standard"
+          fi
+          echo "repair_mode=$REPAIR_MODE" >> $GITHUB_OUTPUT
+
+          # 最大ループ数決定
+          MAX_LOOPS="${{ github.event.inputs.max_loops || env.DEFAULT_MAX_LOOPS }}"
+          echo "max_loops=$MAX_LOOPS" >> $GITHUB_OUTPUT
+
+          # ドライラン設定
+          DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+          echo "is_dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
+
+          # 対象Issue決定
+          if [ "${{ github.event.inputs.target_issue }}" != "" ]; then
+            TARGET_ISSUE="${{ github.event.inputs.target_issue }}"
+          elif [ "${{ steps.check-existing.outputs.oldest_issue }}" != "" ]; then
+            TARGET_ISSUE="${{ steps.check-existing.outputs.oldest_issue }}"
+          else
+            TARGET_ISSUE=""
+          fi
+          echo "target_issue=$TARGET_ISSUE" >> $GITHUB_OUTPUT
+
+          # 修復実行判定
+          EXISTING_COUNT="${{ steps.check-existing.outputs.existing_count }}"
+
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # 手動実行時は常に実行
+            echo "should_repair=true" >> $GITHUB_OUTPUT
+            echo "✅ 手動実行: 修復を実行します"
+          elif [ "$EXISTING_COUNT" -ge 3 ]; then
+            # 既存Issueが3個以上の場合はスキップ
+            echo "should_repair=false" >> $GITHUB_OUTPUT
+            echo "⚠️ 既存Issue多数: 修復をスキップします"
+          else
+            echo "should_repair=true" >> $GITHUB_OUTPUT
+            echo "✅ 修復条件を満たしています"
+          fi
+
+      - name: 📊 実行パラメータサマリー
+        run: |
+          echo "## 🔧 統合自動修復システム - 実行パラメータ" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| パラメータ | 値 |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| 実行トリガー | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 修復モード | ${{ steps.decision.outputs.repair_mode }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 最大ループ数 | ${{ steps.decision.outputs.max_loops }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ドライラン | ${{ steps.decision.outputs.is_dry_run }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 対象Issue | ${{ steps.decision.outputs.target_issue || 'なし（新規作成）' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 実行判定 | ${{ steps.decision.outputs.should_repair == 'true' && '✅ 実行' || '⏸️ スキップ' }} |" >> $GITHUB_STEP_SUMMARY
+
+  # ジョブ2: 修復ループ実行
+  repair-loop:
+    name: 🔧 修復ループ実行
+    runs-on: ubuntu-latest
+    needs: [pre-check]
+    if: needs.pre-check.outputs.should_repair == 'true'
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 リポジトリチェックアウト
+        uses: actions/checkout@v4
+        timeout-minutes: ${{ fromJSON(env.TIMEOUT_CHECKOUT) }}
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐍 Python環境セットアップ
+        uses: actions/setup-python@v5
+        timeout-minutes: ${{ fromJSON(env.TIMEOUT_SETUP) }}
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: 📦 依存関係インストール (リトライ付き)
+        timeout-minutes: ${{ fromJSON(env.TIMEOUT_INSTALL) }}
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 8
+          max_attempts: ${{ fromJSON(env.RETRY_MAX_ATTEMPTS) }}
+          retry_wait_seconds: ${{ fromJSON(env.RETRY_DELAY_SECONDS) }}
+          command: |
+            python -m pip install --upgrade pip setuptools wheel
+            pip install -r requirements.txt
+            pip install -r requirements-dev.txt
+
+      - name: 🔍 修復スクリプト存在確認
+        id: check-scripts
+        run: |
+          SCRIPTS_FOUND=0
+
+          if [ -f "scripts/auto_error_repair_loop.py" ]; then
+            echo "✅ auto_error_repair_loop.py 発見"
+            echo "has_main_script=true" >> $GITHUB_OUTPUT
+            SCRIPTS_FOUND=$((SCRIPTS_FOUND + 1))
+          else
+            echo "⚠️ auto_error_repair_loop.py 未検出"
+            echo "has_main_script=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [ -f "scripts/repair-loop-executor.py" ]; then
+            echo "✅ repair-loop-executor.py 発見"
+            echo "has_executor_script=true" >> $GITHUB_OUTPUT
+            SCRIPTS_FOUND=$((SCRIPTS_FOUND + 1))
+          else
+            echo "⚠️ repair-loop-executor.py 未検出"
+            echo "has_executor_script=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [ "$SCRIPTS_FOUND" -eq 0 ]; then
+            echo "❌ 修復スクリプトが見つかりません"
+            exit 1
+          fi
+
+      - name: 🔧 修復ループ実行
+        id: repair
+        timeout-minutes: ${{ fromJSON(env.TIMEOUT_REPAIR) }}
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPAIR_MODE: ${{ needs.pre-check.outputs.repair_mode }}
+          MAX_LOOPS: ${{ needs.pre-check.outputs.max_loops }}
+          TARGET_ISSUE: ${{ needs.pre-check.outputs.target_issue }}
+          DRY_RUN: ${{ needs.pre-check.outputs.is_dry_run }}
+        run: |
+          # 修復スクリプト実行
+          SCRIPT_ARGS="--max-loops $MAX_LOOPS --interval $REPAIR_INTERVAL_SECONDS"
+
+          if [ "$DRY_RUN" == "true" ]; then
+            SCRIPT_ARGS="$SCRIPT_ARGS --dry-run"
+          fi
+
+          if [ "$REPAIR_MODE" == "aggressive" ]; then
+            SCRIPT_ARGS="$SCRIPT_ARGS --force-full-repair"
+          fi
+
+          if [ -n "$TARGET_ISSUE" ]; then
+            SCRIPT_ARGS="$SCRIPT_ARGS --issue-number $TARGET_ISSUE"
+          else
+            SCRIPT_ARGS="$SCRIPT_ARGS --create-issue-on-failure"
+          fi
+
+          if [ "${{ steps.check-scripts.outputs.has_main_script }}" == "true" ]; then
+            echo "🚀 メインスクリプト実行: auto_error_repair_loop.py"
+            python scripts/auto_error_repair_loop.py $SCRIPT_ARGS
+            EXIT_CODE=$?
+          elif [ "${{ steps.check-scripts.outputs.has_executor_script }}" == "true" ]; then
+            echo "🚀 エグゼキュータスクリプト実行: repair-loop-executor.py"
+            python scripts/repair-loop-executor.py $SCRIPT_ARGS
+            EXIT_CODE=$?
+          else
+            echo "❌ 実行可能なスクリプトがありません"
+            exit 1
+          fi
+
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+
+      - name: 📊 修復ステータス判定
+        id: status
+        if: always()
+        run: |
+          if [ -f repair_summary.json ]; then
+            # JSONから情報抽出
+            FINAL_STATUS=$(jq -r '.final_status // "unknown"' repair_summary.json)
+            ERROR_REDUCTION=$(jq -r '.error_reduction_rate // 0' repair_summary.json)
+            CRITICAL_ERRORS=$(jq -r '.critical_errors // 999' repair_summary.json)
+            WARNING_ERRORS=$(jq -r '.warning_errors // 0' repair_summary.json)
+            TOTAL_LOOPS=$(jq -r '.total_loops // 0' repair_summary.json)
+            SUCCESS_COUNT=$(jq -r '.successful_repairs // 0' repair_summary.json)
+            FAILED_COUNT=$(jq -r '.failed_repairs // 0' repair_summary.json)
+
+            # 出力
+            echo "final_status=$FINAL_STATUS" >> $GITHUB_OUTPUT
+            echo "error_reduction=$ERROR_REDUCTION" >> $GITHUB_OUTPUT
+            echo "critical_errors=$CRITICAL_ERRORS" >> $GITHUB_OUTPUT
+            echo "warning_errors=$WARNING_ERRORS" >> $GITHUB_OUTPUT
+            echo "total_loops=$TOTAL_LOOPS" >> $GITHUB_OUTPUT
+            echo "success_count=$SUCCESS_COUNT" >> $GITHUB_OUTPUT
+            echo "failed_count=$FAILED_COUNT" >> $GITHUB_OUTPUT
+
+            # 成功判定ロジック（段階的）
+            if [ "$FINAL_STATUS" = "success" ]; then
+              echo "result=success" >> $GITHUB_OUTPUT
+              echo "result_emoji=✅" >> $GITHUB_OUTPUT
+              echo "result_text=完全成功" >> $GITHUB_OUTPUT
+            elif [ "$FINAL_STATUS" = "partial_success" ] && [ "$CRITICAL_ERRORS" -eq 0 ]; then
+              echo "result=success" >> $GITHUB_OUTPUT
+              echo "result_emoji=⚠️" >> $GITHUB_OUTPUT
+              echo "result_text=部分的成功（警告のみ残存）" >> $GITHUB_OUTPUT
+            elif [ "$FINAL_STATUS" = "improved" ] && [ "$CRITICAL_ERRORS" -eq 0 ]; then
+              echo "result=partial" >> $GITHUB_OUTPUT
+              echo "result_emoji=📈" >> $GITHUB_OUTPUT
+              echo "result_text=改善（クリティカルエラー解消）" >> $GITHUB_OUTPUT
+            elif [ "$FINAL_STATUS" = "attempted" ]; then
+              echo "result=attempted" >> $GITHUB_OUTPUT
+              echo "result_emoji=🔧" >> $GITHUB_OUTPUT
+              echo "result_text=修復試行済み" >> $GITHUB_OUTPUT
+            else
+              echo "result=failed" >> $GITHUB_OUTPUT
+              echo "result_emoji=❌" >> $GITHUB_OUTPUT
+              echo "result_text=修復失敗" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "⚠️ repair_summary.json が見つかりません"
+            echo "final_status=error" >> $GITHUB_OUTPUT
+            echo "result=failed" >> $GITHUB_OUTPUT
+            echo "result_emoji=❓" >> $GITHUB_OUTPUT
+            echo "result_text=ステータス不明" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📝 修復結果サマリー作成
+        if: always()
+        run: |
+          echo "## 🔧 統合自動修復システム - 実行結果" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ${{ steps.status.outputs.result_emoji }} ${{ steps.status.outputs.result_text }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f repair_summary.json ]; then
+            echo "| 項目 | 値 |" >> $GITHUB_STEP_SUMMARY
+            echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+            echo "| 最終ステータス | ${{ steps.status.outputs.final_status }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| 実行ループ数 | ${{ steps.status.outputs.total_loops }} / ${{ needs.pre-check.outputs.max_loops }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| 成功した修復 | ${{ steps.status.outputs.success_count }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| 失敗した修復 | ${{ steps.status.outputs.failed_count }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| エラー削減率 | ${{ steps.status.outputs.error_reduction }}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| クリティカルエラー | ${{ steps.status.outputs.critical_errors }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| 警告レベルエラー | ${{ steps.status.outputs.warning_errors }} |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # 推奨アクション
+            if [ -f repair_summary.json ]; then
+              RECOMMENDATIONS=$(jq -r '.recommendations[]? // empty' repair_summary.json)
+              if [ -n "$RECOMMENDATIONS" ]; then
+                echo "### 📝 推奨アクション" >> $GITHUB_STEP_SUMMARY
+                echo "$RECOMMENDATIONS" | while read -r line; do
+                  echo "- $line" >> $GITHUB_STEP_SUMMARY
+                done
+              fi
+            fi
+          else
+            echo "⚠️ 詳細なサマリー情報が利用できません" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 💾 ログとアーティファクト保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repair-logs-${{ github.run_number }}-${{ github.run_attempt }}
+          path: |
+            repair_summary.json
+            logs/auto_repair_*.log
+            logs/repair_*.log
+            *.log
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: 🚨 クリティカル失敗時にIssue作成
+        if: |
+          always() &&
+          steps.status.outputs.result == 'failed' &&
+          steps.status.outputs.critical_errors != '0' &&
+          needs.pre-check.outputs.target_issue == ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let summaryData = {
+              final_status: 'unknown',
+              total_loops: 0,
+              successful_repairs: 0,
+              failed_repairs: 0,
+              error_reduction_rate: 0,
+              critical_errors: 999,
+              warning_errors: 0,
+              detected_errors: [],
+              recommendations: ['手動での確認が必要です']
+            };
+
+            try {
+              if (fs.existsSync('repair_summary.json')) {
+                summaryData = JSON.parse(fs.readFileSync('repair_summary.json', 'utf8'));
+              }
+            } catch (error) {
+              console.error('修復サマリー読み込みエラー:', error);
+            }
+
+            const statusEmojis = {
+              'success': '✅',
+              'partial_success': '⚠️',
+              'improved': '📈',
+              'attempted': '🔧',
+              'failed': '❌',
+              'unknown': '❓'
+            };
+
+            const emoji = statusEmojis[summaryData.final_status] || '❓';
+            const timestamp = new Date().toISOString();
+
+            const issueBody = `
+            ## ${emoji} 自動修復失敗レポート
+
+            **実行日時**: ${timestamp}
+            **トリガー**: ${{ github.event_name }}
+            **ワークフローRun**: ${{ github.run_number }}
+
+            ### 📊 実行サマリー
+
+            | 項目 | 値 |
+            |------|-----|
+            | 最終ステータス | ${summaryData.final_status} |
+            | 実行ループ数 | ${summaryData.total_loops || 0} / ${{ needs.pre-check.outputs.max_loops }} |
+            | 成功した修復 | ${summaryData.successful_repairs || 0} |
+            | 失敗した修復 | ${summaryData.failed_repairs || 0} |
+            | エラー削減率 | ${(summaryData.error_reduction_rate || 0).toFixed(1)}% |
+
+            ### 🚨 残存エラー
+
+            - **クリティカル**: ${summaryData.critical_errors || 0}
+            - **警告**: ${summaryData.warning_errors || 0}
+
+            ### 🔍 検出されたエラー（高優先度）
+
+            ${summaryData.detected_errors?.filter(e => e.severity === 'high').map(e =>
+              \`- **\${e.type}**: \${e.message}\`
+            ).join('\\n') || 'なし'}
+
+            ### 📝 推奨アクション
+
+            ${summaryData.recommendations?.map(r => \`- \${r}\`).join('\\n') || '- 手動での確認が必要です'}
+
+            ### 🔗 関連リンク
+
+            - [ワークフロー実行](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [コミット](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+
+            ---
+
+            🤖 このIssueは統合自動修復システムにより自動生成されました
+
+            **再実行方法**: このIssueに \`@auto-repair\` とコメントしてください
+            `;
+
+            // 既存の未解決auto-repair Issueをチェック
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: '${{ env.LABEL_AUTO_REPAIR }},${{ env.LABEL_FAILED }}',
+              state: 'open'
+            });
+
+            // 既存Issueが5個未満なら新規作成
+            if (existingIssues.data.length < 5) {
+              const newIssue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: \`🚨 自動修復失敗 - \${new Date().toISOString().split('T')[0]} (\${summaryData.final_status})\`,
+                body: issueBody,
+                labels: [
+                  '${{ env.LABEL_AUTO_REPAIR }}',
+                  '${{ env.LABEL_FAILED }}',
+                  '${{ env.LABEL_CRITICAL }}',
+                  'bug',
+                  '要確認'
+                ],
+                assignees: ['${{ github.repository_owner }}']
+              });
+
+              console.log(\`✅ Issue #\${newIssue.data.number} を作成しました\`);
+            } else {
+              console.log('⚠️ 既存のIssueが5個以上あるため、新規作成をスキップしました');
+            }
+
+      - name: ✅ 成功時にIssueコメント
+        if: |
+          always() &&
+          steps.status.outputs.result == 'success' &&
+          needs.pre-check.outputs.target_issue != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let commentText = '✅ 自動修復が完了しました';
+
+            try {
+              if (fs.existsSync('repair_summary.json')) {
+                const data = JSON.parse(fs.readFileSync('repair_summary.json', 'utf8'));
+                commentText = \`
+            ## ✅ 自動修復完了
+
+            **最終ステータス**: ${data.final_status}
+            **実行ループ数**: ${data.total_loops || 0} / ${{ needs.pre-check.outputs.max_loops }}
+            **成功した修復**: ${data.successful_repairs || 0}
+            **エラー削減率**: ${(data.error_reduction_rate || 0).toFixed(1)}%
+            **残存エラー**: クリティカル=${data.critical_errors || 0}, 警告=${data.warning_errors || 0}
+
+            すべてのクリティカルエラーが修復されました 🎉
+
+            [ワークフロー実行詳細](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            \`;
+              }
+            } catch (error) {
+              console.error('サマリー読み込みエラー:', error);
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.pre-check.outputs.target_issue }},
+              body: commentText
+            });
+
+            // ラベル更新
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.pre-check.outputs.target_issue }},
+              name: '${{ env.LABEL_IN_PROGRESS }}'
+            }).catch(() => {});
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.pre-check.outputs.target_issue }},
+              labels: ['${{ env.LABEL_COMPLETED }}']
+            });
+
+            // Issueをクローズ
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.pre-check.outputs.target_issue }},
+              state: 'closed'
+            });
+
+      - name: 🎯 修復結果に基づく終了判定
+        if: always()
+        run: |
+          RESULT="${{ steps.status.outputs.result }}"
+
+          echo "📊 最終判定: $RESULT"
+
+          if [ "$RESULT" = "success" ]; then
+            echo "✅ 修復成功 - 正常終了"
+            exit 0
+          elif [ "$RESULT" = "partial" ]; then
+            echo "⚠️ 部分的成功 - 正常終了（改善あり）"
+            exit 0
+          elif [ "$RESULT" = "attempted" ]; then
+            echo "🔧 修復試行済み - 警告付き終了"
+            exit 0
+          else
+            echo "❌ 修復失敗 - エラー終了"
+            exit 1
+          fi
+
+  # ジョブ3: 定期クリーンアップ（スケジュール実行時のみ）
+  cleanup:
+    name: 🧹 古いIssueのクリーンアップ
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 リポジトリチェックアウト
+        uses: actions/checkout@v4
+
+      - name: 🧹 古い修復Issueをクローズ
+        run: |
+          # 30日以上更新されていない修復Issueをクローズ
+          STALE_DATE=$(date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ)
+
+          gh issue list \
+            --label "${{ env.LABEL_AUTO_REPAIR }}" \
+            --state open \
+            --json number,updatedAt,labels \
+            --jq ".[] | select(.updatedAt < \"$STALE_DATE\") | .number" | \
+          while read -r ISSUE_NUMBER; do
+            if [ -n "$ISSUE_NUMBER" ]; then
+              echo "🧹 Issue #$ISSUE_NUMBER をクローズします（30日以上更新なし）"
+
+              gh issue close $ISSUE_NUMBER \
+                --comment "⏰ 30日間更新がないため、自動的にクローズしました。問題が継続する場合は新しいIssueを作成してください。"
+
+              gh issue edit $ISSUE_NUMBER \
+                --remove-label "${{ env.LABEL_IN_PROGRESS }}" \
+                --add-label "auto-closed-stale" || true
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📊 クリーンアップサマリー
+        run: |
+          TOTAL_OPEN=$(gh issue list --label "${{ env.LABEL_AUTO_REPAIR }}" --state open --json number --jq 'length')
+          TOTAL_CLOSED=$(gh issue list --label "${{ env.LABEL_AUTO_REPAIR }}" --state closed --json number --jq 'length')
+
+          echo "## 🧹 クリーンアップ完了" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 状態 | 件数 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| オープン | $TOTAL_OPEN |" >> $GITHUB_STEP_SUMMARY
+          echo "| クローズ済み | $TOTAL_CLOSED |" >> $GITHUB_STEP_SUMMARY
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

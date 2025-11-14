@@ -1,0 +1,442 @@
+# 自動エラー修復システム - 推奨設定
+# バージョン: 2.0
+# 作成日: 2025-11-14
+
+# ========================================
+# 基本設定
+# ========================================
+system:
+  name: "Auto Error Repair System"
+  version: "2.0.0"
+  environment: "production"  # development, staging, production
+
+# ========================================
+# 実行スケジュール設定
+# ========================================
+schedule:
+  # 環境別の実行間隔
+  development:
+    interval_minutes: 15
+    cron: "*/15 * * * *"
+    description: "開発環境 - 高頻度監視"
+
+  staging:
+    interval_minutes: 120
+    cron: "0 */2 * * *"
+    description: "ステージング環境 - 中頻度監視"
+
+  production:
+    # 営業時間内: 30分間隔
+    business_hours:
+      cron: "*/30 9-18 * * 1-5"
+      description: "平日営業時間内 (9-18時)"
+
+    # 営業時間外: 2時間間隔
+    off_hours:
+      cron: "0 */2 19-8,0-8 * * 1-5"
+      description: "平日営業時間外"
+
+    # 週末: 4時間間隔
+    weekend:
+      cron: "0 */4 * * 0,6"
+      description: "土日"
+
+# ========================================
+# ループ制御パラメータ
+# ========================================
+loop_control:
+  # 最大ループ回数
+  max_loops:
+    light: 3        # 軽微なエラー
+    normal: 7       # 通常エラー
+    critical: 10    # 重大エラー
+
+  # ループ間隔 (秒)
+  interval:
+    light: 30       # 軽微なエラー
+    normal: 60      # 通常エラー
+    critical: 120   # 重大エラー
+
+  # タイムアウト (秒)
+  timeout:
+    light: 600      # 10分
+    normal: 1200    # 20分
+    critical: 1800  # 30分
+
+  # 動的調整
+  adaptive:
+    enabled: true
+    adjust_by_severity: true
+    adjust_by_history: true
+
+# ========================================
+# エラー検知設定
+# ========================================
+error_detection:
+  # 構文エラー
+  syntax:
+    enabled: true
+    tool: "py_compile"
+    severity: "high"
+    directories:
+      - "modules"
+      - "tests"
+      - "app"
+    exclude:
+      - "__pycache__"
+      - ".venv"
+      - "*.pyc"
+
+  # インポートエラー
+  import:
+    enabled: true
+    tool: "python -c 'import X'"
+    severity: "high"
+    timeout: 30
+    exclude_patterns:
+      - "attempted relative import"  # 警告のみ
+      - "DeprecationWarning"
+
+  # テスト失敗
+  test:
+    enabled: true
+    tool: "pytest"
+    severity: "medium"
+    options:
+      - "-v"
+      - "--tb=short"
+      - "--maxfail=5"
+      - "-x"
+      - "--timeout=60"
+    coverage:
+      enabled: false  # 高速化のため無効
+      threshold: 75
+
+  # Lintエラー
+  lint:
+    enabled: true
+    tool: "flake8"
+    severity: "low"
+    options:
+      - "--count"
+      - "--max-line-length=120"
+      - "--ignore=E501,W503"  # 長い行、演算子の位置
+    warning_only: true
+
+  # セキュリティスキャン (オプション)
+  security:
+    enabled: false  # 時間がかかるため通常は無効
+    tool: "bandit"
+    severity: "critical"
+    options:
+      - "-r"
+      - "modules"
+      - "-ll"  # Low confidence以上
+
+# ========================================
+# 修復設定
+# ========================================
+repair:
+  # 構文エラー修復
+  syntax:
+    primary:
+      tool: "black"
+      options:
+        - "modules/"
+        - "tests/"
+        - "--line-length=120"
+    fallback:
+      - tool: "autopep8"
+        options:
+          - "--in-place"
+          - "--recursive"
+          - "--max-line-length=120"
+
+  # インポートエラー修復
+  import:
+    primary:
+      tool: "pip"
+      action: "install"
+      options:
+        - "-r"
+        - "requirements.txt"
+        - "--upgrade"
+    fallback:
+      - tool: "pip"
+        action: "install"
+        options:
+          - "-r"
+          - "requirements.txt"
+          - "--force-reinstall"
+      - tool: "git"
+        action: "checkout"
+        target: "requirements.txt"
+        description: "既知の良好な状態に復元"
+
+  # テスト失敗修復
+  test:
+    primary:
+      action: "clear_cache"
+      targets:
+        - ".pytest_cache"
+        - "__pycache__"
+        - "*.pyc"
+    fallback:
+      - action: "reinstall_dependencies"
+      - action: "isolate_tests"
+
+  # Lintエラー修復
+  lint:
+    primary:
+      tool: "autopep8"
+      options:
+        - "--in-place"
+        - "--recursive"
+        - "--max-line-length=120"
+        - "modules/"
+        - "tests/"
+
+# ========================================
+# リソース管理
+# ========================================
+resource_management:
+  # リソース監視
+  monitoring:
+    enabled: true
+    check_interval: 60  # 秒
+
+    # CPU使用率
+    cpu:
+      threshold_warning: 70   # %
+      threshold_critical: 85  # %
+
+    # メモリ使用率
+    memory:
+      threshold_warning: 70   # %
+      threshold_critical: 85  # %
+
+    # ディスク使用率
+    disk:
+      threshold_warning: 80   # %
+      threshold_critical: 90  # %
+
+  # タイムアウト制御
+  timeouts:
+    detection_step: 300   # 5分
+    repair_step: 600      # 10分
+    total_workflow: 1500  # 25分
+
+  # キャッシュ設定
+  cache:
+    enabled: true
+    pip_cache: true
+    pytest_cache: false  # 問題の原因になる可能性
+    paths:
+      - "~/.cache/pip"
+      - "~/.cache/pre-commit"
+
+# ========================================
+# 並行実行制御
+# ========================================
+concurrency:
+  # GitHub Actions並行実行制御
+  group: "auto-repair-system"
+  cancel_in_progress: false
+
+  # CI/CDパイプライン競合回避
+  ci_coordination:
+    enabled: true
+    check_before_start: true
+    check_before_commit: true
+    monitored_workflows:
+      - "ci-pipeline.yml"
+      - "ci-pipeline-improved.yml"
+      - "e2e-tests.yml"
+
+  # ロック機構
+  locking:
+    enabled: true
+    lock_file: ".auto-repair.lock"
+    timeout: 1800  # 30分
+
+# ========================================
+# 通知設定
+# ========================================
+notifications:
+  # 通知チャネル
+  channels:
+    github_issue:
+      enabled: true
+      labels:
+        - "auto-repair"
+      max_open_issues: 5
+
+    email:
+      enabled: false
+      recipients:
+        - "dev-team@example.com"
+      smtp:
+        host: "smtp.gmail.com"
+        port: 587
+        use_tls: true
+
+    slack:
+      enabled: false
+      webhook_url_secret: "SLACK_WEBHOOK_URL"
+      channel: "#dev-alerts"
+
+  # 通知ルール
+  rules:
+    low:
+      severity: "warning"
+      channels: []  # ログのみ
+
+    medium:
+      severity: "error"
+      channels:
+        - "github_issue"
+
+    high:
+      severity: "critical"
+      channels:
+        - "github_issue"
+        - "email"
+
+    critical:
+      severity: "emergency"
+      channels:
+        - "github_issue"
+        - "email"
+        - "slack"
+
+# ========================================
+# メトリクス収集
+# ========================================
+metrics:
+  # データ収集
+  collection:
+    enabled: true
+    database: "repair_metrics.db"
+    retention_days: 90
+
+  # KPI設定
+  kpis:
+    success_rate:
+      target: 80          # %
+      warning: 60         # %
+      critical: 40        # %
+
+    average_repair_time:
+      target: 300         # 5分
+      warning: 900        # 15分
+      critical: 1200      # 20分
+
+    error_reduction_rate:
+      target: 70          # %
+      warning: 50         # %
+      critical: 30        # %
+
+    loop_efficiency:
+      target: 5           # 平均ループ回数
+      warning: 7
+      critical: 9
+
+  # ダッシュボード
+  dashboard:
+    enabled: true
+    update_interval: 3600  # 1時間
+    output_format: "markdown"
+    output_path: "docs/reports/repair-dashboard.md"
+
+# ========================================
+# 高度な機能
+# ========================================
+advanced:
+  # Circuit Breaker
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    timeout: 300  # 5分
+    half_open_attempts: 1
+
+  # エスカレーション
+  escalation:
+    enabled: true
+    max_failures: 5
+    escalation_delay: 1800  # 30分
+    assignee: "dev-team-lead"
+
+  # 機械学習 (将来実装)
+  machine_learning:
+    enabled: false
+    model_path: "models/error_predictor.pkl"
+    prediction_threshold: 0.7
+
+# ========================================
+# ログ設定
+# ========================================
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  # ファイル出力
+  file:
+    enabled: true
+    path: "logs/auto_repair_{timestamp}.log"
+    max_size: 10485760  # 10MB
+    backup_count: 5
+
+  # コンソール出力
+  console:
+    enabled: true
+    colorize: true
+
+# ========================================
+# アーティファクト管理
+# ========================================
+artifacts:
+  # GitHub Actionsアーティファクト
+  github_actions:
+    enabled: true
+    retention_days: 30
+    paths:
+      - "repair_summary.json"
+      - "logs/auto_repair_*.log"
+      - "monitoring_report.json"
+
+  # ローカルストレージ
+  local:
+    enabled: true
+    base_path: "artifacts"
+    cleanup:
+      enabled: true
+      retention_days: 7
+
+# ========================================
+# セキュリティ設定
+# ========================================
+security:
+  # シークレット管理
+  secrets:
+    use_github_secrets: true
+    required:
+      - "GITHUB_TOKEN"
+    optional:
+      - "SLACK_WEBHOOK_URL"
+      - "EMAIL_PASSWORD"
+
+  # 実行権限
+  permissions:
+    contents: "write"
+    issues: "write"
+    actions: "write"
+    pull_requests: "write"
+
+# ========================================
+# デバッグ設定
+# ========================================
+debug:
+  enabled: false
+  dry_run: false  # trueの場合、修復を実行せず検知のみ
+  verbose: false
+  save_intermediate_results: false
