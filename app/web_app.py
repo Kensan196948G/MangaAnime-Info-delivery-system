@@ -830,7 +830,8 @@ def api_rss_feeds_test():
             if e.response.status_code == 404:
                 return jsonify({
                     "success": False,
-                    "error": "このフィードは無効化されています（404 Not Found）"
+                    "error": f"フィード '{feed_config.name}' は無効化されています（サイト側でRSS提供終了）",
+                    "details": "代替フィード: 少年ジャンプ+、となりのヤングジャンプ"
                 })
             else:
                 return jsonify({
