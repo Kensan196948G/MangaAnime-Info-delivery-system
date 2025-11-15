@@ -684,6 +684,294 @@ def collection_settings():
     return render_template("collection_settings.html")
 
 
+@app.route("/api/rss-feeds")
+def api_rss_feeds():
+    """Get all RSS feed configurations"""
+    try:
+        from modules.manga_rss_enhanced import EnhancedMangaRSSCollector
+
+        collector = EnhancedMangaRSSCollector()
+        feeds = []
+
+        # Convert MANGA_SOURCES to API response format
+        for feed_id, feed_config in collector.MANGA_SOURCES.items():
+            feed_data = {
+                "id": feed_id,
+                "name": feed_config.name,
+                "url": feed_config.url,
+                "category": feed_config.category,
+                "enabled": feed_config.enabled,
+                "priority": feed_config.priority,
+                "timeout": feed_config.timeout,
+                "parser_type": feed_config.parser_type,
+                "status": "connected" if feed_config.enabled else "disabled",
+                "stats": {
+                    "itemsCollected": 0,  # TODO: Get from database
+                    "successRate": 0.0     # TODO: Calculate from logs
+                }
+            }
+
+            # Add error information if available
+            # TODO: Retrieve error status from database or logs
+
+            feeds.append(feed_data)
+
+        return jsonify({
+            "success": True,
+            "feeds": feeds,
+            "total": len(feeds)
+        })
+
+    except Exception as e:
+        logging.error(f"Failed to get RSS feeds: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route("/api/rss-feeds/toggle", methods=["POST"])
+def api_rss_feeds_toggle():
+    """Toggle RSS feed enable/disable status"""
+    try:
+        data = request.get_json()
+        feed_id = data.get("feedId")
+        enabled = data.get("enabled", True)
+
+        if not feed_id:
+            return jsonify({
+                "success": False,
+                "error": "feedId is required"
+            }), 400
+
+        # TODO: Persist the enabled/disabled state to database or config file
+        # For now, we'll just acknowledge the request
+
+        logging.info(f"RSS feed '{feed_id}' {'enabled' if enabled else 'disabled'}")
+
+        return jsonify({
+            "success": True,
+            "feedId": feed_id,
+            "enabled": enabled
+        })
+
+    except Exception as e:
+        logging.error(f"Failed to toggle RSS feed: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route("/api/rss-feeds/test", methods=["POST"])
+def api_rss_feeds_test():
+    """Test connection to an RSS feed"""
+    try:
+        data = request.get_json()
+        feed_id = data.get("feedId")
+
+        if not feed_id:
+            return jsonify({
+                "success": False,
+                "error": "feedId is required"
+            }), 400
+
+        from modules.manga_rss_enhanced import EnhancedMangaRSSCollector
+
+        collector = EnhancedMangaRSSCollector()
+        feed_config = collector.MANGA_SOURCES.get(feed_id)
+
+        if not feed_config:
+            return jsonify({
+                "success": False,
+                "error": f"Feed '{feed_id}' not found"
+            }), 404
+
+        # Test the feed
+        import feedparser
+        import requests
+
+        try:
+            # Use requests with timeout
+            response = requests.get(
+                feed_config.url,
+                timeout=feed_config.timeout,
+                headers={
+                    'User-Agent': 'Manga-Anime-Collector/1.0 (https://github.com/your-repo)'
+                }
+            )
+            response.raise_for_status()
+
+            # Parse the feed
+            feed = feedparser.parse(response.content)
+
+            if feed.bozo:
+                # Feed has parsing errors
+                return jsonify({
+                    "success": False,
+                    "error": f"Feed parsing error: {feed.bozo_exception}"
+                })
+
+            items_found = len(feed.entries)
+
+            return jsonify({
+                "success": True,
+                "feedId": feed_id,
+                "itemsFound": items_found,
+                "feedTitle": feed.feed.get("title", "Unknown")
+            })
+
+        except requests.exceptions.Timeout:
+            return jsonify({
+                "success": False,
+                "error": f"タイムアウトが発生しました（{feed_config.timeout}秒）"
+            })
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                return jsonify({
+                    "success": False,
+                    "error": "このフィードは無効化されています（404 Not Found）"
+                })
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": f"HTTPエラー: {e.response.status_code}"
+                })
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            })
+
+    except Exception as e:
+        logging.error(f"Failed to test RSS feed: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route("/api/rss-feeds/diagnose", methods=["POST"])
+def api_rss_feeds_diagnose():
+    """Diagnose RSS feed problems"""
+    try:
+        data = request.get_json()
+        feed_id = data.get("feedId")
+
+        if not feed_id:
+            return jsonify({
+                "success": False,
+                "error": "feedId is required"
+            }), 400
+
+        from modules.manga_rss_enhanced import EnhancedMangaRSSCollector
+        import requests
+
+        collector = EnhancedMangaRSSCollector()
+        feed_config = collector.MANGA_SOURCES.get(feed_id)
+
+        if not feed_config:
+            return jsonify({
+                "success": False,
+                "error": f"Feed '{feed_id}' not found"
+            }), 404
+
+        diagnosis = {
+            "feedId": feed_id,
+            "url": feed_config.url,
+            "checks": []
+        }
+
+        # Check 1: DNS resolution
+        try:
+            from urllib.parse import urlparse
+            hostname = urlparse(feed_config.url).hostname
+            import socket
+            socket.gethostbyname(hostname)
+            diagnosis["checks"].append({
+                "name": "DNS解決",
+                "status": "success",
+                "message": f"ホスト '{hostname}' は解決されました"
+            })
+        except Exception as e:
+            diagnosis["checks"].append({
+                "name": "DNS解決",
+                "status": "error",
+                "message": f"DNS解決に失敗: {str(e)}"
+            })
+
+        # Check 2: HTTP connectivity
+        try:
+            response = requests.head(
+                feed_config.url,
+                timeout=10,
+                allow_redirects=True,
+                headers={'User-Agent': 'Manga-Anime-Collector/1.0'}
+            )
+            diagnosis["checks"].append({
+                "name": "HTTP接続",
+                "status": "success" if response.status_code < 400 else "warning",
+                "message": f"HTTPステータス: {response.status_code}"
+            })
+        except Exception as e:
+            diagnosis["checks"].append({
+                "name": "HTTP接続",
+                "status": "error",
+                "message": f"接続失敗: {str(e)}"
+            })
+
+        # Check 3: SSL certificate (if HTTPS)
+        if feed_config.url.startswith("https://"):
+            try:
+                import ssl
+                import socket
+                from urllib.parse import urlparse
+
+                hostname = urlparse(feed_config.url).hostname
+                context = ssl.create_default_context()
+
+                with socket.create_connection((hostname, 443), timeout=10) as sock:
+                    with context.wrap_socket(sock, server_hostname=hostname) as ssock:
+                        cert = ssock.getpeercert()
+                        diagnosis["checks"].append({
+                            "name": "SSL証明書",
+                            "status": "success",
+                            "message": "証明書は有効です"
+                        })
+            except Exception as e:
+                diagnosis["checks"].append({
+                    "name": "SSL証明書",
+                    "status": "error",
+                    "message": f"証明書エラー: {str(e)}"
+                })
+
+        # Determine overall status
+        error_count = sum(1 for check in diagnosis["checks"] if check["status"] == "error")
+        warning_count = sum(1 for check in diagnosis["checks"] if check["status"] == "warning")
+
+        if error_count > 0:
+            diagnosis["overallStatus"] = "error"
+            diagnosis["recommendation"] = "このフィードは現在利用できません。URLを確認するか、フィードを無効化してください。"
+        elif warning_count > 0:
+            diagnosis["overallStatus"] = "warning"
+            diagnosis["recommendation"] = "接続に問題がある可能性があります。監視を続けてください。"
+        else:
+            diagnosis["overallStatus"] = "success"
+            diagnosis["recommendation"] = "すべてのチェックが成功しました。"
+
+        return jsonify({
+            "success": True,
+            "diagnosis": diagnosis
+        })
+
+    except Exception as e:
+        logging.error(f"Failed to diagnose RSS feed: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
 @app.route("/api/collection-status")
 def api_collection_status():
     """API endpoint for collection status information with caching"""

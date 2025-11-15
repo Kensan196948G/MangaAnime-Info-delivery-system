@@ -187,6 +187,9 @@
 
 <!-- 通知ステータス表示用CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/notification-status.css') }}">
+
+<!-- 収集設定拡張スタイル -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/collection-settings.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -245,7 +248,7 @@
         <!-- 収集ソース設定 -->
         <div class="tab-pane fade show active" id="sources" role="tabpanel">
             <div class="py-4">
-                <div class="row">
+                <div class="row" id="rssSourcesContainer">
                     <!-- AniList API設定 -->
                     <div class="col-lg-6 mb-4">
                         <div class="card source-config-card enabled">
@@ -356,63 +359,56 @@
 
                     <!-- BookWalker RSS設定 -->
                     <div class="col-lg-6 mb-4">
-                        <div class="card source-config-card error">
+                        <div class="card source-config-card disabled">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h5 class="mb-0">BookWalker RSS</h5>
-                                    <small class="text-muted">電子書籍情報</small>
+                                    <h5 class="mb-0">BookWalker RSS <span class="badge bg-secondary">無効化済み</span></h5>
+                                    <small class="text-muted">電子書籍情報 - フィード利用不可</small>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="connection-status disconnected">
-                                        <i class="bi bi-exclamation-circle"></i> エラー
+                                        <i class="bi bi-x-circle"></i> 利用不可
                                     </span>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="bookwalkerEnabled" checked>
+                                        <input class="form-check-input" type="checkbox" id="bookwalkerEnabled" disabled>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div class="alert alert-warning">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                    <strong>接続エラー:</strong> タイムアウトが発生しています。URL を確認してください。
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <strong>フィード利用不可:</strong> BookWalkerのRSSフィードは404エラー（Not Found）のため利用できません。
+                                    <br><small class="mt-2 d-block">このフィードは恒久的に無効化されています。代替として、少年ジャンプ+やとなりのヤングジャンプなど他のマンガRSSフィードをご利用ください。</small>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">RSS URL</label>
+                                    <label class="form-label">RSS URL（利用不可）</label>
                                     <input type="url" class="form-control" 
                                            value="https://bookwalker.jp/rss/new-releases.xml" 
-                                           placeholder="RSSフィードのURL">
+                                           placeholder="RSSフィードのURL" 
+                                           disabled 
+                                           readonly>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">ユーザーエージェント</label>
-                                    <input type="text" class="form-control" 
-                                           value="Manga-Anime-Collector/1.0"
-                                           placeholder="HTTPリクエストのユーザーエージェント">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">タイムアウト（秒）</label>
-                                    <input type="number" class="form-control" value="30" min="5" max="300">
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-primary test-connection-btn" onclick="testConnection('bookwalker')">
-                                        <i class="bi bi-wifi"></i> 接続テスト
-                                    </button>
-                                    <button class="btn btn-outline-warning" onclick="diagnoseProblem('bookwalker')">
-                                        <i class="bi bi-tools"></i> 問題診断
-                                    </button>
+                                <div class="alert alert-info">
+                                    <strong>代替フィード:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li>少年ジャンプ+ (https://shonenjumpplus.com/rss)</li>
+                                        <li>となりのヤングジャンプ (https://tonarinoyj.jp/rss)</li>
+                                    </ul>
                                 </div>
                                 <div class="stats-grid mt-3">
                                     <div class="stats-card">
-                                        <div class="stats-value">0</div>
+                                        <div class="stats-value text-muted">-</div>
                                         <small class="text-muted">取得作品数</small>
                                     </div>
                                     <div class="stats-card">
-                                        <div class="stats-value">23.1%</div>
+                                        <div class="stats-value text-muted">-</div>
                                         <small class="text-muted">成功率</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                     <!-- カスタムRSSフィード -->
                     <div class="col-lg-6 mb-4">
@@ -1332,4 +1328,7 @@ function systemDiagnostics() {
 
 <!-- 通知ステータス表示用JavaScript -->
 <script src="{{ url_for('static', filename='js/notification-status.js') }}"></script>
+
+<!-- 収集設定管理用JavaScript -->
+<script src="{{ url_for('static', filename='js/collection-settings.js') }}"></script>
 {% endblock %}

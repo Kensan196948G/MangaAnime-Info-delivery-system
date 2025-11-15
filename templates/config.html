@@ -86,13 +86,15 @@
                             </label>
                         </div>
 
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="bookwalker_rss" name="bookwalker_rss"
-                                   {% if config.get('enabled_sources', {}).get('bookwalker_rss', True) %}checked{% endif %}>
-                            <label class="form-check-label" for="bookwalker_rss">
-                                <strong>BookWalker RSS</strong>
-                                <div class="text-muted small">電子書籍の新刊情報</div>
+                                                <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="bookwalker_rss" name="bookwalker_rss" disabled>
+                            <label class="form-check-label text-muted" for="bookwalker_rss">
+                                <strong>BookWalker RSS</strong> <span class="badge bg-secondary">無効化済み</span>
+                                <div class="text-danger small">
+                                    <i class="bi bi-exclamation-triangle"></i> フィード利用不可（404 Not Found）
+                                </div>
                             </label>
+                        </div>
                         </div>
 
                         <div class="form-check mb-3">

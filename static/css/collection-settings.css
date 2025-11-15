@@ -1,0 +1,131 @@
+/**
+ * Collection Settings Enhanced Styles
+ * Additional styles for the collection settings page
+ */
+
+/* Disabled feeds section */
+.disabled-feeds-section {
+    margin-top: 2rem;
+}
+
+.disabled-feeds-section .card {
+    border-color: #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.disabled-feeds-section .card:hover {
+    border-color: #adb5bd;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.toggle-disabled-feeds {
+    transition: all 0.3s ease;
+}
+
+.toggle-disabled-feeds i {
+    transition: transform 0.3s ease;
+}
+
+.toggle-disabled-feeds.collapsed i {
+    transform: rotate(0deg);
+}
+
+/* Feed card animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.source-config-card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Status badge with tooltip */
+.connection-status[data-bs-toggle="tooltip"] {
+    cursor: help;
+}
+
+/* Loading state for test buttons */
+.test-connection-btn .spinner-border {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-width: 0.1rem;
+}
+
+/* Diagnosis modal enhancements */
+#diagnosisModal .list-group-item {
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+#diagnosisModal .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+#diagnosisModal .badge {
+    min-width: 60px;
+}
+
+/* Feed URL input highlighting */
+.feed-url:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .source-config-card .card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+    }
+
+    .source-config-card .card-header > div:last-child {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Error message improvements */
+.alert {
+    border-left: 4px solid currentColor;
+}
+
+.alert-warning {
+    border-left-color: #ffc107;
+}
+
+.alert-secondary {
+    border-left-color: #6c757d;
+}
+
+/* Stats card hover effect */
+.stats-card {
+    transition: all 0.2s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* Tooltip customization */
+.tooltip-inner {
+    max-width: 300px;
+    text-align: left;
+}
+
+/* Smooth transitions */
+* {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

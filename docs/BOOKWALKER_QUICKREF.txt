@@ -1,0 +1,53 @@
+===============================================
+BookWalker RSS 無効化 - クイックリファレンス
+===============================================
+
+現在の状態:
+-----------
+❌ BookWalker RSS: 完全に無効化済み
+   理由: 404 Not Found (https://bookwalker.jp/rss/new-releases.xml)
+
+有効なマンガRSSフィード:
+-------------------------
+✓ 少年ジャンプ+ (https://shonenjumpplus.com/rss)
+✓ となりのヤングジャンプ (https://tonarinoyj.jp/rss)
+
+UI での表示:
+------------
+1. 収集設定画面 (/collection/settings):
+   - BookWalkerカードは灰色 (disabled)
+   - チェックボックス無効化
+   - 赤いアラート: "フィード利用不可（404エラー）"
+   - 代替フィード案内あり
+
+2. 設定画面 (/config):
+   - チェックボックス無効化
+   - 「無効化済み」バッジ
+   - エラーメッセージ表示
+
+3. ダッシュボード (/dashboard):
+   - "BookWalker RSS (無効化済み - 404エラー)"
+
+設定ファイル:
+-------------
+config.json:
+  "bookwalker_rss": false
+
+変更されたファイル:
+-------------------
+- config.json (設定)
+- templates/collection_settings.html (UI)
+- templates/config.html (UI)
+- templates/collection_dashboard.html (UI)
+- BOOKWALKER_DISABLED.md (ドキュメント)
+
+将来の対応:
+-----------
+BookWalkerがRSSフィードを復活させた場合:
+1. config.json で "bookwalker_rss": true に変更
+2. templates/ のHTMLファイルから disabled 属性を削除
+3. 正しいURL を設定
+
+===============================================
+更新日: 2025-11-15
+===============================================
