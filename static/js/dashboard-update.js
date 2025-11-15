@@ -221,10 +221,20 @@ class DashboardUpdateManager {
 
         } catch (error) {
             console.error('Error refreshing recent releases:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString()
+            });
+
             if (!silent) {
+                const errorMsg = error.message.includes('HTTP error')
+                    ? 'サーバーからのレスポンスエラーが発生しました。ページを再度読み込んでください。'
+                    : 'データの取得に失敗しました。後でもう一度お試しください。';
+
                 this.showToast(
                     '更新エラー',
-                    'データの取得に失敗しました。後でもう一度お試しください。',
+                    errorMsg,
                     'error'
                 );
             }
@@ -275,10 +285,20 @@ class DashboardUpdateManager {
 
         } catch (error) {
             console.error('Error refreshing upcoming releases:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString()
+            });
+
             if (!silent) {
+                const errorMsg = error.message.includes('HTTP error')
+                    ? 'サーバーからのレスポンスエラーが発生しました。ページを再度読み込んでください。'
+                    : 'データの取得に失敗しました。後でもう一度お試しください。';
+
                 this.showToast(
                     '更新エラー',
-                    'データの取得に失敗しました。後でもう一度お試しください。',
+                    errorMsg,
                     'error'
                 );
             }
@@ -329,10 +349,20 @@ class DashboardUpdateManager {
 
         } catch (error) {
             console.error('Error refreshing release history:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString()
+            });
+
             if (!silent) {
+                const errorMsg = error.message.includes('HTTP error')
+                    ? 'サーバーからのレスポンスエラーが発生しました。ページを再度読み込んでください。'
+                    : 'データの取得に失敗しました。後でもう一度お試しください。';
+
                 this.showToast(
                     '更新エラー',
-                    'データの取得に失敗しました。後でもう一度お試しください。',
+                    errorMsg,
                     'error'
                 );
             }

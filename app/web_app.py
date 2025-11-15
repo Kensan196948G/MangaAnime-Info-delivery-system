@@ -621,23 +621,55 @@ def parse_log_entry(log_line):
 
 @app.route("/api/releases/recent")
 def api_recent_releases():
-    """API endpoint for recent releases (AJAX) with Japanese title priority"""
-    conn = get_db_connection()
-    releases = conn.execute(
+    """API endpoint for recent releases (AJAX) with proper title display"""
+    try:
+        conn = get_db_connection()
+        releases = conn.execute(
+            """
+            SELECT w.title, w.title_kana, w.type, r.release_type, r.number, r.platform,
+                   r.release_date, r.notified
+            FROM releases r
+            JOIN works w ON r.work_id = w.id
+            WHERE r.release_date >= date('now', '-1 days')
+            ORDER BY r.release_date DESC
+            LIMIT 10
         """
-        SELECT COALESCE(w.title_kana, w.title) as title, w.title as original_title,
-               w.type, r.release_type, r.number, r.platform,
-               r.release_date, r.notified
-        FROM releases r
-        JOIN works w ON r.work_id = w.id
-        WHERE r.release_date >= date('now', '-1 days')
-        ORDER BY r.release_date DESC
-        LIMIT 10
-    """
-    ).fetchall()
-    conn.close()
+        ).fetchall()
+        conn.close()
 
-    return jsonify([dict(release) for release in releases])
+        data = [dict(release) for release in releases]
+        logger.info(f"[API] Returning {len(data)} recent releases")
+        return jsonify(data)
+    except Exception as e:
+        logger.error(f"[API] Error fetching recent releases: {e}", exc_info=True)
+        return jsonify({"error": str(e), "message": "Failed to fetch recent releases"}), 500
+
+
+@app.route("/api/releases/upcoming")
+def api_upcoming_releases():
+    """API endpoint for upcoming releases with proper title display"""
+    try:
+        conn = get_db_connection()
+        releases = conn.execute(
+            """
+            SELECT w.id, w.title, w.title_kana, w.type,
+                   r.id as release_id, r.release_type, r.number, r.platform,
+                   r.release_date, r.source_url, r.notified, r.created_at
+            FROM releases r
+            JOIN works w ON r.work_id = w.id
+            WHERE r.release_date >= date('now')
+            ORDER BY r.release_date ASC
+            LIMIT 50
+        """
+        ).fetchall()
+        conn.close()
+
+        data = [dict(release) for release in releases]
+        logger.info(f"[API] Returning {len(data)} upcoming releases")
+        return jsonify(data)
+    except Exception as e:
+        logger.error(f"[API] Error fetching upcoming releases: {e}", exc_info=True)
+        return jsonify({"error": str(e), "message": "Failed to fetch upcoming releases"}), 500
 
 
 @app.route("/admin")
@@ -1030,10 +1062,9 @@ def api_works():
 
     conn = get_db_connection()
 
-    # Build base query with Japanese title priority
+    # Build base query with proper title display
     query = """
-        SELECT w.id, COALESCE(w.title_kana, w.title) as title, w.title as original_title,
-               w.title_en, w.type, w.official_url,
+        SELECT w.id, w.title, w.title_kana, w.title_en, w.type, w.official_url,
                GROUP_CONCAT(DISTINCT r.platform) as platforms,
                MIN(r.release_date) as next_release_date,
                COUNT(r.id) as release_count
@@ -1151,7 +1182,7 @@ def api_work_detail(work_id):
 
     work = conn.execute(
         """
-        SELECT w.*, COALESCE(w.title_kana, w.title) as display_title,
+        SELECT w.*, w.title, w.title_kana,
                GROUP_CONCAT(DISTINCT r.platform) as platforms
         FROM works w
         LEFT JOIN releases r ON w.id = r.work_id
