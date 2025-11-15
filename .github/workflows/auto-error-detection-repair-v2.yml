@@ -282,6 +282,15 @@ jobs:
             try {
               if (fs.existsSync('repair_summary.json')) {
                 const data = JSON.parse(fs.readFileSync('repair_summary.json', 'utf8'));
+                const timestamp = data.timestamp || new Date().toISOString();
+                const finalStatus = data.final_status;
+                const totalLoops = data.total_loops || 0;
+                const maxLoops = data.max_loops;
+                const successfulRepairs = data.successful_repairs || 0;
+                const failedRepairs = data.failed_repairs || 0;
+                const errorReductionRate = (data.error_reduction_rate || 0).toFixed(1);
+                const criticalErrors = data.critical_errors || 0;
+                const warningErrors = data.warning_errors || 0;
 
                 const statusBadges = {
                   'success': '✅',
@@ -291,31 +300,44 @@ jobs:
                   'failed': '❌'
                 };
 
-                const badge = statusBadges[data.final_status] || '❓';
+                const badge = statusBadges[finalStatus] || '❓';
 
-                summary = `
-            ## ${badge} 自動修復失敗レポート
+                // 高重要度エラーの整形
+                let highSeverityErrors = 'なし';
+                if (data.detected_errors && data.detected_errors.length > 0) {
+                  const highErrors = data.detected_errors.filter(e => e.severity === 'high');
+                  if (highErrors.length > 0) {
+                    highSeverityErrors = highErrors.map(e => `- **${e.type}**: ${e.message}`).join('\n');
+                  }
+                }
 
-            **実行日時**: ${data.timestamp || new Date().toISOString()}
-            **最終ステータス**: ${data.final_status}
-            **実行ループ数**: ${data.total_loops || 0} / ${data.max_loops}
-            **成功した修復**: ${data.successful_repairs || 0}
-            **失敗した修復**: ${data.failed_repairs || 0}
-            **エラー削減率**: ${(data.error_reduction_rate || 0).toFixed(1)}%
+                // 推奨アクションの整形
+                let recommendationsText = '手動での確認が必要です';
+                if (data.recommendations && data.recommendations.length > 0) {
+                  recommendationsText = data.recommendations.map(r => `- ${r}`).join('\n');
+                }
+
+                summary = `## ${badge} 自動修復失敗レポート
+
+            **実行日時**: ${timestamp}
+            **最終ステータス**: ${finalStatus}
+            **実行ループ数**: ${totalLoops} / ${maxLoops}
+            **成功した修復**: ${successfulRepairs}
+            **失敗した修復**: ${failedRepairs}
+            **エラー削減率**: ${errorReductionRate}%
 
             ### 🚨 残存エラー
-            - **クリティカル**: ${data.critical_errors || 0}
-            - **警告**: ${data.warning_errors || 0}
+            - **クリティカル**: ${criticalErrors}
+            - **警告**: ${warningErrors}
 
             ### 検出されたエラー
-            ${data.detected_errors?.filter(e => e.severity === 'high').map(e => \`- **\${e.type}**: \${e.message}\`).join('\\n') || 'なし'}
+            ${highSeverityErrors}
 
             ### 推奨アクション
-            ${data.recommendations?.map(r => \`- \${r}\`).join('\\n') || '手動での確認が必要です'}
+            ${recommendationsText}
 
             ---
-            🤖 この Issue は自動生成されました（v2: 段階的成功判定）
-            `;
+            🤖 この Issue は自動生成されました（v2: 段階的成功判定）`;
               }
             } catch (error) {
               console.error('修復サマリー読み込みエラー:', error);
@@ -330,11 +352,12 @@ jobs:
             });
 
             // 既存Issueが5個未満なら新規作成
+            const today = new Date().toISOString().split('T')[0];
             if (existingIssues.data.length < 5) {
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: \`🚨 自動修復失敗 - \${new Date().toISOString().split('T')[0]}\`,
+                title: `🚨 自動修復失敗 - ${today}`,
                 body: summary,
                 labels: ['auto-repair', 'bug', '要確認', 'critical']
               });
@@ -350,31 +373,52 @@ jobs:
             const fs = require('fs');
             let comment = '✅ 自動修復が完了しました';
 
+            // Issue番号の取得と検証
+            const issueNumber = context.issue?.number || context.payload?.issue?.number;
+
+            if (!issueNumber) {
+              console.log('⚠️ Issue番号が取得できませんでした。コメント投稿をスキップします。');
+              return;
+            }
+
             try {
               if (fs.existsSync('repair_summary.json')) {
                 const data = JSON.parse(fs.readFileSync('repair_summary.json', 'utf8'));
-                comment = \`
-            ## ✅ 自動修復完了 v2
+                const finalStatus = data.final_status;
+                const totalLoops = data.total_loops || 0;
+                const maxLoops = data.max_loops;
+                const successfulRepairs = data.successful_repairs || 0;
+                const errorReductionRate = (data.error_reduction_rate || 0).toFixed(1);
+                const criticalErrors = data.critical_errors || 0;
+                const warningErrors = data.warning_errors || 0;
 
-            **最終ステータス**: \${data.final_status}
-            **実行ループ数**: \${data.total_loops || 0} / \${data.max_loops}
-            **成功した修復**: \${data.successful_repairs || 0}
-            **エラー削減率**: \${(data.error_reduction_rate || 0).toFixed(1)}%
-            **残存エラー**: クリティカル=\${data.critical_errors || 0}, 警告=\${data.warning_errors || 0}
+                comment = `## ✅ 自動修復完了 v2
 
-            すべてのクリティカルエラーが修復されました 🎉
-            \`;
+            **最終ステータス**: ${finalStatus}
+            **実行ループ数**: ${totalLoops} / ${maxLoops}
+            **成功した修復**: ${successfulRepairs}
+            **エラー削減率**: ${errorReductionRate}%
+            **残存エラー**: クリティカル=${criticalErrors}, 警告=${warningErrors}
+
+            すべてのクリティカルエラーが修復されました 🎉`;
               }
             } catch (error) {
               console.error('サマリー読み込みエラー:', error);
+              // エラーが発生してもデフォルトのコメントを投稿
             }
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: comment
-            });
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: comment
+              });
+              console.log(`✅ Issue #${issueNumber} にコメントを投稿しました`);
+            } catch (error) {
+              console.error('❌ コメント投稿エラー:', error);
+              core.setFailed(`コメント投稿に失敗しました: ${error.message}`);
+            }
 
       - name: 修復結果に基づく終了判定
         if: always()
