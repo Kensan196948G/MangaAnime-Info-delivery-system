@@ -499,7 +499,7 @@
 
         // Show error/disabled message
         if (isDisabled || feed.enabled === false) {
-            const reason = feed.disabledReason || feed.error_message || 'このフィードは無効化されています';
+            const reason = feed.disabledReason || feed.error_message || 'RSS非対応または利用不可';
             html += `
                 <div class="alert alert-secondary mb-3">
                     <i class="bi bi-info-circle"></i>
@@ -636,7 +636,7 @@
         const error = feed.error_message || feed.error || '';
 
         if (error.includes('404') || error.includes('Not Found')) {
-            return 'このフィードは無効化されています（404 Not Found）。URLを確認するか、フィードを無効化してください。';
+            return 'フィード利用不可（サイト側でRSS提供終了）';
         }
 
         if (error.includes('timeout') || error.includes('Timeout')) {
