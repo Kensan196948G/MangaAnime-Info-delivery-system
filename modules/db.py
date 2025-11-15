@@ -286,6 +286,7 @@ class DatabaseManager:
         Creates tables based on the schema defined in CLAUDE.md:
         - works: Stores anime/manga metadata
         - releases: Stores episode/volume release information
+        - settings: Stores system settings
         """
         with self.get_connection() as conn:
             try:
@@ -324,6 +325,21 @@ class DatabaseManager:
                 """
                 )
 
+                # Create settings table
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS settings (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        key TEXT UNIQUE NOT NULL,
+                        value TEXT,
+                        value_type TEXT CHECK(value_type IN ('string','integer','boolean','json')),
+                        description TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """
+                )
+
                 # Create indexes for better performance
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_works_title ON works(title)"
@@ -338,14 +354,46 @@ class DatabaseManager:
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_releases_notified ON releases(notified)"
                 )
+                conn.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key)"
+                )
 
                 conn.commit()
+
+                # Initialize default settings
+                self._initialize_default_settings(conn)
+
                 self.logger.info("Database initialized successfully")
 
             except sqlite3.Error as e:
                 conn.rollback()
                 self.logger.error(f"Failed to initialize database: {e}")
                 raise
+
+    def _initialize_default_settings(self, conn):
+        """Initialize default settings if they don't exist."""
+        default_settings = [
+            ("notification_email", "kensan1969@gmail.com", "string", "デフォルト通知先メールアドレス"),
+            ("check_interval_hours", "1", "integer", "チェック間隔（時間）"),
+            ("email_notifications_enabled", "true", "boolean", "メール通知を有効化"),
+            ("calendar_enabled", "false", "boolean", "カレンダー登録を有効化"),
+            ("max_notifications_per_day", "50", "integer", "1日あたりの最大通知数"),
+        ]
+
+        for key, value, value_type, description in default_settings:
+            try:
+                conn.execute(
+                    """
+                    INSERT OR IGNORE INTO settings (key, value, value_type, description)
+                    VALUES (?, ?, ?, ?)
+                """,
+                    (key, value, value_type, description),
+                )
+            except sqlite3.Error:
+                # Setting already exists, skip
+                pass
+
+        conn.commit()
 
     def generate_work_id_hash(self, title: str, work_type: str) -> str:
         """
@@ -782,6 +830,137 @@ class DatabaseManager:
                 self.logger.info("Database optimization completed")
         except Exception as e:
             self.logger.error(f"Database optimization failed: {e}")
+
+    def get_setting(self, key: str, default: Any = None) -> Any:
+        """
+        Get a setting value from the database.
+
+        Args:
+            key: Setting key
+            default: Default value if setting doesn't exist
+
+        Returns:
+            Setting value with proper type conversion
+        """
+        with self.get_connection() as conn:
+            cursor = conn.execute(
+                "SELECT value, value_type FROM settings WHERE key = ?", (key,)
+            )
+            row = cursor.fetchone()
+
+            if not row:
+                return default
+
+            value, value_type = row["value"], row["value_type"]
+
+            # Convert value based on type
+            if value_type == "integer":
+                return int(value)
+            elif value_type == "boolean":
+                return value.lower() in ("true", "1", "yes")
+            elif value_type == "json":
+                import json
+                return json.loads(value)
+            else:
+                return value
+
+    def set_setting(self, key: str, value: Any, value_type: str = "string", description: str = ""):
+        """
+        Set a setting value in the database.
+
+        Args:
+            key: Setting key
+            value: Setting value
+            value_type: Type of value ('string', 'integer', 'boolean', 'json')
+            description: Optional description
+        """
+        # Convert value to string for storage
+        if value_type == "json":
+            import json
+            value_str = json.dumps(value)
+        elif value_type == "boolean":
+            value_str = "true" if value else "false"
+        else:
+            value_str = str(value)
+
+        with self.get_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO settings (key, value, value_type, description, updated_at)
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(key) DO UPDATE SET
+                    value = excluded.value,
+                    value_type = excluded.value_type,
+                    description = excluded.description,
+                    updated_at = CURRENT_TIMESTAMP
+            """,
+                (key, value_str, value_type, description),
+            )
+            conn.commit()
+
+    def get_all_settings(self) -> Dict[str, Any]:
+        """
+        Get all settings from the database.
+
+        Returns:
+            Dictionary of all settings with proper type conversion
+        """
+        settings = {}
+        with self.get_connection() as conn:
+            cursor = conn.execute("SELECT key, value, value_type FROM settings")
+            for row in cursor.fetchall():
+                key, value, value_type = row["key"], row["value"], row["value_type"]
+
+                # Convert value based on type
+                if value_type == "integer":
+                    settings[key] = int(value)
+                elif value_type == "boolean":
+                    settings[key] = value.lower() in ("true", "1", "yes")
+                elif value_type == "json":
+                    import json
+                    settings[key] = json.loads(value)
+                else:
+                    settings[key] = value
+
+        return settings
+
+    def update_settings(self, settings: Dict[str, Any]):
+        """
+        Update multiple settings at once.
+
+        Args:
+            settings: Dictionary of settings to update
+        """
+        with self.get_connection() as conn:
+            for key, value in settings.items():
+                # Determine value type
+                if isinstance(value, bool):
+                    value_type = "boolean"
+                    value_str = "true" if value else "false"
+                elif isinstance(value, int):
+                    value_type = "integer"
+                    value_str = str(value)
+                elif isinstance(value, (dict, list)):
+                    import json
+                    value_type = "json"
+                    value_str = json.dumps(value)
+                else:
+                    value_type = "string"
+                    value_str = str(value)
+
+                conn.execute(
+                    """
+                    INSERT INTO settings (key, value, value_type, updated_at)
+                    VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+                    ON CONFLICT(key) DO UPDATE SET
+                        value = excluded.value,
+                        value_type = excluded.value_type,
+                        updated_at = CURRENT_TIMESTAMP
+                """,
+                    (key, value_str, value_type),
+                )
+
+            conn.commit()
 
     def close_connections(self):
         """Close all database connections and clean up resources."""

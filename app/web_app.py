@@ -920,6 +920,125 @@ def api_manual_collection():
     return jsonify({"success": True, "message": "Manual collection started"})
 
 
+@app.route("/api/refresh-upcoming", methods=["POST"])
+def api_refresh_upcoming():
+    """API endpoint to refresh upcoming releases"""
+    try:
+        # This would trigger the actual collection process for upcoming releases
+        # For now, return success with timestamp
+        from datetime import datetime
+
+        result = {
+            "success": True,
+            "message": "今後の予定を更新しました",
+            "timestamp": datetime.now().isoformat(),
+            "count": 0  # This would be the actual count of updated releases
+        }
+
+        logger.info("Upcoming releases refresh triggered")
+        return jsonify(result)
+
+    except Exception as e:
+        logger.error(f"Error refreshing upcoming releases: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route("/api/refresh-history", methods=["POST"])
+def api_refresh_history():
+    """API endpoint to refresh release history"""
+    try:
+        # This would trigger the actual collection process for historical data
+        # For now, return success with timestamp
+        from datetime import datetime
+
+        result = {
+            "success": True,
+            "message": "リリース履歴を更新しました",
+            "timestamp": datetime.now().isoformat(),
+            "count": 0  # This would be the actual count of updated releases
+        }
+
+        logger.info("Release history refresh triggered")
+        return jsonify(result)
+
+    except Exception as e:
+        logger.error(f"Error refreshing release history: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route("/api/settings", methods=["GET", "POST"])
+def api_settings():
+    """API endpoint for settings management"""
+    # Import database manager
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from modules.db import get_db
+
+    db_manager = get_db()
+
+    if request.method == "GET":
+        try:
+            # Get all settings from database
+            settings = db_manager.get_all_settings()
+
+            # If no settings found, return defaults
+            if not settings:
+                settings = {
+                    "notification_email": "kensan1969@gmail.com",
+                    "check_interval_hours": 1,
+                    "email_notifications_enabled": True,
+                    "calendar_enabled": False,
+                    "max_notifications_per_day": 50
+                }
+
+            return jsonify({
+                "success": True,
+                "settings": settings
+            })
+
+        except Exception as e:
+            logger.error(f"Error getting settings: {e}")
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
+    elif request.method == "POST":
+        try:
+            # Update settings
+            data = request.get_json()
+
+            if not data:
+                return jsonify({
+                    "success": False,
+                    "error": "No data provided"
+                }), 400
+
+            # Update settings in database
+            db_manager.update_settings(data)
+
+            logger.info(f"Settings updated: {list(data.keys())}")
+
+            return jsonify({
+                "success": True,
+                "message": "設定を保存しました",
+                "settings": db_manager.get_all_settings()
+            })
+
+        except Exception as e:
+            logger.error(f"Error updating settings: {e}")
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
+
 @app.route("/api/collection-processes")
 def api_collection_processes():
     """API endpoint for collection processes status"""

@@ -765,34 +765,52 @@ https://example3.com/updates.xml"></textarea>
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label">通知先メールアドレス</label>
-                                    <input type="email" class="form-control" 
-                                           value="user@example.com" 
+                                    <input type="email" class="form-control"
+                                           name="notification_email"
+                                           value="kensan1969@gmail.com"
                                            placeholder="通知を受信するメールアドレス">
+                                    <small class="form-text text-muted">デフォルト: kensan1969@gmail.com</small>
                                 </div>
-                                
+
                                 <div class="mb-3">
-                                    <label class="form-label">通知頻度</label>
-                                    <select class="form-select">
-                                        <option value="immediate">即座に通知</option>
-                                        <option value="daily" selected>1日1回まとめて</option>
-                                        <option value="weekly">1週間1回まとめて</option>
-                                        <option value="disabled">通知しない</option>
-                                    </select>
+                                    <label class="form-label">チェック間隔（時間）</label>
+                                    <input type="number" class="form-control"
+                                           name="check_interval_hours"
+                                           value="1"
+                                           min="1"
+                                           max="24"
+                                           placeholder="情報チェックの間隔">
+                                    <small class="form-text text-muted">デフォルト: 1時間</small>
                                 </div>
-                                
+
                                 <div class="mb-3">
-                                    <label class="form-label">通知する内容</label>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="notifyNewReleases" checked>
-                                        <label class="form-check-label" for="notifyNewReleases">新作リリース</label>
+                                    <label class="form-label">1日あたりの最大通知数</label>
+                                    <input type="number" class="form-control"
+                                           name="max_notifications_per_day"
+                                           value="50"
+                                           min="1"
+                                           max="200"
+                                           placeholder="1日に送信する最大通知数">
+                                    <small class="form-text text-muted">デフォルト: 50</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">通知有効化</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="email_notifications_enabled"
+                                               id="emailNotificationsEnabled" checked>
+                                        <label class="form-check-label" for="emailNotificationsEnabled">
+                                            メール通知を有効にする
+                                        </label>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="notifySystemStatus" checked>
-                                        <label class="form-check-label" for="notifySystemStatus">システム状態</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="notifyErrors">
-                                        <label class="form-check-label" for="notifyErrors">エラー通知</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="calendar_enabled"
+                                               id="calendarEnabled">
+                                        <label class="form-check-label" for="calendarEnabled">
+                                            Googleカレンダーへの登録を有効にする
+                                        </label>
                                     </div>
                                 </div>
                                 
@@ -1129,23 +1147,130 @@ function testNotification() {
     }, 2000);
 }
 
-function saveAllSettings() {
+async function loadSettings() {
+    try {
+        const response = await fetch('/api/settings');
+        const data = await response.json();
+
+        if (data.success && data.settings) {
+            // 設定をフォームに反映
+            const settings = data.settings;
+
+            // 通知メールアドレス
+            const emailInput = document.querySelector('input[name="notification_email"]');
+            if (emailInput && settings.notification_email) {
+                emailInput.value = settings.notification_email;
+            }
+
+            // チェック間隔
+            const intervalInput = document.querySelector('input[name="check_interval_hours"]');
+            if (intervalInput && settings.check_interval_hours !== undefined) {
+                intervalInput.value = settings.check_interval_hours;
+            }
+
+            // メール通知有効化
+            const emailEnabledCheckbox = document.querySelector('input[name="email_notifications_enabled"]');
+            if (emailEnabledCheckbox && settings.email_notifications_enabled !== undefined) {
+                emailEnabledCheckbox.checked = settings.email_notifications_enabled;
+            }
+
+            // カレンダー有効化
+            const calendarEnabledCheckbox = document.querySelector('input[name="calendar_enabled"]');
+            if (calendarEnabledCheckbox && settings.calendar_enabled !== undefined) {
+                calendarEnabledCheckbox.checked = settings.calendar_enabled;
+            }
+
+            // 最大通知数
+            const maxNotificationsInput = document.querySelector('input[name="max_notifications_per_day"]');
+            if (maxNotificationsInput && settings.max_notifications_per_day !== undefined) {
+                maxNotificationsInput.value = settings.max_notifications_per_day;
+            }
+
+            console.log('Settings loaded successfully:', settings);
+        }
+    } catch (error) {
+        console.error('Error loading settings:', error);
+    }
+}
+
+async function saveAllSettings() {
     const button = document.getElementById('saveAllBtn');
     const originalText = button.innerHTML;
-    
+
     button.innerHTML = '<i class="bi bi-hourglass-split"></i> 保存中...';
     button.disabled = true;
-    
-    // 設定保存処理（実装簡略）
-    setTimeout(() => {
-        button.innerHTML = '<i class="bi bi-check-lg"></i> 保存完了';
-        
+
+    try {
+        // 設定を収集
+        const settings = {};
+
+        // 通知メールアドレス
+        const emailInput = document.querySelector('input[name="notification_email"]');
+        if (emailInput) {
+            settings.notification_email = emailInput.value;
+        }
+
+        // チェック間隔
+        const intervalInput = document.querySelector('input[name="check_interval_hours"]');
+        if (intervalInput) {
+            settings.check_interval_hours = parseInt(intervalInput.value);
+        }
+
+        // メール通知有効化
+        const emailEnabledCheckbox = document.querySelector('input[name="email_notifications_enabled"]');
+        if (emailEnabledCheckbox) {
+            settings.email_notifications_enabled = emailEnabledCheckbox.checked;
+        }
+
+        // カレンダー有効化
+        const calendarEnabledCheckbox = document.querySelector('input[name="calendar_enabled"]');
+        if (calendarEnabledCheckbox) {
+            settings.calendar_enabled = calendarEnabledCheckbox.checked;
+        }
+
+        // 最大通知数
+        const maxNotificationsInput = document.querySelector('input[name="max_notifications_per_day"]');
+        if (maxNotificationsInput) {
+            settings.max_notifications_per_day = parseInt(maxNotificationsInput.value);
+        }
+
+        // APIに送信
+        const response = await fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(settings)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            button.innerHTML = '<i class="bi bi-check-lg"></i> 保存完了';
+            console.log('Settings saved successfully');
+
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        } else {
+            throw new Error(data.error || '設定の保存に失敗しました');
+        }
+    } catch (error) {
+        console.error('Error saving settings:', error);
+        button.innerHTML = '<i class="bi bi-x-lg"></i> 保存失敗';
+
         setTimeout(() => {
             button.innerHTML = originalText;
             button.disabled = false;
         }, 2000);
-    }, 1500);
+    }
 }
+
+// ページ読み込み時に設定を取得
+document.addEventListener('DOMContentLoaded', function() {
+    loadSettings();
+});
 
 function optimizeDatabase() {
     if (confirm('データベースを最適化しますか？処理には時間がかかる場合があります。')) {

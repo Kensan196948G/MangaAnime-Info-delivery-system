@@ -88,6 +88,8 @@
     left: 0;
 }
 </style>
+<!-- Dashboard Update CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-update.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -162,14 +164,25 @@
     <div class="row">
         <!-- Recent Releases -->
         <div class="col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
+            <div class="card h-100" id="recentReleases-card">
+                <div class="refresh-progress" id="recentReleases-progress"></div>
+                <div class="loading-overlay" id="recentReleases-overlay">
+                    <div class="spinner-border-custom"></div>
+                </div>
+                <div class="card-header section-header">
+                    <h5 class="mb-0">
                         <i class="bi bi-clock-history me-2"></i>最近のリリース（7日以内）
                     </h5>
-                    <button class="btn btn-outline-primary btn-sm" onclick="refreshRecentReleases()">
-                        <i class="bi bi-arrow-clockwise"></i>
-                    </button>
+                    <div class="section-actions">
+                        <span class="last-updated-badge" id="recentReleases-timestamp">
+                            <i class="bi bi-clock"></i>
+                            <span class="time-text">読み込み中...</span>
+                        </span>
+                        <button class="btn-refresh" id="recentReleases-refresh-btn" onclick="refreshRecentReleases()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span class="d-none d-md-inline">更新</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     {% if recent_releases %}
@@ -232,15 +245,29 @@
 
         <!-- Upcoming Releases -->
         <div class="col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
+            <div class="card h-100" id="upcomingReleases-card">
+                <div class="refresh-progress" id="upcomingReleases-progress"></div>
+                <div class="loading-overlay" id="upcomingReleases-overlay">
+                    <div class="spinner-border-custom"></div>
+                </div>
+                <div class="card-header section-header">
+                    <h5 class="mb-0">
                         <i class="bi bi-calendar-event me-2"></i>今後の予定（7日以内）
                     </h5>
+                    <div class="section-actions">
+                        <span class="last-updated-badge" id="upcomingReleases-timestamp">
+                            <i class="bi bi-clock"></i>
+                            <span class="time-text">読み込み中...</span>
+                        </span>
+                        <button class="btn-refresh" id="upcomingReleases-refresh-btn" onclick="refreshUpcomingReleases()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span class="d-none d-md-inline">更新</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     {% if upcoming_releases %}
-                        <div class="list-group list-group-flush">
+                        <div class="list-group list-group-flush" id="upcoming-releases-list">
                             {% for release in upcoming_releases %}
                                 <div class="list-group-item">
                                     <div class="d-flex justify-content-between align-items-start">
@@ -1320,4 +1347,10 @@ function sendTestNotification() {
     });
 }
 </script>
+
+<!-- Toast Container for Notifications -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Dashboard Update JavaScript -->
+<script src="{{ url_for('static', filename='js/dashboard-update.js') }}"></script>
 {% endblock %}
