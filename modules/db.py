@@ -18,6 +18,7 @@ import logging
 import hashlib
 from typing import Optional, List, Dict, Any
 from contextlib import contextmanager
+from datetime import datetime
 import threading
 import os
 import time
@@ -340,6 +341,21 @@ class DatabaseManager:
                 """
                 )
 
+                # Create notification_history table
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS notification_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        notification_type TEXT CHECK(notification_type IN ('email','calendar')),
+                        executed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        success INTEGER DEFAULT 1,
+                        error_message TEXT,
+                        releases_count INTEGER DEFAULT 0,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """
+                )
+
                 # Create indexes for better performance
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_works_title ON works(title)"
@@ -356,6 +372,12 @@ class DatabaseManager:
                 )
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key)"
+                )
+                conn.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_notification_history_type ON notification_history(notification_type)"
+                )
+                conn.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_notification_history_executed_at ON notification_history(executed_at)"
                 )
 
                 conn.commit()
@@ -961,6 +983,201 @@ class DatabaseManager:
                 )
 
             conn.commit()
+
+    def record_notification_history(
+        self,
+        notification_type: str,
+        success: bool = True,
+        error_message: Optional[str] = None,
+        releases_count: int = 0,
+    ) -> int:
+        """
+        Record notification execution history.
+
+        Args:
+            notification_type: 'email' or 'calendar'
+            success: Whether the notification was successful
+            error_message: Error message if failed
+            releases_count: Number of releases processed
+
+        Returns:
+            ID of created history record
+        """
+        if notification_type not in ("email", "calendar"):
+            raise ValueError(
+                f"Invalid notification_type: {notification_type}. Must be 'email' or 'calendar'"
+            )
+
+        with self.get_connection() as conn:
+            cursor = conn.execute(
+                """
+                INSERT INTO notification_history (notification_type, success, error_message, releases_count)
+                VALUES (?, ?, ?, ?)
+            """,
+                (notification_type, 1 if success else 0, error_message, releases_count),
+            )
+
+            history_id = cursor.lastrowid
+            conn.commit()
+
+            self.logger.info(
+                f"Recorded {notification_type} notification history (ID: {history_id}, Success: {success}, Count: {releases_count})"
+            )
+            return history_id
+
+    def get_notification_history(
+        self, notification_type: Optional[str] = None, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """
+        Get notification execution history.
+
+        Args:
+            notification_type: Filter by type ('email' or 'calendar'), None for all
+            limit: Maximum number of records to return
+
+        Returns:
+            List of history records
+        """
+        with self.get_connection() as conn:
+            if notification_type:
+                cursor = conn.execute(
+                    """
+                    SELECT * FROM notification_history
+                    WHERE notification_type = ?
+                    ORDER BY executed_at DESC
+                    LIMIT ?
+                """,
+                    (notification_type, limit),
+                )
+            else:
+                cursor = conn.execute(
+                    """
+                    SELECT * FROM notification_history
+                    ORDER BY executed_at DESC
+                    LIMIT ?
+                """,
+                    (limit,),
+                )
+
+            return [dict(row) for row in cursor.fetchall()]
+
+    def get_last_notification_time(
+        self, notification_type: str
+    ) -> Optional[datetime]:
+        """
+        Get the last successful notification execution time.
+
+        Args:
+            notification_type: 'email' or 'calendar'
+
+        Returns:
+            Datetime of last execution, or None if no history
+        """
+        with self.get_connection() as conn:
+            cursor = conn.execute(
+                """
+                SELECT executed_at FROM notification_history
+                WHERE notification_type = ? AND success = 1
+                ORDER BY executed_at DESC
+                LIMIT 1
+            """,
+                (notification_type,),
+            )
+
+            row = cursor.fetchone()
+            if row:
+                return datetime.fromisoformat(row["executed_at"])
+            return None
+
+    def get_notification_statistics(
+        self, notification_type: Optional[str] = None, days: int = 7
+    ) -> Dict[str, Any]:
+        """
+        Get notification statistics.
+
+        Args:
+            notification_type: Filter by type, None for all
+            days: Number of days to analyze
+
+        Returns:
+            Dictionary with statistics
+        """
+        with self.get_connection() as conn:
+            where_clause = ""
+            params = []
+
+            if notification_type:
+                where_clause = "WHERE notification_type = ? AND"
+                params.append(notification_type)
+            else:
+                where_clause = "WHERE"
+
+            # Total executions
+            cursor = conn.execute(
+                f"""
+                SELECT COUNT(*) as total FROM notification_history
+                {where_clause} executed_at >= datetime('now', '-{days} days')
+            """,
+                params,
+            )
+            total = cursor.fetchone()["total"]
+
+            # Success count
+            cursor = conn.execute(
+                f"""
+                SELECT COUNT(*) as success_count FROM notification_history
+                {where_clause} success = 1 AND executed_at >= datetime('now', '-{days} days')
+            """,
+                params,
+            )
+            success_count = cursor.fetchone()["success_count"]
+
+            # Failure count
+            cursor = conn.execute(
+                f"""
+                SELECT COUNT(*) as failure_count FROM notification_history
+                {where_clause} success = 0 AND executed_at >= datetime('now', '-{days} days')
+            """,
+                params,
+            )
+            failure_count = cursor.fetchone()["failure_count"]
+
+            # Total releases processed
+            cursor = conn.execute(
+                f"""
+                SELECT SUM(releases_count) as total_releases FROM notification_history
+                {where_clause} success = 1 AND executed_at >= datetime('now', '-{days} days')
+            """,
+                params,
+            )
+            total_releases = cursor.fetchone()["total_releases"] or 0
+
+            # Recent errors
+            error_params = params + [5]  # limit to 5 recent errors
+            cursor = conn.execute(
+                f"""
+                SELECT executed_at, error_message, releases_count FROM notification_history
+                {where_clause} success = 0 AND executed_at >= datetime('now', '-{days} days')
+                ORDER BY executed_at DESC
+                LIMIT ?
+            """,
+                error_params,
+            )
+            recent_errors = [dict(row) for row in cursor.fetchall()]
+
+            # Calculate success rate
+            success_rate = (success_count / total * 100) if total > 0 else 0.0
+
+            return {
+                "total_executions": total,
+                "success_count": success_count,
+                "failure_count": failure_count,
+                "success_rate": round(success_rate, 2),
+                "total_releases_processed": total_releases,
+                "recent_errors": recent_errors,
+                "period_days": days,
+                "notification_type": notification_type or "all",
+            }
 
     def close_connections(self):
         """Close all database connections and clean up resources."""

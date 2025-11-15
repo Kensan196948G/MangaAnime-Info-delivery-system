@@ -127,12 +127,13 @@ class CalendarEvent:
 class GoogleCalendarManager:
     """Google Calendar API client for managing anime/manga release events."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], db_manager=None):
         """
         Initialize Google Calendar manager with enhanced error handling and monitoring.
 
         Args:
             config: Configuration dictionary with calendar settings
+            db_manager: DatabaseManager instance for history recording (optional)
         """
         self.config = config
         self.calendar_config = config.get("google", {}).get("calendar", {})
@@ -147,6 +148,7 @@ class GoogleCalendarManager:
         self.service = None
         self.auth_state = CalendarAuthState()
         self.calendar_id = self.calendar_config.get("calendar_id", "primary")
+        self.db_manager = db_manager
 
         # Performance monitoring
         self.total_events_created = 0
@@ -307,18 +309,37 @@ class GoogleCalendarManager:
             logger.error(f"Calendar authentication failed: {str(e)}")
             return False
 
-    def create_event(self, event: CalendarEvent) -> Optional[str]:
+    def create_event(self, event: CalendarEvent, releases_count: int = 1) -> Optional[str]:
         """
-        Create a calendar event.
+        Create a calendar event with history recording.
 
         Args:
             event: CalendarEvent object with event details
+            releases_count: Number of releases in this calendar event
 
         Returns:
             str: Event ID if created successfully, None otherwise
         """
+        success = False
+        error_message = None
+        event_id = None
+
         if not self._authenticated:
-            logger.error("Calendar not authenticated. Call authenticate() first.")
+            error_message = "Calendar not authenticated. Call authenticate() first."
+            logger.error(error_message)
+
+            # Record failure in history
+            if self.db_manager:
+                try:
+                    self.db_manager.record_notification_history(
+                        notification_type="calendar",
+                        success=False,
+                        error_message=error_message,
+                        releases_count=releases_count,
+                    )
+                except Exception as db_error:
+                    logger.warning(f"Failed to record calendar notification history: {db_error}")
+
             return None
 
         try:
@@ -359,15 +380,29 @@ class GoogleCalendarManager:
             )
 
             event_id = created_event.get("id")
+            success = event_id is not None
             logger.info(f"Calendar event created successfully. Event ID: {event_id}")
-            return event_id
 
         except HttpError as error:
-            logger.error(f"Calendar API error: {error}")
-            return None
+            error_message = f"Calendar API error: {error}"
+            logger.error(error_message)
         except Exception as e:
-            logger.error(f"Failed to create calendar event: {str(e)}")
-            return None
+            error_message = f"Failed to create calendar event: {str(e)}"
+            logger.error(error_message)
+        finally:
+            # Record history to database
+            if self.db_manager:
+                try:
+                    self.db_manager.record_notification_history(
+                        notification_type="calendar",
+                        success=success,
+                        error_message=error_message,
+                        releases_count=releases_count,
+                    )
+                except Exception as db_error:
+                    logger.warning(f"Failed to record calendar notification history: {db_error}")
+
+        return event_id
 
     def update_event(self, event_id: str, event: CalendarEvent) -> bool:
         """

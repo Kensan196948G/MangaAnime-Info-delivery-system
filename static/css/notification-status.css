@@ -1,0 +1,388 @@
+/**
+ * 通知・カレンダー連携実行状況表示UI - スタイルシート
+ * ファイル: notification-status.css
+ */
+
+/* ============================================================
+   実行状況カードスタイル
+   ============================================================ */
+
+.execution-status-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.execution-status-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.execution-status-card .card-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    font-weight: 600;
+    border-bottom: none;
+    padding: 1rem 1.25rem;
+}
+
+.execution-status-card .card-body {
+    padding: 1.5rem;
+}
+
+/* ============================================================
+   ステータスバッジ
+   ============================================================ */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.status-badge.success {
+    background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(25, 135, 84, 0.3);
+}
+
+.status-badge.error {
+    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.status-badge.pending {
+    background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(13, 202, 240, 0.3);
+}
+
+.status-badge.warning {
+    background: linear-gradient(135deg, #ffc107 0%, #cc9a06 100%);
+    color: #000;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+.status-badge i {
+    font-size: 1rem;
+}
+
+/* Pulse animation for active status */
+.status-badge.success::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #00ff00;
+    border-radius: 50%;
+    margin-right: 0.25rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+/* ============================================================
+   時刻表示
+   ============================================================ */
+
+.time-display {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #0d6efd;
+}
+
+.time-display.last-executed {
+    border-left-color: #198754;
+}
+
+.time-display.next-scheduled {
+    border-left-color: #0dcaf0;
+}
+
+.time-display i {
+    font-size: 1.25rem;
+    color: #495057;
+}
+
+.time-display .time-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.time-display .time-value {
+    font-size: 1rem;
+    color: #212529;
+    font-weight: 600;
+}
+
+.time-display .time-relative {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* ============================================================
+   カウントダウンタイマー
+   ============================================================ */
+
+.countdown-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+    color: white;
+    border-radius: 2rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(13, 202, 240, 0.3);
+}
+
+.countdown-timer i {
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================================
+   エラーメッセージ表示
+   ============================================================ */
+
+.error-messages {
+    margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.error-message-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #fff5f5;
+    border: 1px solid #ffc9c9;
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.error-message-item:hover {
+    background: #ffe0e0;
+    border-color: #ff9999;
+}
+
+.error-message-item i {
+    color: #dc3545;
+    font-size: 1.25rem;
+    margin-top: 0.1rem;
+}
+
+.error-message-content {
+    flex: 1;
+}
+
+.error-message-text {
+    font-size: 0.9rem;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.error-message-time {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.no-errors {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #d1e7dd;
+    border: 1px solid #badbcc;
+    border-radius: 0.375rem;
+    color: #0f5132;
+    font-weight: 500;
+}
+
+/* ============================================================
+   統計情報
+   ============================================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0d6efd;
+    margin-bottom: 0.25rem;
+}
+
+.stat-item .stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.stat-item.success .stat-value {
+    color: #198754;
+}
+
+.stat-item.error .stat-value {
+    color: #dc3545;
+}
+
+/* ============================================================
+   更新インジケーター
+   ============================================================ */
+
+.update-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: #e9ecef;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.update-indicator.updating {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.update-indicator i {
+    font-size: 0.8rem;
+}
+
+.update-indicator.updating i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================================
+   レスポンシブデザイン
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .execution-status-card .card-body {
+        padding: 1rem;
+    }
+
+    .time-display {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .error-messages {
+        max-height: 200px;
+    }
+}
+
+/* ============================================================
+   ダークモード対応（オプション）
+   ============================================================ */
+
+@media (prefers-color-scheme: dark) {
+    .execution-status-card {
+        background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+        border-color: #495057;
+    }
+
+    .time-display {
+        background: #343a40;
+    }
+
+    .stat-item {
+        background: #343a40;
+        border-color: #495057;
+    }
+
+    .stat-item:hover {
+        background: #495057;
+    }
+
+    .error-message-item {
+        background: #3d2626;
+        border-color: #6b3333;
+    }
+
+    .error-message-item:hover {
+        background: #4d3030;
+    }
+
+    .no-errors {
+        background: #1e3d32;
+        border-color: #2a5240;
+        color: #75b798;
+    }
+}

@@ -1562,6 +1562,156 @@ def generate_ics():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route("/api/notification-status")
+def api_notification_status():
+    """通知・カレンダー連携の実行状況を返すAPIエンドポイント（notification_history使用）"""
+    try:
+        from datetime import timedelta, time
+        from datetime import datetime as dt
+
+        conn = get_db_connection()
+
+        # メール通知の最終実行時刻と統計を取得
+        email_last = conn.execute("""
+            SELECT executed_at, success, error_message, releases_count
+            FROM notification_history
+            WHERE notification_type = 'email'
+            ORDER BY executed_at DESC
+            LIMIT 1
+        """).fetchone()
+
+        # メール通知の本日の統計
+        email_stats_today = conn.execute("""
+            SELECT
+                COUNT(*) as total_executions,
+                SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as success_count,
+                SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as error_count,
+                SUM(CASE WHEN success = 1 THEN releases_count ELSE 0 END) as total_releases
+            FROM notification_history
+            WHERE notification_type = 'email' AND DATE(executed_at) = DATE('now')
+        """).fetchone()
+
+        # メール通知の直近のエラー
+        email_recent_errors = conn.execute("""
+            SELECT executed_at, error_message, releases_count
+            FROM notification_history
+            WHERE notification_type = 'email' AND success = 0
+            ORDER BY executed_at DESC
+            LIMIT 5
+        """).fetchall()
+
+        # カレンダー登録の最終実行時刻と統計を取得
+        calendar_last = conn.execute("""
+            SELECT executed_at, success, error_message, releases_count
+            FROM notification_history
+            WHERE notification_type = 'calendar'
+            ORDER BY executed_at DESC
+            LIMIT 1
+        """).fetchone()
+
+        # カレンダー登録の本日の統計
+        calendar_stats_today = conn.execute("""
+            SELECT
+                COUNT(*) as total_executions,
+                SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as success_count,
+                SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as error_count,
+                SUM(CASE WHEN success = 1 THEN releases_count ELSE 0 END) as total_events
+            FROM notification_history
+            WHERE notification_type = 'calendar' AND DATE(executed_at) = DATE('now')
+        """).fetchone()
+
+        # カレンダー登録の直近のエラー
+        calendar_recent_errors = conn.execute("""
+            SELECT executed_at, error_message, releases_count
+            FROM notification_history
+            WHERE notification_type = 'calendar' AND success = 0
+            ORDER BY executed_at DESC
+            LIMIT 5
+        """).fetchall()
+
+        # settingsテーブルからチェック間隔を取得
+        check_interval = conn.execute("""
+            SELECT value FROM settings WHERE key = 'check_interval_hours'
+        """).fetchone()
+
+        interval_hours = int(check_interval['value']) if check_interval else 1
+
+        # 次回実行予定時刻を計算
+        now = dt.now()
+        if email_last and email_last['executed_at']:
+            last_executed = dt.fromisoformat(email_last['executed_at'])
+            next_run = last_executed + timedelta(hours=interval_hours)
+        else:
+            # デフォルト: 次の整時
+            next_run = dt.combine(now.date(), time(now.hour + 1, 0))
+
+        conn.close()
+
+        # レスポンスを構築
+        response = {
+            'email': {
+                'lastExecuted': email_last['executed_at'] if email_last else None,
+                'lastSuccess': email_last['success'] == 1 if email_last else None,
+                'lastError': email_last['error_message'] if email_last and not email_last['success'] else None,
+                'lastReleasesCount': email_last['releases_count'] if email_last else 0,
+                'nextScheduled': next_run.isoformat(),
+                'checkIntervalHours': interval_hours,
+                'todayStats': {
+                    'totalExecutions': email_stats_today['total_executions'] if email_stats_today else 0,
+                    'successCount': email_stats_today['success_count'] if email_stats_today else 0,
+                    'errorCount': email_stats_today['error_count'] if email_stats_today else 0,
+                    'totalReleases': email_stats_today['total_releases'] if email_stats_today else 0,
+                },
+                'recentErrors': [
+                    {
+                        'time': row['executed_at'],
+                        'message': row['error_message'],
+                        'releasesCount': row['releases_count']
+                    }
+                    for row in email_recent_errors
+                ],
+                'status': 'success' if (email_last and email_last['success']) else ('error' if email_last else 'unknown')
+            },
+            'calendar': {
+                'lastExecuted': calendar_last['executed_at'] if calendar_last else None,
+                'lastSuccess': calendar_last['success'] == 1 if calendar_last else None,
+                'lastError': calendar_last['error_message'] if calendar_last and not calendar_last['success'] else None,
+                'lastEventsCount': calendar_last['releases_count'] if calendar_last else 0,
+                'nextScheduled': next_run.isoformat(),
+                'checkIntervalHours': interval_hours,
+                'todayStats': {
+                    'totalExecutions': calendar_stats_today['total_executions'] if calendar_stats_today else 0,
+                    'successCount': calendar_stats_today['success_count'] if calendar_stats_today else 0,
+                    'errorCount': calendar_stats_today['error_count'] if calendar_stats_today else 0,
+                    'totalEvents': calendar_stats_today['total_events'] if calendar_stats_today else 0,
+                },
+                'recentErrors': [
+                    {
+                        'time': row['executed_at'],
+                        'message': row['error_message'],
+                        'eventsCount': row['releases_count']
+                    }
+                    for row in calendar_recent_errors
+                ],
+                'status': 'success' if (calendar_last and calendar_last['success']) else ('error' if calendar_last else 'unknown')
+            },
+            'overall': {
+                'healthStatus': 'healthy' if (
+                    (not email_last or email_last['success']) and
+                    (not calendar_last or calendar_last['success'])
+                ) else 'issues',
+                'lastUpdate': now.isoformat()
+            }
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        logger.error(f'通知状況取得エラー: {e}')
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == "__main__":
     # Initialize database if it doesn't exist
     if not os.path.exists(DATABASE_PATH):

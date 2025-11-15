@@ -184,9 +184,6 @@
     }
 }
 </style>
-
-<!-- 通知ステータス表示用CSS -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/notification-status.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -759,28 +756,6 @@ https://example3.com/updates.xml"></textarea>
         <!-- 通知設定 -->
         <div class="tab-pane fade" id="notifications" role="tabpanel">
             <div class="py-4">
-
-                <!-- 実行状況表示セクション -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h5 class="mb-3">
-                            <i class="bi bi-activity"></i> 実行状況
-                        </h5>
-                    </div>
-                    <div class="col-lg-6">
-                        <!-- メール通知ステータス -->
-                        <div id="notification-status-container"></div>
-                    </div>
-                    <div class="col-lg-6">
-                        <!-- カレンダー連携ステータス -->
-                        <div id="calendar-status-container"></div>
-                    </div>
-                </div>
-
-                <hr class="my-4">
-
-                <!-- 設定セクション（既存） -->
-
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">通知設定</h5>
@@ -1329,7 +1304,4 @@ function systemDiagnostics() {
     console.log('Run system diagnostics');
 }
 </script>
-
-<!-- 通知ステータス表示用JavaScript -->
-<script src="{{ url_for('static', filename='js/notification-status.js') }}"></script>
 {% endblock %}

@@ -131,12 +131,13 @@ class AuthenticationState:
 class GmailNotifier:
     """Gmail API client for sending notifications."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], db_manager=None):
         """
         Initialize Gmail notifier with enhanced error handling and monitoring.
 
         Args:
             config: Configuration dictionary with Gmail settings
+            db_manager: DatabaseManager instance for history recording (optional)
         """
         self.config = config
         self.gmail_config = config.get("google", {}).get("gmail", {})
@@ -150,6 +151,7 @@ class GmailNotifier:
 
         self.service = None
         self.auth_state = AuthenticationState()
+        self.db_manager = db_manager
 
         # Performance monitoring
         self.total_emails_sent = 0
@@ -638,23 +640,28 @@ class GmailNotifier:
                 return False
 
     def send_notification(
-        self, notification: EmailNotification, recipient: str = None
+        self, notification: EmailNotification, recipient: str = None, releases_count: int = 0
     ) -> bool:
         """
-        Send email notification.
+        Send email notification with history recording.
 
         Args:
             notification: EmailNotification object
             recipient: Recipient email (uses config default if None)
+            releases_count: Number of releases in this notification
 
         Returns:
             bool: True if sent successfully, False otherwise
         """
+        success = False
+        error_message = None
+
         try:
             if not recipient:
                 recipient = self.gmail_config.get("to_email")
                 if not recipient:
-                    logger.error("No recipient email specified")
+                    error_message = "No recipient email specified"
+                    logger.error(error_message)
                     return False
 
             # Create message
@@ -667,11 +674,30 @@ class GmailNotifier:
             )
 
             # Send message
-            return self.send_message(message)
+            success = self.send_message(message)
+
+            if not success:
+                error_message = "Failed to send message via Gmail API"
+
+            return success
 
         except Exception as e:
-            logger.error(f"Failed to send notification: {str(e)}")
+            error_message = f"Failed to send notification: {str(e)}"
+            logger.error(error_message)
             return False
+
+        finally:
+            # Record history to database
+            if self.db_manager:
+                try:
+                    self.db_manager.record_notification_history(
+                        notification_type="email",
+                        success=success,
+                        error_message=error_message,
+                        releases_count=releases_count,
+                    )
+                except Exception as db_error:
+                    logger.warning(f"Failed to record email notification history: {db_error}")
 
 
 class EmailTemplateGenerator:
