@@ -60,9 +60,23 @@
             state.loading = true;
             showLoadingIndicator('api');
 
+            console.log('[CollectionSettings] Fetching /api/sources...');
+
             // Fetch API configurations from server
             const response = await fetch('/api/sources');
+            console.log('[CollectionSettings] Fetch response:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
             const data = await response.json();
+            console.log('[CollectionSettings] Received data:', data);
+
+            // Check if data.apis exists
+            if (!data || !data.apis) {
+                throw new Error('Invalid API response: apis array not found');
+            }
 
             // Transform API response to expected format
             state.apiSources = data.apis.map(api => ({
@@ -85,6 +99,7 @@
             console.log(`[CollectionSettings] Loaded ${state.apiSources.length} API sources from server`);
 
             renderApiSources();
+            console.log('[CollectionSettings] API sources rendered successfully');
 
         } catch (error) {
             console.error('[CollectionSettings] Failed to load API sources:', error);
