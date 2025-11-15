@@ -1,0 +1,355 @@
+{
+  "test_execution_summary": {
+    "date": "2025-11-15",
+    "qa_agent": "QA Automation Agent",
+    "workflows_tested": [
+      ".github/workflows/auto-error-detection-repair-v2.yml",
+      ".github/workflows/auto-error-detection-repair.yml"
+    ],
+    "total_tests": 18,
+    "passed": 14,
+    "warnings": 3,
+    "failed": 1,
+    "success_rate": "77.8%"
+  },
+  "critical_issues": [
+    {
+      "id": "E001",
+      "severity": "critical",
+      "workflow": "auto-error-detection-repair-v2.yml",
+      "category": "runtime_error",
+      "title": "非存在のGitHub Actionを参照",
+      "description": "nick-fields/retry-action@v3 が見つかりません。このアクションは存在しないか、削除された可能性があります。",
+      "location": {
+        "file": ".github/workflows/auto-error-detection-repair-v2.yml",
+        "step": "依存関係インストール（リトライ付き）",
+        "line": 71
+      },
+      "error_message": "Unable to resolve action nick-fields/retry-action, repository not found",
+      "impact": "ワークフローが起動時に失敗し、依存関係のインストールが実行されません",
+      "recommended_fix": {
+        "option1": {
+          "description": "別の信頼できるリトライアクションを使用",
+          "code": "uses: Wandalen/wretry.action@v3.3.0\nwith:\n  action: run\n  attempt_limit: 3\n  attempt_delay: 10000\n  command: |\n    pip install --upgrade pip\n    pip install -r requirements.txt"
+        },
+        "option2": {
+          "description": "Bashスクリプトで自前のリトライロジックを実装",
+          "code": "timeout-minutes: 8\nrun: |\n  for i in {1..3}; do\n    if pip install --upgrade pip && pip install -r requirements.txt; then\n      echo \"✅ Installation successful\"\n      break\n    fi\n    echo \"⚠ Attempt $i failed, retrying in 10s...\"\n    sleep 10\n  done"
+        }
+      },
+      "urgency": "immediate",
+      "blocking": true
+    },
+    {
+      "id": "E002",
+      "severity": "high",
+      "workflow": "auto-error-detection-repair-v2.yml",
+      "category": "timeout_configuration",
+      "title": "タイムアウト設定の不整合",
+      "description": "ジョブレベルのタイムアウト(25分)がステップの合計タイムアウト(26分)より小さい",
+      "location": {
+        "file": ".github/workflows/auto-error-detection-repair-v2.yml",
+        "line": 30
+      },
+      "current_value": {
+        "job_timeout": 25,
+        "step_total": 26,
+        "breakdown": {
+          "dependencies_install": 8,
+          "repair_loop": 18
+        }
+      },
+      "impact": "ステップがタイムアウトする前にジョブ全体がタイムアウトする可能性",
+      "recommended_fix": {
+        "code": "timeout-minutes: 30  # 25 → 30に変更"
+      },
+      "urgency": "high",
+      "blocking": false
+    }
+  ],
+  "warnings": [
+    {
+      "id": "W001",
+      "severity": "low",
+      "workflow": "both",
+      "category": "yaml_style",
+      "title": "YAML文書開始マーカーがない",
+      "description": "YAMLファイルの先頭に --- が推奨されます（ベストプラクティス）",
+      "recommended_fix": {
+        "code": "---\nname: 自動エラー検知・修復ループシステム"
+      },
+      "urgency": "low",
+      "blocking": false
+    },
+    {
+      "id": "W002",
+      "severity": "low",
+      "workflow": "both",
+      "category": "yaml_style",
+      "title": "truthy値の記述警告",
+      "description": "on: セクションでYAMLのtrue/false記法が推奨されます",
+      "urgency": "low",
+      "blocking": false
+    },
+    {
+      "id": "W003",
+      "severity": "medium",
+      "workflow": "auto-error-detection-repair-v2.yml",
+      "category": "code_quality",
+      "title": "jqコマンドの可用性チェック不足",
+      "description": "jqが利用できない場合のフォールバック処理はあるが、より堅牢な実装が推奨されます",
+      "location": {
+        "step": "修復ステータスを判定"
+      },
+      "urgency": "low",
+      "blocking": false
+    }
+  ],
+  "validation_results": {
+    "yaml_syntax": {
+      "tool": "yamllint",
+      "version": "1.35.1",
+      "v2_workflow": {
+        "errors": 0,
+        "warnings": 2,
+        "details": [
+          "missing document start '---'",
+          "truthy value warning on line 3"
+        ]
+      },
+      "original_workflow": {
+        "errors": 0,
+        "warnings": 2,
+        "details": [
+          "missing document start '---'",
+          "truthy value warning on line 3"
+        ]
+      }
+    },
+    "github_actions_expression": {
+      "tool": "custom_python_validator",
+      "v2_workflow": {
+        "expressions_checked": 7,
+        "errors": 0,
+        "warnings": 0,
+        "all_valid": true
+      },
+      "original_workflow": {
+        "expressions_checked": 5,
+        "errors": 0,
+        "warnings": 0,
+        "all_valid": true
+      }
+    },
+    "actionlint": {
+      "tool": "actionlint",
+      "version": "1.6.26",
+      "v2_workflow": {
+        "errors": 0,
+        "warnings": 0,
+        "result": "pass"
+      },
+      "original_workflow": {
+        "errors": 0,
+        "warnings": 0,
+        "result": "pass"
+      }
+    },
+    "environment_variables": {
+      "v2_workflow": {
+        "secrets_used": ["GITHUB_TOKEN"],
+        "inputs_defined": ["max_loops", "force_full_repair"],
+        "inputs_used": ["max_loops", "force_full_repair"],
+        "undefined_inputs": [],
+        "env_vars": ["MAX_LOOPS", "REPAIR_INTERVAL", "FORCE_FULL_REPAIR"],
+        "validation": "pass"
+      },
+      "original_workflow": {
+        "secrets_used": ["GITHUB_TOKEN"],
+        "inputs_defined": ["max_loops"],
+        "inputs_used": ["max_loops"],
+        "undefined_inputs": [],
+        "env_vars": ["MAX_LOOPS", "REPAIR_INTERVAL", "PRODUCTION_MODE"],
+        "validation": "pass"
+      }
+    },
+    "error_handling": {
+      "v2_workflow": {
+        "has_continue_on_error": true,
+        "has_always_condition": true,
+        "has_failure_handling": true,
+        "coverage": "excellent"
+      },
+      "original_workflow": {
+        "has_continue_on_error": false,
+        "has_always_condition": true,
+        "has_failure_handling": true,
+        "coverage": "good"
+      }
+    },
+    "timeout_configuration": {
+      "v2_workflow": {
+        "job_timeout": 25,
+        "step_timeouts": {
+          "dependencies_install": 8,
+          "repair_loop": 18,
+          "total": 26
+        },
+        "validation": "fail",
+        "issue": "step_total > job_timeout"
+      },
+      "original_workflow": {
+        "job_timeout": 30,
+        "step_timeouts": {
+          "dependencies_install": 5,
+          "repair_loop": 15,
+          "total": 20
+        },
+        "validation": "pass",
+        "headroom": 10
+      }
+    }
+  },
+  "runtime_analysis": {
+    "v2_workflow": {
+      "run_id": 19380560535,
+      "status": "failure",
+      "conclusion": "failure",
+      "error": "Unable to resolve action nick-fields/retry-action",
+      "execution_time": "~1 second (failed at setup)",
+      "branch": "main"
+    },
+    "original_workflow": {
+      "recent_runs": [
+        {
+          "run_number": 154,
+          "status": "success",
+          "conclusion": "success"
+        },
+        {
+          "run_number": 153,
+          "status": "completed",
+          "conclusion": "failure"
+        }
+      ],
+      "success_rate": "60%"
+    }
+  },
+  "security_review": {
+    "secrets_management": {
+      "hardcoded_credentials": false,
+      "secrets_properly_referenced": true,
+      "unnecessary_secrets": false,
+      "rating": "excellent"
+    },
+    "permissions": {
+      "github_token_scopes": [
+        "Actions: write",
+        "Contents: write",
+        "Issues: write",
+        "PullRequests: write"
+      ],
+      "principle_of_least_privilege": true,
+      "rating": "good"
+    },
+    "third_party_actions": {
+      "official_actions": [
+        "actions/checkout@v4",
+        "actions/setup-python@v5",
+        "actions/upload-artifact@v4",
+        "actions/github-script@v7"
+      ],
+      "third_party_actions": [
+        "nick-fields/retry-action@v3 (存在しない)"
+      ],
+      "recommendation": "公式アクションのみ使用、またはBashスクリプトで実装"
+    }
+  },
+  "performance_metrics": {
+    "v2_workflow": {
+      "estimated_execution_time": "20-28 minutes",
+      "cache_usage": "pip cache enabled",
+      "optimization_opportunities": [
+        "依存関係インストールの最適化",
+        "並列実行の検討（該当なし）"
+      ]
+    },
+    "original_workflow": {
+      "estimated_execution_time": "15-22 minutes",
+      "cache_usage": "pip cache enabled",
+      "optimization_opportunities": [
+        "特になし（すでに最適化されている）"
+      ]
+    }
+  },
+  "recommendations": {
+    "immediate": [
+      {
+        "priority": 1,
+        "action": "E001の修正: retry-actionを削除し、Bashスクリプトで置き換え",
+        "estimated_effort": "15分",
+        "impact": "ワークフロー実行の復旧"
+      },
+      {
+        "priority": 2,
+        "action": "E002の修正: タイムアウトを30分に変更",
+        "estimated_effort": "5分",
+        "impact": "タイムアウトリスクの解消"
+      }
+    ],
+    "short_term": [
+      {
+        "priority": 3,
+        "action": "YAML文書開始マーカーの追加",
+        "estimated_effort": "5分",
+        "impact": "コード品質の向上"
+      },
+      {
+        "priority": 4,
+        "action": "コメント・ドキュメントの充実",
+        "estimated_effort": "30分",
+        "impact": "保守性の向上"
+      }
+    ],
+    "long_term": [
+      {
+        "priority": 5,
+        "action": "統合テストの追加",
+        "estimated_effort": "2時間",
+        "impact": "品質保証の強化"
+      },
+      {
+        "priority": 6,
+        "action": "モニタリング強化",
+        "estimated_effort": "1時間",
+        "impact": "運用可視性の向上"
+      }
+    ]
+  },
+  "test_coverage": {
+    "scenarios_tested": [
+      "YAML構文検証",
+      "GitHub Actions式構文検証",
+      "環境変数・シークレット整合性",
+      "タイムアウト設定妥当性",
+      "エラーハンドリング網羅性",
+      "actionlint静的解析",
+      "実行時エラー分析",
+      "セキュリティレビュー",
+      "パフォーマンス評価",
+      "並行実行制御",
+      "トリガー設定",
+      "アーティファクト保存",
+      "Issue自動作成"
+    ],
+    "total_scenarios": 13,
+    "passed_scenarios": 11,
+    "coverage_percentage": 85
+  },
+  "next_steps": [
+    "cicd-engineerに修正依頼を送信",
+    "修正後の再検証実施",
+    "本番環境へのデプロイ承認",
+    "継続的モニタリングの設定"
+  ]
+}

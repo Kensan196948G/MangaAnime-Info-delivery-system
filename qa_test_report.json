@@ -1,0 +1,26 @@
+{
+  "auto-error-detection-repair-v2.yml": {
+    "valid": true,
+    "errors": [],
+    "warnings": [
+      "ジョブ 'error-detection-and-repair': ステップの合計タイムアウト(26分) > ジョブのタイムアウト(25分)"
+    ],
+    "info": [
+      "✓ YAML構文: 正常 (/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/.github/workflows/auto-error-detection-repair-v2.yml)",
+      "✓ 式構文検証: 7個の式を検証",
+      "✓ 環境変数検証: secrets=1, inputs=2, env=0",
+      "✓ ジョブ 'error-detection-and-repair': エラーハンドリングあり"
+    ]
+  },
+  "auto-error-detection-repair.yml": {
+    "valid": true,
+    "errors": [],
+    "warnings": [],
+    "info": [
+      "✓ YAML構文: 正常 (/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/.github/workflows/auto-error-detection-repair.yml)",
+      "✓ 式構文検証: 5個の式を検証",
+      "✓ 環境変数検証: secrets=1, inputs=1, env=1",
+      "✓ ジョブ 'error-detection-and-repair': エラーハンドリングあり"
+    ]
+  }
+}
