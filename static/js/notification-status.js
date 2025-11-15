@@ -88,16 +88,18 @@
         const container = document.getElementById('notification-status-container');
         if (!container) return;
 
-        const notification = data.notification;
-        const statusClass = notification.status === 'success' ? 'success' :
-                          notification.status === 'error' ? 'error' : 'pending';
-        const statusIcon = notification.status === 'success' ? 'bi-check-circle-fill' :
-                         notification.status === 'error' ? 'bi-x-circle-fill' : 'bi-hourglass-split';
-        const statusText = notification.status === 'success' ? '正常' :
-                         notification.status === 'error' ? 'エラーあり' : '未実行';
+        // データの存在確認とデフォルト値設定
+        const notification = data?.notification || {};
+        const status = notification.status || 'pending';
+        const statusClass = status === 'success' ? 'success' :
+                          status === 'error' ? 'error' : 'pending';
+        const statusIcon = status === 'success' ? 'bi-check-circle-fill' :
+                         status === 'error' ? 'bi-x-circle-fill' : 'bi-hourglass-split';
+        const statusText = status === 'success' ? '正常' :
+                         status === 'error' ? 'エラーあり' : '未実行';
 
         let errorsHtml = '';
-        if (notification.recentErrors && notification.recentErrors.length > 0) {
+        if (notification?.recentErrors && notification.recentErrors.length > 0) {
             errorsHtml = `
                 <div class="error-messages mt-3">
                     <h6 class="mb-2"><i class="bi bi-exclamation-triangle-fill text-warning"></i> 最近のエラー</h6>
@@ -105,14 +107,14 @@
                         <div class="error-message-item">
                             <i class="bi bi-exclamation-circle-fill"></i>
                             <div class="error-message-content">
-                                <div class="error-message-text">${error.message || 'エラーメッセージなし'}</div>
-                                <div class="error-message-time">${formatDateTime(error.time)}</div>
+                                <div class="error-message-text">${error?.message || 'エラーメッセージなし'}</div>
+                                <div class="error-message-time">${formatDateTime(error?.time)}</div>
                             </div>
                         </div>
                     `).join('')}
                 </div>
             `;
-        } else if (notification.status === 'success') {
+        } else if (status === 'success') {
             errorsHtml = `
                 <div class="no-errors mt-3">
                     <i class="bi bi-check-circle-fill"></i>
@@ -142,20 +144,20 @@
                         <i class="bi bi-clock-history"></i>
                         <div class="flex-grow-1">
                             <div class="time-label">最終実行時刻</div>
-                            <div class="time-value">${formatDateTime(notification.lastExecuted)}</div>
-                            <div class="time-relative">${getRelativeTime(notification.lastExecuted)}</div>
+                            <div class="time-value">${formatDateTime(notification?.lastExecuted)}</div>
+                            <div class="time-relative">${getRelativeTime(notification?.lastExecuted)}</div>
                         </div>
                     </div>
 
                     <div class="time-display next-scheduled">
                         <i class="bi bi-calendar-check"></i>
                         <div class="flex-grow-1">
-                            <div class="time-label">次回実行予定 (${notification.checkIntervalHours || 1}時間ごと)</div>
-                            <div class="time-value">${formatDateTime(notification.nextScheduled)}</div>
+                            <div class="time-label">次回実行予定 (${notification?.checkIntervalHours || 1}時間ごと)</div>
+                            <div class="time-value">${formatDateTime(notification?.nextScheduled)}</div>
                             ${CONFIG.enableCountdown ? `
                                 <div class="countdown-timer mt-2" id="notification-countdown">
                                     <i class="bi bi-hourglass-split"></i>
-                                    <span>${getCountdown(notification.nextScheduled)}</span>
+                                    <span>${getCountdown(notification?.nextScheduled)}</span>
                                 </div>
                             ` : ''}
                         </div>
@@ -163,15 +165,15 @@
 
                     <div class="stats-grid">
                         <div class="stat-item success">
-                            <div class="stat-value">${notification.todayStats?.successCount || 0}</div>
+                            <div class="stat-value">${notification?.todayStats?.successCount || 0}</div>
                             <div class="stat-label">成功</div>
                         </div>
                         <div class="stat-item error">
-                            <div class="stat-value">${notification.todayStats?.errorCount || 0}</div>
+                            <div class="stat-value">${notification?.todayStats?.errorCount || 0}</div>
                             <div class="stat-label">エラー</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value">${notification.todayStats?.totalReleases || 0}</div>
+                            <div class="stat-value">${notification?.todayStats?.totalReleases || 0}</div>
                             <div class="stat-label">通知数</div>
                         </div>
                     </div>
@@ -191,16 +193,18 @@
         const container = document.getElementById('calendar-status-container');
         if (!container) return;
 
-        const calendar = data.calendar;
-        const statusClass = calendar.status === 'success' ? 'success' :
-                          calendar.status === 'error' ? 'error' : 'pending';
-        const statusIcon = calendar.status === 'success' ? 'bi-check-circle-fill' :
-                         calendar.status === 'error' ? 'bi-x-circle-fill' : 'bi-hourglass-split';
-        const statusText = calendar.status === 'success' ? '正常' :
-                         calendar.status === 'error' ? 'エラーあり' : '未実行';
+        // データの存在確認とデフォルト値設定
+        const calendar = data?.calendar || {};
+        const status = calendar.status || 'pending';
+        const statusClass = status === 'success' ? 'success' :
+                          status === 'error' ? 'error' : 'pending';
+        const statusIcon = status === 'success' ? 'bi-check-circle-fill' :
+                         status === 'error' ? 'bi-x-circle-fill' : 'bi-hourglass-split';
+        const statusText = status === 'success' ? '正常' :
+                         status === 'error' ? 'エラーあり' : '未実行';
 
         let errorsHtml = '';
-        if (calendar.recentErrors && calendar.recentErrors.length > 0) {
+        if (calendar?.recentErrors && calendar.recentErrors.length > 0) {
             errorsHtml = `
                 <div class="error-messages mt-3">
                     <h6 class="mb-2"><i class="bi bi-exclamation-triangle-fill text-warning"></i> 最近のエラー</h6>
@@ -208,14 +212,14 @@
                         <div class="error-message-item">
                             <i class="bi bi-exclamation-circle-fill"></i>
                             <div class="error-message-content">
-                                <div class="error-message-text">${error.message || 'エラーメッセージなし'}</div>
-                                <div class="error-message-time">${formatDateTime(error.time)}</div>
+                                <div class="error-message-text">${error?.message || 'エラーメッセージなし'}</div>
+                                <div class="error-message-time">${formatDateTime(error?.time)}</div>
                             </div>
                         </div>
                     `).join('')}
                 </div>
             `;
-        } else if (calendar.status === 'success') {
+        } else if (status === 'success') {
             errorsHtml = `
                 <div class="no-errors mt-3">
                     <i class="bi bi-check-circle-fill"></i>
@@ -245,20 +249,20 @@
                         <i class="bi bi-clock-history"></i>
                         <div class="flex-grow-1">
                             <div class="time-label">最終登録時刻</div>
-                            <div class="time-value">${formatDateTime(calendar.lastExecuted)}</div>
-                            <div class="time-relative">${getRelativeTime(calendar.lastExecuted)}</div>
+                            <div class="time-value">${formatDateTime(calendar?.lastExecuted)}</div>
+                            <div class="time-relative">${getRelativeTime(calendar?.lastExecuted)}</div>
                         </div>
                     </div>
 
                     <div class="time-display next-scheduled">
                         <i class="bi bi-calendar-check"></i>
                         <div class="flex-grow-1">
-                            <div class="time-label">次回登録予定 (${calendar.checkIntervalHours || 1}時間ごと)</div>
-                            <div class="time-value">${formatDateTime(calendar.nextScheduled)}</div>
+                            <div class="time-label">次回登録予定 (${calendar?.checkIntervalHours || 1}時間ごと)</div>
+                            <div class="time-value">${formatDateTime(calendar?.nextScheduled)}</div>
                             ${CONFIG.enableCountdown ? `
                                 <div class="countdown-timer mt-2" id="calendar-countdown">
                                     <i class="bi bi-hourglass-split"></i>
-                                    <span>${getCountdown(calendar.nextScheduled)}</span>
+                                    <span>${getCountdown(calendar?.nextScheduled)}</span>
                                 </div>
                             ` : ''}
                         </div>
@@ -266,15 +270,15 @@
 
                     <div class="stats-grid">
                         <div class="stat-item success">
-                            <div class="stat-value">${calendar.todayStats?.successCount || 0}</div>
+                            <div class="stat-value">${calendar?.todayStats?.successCount || 0}</div>
                             <div class="stat-label">成功</div>
                         </div>
                         <div class="stat-item error">
-                            <div class="stat-value">${calendar.todayStats?.errorCount || 0}</div>
+                            <div class="stat-value">${calendar?.todayStats?.errorCount || 0}</div>
                             <div class="stat-label">エラー</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value">${calendar.todayStats?.totalEvents || 0}</div>
+                            <div class="stat-value">${calendar?.todayStats?.totalEvents || 0}</div>
                             <div class="stat-label">登録数</div>
                         </div>
                     </div>
@@ -295,13 +299,13 @@
 
         // メール通知のカウントダウン
         const notificationCountdown = document.querySelector('#notification-countdown span');
-        if (notificationCountdown && lastData.notification.nextScheduled) {
+        if (notificationCountdown && lastData?.notification?.nextScheduled) {
             notificationCountdown.textContent = getCountdown(lastData.notification.nextScheduled);
         }
 
         // カレンダーのカウントダウン
         const calendarCountdown = document.querySelector('#calendar-countdown span');
-        if (calendarCountdown && lastData.calendar.nextScheduled) {
+        if (calendarCountdown && lastData?.calendar?.nextScheduled) {
             calendarCountdown.textContent = getCountdown(lastData.calendar.nextScheduled);
         }
     }
@@ -323,11 +327,26 @@
             }
 
             const data = await response.json();
+
+            // データの妥当性チェック
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid data format received from API');
+            }
+
             lastData = data;
 
-            // データ更新
-            updateNotificationStatus(data);
-            updateCalendarStatus(data);
+            // データ更新（エラーハンドリング付き）
+            try {
+                updateNotificationStatus(data);
+            } catch (err) {
+                console.error('通知ステータス更新エラー:', err);
+            }
+
+            try {
+                updateCalendarStatus(data);
+            } catch (err) {
+                console.error('カレンダーステータス更新エラー:', err);
+            }
 
             // 更新中インジケーター非表示
             setTimeout(() => {
@@ -339,6 +358,12 @@
         } catch (error) {
             console.error('ステータス取得エラー:', error);
             showError('ステータスの取得に失敗しました: ' + error.message);
+
+            // 更新中インジケーター非表示
+            const indicators = document.querySelectorAll('.update-indicator');
+            indicators.forEach(ind => {
+                ind.classList.remove('updating');
+            });
         }
     }
 

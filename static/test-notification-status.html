@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知ステータスJS テスト</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/notification-status.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; background: #f5f5f5; }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-controls { margin-bottom: 20px; }
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .test-result.success { background: #d4edda; color: #155724; }
+        .test-result.error { background: #f8d7da; color: #721c24; }
+        .test-result.info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">通知ステータスJS エラーハンドリングテスト</h1>
+
+        <!-- テストコントロール -->
+        <div class="test-section">
+            <h3>テストシナリオ</h3>
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testNormalData()">1. 正常データテスト</button>
+                <button class="btn btn-warning" onclick="testEmptyData()">2. 空データテスト</button>
+                <button class="btn btn-danger" onclick="testPartialData()">3. 部分データテスト</button>
+                <button class="btn btn-info" onclick="testMalformedData()">4. 不正データテスト</button>
+                <button class="btn btn-secondary" onclick="clearResults()">結果クリア</button>
+            </div>
+            <div id="test-results"></div>
+        </div>
+
+        <!-- 通知ステータス表示エリア -->
+        <div class="row">
+            <div class="col-md-6">
+                <div id="notification-status-container"></div>
+            </div>
+            <div class="col-md-6">
+                <div id="calendar-status-container"></div>
+            </div>
+        </div>
+
+        <!-- コンソールログ表示 -->
+        <div class="test-section mt-4">
+            <h3>コンソールログ</h3>
+            <div id="console-log" class="test-result info"></div>
+        </div>
+    </div>
+
+    <script>
+        // コンソールログをキャプチャ
+        const originalConsoleError = console.error;
+        const originalConsoleLog = console.log;
+        const consoleLogDiv = document.getElementById('console-log');
+
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            consoleLogDiv.innerHTML += `<div style="color: red;">ERROR: ${args.join(' ')}</div>`;
+        };
+
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            consoleLogDiv.innerHTML += `<div>${args.join(' ')}</div>`;
+        };
+
+        // テスト結果表示
+        function addTestResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+            consoleLogDiv.innerHTML = '';
+        }
+
+        // テストデータ
+        const normalData = {
+            notification: {
+                status: 'success',
+                lastExecuted: '2025-11-15T10:30:00',
+                nextScheduled: '2025-11-15T11:30:00',
+                checkIntervalHours: 1,
+                todayStats: {
+                    successCount: 5,
+                    errorCount: 0,
+                    totalReleases: 10
+                },
+                recentErrors: []
+            },
+            calendar: {
+                status: 'success',
+                lastExecuted: '2025-11-15T10:30:00',
+                nextScheduled: '2025-11-15T11:30:00',
+                checkIntervalHours: 1,
+                todayStats: {
+                    successCount: 5,
+                    errorCount: 0,
+                    totalEvents: 10
+                },
+                recentErrors: []
+            }
+        };
+
+        const emptyData = {};
+
+        const partialData = {
+            notification: {
+                status: 'error',
+                recentErrors: [
+                    { message: 'テストエラー1', time: '2025-11-15T09:00:00' },
+                    { message: 'テストエラー2', time: '2025-11-15T09:15:00' }
+                ]
+            }
+        };
+
+        const malformedData = {
+            notification: null,
+            calendar: undefined
+        };
+
+        // テスト実行関数
+        function testNormalData() {
+            addTestResult('正常データテスト開始...', 'info');
+            try {
+                window.NotificationStatus.getLastData = () => normalData;
+                updateNotificationStatus(normalData);
+                updateCalendarStatus(normalData);
+                addTestResult('✓ 正常データテスト成功！エラーなし', 'success');
+            } catch (error) {
+                addTestResult(`✗ エラー発生: ${error.message}`, 'error');
+            }
+        }
+
+        function testEmptyData() {
+            addTestResult('空データテスト開始...', 'info');
+            try {
+                window.NotificationStatus.getLastData = () => emptyData;
+                updateNotificationStatus(emptyData);
+                updateCalendarStatus(emptyData);
+                addTestResult('✓ 空データテスト成功！デフォルト値で表示', 'success');
+            } catch (error) {
+                addTestResult(`✗ エラー発生: ${error.message}`, 'error');
+            }
+        }
+
+        function testPartialData() {
+            addTestResult('部分データテスト開始...', 'info');
+            try {
+                window.NotificationStatus.getLastData = () => partialData;
+                updateNotificationStatus(partialData);
+                updateCalendarStatus(partialData);
+                addTestResult('✓ 部分データテスト成功！欠損部分はデフォルト値', 'success');
+            } catch (error) {
+                addTestResult(`✗ エラー発生: ${error.message}`, 'error');
+            }
+        }
+
+        function testMalformedData() {
+            addTestResult('不正データテスト開始...', 'info');
+            try {
+                window.NotificationStatus.getLastData = () => malformedData;
+                updateNotificationStatus(malformedData);
+                updateCalendarStatus(malformedData);
+                addTestResult('✓ 不正データテスト成功！エラーハンドリング動作', 'success');
+            } catch (error) {
+                addTestResult(`✗ エラー発生: ${error.message}`, 'error');
+            }
+        }
+
+        // ページロード時の初期化
+        window.addEventListener('load', function() {
+            console.log('テストページ読み込み完了');
+            addTestResult('テストページ準備完了。テストボタンをクリックしてください。', 'info');
+        });
+    </script>
+
+    <!-- 修正後のJavaScript読み込み -->
+    <script src="/static/js/notification-status.js"></script>
+</body>
+</html>
