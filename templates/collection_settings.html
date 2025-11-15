@@ -281,61 +281,10 @@
                         </button>
                     </div>
                     <div class="row" id="rssSourcesContainer">
-
-                    <!-- BookWalker RSS設定 -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card source-config-card disabled">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-0">BookWalker RSS <span class="badge bg-secondary">無効化済み</span></h5>
-                                    <small class="text-muted">電子書籍情報 - フィード利用不可</small>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="connection-status disconnected">
-                                        <i class="bi bi-x-circle"></i> 利用不可
-                                    </span>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="bookwalkerEnabled" disabled>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="alert alert-danger">
-                                    <i class="bi bi-exclamation-triangle-fill"></i>
-                                    <strong>フィード利用不可:</strong> BookWalkerのRSSフィードは404エラー（Not Found）のため利用できません。
-                                    <br><small class="mt-2 d-block">このフィードは恒久的に無効化されています。代替として、少年ジャンプ+やとなりのヤングジャンプなど他のマンガRSSフィードをご利用ください。</small>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">RSS URL（利用不可）</label>
-                                    <input type="url" class="form-control" 
-                                           value="https://bookwalker.jp/rss/new-releases.xml" 
-                                           placeholder="RSSフィードのURL" 
-                                           disabled 
-                                           readonly>
-                                </div>
-                                <div class="alert alert-info">
-                                    <strong>代替フィード:</strong>
-                                    <ul class="mb-0 mt-2">
-                                        <li>少年ジャンプ+ (https://shonenjumpplus.com/rss)</li>
-                                        <li>となりのヤングジャンプ (https://tonarinoyj.jp/rss)</li>
-                                    </ul>
-                                </div>
-                                <div class="stats-grid mt-3">
-                                    <div class="stats-card">
-                                        <div class="stats-value text-muted">-</div>
-                                        <small class="text-muted">取得作品数</small>
-                                    </div>
-                                    <div class="stats-card">
-                                        <div class="stats-value text-muted">-</div>
-                                        <small class="text-muted">成功率</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- RSSフィードはJavaScriptで動的に生成されます -->
                     </div>
 
-
-                    <!-- カスタムRSSフィード -->
+                    <!-- カスタムRSSフィード追加セクション -->
                     <div class="col-lg-6 mb-4">
                         <div class="card source-config-card disabled">
                             <div class="card-header d-flex justify-content-between align-items-center">
