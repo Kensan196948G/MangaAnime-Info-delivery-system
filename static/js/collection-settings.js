@@ -132,9 +132,8 @@
             return;
         }
 
-        // Clear existing content (keep the existing static content if present)
-        const existingCards = elements.apiContainer.querySelectorAll('.col-lg-6.mb-4');
-        existingCards.forEach(card => card.remove());
+        // 完全にクリア（ローディングメッセージも削除）
+        elements.apiContainer.innerHTML = '';
 
         // Render API source cards
         state.apiSources.forEach(api => {
