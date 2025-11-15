@@ -27,6 +27,9 @@ from enum import Enum
 import threading
 
 from .anime_anilist import AniListCollector
+from .anime_kitsu import collect_kitsu_anime, collect_kitsu_manga
+from .manga_mangadex import collect_mangadex_manga, collect_mangadex_chapters
+from .manga_mangaupdates import collect_mangaupdates_releases
 from .manga_rss import MangaRSSCollector, BookWalkerRSSCollector, DAnimeRSSCollector
 from .data_normalizer import DataIntegrator, DataQualityAnalyzer, analyze_data_quality
 from .models import Work

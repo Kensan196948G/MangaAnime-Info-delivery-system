@@ -35,6 +35,10 @@ class DataSource(Enum):
 
     ANILIST = "anilist"
     SYOBOI = "syoboi_calendar"
+    KITSU = "kitsu"
+    ANNICT = "annict"
+    MANGADEX = "mangadex"
+    MANGAUPDATES = "mangaupdates"
     RSS_DANIME = "danime_rss"
     RSS_BOOKWALKER = "bookwalker_rss"
     RSS_GENERAL = "rss_general"

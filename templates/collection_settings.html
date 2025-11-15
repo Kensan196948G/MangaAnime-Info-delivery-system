@@ -12,6 +12,12 @@
     padding: 2rem 0;
 }
 
+/* タブコンテンツの幅を最大化 */
+.settings-tab-content > .container-fluid {
+    max-width: 100%;
+    width: 100%;
+}
+
 /* ========== カード統一スタイル ========== */
 .settings-card {
     border: 1px solid #dee2e6;
@@ -19,6 +25,7 @@
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     transition: all 0.3s ease;
     margin-bottom: 1.5rem;
+    width: 100%;
 }
 
 .settings-card:hover {
@@ -137,6 +144,19 @@
 .form-select:focus {
     border-color: #0d6efd;
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* フォームフィールドの幅を最大化 */
+.form-control,
+.form-select,
+.input-group {
+    width: 100%;
+    max-width: 100%;
+}
+
+.settings-card textarea.form-control {
+    width: 100%;
+    max-width: 100%;
 }
 
 /* ========== キーワードタグ ========== */
@@ -387,6 +407,23 @@
 }
 
 /* ========== レスポンシブ対応 ========== */
+@media (min-width: 1400px) {
+    .settings-tab-content > .container-fluid {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}
+
+@media (max-width: 1199px) {
+    .col-12.col-xl-8,
+    .col-12.col-xl-4,
+    .col-12.col-xl-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 1.5rem;
+    }
+}
+
 @media (max-width: 992px) {
     .settings-card .card-header {
         flex-direction: column;
@@ -409,6 +446,11 @@
 @media (max-width: 768px) {
     .settings-tab-content {
         padding: 1rem 0;
+    }
+
+    .settings-tab-content > .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .settings-card {
@@ -518,7 +560,7 @@
 
         <!-- ========== 1. 収集ソース設定タブ ========== -->
         <div class="tab-pane fade show active" id="sources" role="tabpanel" aria-labelledby="sources-tab">
-            <div class="container">
+            <div class="container-fluid px-4">
                 <!-- API収集ソース -->
                 <div class="form-section">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -558,7 +600,7 @@
 
                     <!-- カスタムRSSフィード追加 -->
                     <div class="row mt-3">
-                        <div class="col-lg-6">
+                        <div class="col-12 col-xl-6">
                             <div class="settings-card source-config-card disabled">
                                 <div class="card-header">
                                     <div>
@@ -610,10 +652,10 @@
 
         <!-- ========== 2. フィルター設定タブ ========== -->
         <div class="tab-pane fade" id="filters" role="tabpanel" aria-labelledby="filters-tab">
-            <div class="container">
+            <div class="container-fluid px-4">
                 <div class="row">
                     <!-- フィルター設定パネル -->
-                    <div class="col-lg-8">
+                    <div class="col-12 col-xl-8">
                         <!-- NGワード設定 -->
                         <div class="settings-card">
                             <div class="card-header">
@@ -707,7 +749,7 @@
                     </div>
 
                     <!-- フィルター統計パネル -->
-                    <div class="col-lg-4">
+                    <div class="col-12 col-xl-4">
                         <!-- 統計カード -->
                         <div class="settings-card">
                             <div class="card-header">
@@ -772,10 +814,10 @@
 
         <!-- ========== 3. スケジュール設定タブ ========== -->
         <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
-            <div class="container">
+            <div class="container-fluid px-4">
                 <div class="row">
                     <!-- スケジュール設定パネル -->
-                    <div class="col-lg-8">
+                    <div class="col-12 col-xl-8">
                         <div class="settings-card">
                             <div class="card-header">
                                 <div>
@@ -904,7 +946,7 @@
                     </div>
 
                     <!-- 次回実行予定・実行履歴パネル -->
-                    <div class="col-lg-4">
+                    <div class="col-12 col-xl-4">
                         <!-- 次回実行予定 -->
                         <div class="settings-card">
                             <div class="card-header">
@@ -993,7 +1035,7 @@
 
         <!-- ========== 4. 通知設定タブ ========== -->
         <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
-            <div class="container">
+            <div class="container-fluid px-4">
                 <!-- 実行状況セクション -->
                 <div class="form-section">
                     <h4 class="form-section-title mb-3">
@@ -1015,7 +1057,7 @@
 
                 <!-- 通知設定セクション -->
                 <div class="row">
-                    <div class="col-lg-8">
+                    <div class="col-12 col-xl-8">
                         <!-- メール通知設定 -->
                         <div class="settings-card">
                             <div class="card-header">
@@ -1119,7 +1161,7 @@
                     </div>
 
                     <!-- 通知プレビュー・設定パネル -->
-                    <div class="col-lg-4">
+                    <div class="col-12 col-xl-4">
                         <!-- 通知プレビュー -->
                         <div class="settings-card">
                             <div class="card-header">
@@ -1167,9 +1209,9 @@
 
         <!-- ========== 5. 詳細設定タブ ========== -->
         <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="advanced-tab">
-            <div class="container">
+            <div class="container-fluid px-4">
                 <div class="row">
-                    <div class="col-lg-8">
+                    <div class="col-12 col-xl-8">
                         <!-- データベース設定 -->
                         <div class="settings-card">
                             <div class="card-header">
@@ -1332,7 +1374,7 @@
                     </div>
 
                     <!-- システム情報・設定管理パネル -->
-                    <div class="col-lg-4">
+                    <div class="col-12 col-xl-4">
                         <!-- システム情報 -->
                         <div class="settings-card">
                             <div class="card-header">

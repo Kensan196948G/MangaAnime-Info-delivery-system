@@ -172,6 +172,23 @@
 }
 
 /* Responsive improvements */
+@media (min-width: 1400px) {
+    /* 大画面での最適化 */
+    .row > [class*="col-xl-"] {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+@media (max-width: 1199px) {
+    /* タブレット・小さめのPCでの表示最適化 */
+    .col-12.col-xl-8,
+    .col-12.col-xl-4,
+    .col-12.col-xl-6 {
+        margin-bottom: 1.5rem;
+    }
+}
+
 @media (max-width: 768px) {
     .stats-grid {
         grid-template-columns: 1fr;
@@ -186,6 +203,22 @@
     .source-config-card .card-header > div:last-child {
         width: 100%;
         justify-content: space-between;
+    }
+
+    /* モバイルでの最適化 */
+    .settings-tab-content .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .row {
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+    .row > [class*="col-"] {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 
@@ -221,4 +254,73 @@
 /* Smooth transitions */
 * {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== 表示幅の最大化設定 ========== */
+
+/* タブコンテンツの幅を最大化 */
+.settings-tab-content .container-fluid {
+    max-width: 100%;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+/* フォームフィールドの幅を広げる */
+.settings-card .form-control,
+.settings-card .form-select {
+    max-width: 100%;
+}
+
+/* カードの幅を最大化 */
+.settings-card {
+    width: 100%;
+}
+
+/* 入力グループの幅を最大化 */
+.input-group {
+    max-width: 100%;
+}
+
+/* テキストエリアの幅を最大化 */
+.settings-card textarea.form-control {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* APIキー入力欄の幅を最大化 */
+.api-setting {
+    width: 100%;
+}
+
+/* カスタムRSSフィード入力欄の幅を最大化 */
+#customRssEnabled ~ * textarea {
+    width: 100%;
+}
+
+/* レスポンシブ対応の改善 */
+@media (min-width: 1400px) {
+    .settings-tab-content .container-fluid {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}
+
+@media (max-width: 1199px) {
+    .col-12.col-xl-8,
+    .col-12.col-xl-4,
+    .col-12.col-xl-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* グリッドの調整 */
+.row {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.row > [class*="col-"] {
+    padding-left: 15px;
+    padding-right: 15px;
 }
