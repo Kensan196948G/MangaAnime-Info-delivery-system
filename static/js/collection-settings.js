@@ -60,44 +60,29 @@
             state.loading = true;
             showLoadingIndicator('api');
 
-            // For now, use hardcoded API configurations
-            // In the future, this could be loaded from the server
-            state.apiSources = [
-                {
-                    id: 'anilist',
-                    name: 'AniList GraphQL API',
-                    type: 'api',
-                    category: 'アニメ情報収集',
-                    url: 'https://graphql.anilist.co',
-                    enabled: true,
-                    status: 'connected',
-                    rateLimit: '90 requests/min',
-                    requestInterval: 1,
-                    maxConcurrent: 2,
-                    stats: {
-                        itemsCollected: 1247,
-                        successRate: 98.5
-                    }
-                },
-                {
-                    id: 'syobocal',
-                    name: 'しょぼいカレンダー',
-                    type: 'api',
-                    category: 'TV放送スケジュール',
-                    url: 'http://cal.syoboi.jp/json.php',
-                    enabled: true,
-                    status: 'connected',
-                    rateLimit: '60 requests/min',
-                    fetchPeriodDays: 30,
-                    updateFrequency: 'daily',
-                    stats: {
-                        itemsCollected: 89,
-                        successRate: 87.2
-                    }
-                }
-            ];
+            // Fetch API configurations from server
+            const response = await fetch('/api/sources');
+            const data = await response.json();
 
-            console.log(`[CollectionSettings] Loaded ${state.apiSources.length} API sources`);
+            // Transform API response to expected format
+            state.apiSources = data.apis.map(api => ({
+                id: api.id,
+                name: api.name,
+                type: 'api',
+                category: api.description,
+                url: api.url,
+                enabled: api.enabled,
+                status: api.health_status === 'healthy' ? 'connected' :
+                        api.health_status === 'error' ? 'error' : 'unknown',
+                rateLimit: `${api.rate_limit} requests/min`,
+                timeout: api.timeout,
+                stats: {
+                    itemsCollected: 0,
+                    successRate: 0
+                }
+            }));
+
+            console.log(`[CollectionSettings] Loaded ${state.apiSources.length} API sources from server`);
 
             renderApiSources();
 
