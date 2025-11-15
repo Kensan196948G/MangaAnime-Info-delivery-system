@@ -1270,19 +1270,29 @@ def api_test_configuration():
 
     # Test Gmail SMTP connection
     try:
-        email_config = config.get("email", {})
-        smtp_server = email_config.get("smtp_server", "smtp.gmail.com")
-        smtp_port = email_config.get("smtp_port", 587)
-        sender_email = email_config.get("sender_email", "")
-        sender_password = email_config.get("sender_password", "")
+        # .envファイルから環境変数を読み込み
+        from dotenv import load_dotenv
+        load_dotenv()
+
+        # 環境変数から取得（.envファイル）
+        sender_email = os.getenv('GMAIL_ADDRESS') or os.getenv('GMAIL_SENDER_EMAIL', '')
+        sender_password = os.getenv('GMAIL_APP_PASSWORD', '')
+
+        # フォールバック: config.jsonから取得
+        if not sender_email:
+            gmail_config = config.get("google", {}).get("gmail", {})
+            sender_email = gmail_config.get("from_email", "")
+
+        smtp_server = "smtp.gmail.com"
+        smtp_port = 465  # SSL接続
 
         if not sender_email or not sender_password:
             results["gmail"]["status"] = "error"
-            results["gmail"]["message"] = "メール設定が不完全です"
+            results["gmail"]["message"] = "メール設定が不完全です（.envファイルを確認してください）"
         else:
+            # SSL接続（465ポート）
             context = ssl.create_default_context()
-            with smtplib.SMTP(smtp_server, smtp_port, timeout=10) as server:
-                server.starttls(context=context)
+            with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context, timeout=10) as server:
                 server.login(sender_email, sender_password)
 
             results["gmail"]["status"] = "success"
