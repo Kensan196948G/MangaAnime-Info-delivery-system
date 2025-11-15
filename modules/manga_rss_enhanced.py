@@ -91,7 +91,7 @@ class EnhancedMangaRSSCollector:
             name="BOOK☆WALKER - マンガ新刊",
             url="https://bookwalker.jp/series/rss/",
             category="manga",
-            enabled=True,
+            enabled=False,  # 404 Not Found
             priority="high",
             timeout=20,
             parser_type="standard",
