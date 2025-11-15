@@ -88,7 +88,20 @@
 
         } catch (error) {
             console.error('[CollectionSettings] Failed to load API sources:', error);
-            showErrorNotification('API設定の読み込みに失敗しました: ' + error.message);
+
+            // エラー時もAPIソースを表示（フォールバック）
+            if (!elements.apiContainer) return;
+
+            elements.apiContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        API設定の読み込みに失敗しました: ${error.message}
+                        <br>
+                        <small>サーバーに接続できないか、/api/sourcesエンドポイントでエラーが発生しています。</small>
+                    </div>
+                </div>
+            `;
         } finally {
             state.loading = false;
             hideLoadingIndicator('api');
