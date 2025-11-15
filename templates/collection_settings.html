@@ -4,13 +4,58 @@
 
 {% block head %}
 <style>
+/* ========== グローバルスタイル ========== */
 .settings-tab-content {
     min-height: 500px;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 2rem 0;
 }
 
+/* ========== カード統一スタイル ========== */
+.settings-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.settings-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.settings-card .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #dee2e6;
+    padding: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-card .card-header h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.settings-card .card-header .card-subtitle {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.settings-card .card-body {
+    padding: 1.5rem;
+}
+
+/* ========== ソース設定カード ========== */
 .source-config-card {
     transition: all 0.3s ease;
     border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    margin-bottom: 1.5rem;
 }
 
 .source-config-card.enabled {
@@ -28,12 +73,13 @@
     background-color: rgba(220, 53, 69, 0.02);
 }
 
+/* ========== 接続ステータス ========== */
 .connection-status {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 0.85rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 1rem;
     font-weight: 500;
 }
@@ -53,21 +99,63 @@
     color: #ffc107;
 }
 
+/* ========== フォームセクション ========== */
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-section-title i {
+    font-size: 1.3rem;
+}
+
+/* ========== フォームコントロール ========== */
+.form-label {
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.form-label .label-description {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 400;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* ========== キーワードタグ ========== */
 .keyword-tag {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    background: #f8f9fa;
+    gap: 6px;
+    background: #f0f2f5;
     border: 1px solid #dee2e6;
-    border-radius: 1rem;
-    padding: 0.25rem 0.75rem;
-    margin: 0.125rem;
+    border-radius: 1.5rem;
+    padding: 0.35rem 0.85rem;
+    margin: 0.25rem;
     font-size: 0.85rem;
     transition: all 0.2s ease;
 }
 
 .keyword-tag:hover {
     background: #e9ecef;
+    border-color: #adb5bd;
 }
 
 .keyword-tag .remove-keyword {
@@ -75,31 +163,104 @@
     color: #dc3545;
     font-weight: bold;
     padding: 0 4px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
 }
 
 .keyword-tag .remove-keyword:hover {
-    color: #b02a37;
+    background: #dc3545;
+    color: white;
 }
 
+/* ========== スケジュールアイテム ========== */
 .schedule-item {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.75rem;
+    padding: 1rem;
     border: 1px solid #dee2e6;
     border-radius: 0.375rem;
-    margin-bottom: 0.5rem;
-    background: #f8f9fa;
+    margin-bottom: 0.75rem;
+    background: white;
     transition: all 0.2s ease;
 }
 
 .schedule-item:hover {
-    background: #e9ecef;
+    background: #f8f9fa;
+    border-color: #adb5bd;
 }
 
 .schedule-item.active {
     border-color: #198754;
     background-color: rgba(25, 135, 84, 0.05);
+}
+
+.schedule-item .schedule-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.schedule-item .schedule-info {
+    flex-grow: 1;
+}
+
+.schedule-item .schedule-name {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+}
+
+.schedule-item .schedule-desc {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.schedule-item .schedule-controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* ========== 統計カード ========== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1.25rem;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    border-color: #0d6efd;
+}
+
+.stats-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0d6efd;
+    margin-bottom: 0.5rem;
+}
+
+.stats-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* ========== ボタングループ ========== */
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .test-connection-btn {
@@ -123,65 +284,175 @@
     100% { left: 100%; }
 }
 
-.form-floating-textarea {
-    position: relative;
-}
-
-.form-floating-textarea .form-control {
-    min-height: 120px;
-    resize: vertical;
-}
-
-.advanced-settings {
-    background: #f8f9fa;
+/* ========== アラート・情報パネル ========== */
+.info-box {
+    background: #e7f3ff;
+    border-left: 4px solid #0d6efd;
     border-radius: 0.375rem;
     padding: 1rem;
-    margin-top: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+.info-box i {
+    color: #0d6efd;
+    margin-right: 0.5rem;
 }
 
-.stats-card {
-    background: white;
-    border-radius: 0.375rem;
-    padding: 1rem;
-    border: 1px solid #dee2e6;
-    text-align: center;
-}
-
-.stats-value {
-    font-size: 1.5rem;
-    font-weight: bold;
+.info-box strong {
     color: #0d6efd;
 }
 
-.backup-restore-section {
+.warning-box {
     background: #fff3cd;
-    border: 1px solid #ffeaa7;
+    border-left: 4px solid #ffc107;
     border-radius: 0.375rem;
     padding: 1rem;
-    margin: 1rem 0;
+    margin-bottom: 1.5rem;
 }
 
-@media (max-width: 768px) {
-    .source-config-card {
-        margin-bottom: 1rem;
+.warning-box i {
+    color: #ffc107;
+    margin-right: 0.5rem;
+}
+
+.success-box {
+    background: #d1e7dd;
+    border-left: 4px solid #198754;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.success-box i {
+    color: #198754;
+    margin-right: 0.5rem;
+}
+
+/* ========== セクション区切り ========== */
+.section-divider {
+    border: none;
+    border-top: 2px solid #dee2e6;
+    margin: 2rem 0;
+}
+
+.section-divider.light {
+    border-top: 1px solid #e9ecef;
+    margin: 1.5rem 0;
+}
+
+/* ========== タイムライン ========== */
+.timeline {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.timeline-item i {
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+    margin-top: 0.125rem;
+}
+
+.timeline-content {
+    flex-grow: 1;
+}
+
+.timeline-time {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-desc {
+    font-size: 0.9rem;
+    color: #1a1a1a;
+}
+
+/* ========== 高度な設定セクション ========== */
+.advanced-settings {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.advanced-settings .form-section-title {
+    margin-bottom: 1rem;
+}
+
+/* ========== レスポンシブ対応 ========== */
+@media (max-width: 992px) {
+    .settings-card .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
-    
+
     .schedule-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
-    
+
+    .schedule-item .schedule-controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .settings-tab-content {
+        padding: 1rem 0;
+    }
+
+    .settings-card {
+        margin-bottom: 1rem;
+    }
+
     .stats-grid {
         grid-template-columns: 1fr;
     }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group .btn {
+        width: 100%;
+    }
+
+    .form-section-title {
+        font-size: 1rem;
+    }
+
+    .timeline {
+        padding-left: 1rem;
+    }
+}
+
+/* ========== 追加スタイル ========== */
+.badge-status {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-status.active {
+    background: rgba(25, 135, 84, 0.15);
+    color: #198754;
+}
+
+.badge-status.inactive {
+    background: rgba(108, 117, 125, 0.15);
+    color: #6c757d;
 }
 </style>
 
@@ -194,18 +465,18 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- ページヘッダー -->
+    <!-- ========== ページヘッダー ========== -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1">収集設定</h1>
-            <p class="text-muted mb-0">データ収集源とシステム設定の管理</p>
+            <p class="text-muted mb-0">データ収集源、フィルター、スケジュール、通知設定を一元管理します</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="button-group">
             <button class="btn btn-outline-secondary" id="importBtn">
-                <i class="bi bi-upload"></i> 設定インポート
+                <i class="bi bi-upload"></i> インポート
             </button>
             <button class="btn btn-outline-primary" id="exportBtn">
-                <i class="bi bi-download"></i> 設定エクスポート
+                <i class="bi bi-download"></i> エクスポート
             </button>
             <button class="btn btn-success" id="saveAllBtn">
                 <i class="bi bi-check-lg"></i> すべて保存
@@ -213,50 +484,49 @@
         </div>
     </div>
 
-    <!-- タブナビゲーション -->
-    <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+    <!-- ========== タブナビゲーション ========== -->
+    <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="sources-tab" data-bs-toggle="tab" data-bs-target="#sources" type="button" role="tab">
-                <i class="bi bi-globe me-1"></i>収集ソース
+            <button class="nav-link active" id="sources-tab" data-bs-toggle="tab" data-bs-target="#sources" type="button" role="tab" aria-controls="sources" aria-selected="true">
+                <i class="bi bi-globe me-2"></i>収集ソース
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="filters-tab" data-bs-toggle="tab" data-bs-target="#filters" type="button" role="tab">
-                <i class="bi bi-funnel me-1"></i>フィルター
+            <button class="nav-link" id="filters-tab" data-bs-toggle="tab" data-bs-target="#filters" type="button" role="tab" aria-controls="filters" aria-selected="false">
+                <i class="bi bi-funnel me-2"></i>フィルター
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab">
-                <i class="bi bi-clock me-1"></i>スケジュール
+            <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab" aria-controls="schedule" aria-selected="false">
+                <i class="bi bi-clock me-2"></i>スケジュール
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">
-                <i class="bi bi-bell me-1"></i>通知設定
+            <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab" aria-controls="notifications" aria-selected="false">
+                <i class="bi bi-bell me-2"></i>通知設定
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab">
-                <i class="bi bi-gear me-1"></i>詳細設定
+            <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab" aria-controls="advanced" aria-selected="false">
+                <i class="bi bi-gear me-2"></i>詳細設定
             </button>
         </li>
     </ul>
 
-    <!-- タブコンテンツ -->
+    <!-- ========== タブコンテンツ ========== -->
     <div class="tab-content settings-tab-content" id="settingsTabContent">
-        
-        <!-- 収集ソース設定 -->
-        <div class="tab-pane fade show active" id="sources" role="tabpanel">
-            <div class="py-4">
 
+        <!-- ========== 1. 収集ソース設定タブ ========== -->
+        <div class="tab-pane fade show active" id="sources" role="tabpanel" aria-labelledby="sources-tab">
+            <div class="container">
                 <!-- API収集ソース -->
-                <div class="mb-5">
+                <div class="form-section">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <h4 class="mb-1">
+                            <h4 class="form-section-title">
                                 <i class="bi bi-code-square text-primary"></i> API収集ソース
                             </h4>
-                            <p class="text-muted mb-0 small">外部APIからアニメ情報を自動収集します</p>
+                            <p class="text-muted mb-0">外部APIからアニメ・マンガの最新情報を自動収集します</p>
                         </div>
                         <button class="btn btn-sm btn-outline-primary" id="testAllApisBtn">
                             <i class="bi bi-wifi"></i> すべてテスト
@@ -267,14 +537,16 @@
                     </div>
                 </div>
 
+                <hr class="section-divider light">
+
                 <!-- RSS収集ソース -->
-                <div>
+                <div class="form-section">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <h4 class="mb-1">
+                            <h4 class="form-section-title">
                                 <i class="bi bi-rss text-warning"></i> RSS収集ソース
                             </h4>
-                            <p class="text-muted mb-0 small">RSSフィードからマンガ・アニメ情報を収集します</p>
+                            <p class="text-muted mb-0">RSSフィードからマンガ・アニメの最新情報を定期取得します</p>
                         </div>
                         <button class="btn btn-sm btn-outline-primary" id="testAllRssBtn">
                             <i class="bi bi-wifi"></i> すべてテスト
@@ -284,78 +556,92 @@
                         <!-- RSSフィードはJavaScriptで動的に生成されます -->
                     </div>
 
-                    <!-- カスタムRSSフィード追加セクション -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card source-config-card disabled">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-0">カスタムRSSフィード</h5>
-                                    <small class="text-muted">独自のRSSソース</small>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="connection-status disconnected">
-                                        <i class="bi bi-dash-circle"></i> 無効
-                                    </span>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="customRssEnabled">
+                    <!-- カスタムRSSフィード追加 -->
+                    <div class="row mt-3">
+                        <div class="col-lg-6">
+                            <div class="settings-card source-config-card disabled">
+                                <div class="card-header">
+                                    <div>
+                                        <h5 class="mb-0">カスタムRSSフィード</h5>
+                                        <p class="card-subtitle">独自のRSSソースを追加できます</p>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="connection-status disconnected">
+                                            <i class="bi bi-dash-circle"></i> 無効
+                                        </span>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="customRssEnabled">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label">RSS URLs（1行につき1つのURL）</label>
-                                    <textarea class="form-control" rows="4" 
-                                              placeholder="https://example1.com/rss
-https://example2.com/feed
-https://example3.com/updates.xml"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">更新間隔（分）</label>
-                                    <input type="number" class="form-control" value="60" min="15" max="1440">
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-primary" id="addCustomRss">
-                                        <i class="bi bi-plus-lg"></i> RSS追加
-                                    </button>
-                                    <button class="btn btn-outline-primary test-connection-btn" onclick="testConnection('custom')">
-                                        <i class="bi bi-wifi"></i> 一括テスト
-                                    </button>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            RSS URLs
+                                            <span class="label-description">1行につき1つのURLを入力してください</span>
+                                        </label>
+                                        <textarea class="form-control" rows="4" placeholder="https://example1.com/rss&#10;https://example2.com/feed&#10;https://example3.com/updates.xml"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            更新間隔
+                                            <span class="label-description">データ取得の頻度を指定します</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" value="60" min="15" max="1440">
+                                            <span class="input-group-text">分</span>
+                                        </div>
+                                    </div>
+                                    <div class="button-group">
+                                        <button class="btn btn-primary" id="addCustomRss">
+                                            <i class="bi bi-plus-lg"></i> RSS追加
+                                        </button>
+                                        <button class="btn btn-outline-primary test-connection-btn">
+                                            <i class="bi bi-wifi"></i> 接続テスト
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- フィルター設定 -->
-        <div class="tab-pane fade" id="filters" role="tabpanel">
-            <div class="py-4">
+        <!-- ========== 2. フィルター設定タブ ========== -->
+        <div class="tab-pane fade" id="filters" role="tabpanel" aria-labelledby="filters-tab">
+            <div class="container">
                 <div class="row">
+                    <!-- フィルター設定パネル -->
                     <div class="col-lg-8">
-                        <div class="card">
+                        <!-- NGワード設定 -->
+                        <div class="settings-card">
                             <div class="card-header">
-                                <h5 class="mb-0">NGワード設定</h5>
+                                <div>
+                                    <h5 class="mb-0">NGワード設定</h5>
+                                    <p class="card-subtitle">タイトル・説明に含まれる作品を除外します</p>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label">NGワードを追加</label>
+                                <div class="form-group mb-4">
+                                    <label class="form-label">
+                                        NGワードを追加
+                                        <span class="label-description">除外したいキーワードを入力してください</span>
+                                    </label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="newNgKeyword" 
-                                               placeholder="除外したいキーワードを入力">
+                                        <input type="text" class="form-control" id="newNgKeyword" placeholder="例: R18, BL, エロ">
                                         <button class="btn btn-outline-primary" id="addNgKeyword">
                                             <i class="bi bi-plus-lg"></i> 追加
                                         </button>
                                     </div>
-                                    <small class="form-text text-muted">タイトル、説明、ジャンル、タグに含まれる作品を除外します</small>
                                 </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">現在のNGワード</label>
-                                    <div class="border rounded p-3" id="ngKeywordsList" style="min-height: 120px;">
+
+                                <div class="form-group mb-4">
+                                    <label class="form-label">
+                                        現在のNGワード
+                                        <span class="label-description">クリックで削除できます</span>
+                                    </label>
+                                    <div class="border rounded p-3" id="ngKeywordsList" style="min-height: 120px; background: white;">
                                         <div class="keyword-tag">
                                             エロ <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>
                                         </div>
@@ -376,28 +662,54 @@ https://example3.com/updates.xml"></textarea>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">フィルター強度</label>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        フィルター強度
+                                        <span class="label-description">除外の厳しさを設定します</span>
+                                    </label>
                                     <select class="form-select">
                                         <option value="strict" selected>厳格（部分一致も除外）</option>
                                         <option value="normal">標準（完全一致のみ除外）</option>
                                         <option value="loose">緩い（明確なマッチのみ除外）</option>
                                     </select>
                                 </div>
-                                
+
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="enableWhitelist">
                                     <label class="form-check-label" for="enableWhitelist">
-                                        ホワイトリスト機能を有効にする（指定キーワードを含む作品のみ収集）
+                                        ホワイトリスト機能を有効にする（指定キーワドを含む作品のみを収集）
                                     </label>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- プリセット設定 -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">クイック設定プリセット</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">よく使う設定をワンクリックで適用できます</p>
+                                <div class="button-group">
+                                    <button class="btn btn-outline-secondary flex-fill" onclick="loadPreset('family')">
+                                        <i class="bi bi-house"></i> ファミリー向け
+                                    </button>
+                                    <button class="btn btn-outline-secondary flex-fill" onclick="loadPreset('general')">
+                                        <i class="bi bi-people"></i> 一般向け
+                                    </button>
+                                    <button class="btn btn-outline-secondary flex-fill" onclick="loadPreset('all')">
+                                        <i class="bi bi-globe"></i> 制限なし
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
+
+                    <!-- フィルター統計パネル -->
                     <div class="col-lg-4">
-                        <div class="card">
+                        <!-- 統計カード -->
+                        <div class="settings-card">
                             <div class="card-header">
                                 <h5 class="mb-0">フィルター統計</h5>
                             </div>
@@ -405,66 +717,71 @@ https://example3.com/updates.xml"></textarea>
                                 <div class="stats-grid">
                                     <div class="stats-card">
                                         <div class="stats-value text-success">2,341</div>
-                                        <small class="text-muted">許可された作品</small>
+                                        <div class="stats-label">許可された作品</div>
                                     </div>
                                     <div class="stats-card">
                                         <div class="stats-value text-danger">147</div>
-                                        <small class="text-muted">除外された作品</small>
+                                        <div class="stats-label">除外された作品</div>
                                     </div>
                                 </div>
-                                
-                                <div class="mt-3">
-                                    <h6>よく除外されるキーワード</h6>
-                                    <div class="progress mb-1">
+
+                                <hr class="section-divider light">
+
+                                <h6 class="mb-3">よく除外されるキーワード</h6>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">R18</small>
+                                        <small class="text-muted">67件</small>
+                                    </div>
+                                    <div class="progress" style="height: 1.5rem;">
                                         <div class="progress-bar bg-danger" style="width: 45%"></div>
                                     </div>
-                                    <small>R18: 67件</small>
-                                    
-                                    <div class="progress mb-1 mt-2">
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">BL</small>
+                                        <small class="text-muted">44件</small>
+                                    </div>
+                                    <div class="progress" style="height: 1.5rem;">
                                         <div class="progress-bar bg-warning" style="width: 30%"></div>
                                     </div>
-                                    <small>BL: 44件</small>
-                                    
-                                    <div class="progress mb-1 mt-2">
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">成人向け</small>
+                                        <small class="text-muted">28件</small>
+                                    </div>
+                                    <div class="progress" style="height: 1.5rem;">
                                         <div class="progress-bar bg-info" style="width: 20%"></div>
                                     </div>
-                                    <small>成人向け: 28件</small>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                <h5 class="mb-0">クイック設定</h5>
-                            </div>
-                            <div class="card-body">
-                                <button class="btn btn-outline-secondary btn-sm mb-2 w-100" onclick="loadPreset('family')">
-                                    <i class="bi bi-house"></i> ファミリー向け
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm mb-2 w-100" onclick="loadPreset('general')">
-                                    <i class="bi bi-people"></i> 一般向け
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm mb-2 w-100" onclick="loadPreset('all')">
-                                    <i class="bi bi-globe"></i> 制限なし
-                                </button>
-                                <button class="btn btn-outline-primary btn-sm w-100" onclick="customizeFilter()">
-                                    <i class="bi bi-gear"></i> カスタマイズ
-                                </button>
-                            </div>
+
+                        <!-- フィルター情報 -->
+                        <div class="info-box">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>ヒント:</strong> フィルター設定は即座に反映され、次回の収集から適用されます
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- スケジュール設定 -->
-        <div class="tab-pane fade" id="schedule" role="tabpanel">
-            <div class="py-4">
+        <!-- ========== 3. スケジュール設定タブ ========== -->
+        <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
+            <div class="container">
                 <div class="row">
+                    <!-- スケジュール設定パネル -->
                     <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">収集スケジュール</h5>
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <div>
+                                    <h5 class="mb-0">収集スケジュール</h5>
+                                    <p class="card-subtitle">定期実行タスクの時間と頻度を設定します</p>
+                                </div>
                                 <button class="btn btn-primary btn-sm" id="addScheduleBtn">
                                     <i class="bi bi-plus-lg"></i> スケジュール追加
                                 </button>
@@ -473,268 +790,197 @@ https://example3.com/updates.xml"></textarea>
                                 <div id="scheduleList">
                                     <!-- 定期収集スケジュール -->
                                     <div class="schedule-item active">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" checked>
-                                            </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked id="schedule1">
+                                        </div>
+                                        <div class="schedule-icon">
                                             <i class="bi bi-clock text-primary"></i>
                                         </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-medium">定期収集 - 毎日</div>
-                                            <small class="text-muted">毎日 08:00 に全ソースから情報収集</small>
+                                        <div class="schedule-info">
+                                            <div class="schedule-name">毎日定期収集</div>
+                                            <div class="schedule-desc">毎日 08:00 に全ソースからアニメ・マンガ情報を収集</div>
                                         </div>
-                                        <div class="d-flex gap-1">
-                                            <select class="form-select form-select-sm" style="width: 80px;">
-                                                <option value="0">0時</option>
-                                                <option value="6">6時</option>
-                                                <option value="8" selected>8時</option>
-                                                <option value="12">12時</option>
-                                                <option value="18">18時</option>
+                                        <div class="schedule-controls">
+                                            <select class="form-select form-select-sm" style="width: 120px;">
+                                                <option value="0">00:00</option>
+                                                <option value="6">06:00</option>
+                                                <option value="8" selected>08:00</option>
+                                                <option value="12">12:00</option>
+                                                <option value="18">18:00</option>
+                                                <option value="21">21:00</option>
                                             </select>
-                                            <button class="btn btn-outline-secondary btn-sm">
+                                            <button class="btn btn-outline-secondary btn-sm" title="設定">
                                                 <i class="bi bi-gear"></i>
                                             </button>
-                                            <button class="btn btn-outline-danger btn-sm">
+                                            <button class="btn btn-outline-danger btn-sm" title="削除">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
                                     </div>
 
+                                    <!-- 週次まとめ収集 -->
                                     <div class="schedule-item">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" checked>
-                                            </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked id="schedule2">
+                                        </div>
+                                        <div class="schedule-icon">
                                             <i class="bi bi-calendar-week text-success"></i>
                                         </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-medium">週次まとめ収集</div>
-                                            <small class="text-muted">日曜日 23:00 に週次データの整理と通知</small>
+                                        <div class="schedule-info">
+                                            <div class="schedule-name">週次まとめ収集</div>
+                                            <div class="schedule-desc">毎週日曜日 23:00 に週次データの整理と通知</div>
                                         </div>
-                                        <div class="d-flex gap-1">
-                                            <select class="form-select form-select-sm" style="width: 100px;">
+                                        <div class="schedule-controls">
+                                            <select class="form-select form-select-sm" style="width: 130px;">
                                                 <option value="sunday" selected>日曜日</option>
                                                 <option value="monday">月曜日</option>
+                                                <option value="tuesday">火曜日</option>
+                                                <option value="wednesday">水曜日</option>
+                                                <option value="thursday">木曜日</option>
+                                                <option value="friday">金曜日</option>
                                                 <option value="saturday">土曜日</option>
                                             </select>
-                                            <button class="btn btn-outline-secondary btn-sm">
+                                            <button class="btn btn-outline-secondary btn-sm" title="設定">
                                                 <i class="bi bi-gear"></i>
                                             </button>
-                                            <button class="btn btn-outline-danger btn-sm">
+                                            <button class="btn btn-outline-danger btn-sm" title="削除">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
                                     </div>
 
+                                    <!-- 緊急更新チェック -->
                                     <div class="schedule-item">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox">
-                                            </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="schedule3">
+                                        </div>
+                                        <div class="schedule-icon">
                                             <i class="bi bi-lightning text-warning"></i>
                                         </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-medium">緊急更新チェック</div>
-                                            <small class="text-muted">1時間ごとに重要な更新をチェック（無効）</small>
+                                        <div class="schedule-info">
+                                            <div class="schedule-name">緊急更新チェック</div>
+                                            <div class="schedule-desc">重要な更新をリアルタイムで検出（現在無効）</div>
                                         </div>
-                                        <div class="d-flex gap-1">
-                                            <select class="form-select form-select-sm" style="width: 80px;">
-                                                <option value="15">15分</option>
-                                                <option value="30">30分</option>
-                                                <option value="60" selected>1時間</option>
+                                        <div class="schedule-controls">
+                                            <select class="form-select form-select-sm" style="width: 120px;">
+                                                <option value="15">15分ごと</option>
+                                                <option value="30">30分ごと</option>
+                                                <option value="60" selected>60分ごと</option>
                                             </select>
-                                            <button class="btn btn-outline-secondary btn-sm">
+                                            <button class="btn btn-outline-secondary btn-sm" title="設定">
                                                 <i class="bi bi-gear"></i>
                                             </button>
-                                            <button class="btn btn-outline-danger btn-sm">
+                                            <button class="btn btn-outline-danger btn-sm" title="削除">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <div class="mt-3">
-                                    <div class="alert alert-info">
-                                        <i class="bi bi-info-circle"></i>
-                                        <strong>注意:</strong> スケジュール変更後は、システムの再起動が必要です。
-                                    </div>
+
+                                <div class="warning-box mt-3">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <strong>注意:</strong> スケジュール変更後は、システムの再起動が必要です。
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 手動実行 -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">手動実行</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">スケジュールを待たず、すぐに実行できます</p>
+                                <div class="button-group">
+                                    <button class="btn btn-outline-primary" onclick="runCollectionNow()">
+                                        <i class="bi bi-play-circle"></i> 今すぐ収集実行
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="testSchedule()">
+                                        <i class="bi bi-check-circle"></i> スケジュールテスト
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
+                    <!-- 次回実行予定・実行履歴パネル -->
                     <div class="col-lg-4">
-                        <div class="card">
+                        <!-- 次回実行予定 -->
+                        <div class="settings-card">
                             <div class="card-header">
                                 <h5 class="mb-0">次回実行予定</h5>
                             </div>
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span>定期収集</span>
-                                    <strong class="text-primary">明日 08:00</strong>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span>週次まとめ</span>
-                                    <strong class="text-success">日曜日 23:00</strong>
-                                </div>
-                                
-                                <hr>
-                                
                                 <div class="mb-3">
-                                    <label class="form-label">手動実行</label>
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-outline-primary btn-sm" onclick="runCollectionNow()">
-                                            <i class="bi bi-play-circle"></i> 今すぐ収集実行
-                                        </button>
-                                        <button class="btn btn-outline-secondary btn-sm" onclick="testSchedule()">
-                                            <i class="bi bi-check-circle"></i> スケジュールテスト
-                                        </button>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <small class="text-muted">毎日定期収集</small>
+                                        </div>
+                                        <div>
+                                            <strong class="text-primary">明日 08:00</strong>
+                                        </div>
                                     </div>
+                                    <div class="progress" style="height: 1rem;">
+                                        <div class="progress-bar bg-primary" style="width: 65%"></div>
+                                    </div>
+                                    <small class="text-muted">あと16時間20分</small>
+                                </div>
+
+                                <hr class="section-divider light">
+
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <small class="text-muted">週次まとめ収集</small>
+                                        </div>
+                                        <div>
+                                            <strong class="text-success">日曜日 23:00</strong>
+                                        </div>
+                                    </div>
+                                    <div class="progress" style="height: 1rem;">
+                                        <div class="progress-bar bg-success" style="width: 30%"></div>
+                                    </div>
+                                    <small class="text-muted">あと4日15時間</small>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="card mt-3">
+
+                        <!-- 実行履歴 -->
+                        <div class="settings-card">
                             <div class="card-header">
-                                <h5 class="mb-0">実行履歴</h5>
+                                <h5 class="mb-0">最近の実行履歴</h5>
                             </div>
                             <div class="card-body">
                                 <div class="timeline">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                        <div class="flex-grow-1">
-                                            <small class="text-muted">今日 08:00</small>
-                                            <div class="small">定期収集完了 (127件)</div>
+                                    <div class="timeline-item">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <div class="timeline-content">
+                                            <div class="timeline-time">今日 08:00</div>
+                                            <div class="timeline-desc">定期収集完了（127件取得）</div>
                                         </div>
                                     </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                        <div class="flex-grow-1">
-                                            <small class="text-muted">昨日 23:00</small>
-                                            <div class="small">週次まとめ完了</div>
+
+                                    <div class="timeline-item">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <div class="timeline-content">
+                                            <div class="timeline-time">昨日 23:00</div>
+                                            <div class="timeline-desc">週次まとめ完了</div>
                                         </div>
                                     </div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
-                                        <div class="flex-grow-1">
-                                            <small class="text-muted">昨日 08:00</small>
-                                            <div class="small">部分的な収集 (警告あり)</div>
+
+                                    <div class="timeline-item">
+                                        <i class="bi bi-exclamation-circle-fill text-warning"></i>
+                                        <div class="timeline-content">
+                                            <div class="timeline-time">昨日 08:00</div>
+                                            <div class="timeline-desc">部分的な収集（警告あり）</div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- 通知設定 -->
-        <div class="tab-pane fade" id="notifications" role="tabpanel">
-            <div class="py-4">
-
-                <!-- 実行状況表示セクション -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h5 class="mb-3">
-                            <i class="bi bi-activity"></i> 実行状況
-                        </h5>
-                    </div>
-                    <div class="col-lg-6">
-                        <!-- メール通知ステータス -->
-                        <div id="notification-status-container"></div>
-                    </div>
-                    <div class="col-lg-6">
-                        <!-- カレンダー連携ステータス -->
-                        <div id="calendar-status-container"></div>
-                    </div>
-                </div>
-
-                <hr class="my-4">
-
-                <!-- 設定セクション（既存） -->
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">通知設定</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="mb-3">
-                                    <label class="form-label">通知先メールアドレス</label>
-                                    <input type="email" class="form-control"
-                                           name="notification_email"
-                                           value="kensan1969@gmail.com"
-                                           placeholder="通知を受信するメールアドレス">
-                                    <small class="form-text text-muted">デフォルト: kensan1969@gmail.com</small>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">チェック間隔（時間）</label>
-                                    <input type="number" class="form-control"
-                                           name="check_interval_hours"
-                                           value="1"
-                                           min="1"
-                                           max="24"
-                                           placeholder="情報チェックの間隔">
-                                    <small class="form-text text-muted">デフォルト: 1時間</small>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">1日あたりの最大通知数</label>
-                                    <input type="number" class="form-control"
-                                           name="max_notifications_per_day"
-                                           value="50"
-                                           min="1"
-                                           max="200"
-                                           placeholder="1日に送信する最大通知数">
-                                    <small class="form-text text-muted">デフォルト: 50</small>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">通知有効化</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="email_notifications_enabled"
-                                               id="emailNotificationsEnabled" checked>
-                                        <label class="form-check-label" for="emailNotificationsEnabled">
-                                            メール通知を有効にする
-                                        </label>
-                                    </div>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="calendar_enabled"
-                                               id="calendarEnabled">
-                                        <label class="form-check-label" for="calendarEnabled">
-                                            Googleカレンダーへの登録を有効にする
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn btn-outline-primary" onclick="testNotification()">
-                                    <i class="bi bi-envelope"></i> テスト通知送信
-                                </button>
-                            </div>
-                            
-                            <div class="col-lg-6">
-                                <div class="card bg-light">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">通知プレビュー</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="border rounded p-3 bg-white">
-                                            <strong>件名:</strong> [アニメ・マンガ配信] 新作情報 - 2024/01/15<br>
-                                            <hr class="my-2">
-                                            <strong>今日の新着:</strong><br>
-                                            • 【アニメ】魔法少女リリカルなのは新シリーズ<br>
-                                            • 【マンガ】転生したらスライムだった件 第20巻<br>
-                                            • 【配信】dアニメストアに5作品追加<br>
-                                            <hr class="my-2">
-                                            <small class="text-muted">
-                                                配信予定: 3件 | エラー: 0件<br>
-                                                システム状態: 正常
-                                            </small>
+                                    <div class="timeline-item">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <div class="timeline-content">
+                                            <div class="timeline-time">3日前 08:00</div>
+                                            <div class="timeline-desc">定期収集完了（89件取得）</div>
                                         </div>
                                     </div>
                                 </div>
@@ -745,150 +991,405 @@ https://example3.com/updates.xml"></textarea>
             </div>
         </div>
 
-        <!-- 詳細設定 -->
-        <div class="tab-pane fade" id="advanced" role="tabpanel">
-            <div class="py-4">
+        <!-- ========== 4. 通知設定タブ ========== -->
+        <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
+            <div class="container">
+                <!-- 実行状況セクション -->
+                <div class="form-section">
+                    <h4 class="form-section-title mb-3">
+                        <i class="bi bi-activity"></i> 実行状況
+                    </h4>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <!-- メール通知ステータス -->
+                            <div id="notification-status-container"></div>
+                        </div>
+                        <div class="col-lg-6">
+                            <!-- カレンダー連携ステータス -->
+                            <div id="calendar-status-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- 通知設定セクション -->
                 <div class="row">
                     <div class="col-lg-8">
-                        <div class="card">
+                        <!-- メール通知設定 -->
+                        <div class="settings-card">
                             <div class="card-header">
-                                <h5 class="mb-0">システム設定</h5>
+                                <div>
+                                    <h5 class="mb-0">メール通知</h5>
+                                    <p class="card-subtitle">新作情報をメールで受け取ります</p>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifyEnabled" checked>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">データ保持期間（日）</label>
-                                            <input type="number" class="form-control" value="365" min="30" max="1095">
-                                            <small class="form-text text-muted">古いデータを自動削除する期間</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">最大同時処理数</label>
-                                            <input type="number" class="form-control" value="5" min="1" max="10">
-                                            <small class="form-text text-muted">収集時の並列処理数</small>
-                                        </div>
-                                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        送信先メールアドレス
+                                        <span class="label-description">Google アカウントで認証済みです</span>
+                                    </label>
+                                    <input type="email" class="form-control" value="user@example.com" readonly>
+                                    <small class="form-text text-muted">メールアドレスを変更するには、設定を再認証してください</small>
                                 </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">ログレベル</label>
-                                            <select class="form-select">
-                                                <option value="DEBUG">デバッグ</option>
-                                                <option value="INFO" selected>情報</option>
-                                                <option value="WARNING">警告</option>
-                                                <option value="ERROR">エラーのみ</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">タイムゾーン</label>
-                                            <select class="form-select">
-                                                <option value="Asia/Tokyo" selected>日本標準時 (JST)</option>
-                                                <option value="UTC">協定世界時 (UTC)</option>
-                                                <option value="America/New_York">東部標準時 (EST)</option>
-                                            </select>
-                                        </div>
-                                    </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        通知頻度
+                                        <span class="label-description">メール送信のタイミングを選択します</span>
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="instant">リアルタイム（新作時にすぐ送信）</option>
+                                        <option value="daily" selected>毎日まとめ（毎朝8:00に一度に送信）</option>
+                                        <option value="weekly">毎週まとめ（日曜23:00に一度に送信）</option>
+                                        <option value="disabled">通知しない</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        メール形式
+                                        <span class="label-description">メール本文のレイアウトを選択します</span>
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="html" selected>HTML（画像・リンク付き、見やすい）</option>
+                                        <option value="text">テキスト（シンプル、軽量）</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="includeImages" checked>
+                                    <label class="form-check-label" for="includeImages">
+                                        作品画像を含める（メール容量が増加します）
+                                    </label>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="card mt-3">
+
+                        <!-- Google Calendar連携 -->
+                        <div class="settings-card">
                             <div class="card-header">
-                                <h5 class="mb-0">データベース管理</h5>
+                                <div>
+                                    <h5 class="mb-0">Google Calendar連携</h5>
+                                    <p class="card-subtitle">新作情報をカレンダーに自動登録</p>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="calendarIntegrationEnabled" checked>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="backup-restore-section">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h6><i class="bi bi-download"></i> バックアップ</h6>
-                                            <p class="small mb-2">データベースと設定をエクスポート</p>
-                                            <button class="btn btn-outline-primary btn-sm">
-                                                <i class="bi bi-download"></i> フルバックアップ
-                                            </button>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h6><i class="bi bi-upload"></i> 復元</h6>
-                                            <p class="small mb-2">バックアップファイルから復元</p>
-                                            <input type="file" class="form-control form-control-sm mb-2" accept=".sql,.zip">
-                                            <button class="btn btn-outline-warning btn-sm">
-                                                <i class="bi bi-upload"></i> 復元実行
-                                            </button>
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        対象カレンダー
+                                        <span class="label-description">イベントが追加されるカレンダーを選択</span>
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="primary" selected>メインカレンダー（primary）</option>
+                                        <option value="anime">アニメ専用カレンダー</option>
+                                        <option value="manga">マンガ専用カレンダー</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        通知時間
+                                        <span class="label-description">配信日の何時間前に通知するか</span>
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="1440">1日前</option>
+                                        <option value="480" selected>8時間前</option>
+                                        <option value="120">2時間前</option>
+                                        <option value="60">1時間前</option>
+                                        <option value="0">通知しない</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="googleNotification" checked>
+                                    <label class="form-check-label" for="googleNotification">
+                                        Google Calendar の通知も有効にする
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 通知プレビュー・設定パネル -->
+                    <div class="col-lg-4">
+                        <!-- 通知プレビュー -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">メール通知プレビュー</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="border rounded p-3" style="background: #f8f9fa; max-height: 400px; overflow-y: auto;">
+                                    <div style="background: white; padding: 1rem; border-radius: 0.25rem;">
+                                        <h6 class="mb-2">新作アニメ・マンガ情報</h6>
+                                        <small class="text-muted">配信日: 2024-11-15</small>
+                                        <hr class="my-2">
+                                        <div class="small">
+                                            <p class="mb-2"><strong>作品タイトル</strong></p>
+                                            <p class="mb-2">第3話配信予定</p>
+                                            <p class="text-primary"><a href="#">詳細を見る</a></p>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <div class="row mt-3">
-                                    <div class="col-md-4">
-                                        <button class="btn btn-outline-info w-100" onclick="optimizeDatabase()">
-                                            <i class="bi bi-speedometer2"></i> DB最適化
-                                        </button>
+                                <small class="text-muted d-block mt-2">これはプレビューです。実際のメール形式とは異なる場合があります。</small>
+                            </div>
+                        </div>
+
+                        <!-- テスト送信 -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">テスト送信</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">現在の設定でテストメールを送信します</p>
+                                <button class="btn btn-outline-primary w-100" onclick="sendTestEmail()">
+                                    <i class="bi bi-envelope"></i> テストメール送信
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 認証情報 -->
+                        <div class="success-box">
+                            <i class="bi bi-check-circle"></i>
+                            <strong>認証済み:</strong> Google アカウント認証が完了しています
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 5. 詳細設定タブ ========== -->
+        <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="advanced-tab">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- データベース設定 -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">データベース設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="info-box">
+                                    <i class="bi bi-info-circle"></i>
+                                    <strong>情報:</strong> SQLite3 データベースファイル: db.sqlite3
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        自動クリーンアップ
+                                        <span class="label-description">古いレコードを自動削除します</span>
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="7days">7日以上前のデータを削除</option>
+                                        <option value="30days" selected>30日以上前のデータを削除</option>
+                                        <option value="90days">90日以上前のデータを削除</option>
+                                        <option value="disabled">無効</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        クリーンアップ実行時刻
+                                        <span class="label-description">毎日自動実行される時刻</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="time" class="form-control" value="02:00">
                                     </div>
-                                    <div class="col-md-4">
-                                        <button class="btn btn-outline-secondary w-100" onclick="cleanupOldData()">
-                                            <i class="bi bi-trash"></i> 古いデータ削除
-                                        </button>
+                                </div>
+
+                                <div class="button-group">
+                                    <button class="btn btn-outline-primary" onclick="backupDatabase()">
+                                        <i class="bi bi-cloud-download"></i> バックアップ
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="cleanupNow()">
+                                        <i class="bi bi-trash"></i> 今すぐクリーンアップ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ログ設定 -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">ログ設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        ログレベル
+                                        <span class="label-description">記録する情報の詳細度</span>
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="debug">DEBUG（詳細）</option>
+                                        <option value="info" selected>INFO（標準）</option>
+                                        <option value="warning">WARNING（警告のみ）</option>
+                                        <option value="error">ERROR（エラーのみ）</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        ログ保持期間
+                                        <span class="label-description">ログファイルを保持する日数</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" value="30" min="1" max="365">
+                                        <span class="input-group-text">日</span>
                                     </div>
-                                    <div class="col-md-4">
-                                        <button class="btn btn-outline-danger w-100" onclick="resetAllSettings()">
-                                            <i class="bi bi-arrow-clockwise"></i> 設定リセット
-                                        </button>
+                                </div>
+
+                                <div class="button-group">
+                                    <button class="btn btn-outline-secondary" onclick="viewLogs()">
+                                        <i class="bi bi-file-text"></i> ログ表示
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="clearLogs()">
+                                        <i class="bi bi-trash"></i> ログクリア
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- API設定 -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">API設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        接続タイムアウト
+                                        <span class="label-description">API接続の最大待機時間</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" value="30" min="5" max="120">
+                                        <span class="input-group-text">秒</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        リトライ回数
+                                        <span class="label-description">失敗時の再試行回数</span>
+                                    </label>
+                                    <input type="number" class="form-control" value="3" min="0" max="10">
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableProxy">
+                                    <label class="form-check-label" for="enableProxy">
+                                        プロキシ設定を使用する
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- パフォーマンス設定 -->
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">パフォーマンス設定</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        並列処理スレッド数
+                                        <span class="label-description">同時に処理するタスク数</span>
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="1">1（シングル）</option>
+                                        <option value="2">2</option>
+                                        <option value="4" selected>4</option>
+                                        <option value="8">8</option>
+                                        <option value="16">16</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enableCache" checked>
+                                    <label class="form-check-label" for="enableCache">
+                                        キャッシュを有効にする（取得結果をキャッシュ）
+                                    </label>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        キャッシュ有効期限
+                                        <span class="label-description">キャッシュ保持時間</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" value="3600" min="300" max="86400">
+                                        <span class="input-group-text">秒</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
+                    <!-- システム情報・設定管理パネル -->
                     <div class="col-lg-4">
-                        <div class="card">
+                        <!-- システム情報 -->
+                        <div class="settings-card">
                             <div class="card-header">
                                 <h5 class="mb-0">システム情報</h5>
                             </div>
                             <div class="card-body">
-                                <table class="table table-sm">
-                                    <tr>
-                                        <td>システム版本:</td>
-                                        <td>v2.1.0</td>
-                                    </tr>
-                                    <tr>
-                                        <td>データベースサイズ:</td>
-                                        <td>15.7 MB</td>
-                                    </tr>
-                                    <tr>
-                                        <td>作品数:</td>
-                                        <td>2,341</td>
-                                    </tr>
-                                    <tr>
-                                        <td>リリース数:</td>
-                                        <td>18,907</td>
-                                    </tr>
-                                    <tr>
-                                        <td>最終更新:</td>
-                                        <td>2024/01/15 08:00</td>
-                                    </tr>
-                                </table>
+                                <div class="mb-2">
+                                    <small class="text-muted">バージョン</small>
+                                    <div class="small font-weight-bold">1.2.0</div>
+                                </div>
+                                <hr class="section-divider light">
+                                <div class="mb-2">
+                                    <small class="text-muted">最終更新</small>
+                                    <div class="small font-weight-bold">2024-11-15 08:00:00</div>
+                                </div>
+                                <hr class="section-divider light">
+                                <div class="mb-2">
+                                    <small class="text-muted">ステータス</small>
+                                    <div class="small">
+                                        <span class="badge-status active">稼働中</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="card mt-3">
+
+                        <!-- 設定バックアップ・復元 -->
+                        <div class="settings-card">
                             <div class="card-header">
-                                <h5 class="mb-0">クイックアクション</h5>
+                                <h5 class="mb-0">設定管理</h5>
                             </div>
                             <div class="card-body">
+                                <p class="text-muted mb-3">設定を保存・復元できます</p>
                                 <div class="d-grid gap-2">
-                                    <button class="btn btn-outline-primary btn-sm" onclick="exportLogs()">
-                                        <i class="bi bi-file-earmark-text"></i> ログエクスポート
+                                    <button class="btn btn-outline-primary btn-sm" onclick="exportSettings()">
+                                        <i class="bi bi-download"></i> 設定エクスポート
                                     </button>
-                                    <button class="btn btn-outline-secondary btn-sm" onclick="checkUpdates()">
-                                        <i class="bi bi-arrow-up-circle"></i> 更新確認
+                                    <button class="btn btn-outline-primary btn-sm" onclick="importSettings()">
+                                        <i class="bi bi-upload"></i> 設定インポート
                                     </button>
-                                    <button class="btn btn-outline-info btn-sm" onclick="systemDiagnostics()">
-                                        <i class="bi bi-tools"></i> システム診断
+                                    <button class="btn btn-outline-danger btn-sm" onclick="resetSettings()">
+                                        <i class="bi bi-arrow-clockwise"></i> リセット
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 危険な操作 -->
+                        <div class="warning-box mt-4">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>警告:</strong> 以下の操作は取り消せません。慎重に実行してください。
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-danger btn-sm" onclick="resetAllData()">
+                                        <i class="bi bi-x-circle"></i> すべてのデータを削除
                                     </button>
                                 </div>
                             </div>
@@ -897,315 +1398,82 @@ https://example3.com/updates.xml"></textarea>
                 </div>
             </div>
         </div>
+
     </div>
+
 </div>
 
-<!-- 設定インポートモーダル -->
-<div class="modal fade" id="importModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">設定インポート</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">設定ファイル</label>
-                    <input type="file" class="form-control" accept=".json">
-                </div>
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    現在の設定は上書きされます。事前にエクスポートしてバックアップを作成してください。
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-                <button type="button" class="btn btn-primary">インポート実行</button>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+<!-- JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-{% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // NGキーワード追加機能
-    document.getElementById('addNgKeyword').addEventListener('click', function() {
-        const input = document.getElementById('newNgKeyword');
-        const keyword = input.value.trim();
-        
-        if (keyword) {
-            addNgKeywordTag(keyword);
-            input.value = '';
-        }
-    });
-    
-    // Enterキーでキーワード追加
-    document.getElementById('newNgKeyword').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            document.getElementById('addNgKeyword').click();
-        }
-    });
-    
-    // スケジュール追加
-    document.getElementById('addScheduleBtn').addEventListener('click', function() {
-        // スケジュール追加モーダルの表示（実装簡略）
-        console.log('Add schedule modal');
-    });
-    
-    // 全体保存
-    document.getElementById('saveAllBtn').addEventListener('click', function() {
-        saveAllSettings();
-    });
-});
-
-function addNgKeywordTag(keyword) {
-    const container = document.getElementById('ngKeywordsList');
-    const tag = document.createElement('div');
-    tag.className = 'keyword-tag';
-    tag.innerHTML = `${keyword} <span class="remove-keyword" onclick="removeKeyword(this)">&times;</span>`;
-    container.appendChild(tag);
+// フィルター設定
+function removeKeyword(el) {
+    el.closest('.keyword-tag').remove();
 }
 
-function removeKeyword(element) {
-    element.parentElement.remove();
-}
-
-function testConnection(source) {
-    const button = event.target.closest('button');
-    const originalContent = button.innerHTML;
-    
-    button.classList.add('testing');
-    button.innerHTML = '<i class="bi bi-hourglass-split"></i> テスト中...';
-    button.disabled = true;
-    
-    // 実際のテスト処理（モック）
-    setTimeout(() => {
-        button.classList.remove('testing');
-        button.innerHTML = '<i class="bi bi-check-circle"></i> 成功';
-        button.className = 'btn btn-success test-connection-btn';
-        
-        setTimeout(() => {
-            button.innerHTML = originalContent;
-            button.className = 'btn btn-outline-primary test-connection-btn';
-            button.disabled = false;
-        }, 2000);
-    }, 3000);
-}
-
-function resetToDefaults(source) {
-    if (confirm('設定をデフォルト値にリセットしますか？')) {
-        // リセット処理（実装簡略）
-        console.log(`Reset ${source} to defaults`);
-    }
-}
-
-function diagnoseProblem(source) {
-    // 問題診断の実行（実装簡略）
-    alert(`${source}の問題診断を実行します。`);
-}
-
-function loadPreset(type) {
-    // プリセット読み込み（実装簡略）
-    console.log(`Load preset: ${type}`);
+function loadPreset(preset) {
+    console.log('Loading preset:', preset);
+    // プリセット読み込みロジック
 }
 
 function customizeFilter() {
-    // カスタムフィルター設定（実装簡略）
-    console.log('Open custom filter dialog');
+    console.log('Customizing filter');
 }
 
+// スケジュール管理
 function runCollectionNow() {
-    if (confirm('手動収集を実行しますか？')) {
-        // 手動収集実行（実装簡略）
-        console.log('Run collection now');
-    }
+    console.log('Running collection now');
 }
 
 function testSchedule() {
-    // スケジュールテスト（実装簡略）
-    console.log('Test schedule');
+    console.log('Testing schedule');
 }
 
-function testNotification() {
-    const button = event.target;
-    const originalText = button.textContent;
-    
-    button.innerHTML = '<i class="bi bi-hourglass-split"></i> 送信中...';
-    button.disabled = true;
-    
-    setTimeout(() => {
-        button.innerHTML = '<i class="bi bi-check-circle"></i> 送信完了';
-        
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.disabled = false;
-        }, 2000);
-    }, 2000);
+// 通知設定
+function sendTestEmail() {
+    console.log('Sending test email');
 }
 
-async function loadSettings() {
-    try {
-        const response = await fetch('/api/settings');
-        const data = await response.json();
+// 詳細設定
+function backupDatabase() {
+    console.log('Backing up database');
+}
 
-        if (data.success && data.settings) {
-            // 設定をフォームに反映
-            const settings = data.settings;
+function cleanupNow() {
+    console.log('Running cleanup');
+}
 
-            // 通知メールアドレス
-            const emailInput = document.querySelector('input[name="notification_email"]');
-            if (emailInput && settings.notification_email) {
-                emailInput.value = settings.notification_email;
-            }
+function viewLogs() {
+    console.log('Viewing logs');
+}
 
-            // チェック間隔
-            const intervalInput = document.querySelector('input[name="check_interval_hours"]');
-            if (intervalInput && settings.check_interval_hours !== undefined) {
-                intervalInput.value = settings.check_interval_hours;
-            }
+function clearLogs() {
+    console.log('Clearing logs');
+}
 
-            // メール通知有効化
-            const emailEnabledCheckbox = document.querySelector('input[name="email_notifications_enabled"]');
-            if (emailEnabledCheckbox && settings.email_notifications_enabled !== undefined) {
-                emailEnabledCheckbox.checked = settings.email_notifications_enabled;
-            }
+function exportSettings() {
+    console.log('Exporting settings');
+}
 
-            // カレンダー有効化
-            const calendarEnabledCheckbox = document.querySelector('input[name="calendar_enabled"]');
-            if (calendarEnabledCheckbox && settings.calendar_enabled !== undefined) {
-                calendarEnabledCheckbox.checked = settings.calendar_enabled;
-            }
+function importSettings() {
+    console.log('Importing settings');
+}
 
-            // 最大通知数
-            const maxNotificationsInput = document.querySelector('input[name="max_notifications_per_day"]');
-            if (maxNotificationsInput && settings.max_notifications_per_day !== undefined) {
-                maxNotificationsInput.value = settings.max_notifications_per_day;
-            }
+function resetSettings() {
+    console.log('Resetting settings');
+}
 
-            console.log('Settings loaded successfully:', settings);
-        }
-    } catch (error) {
-        console.error('Error loading settings:', error);
+function resetAllData() {
+    if (confirm('本当にすべてのデータを削除しますか？この操作は取り消せません。')) {
+        console.log('Resetting all data');
     }
 }
 
-async function saveAllSettings() {
-    const button = document.getElementById('saveAllBtn');
-    const originalText = button.innerHTML;
-
-    button.innerHTML = '<i class="bi bi-hourglass-split"></i> 保存中...';
-    button.disabled = true;
-
-    try {
-        // 設定を収集
-        const settings = {};
-
-        // 通知メールアドレス
-        const emailInput = document.querySelector('input[name="notification_email"]');
-        if (emailInput) {
-            settings.notification_email = emailInput.value;
-        }
-
-        // チェック間隔
-        const intervalInput = document.querySelector('input[name="check_interval_hours"]');
-        if (intervalInput) {
-            settings.check_interval_hours = parseInt(intervalInput.value);
-        }
-
-        // メール通知有効化
-        const emailEnabledCheckbox = document.querySelector('input[name="email_notifications_enabled"]');
-        if (emailEnabledCheckbox) {
-            settings.email_notifications_enabled = emailEnabledCheckbox.checked;
-        }
-
-        // カレンダー有効化
-        const calendarEnabledCheckbox = document.querySelector('input[name="calendar_enabled"]');
-        if (calendarEnabledCheckbox) {
-            settings.calendar_enabled = calendarEnabledCheckbox.checked;
-        }
-
-        // 最大通知数
-        const maxNotificationsInput = document.querySelector('input[name="max_notifications_per_day"]');
-        if (maxNotificationsInput) {
-            settings.max_notifications_per_day = parseInt(maxNotificationsInput.value);
-        }
-
-        // APIに送信
-        const response = await fetch('/api/settings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(settings)
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            button.innerHTML = '<i class="bi bi-check-lg"></i> 保存完了';
-            console.log('Settings saved successfully');
-
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 2000);
-        } else {
-            throw new Error(data.error || '設定の保存に失敗しました');
-        }
-    } catch (error) {
-        console.error('Error saving settings:', error);
-        button.innerHTML = '<i class="bi bi-x-lg"></i> 保存失敗';
-
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.disabled = false;
-        }, 2000);
-    }
-}
-
-// ページ読み込み時に設定を取得
+// 初期化
 document.addEventListener('DOMContentLoaded', function() {
-    loadSettings();
+    console.log('Settings page loaded');
 });
-
-function optimizeDatabase() {
-    if (confirm('データベースを最適化しますか？処理には時間がかかる場合があります。')) {
-        console.log('Optimize database');
-    }
-}
-
-function cleanupOldData() {
-    if (confirm('古いデータを削除しますか？この操作は取り消せません。')) {
-        console.log('Cleanup old data');
-    }
-}
-
-function resetAllSettings() {
-    if (confirm('すべての設定をリセットしますか？この操作は取り消せません。')) {
-        if (confirm('本当にリセットしてもよろしいですか？')) {
-            console.log('Reset all settings');
-        }
-    }
-}
-
-function exportLogs() {
-    console.log('Export logs');
-}
-
-function checkUpdates() {
-    console.log('Check for updates');
-}
-
-function systemDiagnostics() {
-    console.log('Run system diagnostics');
-}
 </script>
 
-<!-- 通知ステータス表示用JavaScript -->
-<script src="{{ url_for('static', filename='js/notification-status.js') }}"></script>
-
-<!-- 収集設定管理用JavaScript -->
-<script src="{{ url_for('static', filename='js/collection-settings.js') }}"></script>
 {% endblock %}
