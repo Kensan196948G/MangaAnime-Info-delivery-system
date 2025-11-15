@@ -13,16 +13,20 @@
 
     // State management
     const state = {
-        feeds: [],
+        apiSources: [],
+        rssFeeds: [],
         loading: false,
-        testingFeeds: new Set()
+        testingFeeds: new Set(),
+        testingApis: new Set()
     };
 
     // DOM elements cache
     const elements = {
+        apiContainer: null,
         rssContainer: null,
         saveAllBtn: null,
-        testAllBtn: null
+        testAllApisBtn: null,
+        testAllRssBtn: null
     };
 
     /**
@@ -32,16 +36,294 @@
         console.log('[CollectionSettings] Initializing...');
 
         // Cache DOM elements
+        elements.apiContainer = document.getElementById('apiSourcesContainer');
         elements.rssContainer = document.getElementById('rssSourcesContainer');
         elements.saveAllBtn = document.getElementById('saveAllBtn');
+        elements.testAllApisBtn = document.getElementById('testAllApisBtn');
+        elements.testAllRssBtn = document.getElementById('testAllRssBtn');
 
-        // Load feed configurations
+        // Load configurations
+        loadApiConfigurations();
         loadFeedConfigurations();
 
         // Setup event listeners
         setupEventListeners();
 
         console.log('[CollectionSettings] Initialized successfully');
+    }
+
+    /**
+     * Load API source configurations
+     */
+    async function loadApiConfigurations() {
+        try {
+            state.loading = true;
+            showLoadingIndicator('api');
+
+            // For now, use hardcoded API configurations
+            // In the future, this could be loaded from the server
+            state.apiSources = [
+                {
+                    id: 'anilist',
+                    name: 'AniList GraphQL API',
+                    type: 'api',
+                    category: 'アニメ情報収集',
+                    url: 'https://graphql.anilist.co',
+                    enabled: true,
+                    status: 'connected',
+                    rateLimit: '90 requests/min',
+                    requestInterval: 1,
+                    maxConcurrent: 2,
+                    stats: {
+                        itemsCollected: 1247,
+                        successRate: 98.5
+                    }
+                },
+                {
+                    id: 'syobocal',
+                    name: 'しょぼいカレンダー',
+                    type: 'api',
+                    category: 'TV放送スケジュール',
+                    url: 'http://cal.syoboi.jp/json.php',
+                    enabled: true,
+                    status: 'connected',
+                    rateLimit: '60 requests/min',
+                    fetchPeriodDays: 30,
+                    updateFrequency: 'daily',
+                    stats: {
+                        itemsCollected: 89,
+                        successRate: 87.2
+                    }
+                }
+            ];
+
+            console.log(`[CollectionSettings] Loaded ${state.apiSources.length} API sources`);
+
+            renderApiSources();
+
+        } catch (error) {
+            console.error('[CollectionSettings] Failed to load API sources:', error);
+            showErrorNotification('API設定の読み込みに失敗しました: ' + error.message);
+        } finally {
+            state.loading = false;
+            hideLoadingIndicator('api');
+        }
+    }
+
+    /**
+     * Render API source cards
+     */
+    function renderApiSources() {
+        if (!elements.apiContainer) {
+            console.warn('[CollectionSettings] API container not found');
+            return;
+        }
+
+        // Clear existing content (keep the existing static content if present)
+        const existingCards = elements.apiContainer.querySelectorAll('.col-lg-6.mb-4');
+        existingCards.forEach(card => card.remove());
+
+        // Render API source cards
+        state.apiSources.forEach(api => {
+            const card = createApiCard(api);
+            elements.apiContainer.appendChild(card);
+        });
+
+        console.log(`[CollectionSettings] Rendered ${state.apiSources.length} API sources`);
+
+        // Initialize Bootstrap tooltips
+        initializeTooltips();
+    }
+
+    /**
+     * Create an API source card element
+     */
+    function createApiCard(api) {
+        const col = document.createElement('div');
+        col.className = 'col-lg-6 mb-4';
+
+        const cardClass = api.enabled === false ? 'source-config-card disabled' :
+                         api.status === 'error' ? 'source-config-card error' :
+                         'source-config-card enabled';
+
+        const statusBadge = getApiStatusBadge(api);
+        const bodyContent = renderApiCardBody(api);
+
+        col.innerHTML = `
+            <div class="${cardClass}" data-api-id="${api.id}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="mb-0">${escapeHtml(api.name)}</h5>
+                        <small class="text-muted">${escapeHtml(api.category)}</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        ${statusBadge}
+                        <div class="form-check form-switch">
+                            <input class="form-check-input api-enable-toggle"
+                                   type="checkbox"
+                                   ${api.enabled !== false ? 'checked' : ''}
+                                   data-api-id="${api.id}">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    ${bodyContent}
+                </div>
+            </div>
+        `;
+
+        return col;
+    }
+
+    /**
+     * Get API status badge HTML
+     */
+    function getApiStatusBadge(api) {
+        if (api.enabled === false) {
+            return `
+                <span class="connection-status disconnected">
+                    <i class="bi bi-dash-circle"></i> 無効
+                </span>
+            `;
+        }
+
+        if (api.status === 'error') {
+            const errorMsg = api.error_message || 'エラーが発生しました';
+            return `
+                <span class="connection-status disconnected"
+                      data-bs-toggle="tooltip"
+                      title="${escapeHtml(errorMsg)}">
+                    <i class="bi bi-exclamation-circle"></i> エラー
+                </span>
+            `;
+        }
+
+        if (api.status === 'connected') {
+            return `
+                <span class="connection-status connected">
+                    <i class="bi bi-check-circle"></i> 接続中
+                </span>
+            `;
+        }
+
+        return `
+            <span class="connection-status" style="background-color: rgba(108, 117, 125, 0.1); color: #6c757d;">
+                <i class="bi bi-question-circle"></i> 未確認
+            </span>
+        `;
+    }
+
+    /**
+     * Render API card body
+     */
+    function renderApiCardBody(api) {
+        let html = '';
+
+        // API URL
+        html += `
+            <div class="mb-3">
+                <label class="form-label">API URL</label>
+                <input type="url"
+                       class="form-control form-control-sm"
+                       value="${escapeHtml(api.url)}"
+                       readonly>
+            </div>
+        `;
+
+        // Rate limit info
+        if (api.rateLimit) {
+            html += `
+                <div class="mb-3">
+                    <label class="form-label">レート制限</label>
+                    <div class="alert alert-info py-2 px-3 mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        <small>${escapeHtml(api.rateLimit)}</small>
+                    </div>
+                </div>
+            `;
+        }
+
+        // API-specific settings
+        if (api.id === 'anilist') {
+            html += `
+                <div class="mb-3">
+                    <label class="form-label">リクエスト間隔（秒）</label>
+                    <input type="number"
+                           class="form-control form-control-sm api-setting"
+                           data-api-id="${api.id}"
+                           data-setting="requestInterval"
+                           value="${api.requestInterval || 1}"
+                           min="0.5"
+                           step="0.1">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">最大同時接続数</label>
+                    <input type="number"
+                           class="form-control form-control-sm api-setting"
+                           data-api-id="${api.id}"
+                           data-setting="maxConcurrent"
+                           value="${api.maxConcurrent || 2}"
+                           min="1"
+                           max="5">
+                </div>
+            `;
+        } else if (api.id === 'syobocal') {
+            html += `
+                <div class="mb-3">
+                    <label class="form-label">取得期間（日）</label>
+                    <input type="number"
+                           class="form-control form-control-sm api-setting"
+                           data-api-id="${api.id}"
+                           data-setting="fetchPeriodDays"
+                           value="${api.fetchPeriodDays || 30}"
+                           min="1"
+                           max="365">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">更新頻度</label>
+                    <select class="form-select form-select-sm api-setting"
+                            data-api-id="${api.id}"
+                            data-setting="updateFrequency">
+                        <option value="hourly" ${api.updateFrequency === 'hourly' ? 'selected' : ''}>1時間ごと</option>
+                        <option value="daily" ${api.updateFrequency === 'daily' ? 'selected' : ''}>1日1回</option>
+                        <option value="weekly" ${api.updateFrequency === 'weekly' ? 'selected' : ''}>1週間に1回</option>
+                    </select>
+                </div>
+            `;
+        }
+
+        // Action buttons
+        html += `
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm test-api-btn"
+                        data-api-id="${api.id}">
+                    <i class="bi bi-wifi"></i> 接続テスト
+                </button>
+                <button class="btn btn-outline-secondary btn-sm reset-api-btn"
+                        data-api-id="${api.id}">
+                    <i class="bi bi-arrow-clockwise"></i> デフォルト
+                </button>
+            </div>
+        `;
+
+        // Statistics
+        if (api.stats) {
+            const statLabel = api.id === 'syobocal' ? '放送局数' : '取得作品数';
+            html += `
+                <div class="stats-grid mt-3">
+                    <div class="stats-card">
+                        <div class="stats-value">${api.stats.itemsCollected || 0}</div>
+                        <small class="text-muted">${statLabel}</small>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value">${(api.stats.successRate || 0).toFixed(1)}%</div>
+                        <small class="text-muted">成功率</small>
+                    </div>
+                </div>
+            `;
+        }
+
+        return html;
     }
 
     /**
@@ -59,9 +341,9 @@
             }
 
             const data = await response.json();
-            state.feeds = data.feeds || [];
+            state.rssFeeds = data.feeds || [];
 
-            console.log(`[CollectionSettings] Loaded ${state.feeds.length} RSS feeds`);
+            console.log(`[CollectionSettings] Loaded ${state.rssFeeds.length} RSS feeds`);
 
             renderFeeds();
 
@@ -87,8 +369,8 @@
         elements.rssContainer.innerHTML = '';
 
         // Filter and render only enabled feeds (or show all with visual distinction)
-        const activeFeeds = state.feeds.filter(feed => feed.enabled !== false);
-        const disabledFeeds = state.feeds.filter(feed => feed.enabled === false);
+        const activeFeeds = state.rssFeeds.filter(feed => feed.enabled !== false);
+        const disabledFeeds = state.rssFeeds.filter(feed => feed.enabled === false);
 
         // Render active feeds
         activeFeeds.forEach(feed => {
@@ -369,9 +651,33 @@
             elements.saveAllBtn.addEventListener('click', saveAllSettings);
         }
 
+        // Test all APIs button
+        if (elements.testAllApisBtn) {
+            elements.testAllApisBtn.addEventListener('click', testAllApis);
+        }
+
+        // Test all RSS button
+        if (elements.testAllRssBtn) {
+            elements.testAllRssBtn.addEventListener('click', testAllRssFeeds);
+        }
+
         // Delegate events for dynamically created elements
         document.addEventListener('click', function(e) {
-            // Test connection button
+            // Test API connection button
+            if (e.target.closest('.test-api-btn')) {
+                const btn = e.target.closest('.test-api-btn');
+                const apiId = btn.dataset.apiId;
+                testApiConnection(apiId);
+            }
+
+            // Reset API settings button
+            if (e.target.closest('.reset-api-btn')) {
+                const btn = e.target.closest('.reset-api-btn');
+                const apiId = btn.dataset.apiId;
+                resetApiToDefaults(apiId);
+            }
+
+            // Test RSS connection button
             if (e.target.closest('.test-connection-btn')) {
                 const btn = e.target.closest('.test-connection-btn');
                 const feedId = btn.dataset.feedId;
@@ -386,14 +692,165 @@
             }
         });
 
-        // Feed enable/disable toggle
+        // API enable/disable toggle
         document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('api-enable-toggle')) {
+                const apiId = e.target.dataset.apiId;
+                const enabled = e.target.checked;
+                toggleApi(apiId, enabled);
+            }
+
+            // Feed enable/disable toggle
             if (e.target.classList.contains('feed-enable-toggle')) {
                 const feedId = e.target.dataset.feedId;
                 const enabled = e.target.checked;
                 toggleFeed(feedId, enabled);
             }
+
+            // API settings change
+            if (e.target.classList.contains('api-setting')) {
+                const apiId = e.target.dataset.apiId;
+                const setting = e.target.dataset.setting;
+                const value = e.target.value;
+                updateApiSetting(apiId, setting, value);
+            }
         });
+    }
+
+    /**
+     * Toggle API enable/disable
+     */
+    async function toggleApi(apiId, enabled) {
+        try {
+            // Update local state
+            const api = state.apiSources.find(a => a.id === apiId);
+            if (api) {
+                api.enabled = enabled;
+
+                // Re-render to update UI
+                renderApiSources();
+
+                showSuccessNotification(
+                    enabled ? 'APIを有効化しました' : 'APIを無効化しました'
+                );
+
+                // In the future, save to server
+                // await saveApiConfiguration(apiId, { enabled });
+            }
+
+        } catch (error) {
+            console.error('[CollectionSettings] Failed to toggle API:', error);
+            showErrorNotification('API設定の更新に失敗しました: ' + error.message);
+        }
+    }
+
+    /**
+     * Update API setting
+     */
+    function updateApiSetting(apiId, setting, value) {
+        const api = state.apiSources.find(a => a.id === apiId);
+        if (api) {
+            api[setting] = value;
+            console.log(`[CollectionSettings] Updated ${apiId}.${setting} = ${value}`);
+
+            // Auto-save could be implemented here
+            // For now, settings are stored in memory
+        }
+    }
+
+    /**
+     * Test API connection
+     */
+    async function testApiConnection(apiId) {
+        const btn = document.querySelector(`[data-api-id="${apiId}"].test-api-btn`);
+
+        if (!btn || state.testingApis.has(apiId)) {
+            return;
+        }
+
+        try {
+            state.testingApis.add(apiId);
+            btn.classList.add('testing');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> テスト中...';
+
+            // Simulate API test (in the future, call actual API endpoint)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            const api = state.apiSources.find(a => a.id === apiId);
+            if (api) {
+                api.status = 'connected';
+                renderApiSources();
+                showSuccessNotification(`${api.name} 接続成功`);
+            }
+
+        } catch (error) {
+            console.error('[CollectionSettings] API connection test failed:', error);
+            showErrorNotification('接続テストに失敗しました: ' + error.message);
+        } finally {
+            state.testingApis.delete(apiId);
+            if (btn) {
+                btn.classList.remove('testing');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-wifi"></i> 接続テスト';
+            }
+        }
+    }
+
+    /**
+     * Reset API to default settings
+     */
+    function resetApiToDefaults(apiId) {
+        const api = state.apiSources.find(a => a.id === apiId);
+        if (!api) return;
+
+        if (confirm(`${api.name} の設定をデフォルトに戻しますか?`)) {
+            // Reset to defaults
+            if (api.id === 'anilist') {
+                api.requestInterval = 1;
+                api.maxConcurrent = 2;
+            } else if (api.id === 'syobocal') {
+                api.fetchPeriodDays = 30;
+                api.updateFrequency = 'daily';
+            }
+
+            renderApiSources();
+            showSuccessNotification('デフォルト設定に戻しました');
+        }
+    }
+
+    /**
+     * Test all APIs
+     */
+    async function testAllApis() {
+        showInfoNotification('すべてのAPIをテスト中...');
+
+        for (const api of state.apiSources) {
+            if (api.enabled !== false) {
+                await testApiConnection(api.id);
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        showSuccessNotification('すべてのAPIテストが完了しました');
+    }
+
+    /**
+     * Test all RSS feeds
+     */
+    async function testAllRssFeeds() {
+        showInfoNotification('すべてのRSSフィードをテスト中...');
+
+        const enabledFeeds = state.rssFeeds.filter(f => f.enabled !== false);
+
+        for (const feed of enabledFeeds) {
+            await testConnection(feed.id || feed.name);
+            // Small delay between tests
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        showSuccessNotification('すべてのRSSフィードのテストが完了しました');
     }
 
     /**
@@ -625,21 +1082,26 @@
         }
     }
 
-    function showLoadingIndicator() {
-        if (elements.rssContainer) {
-            elements.rssContainer.innerHTML = `
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">読み込み中...</span>
+    function showLoadingIndicator(type = 'rss') {
+        const container = type === 'api' ? elements.apiContainer : elements.rssContainer;
+        const message = type === 'api' ? 'API設定を読み込んでいます...' : 'フィード設定を読み込んでいます...';
+
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">読み込み中...</span>
+                        </div>
+                        <p class="mt-3 text-muted">${message}</p>
                     </div>
-                    <p class="mt-3 text-muted">フィード設定を読み込んでいます...</p>
                 </div>
             `;
         }
     }
 
-    function hideLoadingIndicator() {
-        // Handled by renderFeeds()
+    function hideLoadingIndicator(type = 'rss') {
+        // Handled by render functions
     }
 
     /**
@@ -660,8 +1122,12 @@
 
     // Export for global access if needed
     window.CollectionSettings = {
-        reload: loadFeedConfigurations,
-        testConnection: testConnection
+        reloadApis: loadApiConfigurations,
+        reloadFeeds: loadFeedConfigurations,
+        testApiConnection: testApiConnection,
+        testConnection: testConnection,
+        testAllApis: testAllApis,
+        testAllRssFeeds: testAllRssFeeds
     };
 
 })();

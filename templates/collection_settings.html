@@ -248,114 +248,39 @@
         <!-- 収集ソース設定 -->
         <div class="tab-pane fade show active" id="sources" role="tabpanel">
             <div class="py-4">
-                <div class="row" id="rssSourcesContainer">
-                    <!-- AniList API設定 -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card source-config-card enabled">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-0">AniList GraphQL API</h5>
-                                    <small class="text-muted">アニメ情報収集</small>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="connection-status connected">
-                                        <i class="bi bi-check-circle"></i> 接続中
-                                    </span>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="anilistEnabled" checked>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label">API URL</label>
-                                    <input type="url" class="form-control" value="https://graphql.anilist.co" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">リクエスト間隔（秒）</label>
-                                    <input type="number" class="form-control" value="1" min="0.5" step="0.1">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">最大同時接続数</label>
-                                    <input type="number" class="form-control" value="2" min="1" max="5">
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-primary test-connection-btn" onclick="testConnection('anilist')">
-                                        <i class="bi bi-wifi"></i> 接続テスト
-                                    </button>
-                                    <button class="btn btn-outline-secondary" onclick="resetToDefaults('anilist')">
-                                        <i class="bi bi-arrow-clockwise"></i> デフォルト
-                                    </button>
-                                </div>
-                                <div class="stats-grid mt-3">
-                                    <div class="stats-card">
-                                        <div class="stats-value">1,247</div>
-                                        <small class="text-muted">取得作品数</small>
-                                    </div>
-                                    <div class="stats-card">
-                                        <div class="stats-value">98.5%</div>
-                                        <small class="text-muted">成功率</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- しょぼいカレンダー設定 -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card source-config-card enabled">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-0">しょぼいカレンダー</h5>
-                                    <small class="text-muted">TV放送スケジュール</small>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="connection-status connected">
-                                        <i class="bi bi-check-circle"></i> 接続中
-                                    </span>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="shoboEnabled" checked>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label">API URL</label>
-                                    <input type="url" class="form-control" value="http://cal.syoboi.jp/json.php" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">取得期間（日）</label>
-                                    <input type="number" class="form-control" value="30" min="1" max="365">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">更新頻度</label>
-                                    <select class="form-select">
-                                        <option value="hourly">1時間ごと</option>
-                                        <option value="daily" selected>1日1回</option>
-                                        <option value="weekly">1週間に1回</option>
-                                    </select>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-primary test-connection-btn" onclick="testConnection('shobo')">
-                                        <i class="bi bi-wifi"></i> 接続テスト
-                                    </button>
-                                    <button class="btn btn-outline-secondary" onclick="resetToDefaults('shobo')">
-                                        <i class="bi bi-arrow-clockwise"></i> デフォルト
-                                    </button>
-                                </div>
-                                <div class="stats-grid mt-3">
-                                    <div class="stats-card">
-                                        <div class="stats-value">89</div>
-                                        <small class="text-muted">放送局数</small>
-                                    </div>
-                                    <div class="stats-card">
-                                        <div class="stats-value">87.2%</div>
-                                        <small class="text-muted">成功率</small>
-                                    </div>
-                                </div>
-                            </div>
+                <!-- API収集ソース -->
+                <div class="mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bi bi-code-square text-primary"></i> API収集ソース
+                            </h4>
+                            <p class="text-muted mb-0 small">外部APIからアニメ情報を自動収集します</p>
                         </div>
+                        <button class="btn btn-sm btn-outline-primary" id="testAllApisBtn">
+                            <i class="bi bi-wifi"></i> すべてテスト
+                        </button>
                     </div>
+                    <div class="row" id="apiSourcesContainer">
+                        <!-- API sources will be dynamically loaded here by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- RSS収集ソース -->
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bi bi-rss text-warning"></i> RSS収集ソース
+                            </h4>
+                            <p class="text-muted mb-0 small">RSSフィードからマンガ・アニメ情報を収集します</p>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary" id="testAllRssBtn">
+                            <i class="bi bi-wifi"></i> すべてテスト
+                        </button>
+                    </div>
+                    <div class="row" id="rssSourcesContainer">
 
                     <!-- BookWalker RSS設定 -->
                     <div class="col-lg-6 mb-4">
@@ -450,7 +375,10 @@ https://example3.com/updates.xml"></textarea>
                             </div>
                         </div>
                     </div>
+
+                    </div>
                 </div>
+
             </div>
         </div>
 

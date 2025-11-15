@@ -2000,6 +2000,714 @@ def api_notification_status():
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
+
+# ============================================================================
+# API Source Testing and Configuration Endpoints
+# ============================================================================
+
+@app.route('/api/sources')
+def api_sources():
+    """
+    Get all collection sources with their status and configuration.
+    
+    Returns:
+        JSON with list of all sources (APIs and RSS feeds) including:
+        - Source name and type
+        - Enabled/disabled status
+        - Last test results
+        - Configuration details
+    """
+    try:
+        config = load_config()
+        
+        sources = {
+            'apis': [],
+            'rss_feeds': [],
+            'summary': {
+                'total_sources': 0,
+                'enabled_sources': 0,
+                'disabled_sources': 0,
+                'last_updated': datetime.now().isoformat()
+            }
+        }
+        
+        # AniList API
+        anilist_config = config.get('apis', {}).get('anilist', {})
+        anilist_source = {
+            'id': 'anilist',
+            'name': 'AniList GraphQL API',
+            'type': 'api',
+            'enabled': anilist_config.get('enabled', True),
+            'url': anilist_config.get('graphql_url', 'https://graphql.anilist.co'),
+            'rate_limit': anilist_config.get('rate_limit', {}).get('requests_per_minute', 90),
+            'timeout': anilist_config.get('timeout_seconds', 30),
+            'description': 'アニメ情報取得用GraphQL API',
+            'data_type': 'anime',
+            'last_test': None,  # Will be populated if available
+            'health_status': 'unknown'
+        }
+        sources['apis'].append(anilist_source)
+        
+        # Syoboi Calendar API
+        syoboi_config = config.get('apis', {}).get('syoboi', {})
+        syoboi_source = {
+            'id': 'syoboi',
+            'name': 'しょぼいカレンダー',
+            'type': 'api',
+            'enabled': syoboi_config.get('enabled', False),
+            'url': syoboi_config.get('base_url', 'https://cal.syoboi.jp'),
+            'rate_limit': syoboi_config.get('rate_limit', {}).get('requests_per_minute', 60),
+            'description': '日本のアニメ放送スケジュール',
+            'data_type': 'anime',
+            'last_test': None,
+            'health_status': 'unknown'
+        }
+        sources['apis'].append(syoboi_source)
+        
+        # RSS Feeds
+        rss_config = config.get('apis', {}).get('rss_feeds', {})
+        rss_feeds = rss_config.get('feeds', [])
+        
+        for feed in rss_feeds:
+            feed_source = {
+                'id': feed.get('name', '').lower().replace(' ', '_').replace('＋', 'plus'),
+                'name': feed.get('name', 'Unknown'),
+                'type': 'rss',
+                'enabled': feed.get('enabled', False),
+                'url': feed.get('url', ''),
+                'description': feed.get('description', ''),
+                'data_type': feed.get('type', 'manga'),
+                'verified': feed.get('verified', False),
+                'timeout': feed.get('timeout', 25),
+                'retry_count': feed.get('retry_count', 3),
+                'last_test': None,
+                'health_status': 'unknown' if feed.get('enabled') else 'disabled'
+            }
+            sources['rss_feeds'].append(feed_source)
+        
+        # Calculate summary
+        total_apis = len(sources['apis'])
+        total_rss = len(sources['rss_feeds'])
+        sources['summary']['total_sources'] = total_apis + total_rss
+        sources['summary']['enabled_sources'] = (
+            sum(1 for api in sources['apis'] if api['enabled']) +
+            sum(1 for rss in sources['rss_feeds'] if rss['enabled'])
+        )
+        sources['summary']['disabled_sources'] = (
+            sources['summary']['total_sources'] - sources['summary']['enabled_sources']
+        )
+        
+        return jsonify(sources)
+        
+    except Exception as e:
+        logger.error(f"Failed to get sources: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/sources/anilist/test', methods=['POST'])
+def api_test_anilist():
+    """
+    Test AniList GraphQL API connection.
+    
+    Returns:
+        JSON with test results including:
+        - Connection status
+        - Response time
+        - Error details if any
+        - Sample data retrieval success
+    """
+    try:
+        start_time = time.time()
+        test_results = {
+            'source': 'anilist',
+            'timestamp': datetime.now().isoformat(),
+            'tests': []
+        }
+        
+        # Test 1: Basic connectivity
+        try:
+            basic_query = '{ Media(id: 1) { id title { romaji } } }'
+            response = requests.post(
+                'https://graphql.anilist.co',
+                json={'query': basic_query},
+                headers={'User-Agent': 'MangaAnimeNotifier/1.0'},
+                timeout=5
+            )
+            basic_time = time.time() - start_time
+            
+            test_results['tests'].append({
+                'name': 'basic_connectivity',
+                'status': 'success' if response.status_code == 200 else 'failed',
+                'response_time_ms': round(basic_time * 1000, 2),
+                'http_status': response.status_code,
+                'details': f'HTTP {response.status_code}' if response.status_code != 200 else 'GraphQL API responding'
+            })
+            
+            if response.status_code == 200:
+                data = response.json()
+                if 'errors' in data:
+                    test_results['tests'][-1]['status'] = 'warning'
+                    test_results['tests'][-1]['details'] = f"GraphQL errors: {data['errors']}"
+                    
+        except requests.exceptions.Timeout:
+            test_results['tests'].append({
+                'name': 'basic_connectivity',
+                'status': 'failed',
+                'response_time_ms': 5000,
+                'error': 'タイムアウト (5秒)'
+            })
+        except Exception as e:
+            test_results['tests'].append({
+                'name': 'basic_connectivity',
+                'status': 'error',
+                'error': str(e)
+            })
+        
+        # Test 2: Current season query
+        try:
+            now = datetime.now()
+            year = now.year
+            month = now.month
+            if month in [12, 1, 2]:
+                season = "WINTER"
+            elif month in [3, 4, 5]:
+                season = "SPRING"
+            elif month in [6, 7, 8]:
+                season = "SUMMER"
+            else:
+                season = "FALL"
+            
+            season_query = f'''
+            {{
+                Page(page: 1, perPage: 5) {{
+                    media(season: {season}, seasonYear: {year}, type: ANIME) {{
+                        id
+                        title {{ romaji }}
+                        status
+                    }}
+                }}
+            }}
+            '''
+            
+            start_season = time.time()
+            response = requests.post(
+                'https://graphql.anilist.co',
+                json={'query': season_query},
+                headers={'User-Agent': 'MangaAnimeNotifier/1.0'},
+                timeout=5
+            )
+            season_time = time.time() - start_season
+            
+            if response.status_code == 200:
+                data = response.json()
+                media_count = len(data.get('data', {}).get('Page', {}).get('media', []))
+                test_results['tests'].append({
+                    'name': 'current_season_query',
+                    'status': 'success',
+                    'response_time_ms': round(season_time * 1000, 2),
+                    'results_count': media_count,
+                    'details': f'{season} {year}シーズンのアニメ{media_count}件取得'
+                })
+            else:
+                test_results['tests'].append({
+                    'name': 'current_season_query',
+                    'status': 'failed',
+                    'http_status': response.status_code,
+                    'response_time_ms': round(season_time * 1000, 2)
+                })
+                
+        except Exception as e:
+            test_results['tests'].append({
+                'name': 'current_season_query',
+                'status': 'error',
+                'error': str(e)
+            })
+        
+        # Test 3: Rate limit check
+        test_results['tests'].append({
+            'name': 'rate_limit_info',
+            'status': 'info',
+            'details': 'AniList rate limit: 90 requests/minute',
+            'configured_limit': 90
+        })
+        
+        # Overall status
+        failed_tests = sum(1 for test in test_results['tests'] if test['status'] in ['failed', 'error'])
+        test_results['overall_status'] = 'success' if failed_tests == 0 else 'failed'
+        test_results['success_rate'] = f"{((len(test_results['tests']) - failed_tests) / len(test_results['tests']) * 100):.1f}%"
+        test_results['total_time_ms'] = round((time.time() - start_time) * 1000, 2)
+        
+        return jsonify(test_results)
+        
+    except Exception as e:
+        logger.error(f"AniList test failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'source': 'anilist',
+            'overall_status': 'error',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+
+@app.route('/api/sources/syoboi/test', methods=['POST'])
+def api_test_syoboi():
+    """
+    Test Syoboi Calendar API connection.
+    
+    Returns:
+        JSON with test results including:
+        - Connection status
+        - Response time
+        - Sample data retrieval
+    """
+    try:
+        start_time = time.time()
+        test_results = {
+            'source': 'syoboi',
+            'timestamp': datetime.now().isoformat(),
+            'tests': []
+        }
+        
+        # Test 1: Title lookup
+        try:
+            response = requests.get(
+                'https://cal.syoboi.jp/json.php?Req=TitleLookup&TID=1',
+                headers={'User-Agent': 'MangaAnimeNotifier/1.0'},
+                timeout=5
+            )
+            lookup_time = time.time() - start_time
+            
+            test_results['tests'].append({
+                'name': 'title_lookup',
+                'status': 'success' if response.status_code == 200 else 'failed',
+                'response_time_ms': round(lookup_time * 1000, 2),
+                'http_status': response.status_code,
+                'details': 'タイトル検索APIアクセス成功' if response.status_code == 200 else f'HTTP {response.status_code}'
+            })
+            
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    test_results['tests'][-1]['data_format'] = 'valid_json'
+                except:
+                    test_results['tests'][-1]['status'] = 'warning'
+                    test_results['tests'][-1]['data_format'] = 'invalid_json'
+                    
+        except requests.exceptions.Timeout:
+            test_results['tests'].append({
+                'name': 'title_lookup',
+                'status': 'failed',
+                'response_time_ms': 5000,
+                'error': 'タイムアウト (5秒)'
+            })
+        except Exception as e:
+            test_results['tests'].append({
+                'name': 'title_lookup',
+                'status': 'error',
+                'error': str(e)
+            })
+        
+        # Test 2: Program lookup
+        try:
+            start_prog = time.time()
+            response = requests.get(
+                'https://cal.syoboi.jp/json.php?Req=ProgramByDate&Start=20240101&Days=1',
+                headers={'User-Agent': 'MangaAnimeNotifier/1.0'},
+                timeout=5
+            )
+            prog_time = time.time() - start_prog
+            
+            test_results['tests'].append({
+                'name': 'program_lookup',
+                'status': 'success' if response.status_code == 200 else 'failed',
+                'response_time_ms': round(prog_time * 1000, 2),
+                'http_status': response.status_code,
+                'details': '番組スケジュール取得成功' if response.status_code == 200 else f'HTTP {response.status_code}'
+            })
+            
+        except Exception as e:
+            test_results['tests'].append({
+                'name': 'program_lookup',
+                'status': 'error',
+                'error': str(e)
+            })
+        
+        # Overall status
+        failed_tests = sum(1 for test in test_results['tests'] if test['status'] in ['failed', 'error'])
+        test_results['overall_status'] = 'success' if failed_tests == 0 else 'failed'
+        test_results['success_rate'] = f"{((len(test_results['tests']) - failed_tests) / len(test_results['tests']) * 100):.1f}%"
+        test_results['total_time_ms'] = round((time.time() - start_time) * 1000, 2)
+        
+        return jsonify(test_results)
+        
+    except Exception as e:
+        logger.error(f"Syoboi test failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'source': 'syoboi',
+            'overall_status': 'error',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+
+@app.route('/api/sources/rss/test', methods=['POST'])
+def api_test_rss():
+    """
+    Test RSS feed connection.
+    
+    Request JSON:
+        {
+            "feed_id": "shonenjump_plus" or "feed_url": "https://..."
+        }
+    
+    Returns:
+        JSON with test results
+    """
+    try:
+        data = request.get_json() or {}
+        feed_id = data.get('feed_id')
+        feed_url = data.get('feed_url')
+        
+        if not feed_id and not feed_url:
+            return jsonify({'error': 'feed_id or feed_url is required'}), 400
+        
+        # Find feed configuration
+        config = load_config()
+        rss_feeds = config.get('apis', {}).get('rss_feeds', {}).get('feeds', [])
+        
+        feed_config = None
+        if feed_id:
+            # Convert feed_id to match name
+            for feed in rss_feeds:
+                if feed.get('name', '').lower().replace(' ', '_').replace('＋', 'plus') == feed_id.lower():
+                    feed_config = feed
+                    break
+        
+        if not feed_config and feed_url:
+            # Use provided URL
+            feed_config = {
+                'name': 'Custom Feed',
+                'url': feed_url,
+                'timeout': 25,
+                'enabled': True
+            }
+        elif not feed_config:
+            return jsonify({'error': f'Feed not found: {feed_id}'}), 404
+        
+        start_time = time.time()
+        test_results = {
+            'source': feed_config.get('name', 'Unknown'),
+            'url': feed_config.get('url'),
+            'timestamp': datetime.now().isoformat(),
+            'tests': []
+        }
+        
+        # Test 1: HTTP connectivity
+        try:
+            response = requests.get(
+                feed_config['url'],
+                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'},
+                timeout=feed_config.get('timeout', 25),
+                allow_redirects=True
+            )
+            http_time = time.time() - start_time
+            
+            test_results['tests'].append({
+                'name': 'http_connectivity',
+                'status': 'success' if response.status_code == 200 else 'failed',
+                'response_time_ms': round(http_time * 1000, 2),
+                'http_status': response.status_code,
+                'content_type': response.headers.get('content-type', 'unknown'),
+                'content_length': len(response.content),
+                'details': f'HTTP {response.status_code}' + (f' (リダイレクト: {response.url})' if response.url != feed_config['url'] else '')
+            })
+            
+            # Test 2: RSS/XML parsing
+            if response.status_code == 200:
+                try:
+                    import feedparser
+                    feed_start = time.time()
+                    parsed_feed = feedparser.parse(response.content)
+                    parse_time = time.time() - feed_start
+                    
+                    entries_count = len(parsed_feed.get('entries', []))
+                    has_title = bool(parsed_feed.get('feed', {}).get('title'))
+                    
+                    test_results['tests'].append({
+                        'name': 'rss_parsing',
+                        'status': 'success' if entries_count > 0 else 'warning',
+                        'response_time_ms': round(parse_time * 1000, 2),
+                        'entries_count': entries_count,
+                        'feed_title': parsed_feed.get('feed', {}).get('title', 'N/A'),
+                        'has_valid_structure': has_title and entries_count > 0,
+                        'details': f'{entries_count}件のエントリー検出' if entries_count > 0 else 'エントリーが見つかりません'
+                    })
+                    
+                    # Sample entry details
+                    if entries_count > 0:
+                        sample_entry = parsed_feed.entries[0]
+                        test_results['sample_entry'] = {
+                            'title': sample_entry.get('title', 'N/A'),
+                            'link': sample_entry.get('link', 'N/A'),
+                            'published': sample_entry.get('published', 'N/A'),
+                            'has_description': bool(sample_entry.get('description') or sample_entry.get('summary'))
+                        }
+                    
+                except Exception as parse_error:
+                    test_results['tests'].append({
+                        'name': 'rss_parsing',
+                        'status': 'error',
+                        'error': str(parse_error),
+                        'details': 'RSSパース失敗'
+                    })
+            
+        except requests.exceptions.Timeout:
+            test_results['tests'].append({
+                'name': 'http_connectivity',
+                'status': 'failed',
+                'response_time_ms': feed_config.get('timeout', 25) * 1000,
+                'error': f'タイムアウト ({feed_config.get("timeout", 25)}秒)'
+            })
+        except Exception as e:
+            test_results['tests'].append({
+                'name': 'http_connectivity',
+                'status': 'error',
+                'error': str(e)
+            })
+        
+        # Overall status
+        failed_tests = sum(1 for test in test_results['tests'] if test['status'] in ['failed', 'error'])
+        test_results['overall_status'] = 'success' if failed_tests == 0 else 'failed'
+        test_results['success_rate'] = f"{((len(test_results['tests']) - failed_tests) / len(test_results['tests']) * 100):.1f}%"
+        test_results['total_time_ms'] = round((time.time() - start_time) * 1000, 2)
+        
+        return jsonify(test_results)
+        
+    except Exception as e:
+        logger.error(f"RSS test failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'overall_status': 'error',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+
+@app.route('/api/sources/toggle', methods=['POST'])
+def api_toggle_source():
+    """
+    Toggle a collection source on/off.
+    
+    Request JSON:
+        {
+            "source_type": "anilist" | "syoboi" | "rss_feed",
+            "source_id": "feed_name_for_rss",  # Required only for RSS feeds
+            "enabled": true | false
+        }
+    
+    Returns:
+        JSON with updated source configuration
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
+        source_type = data.get('source_type')
+        source_id = data.get('source_id')
+        enabled = data.get('enabled')
+        
+        if not source_type:
+            return jsonify({'error': 'source_type is required'}), 400
+        
+        if enabled is None:
+            return jsonify({'error': 'enabled is required'}), 400
+        
+        # Load current configuration
+        config = load_config()
+        
+        updated = False
+        
+        if source_type == 'anilist':
+            if 'apis' not in config:
+                config['apis'] = {}
+            if 'anilist' not in config['apis']:
+                config['apis']['anilist'] = {}
+            config['apis']['anilist']['enabled'] = bool(enabled)
+            updated = True
+            
+        elif source_type == 'syoboi':
+            if 'apis' not in config:
+                config['apis'] = {}
+            if 'syoboi' not in config['apis']:
+                config['apis']['syoboi'] = {}
+            config['apis']['syoboi']['enabled'] = bool(enabled)
+            updated = True
+            
+        elif source_type == 'rss_feed':
+            if not source_id:
+                return jsonify({'error': 'source_id is required for RSS feeds'}), 400
+            
+            rss_feeds = config.get('apis', {}).get('rss_feeds', {}).get('feeds', [])
+            
+            for feed in rss_feeds:
+                feed_key = feed.get('name', '').lower().replace(' ', '_').replace('＋', 'plus')
+                if feed_key == source_id.lower():
+                    feed['enabled'] = bool(enabled)
+                    updated = True
+                    break
+            
+            if not updated:
+                return jsonify({'error': f'RSS feed not found: {source_id}'}), 404
+        else:
+            return jsonify({'error': f'Invalid source_type: {source_type}'}), 400
+        
+        # Save updated configuration
+        if updated:
+            save_config(config)
+            
+            return jsonify({
+                'success': True,
+                'source_type': source_type,
+                'source_id': source_id,
+                'enabled': enabled,
+                'message': f'Source {"enabled" if enabled else "disabled"} successfully',
+                'timestamp': datetime.now().isoformat()
+            })
+        else:
+            return jsonify({'error': 'Failed to update configuration'}), 500
+        
+    except Exception as e:
+        logger.error(f"Failed to toggle source: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/sources/test-all', methods=['POST'])
+def api_test_all_sources():
+    """
+    Test all enabled collection sources in parallel.
+    
+    Returns:
+        JSON with test results for all sources
+    """
+    try:
+        import concurrent.futures
+        
+        config = load_config()
+        results = {
+            'timestamp': datetime.now().isoformat(),
+            'sources': [],
+            'summary': {
+                'total': 0,
+                'success': 0,
+                'failed': 0,
+                'errors': 0
+            }
+        }
+        
+        def test_source(source_info):
+            """Test a single source"""
+            source_type = source_info['type']
+            source_id = source_info['id']
+            
+            try:
+                if source_type == 'anilist':
+                    response = requests.post(
+                        '/api/sources/anilist/test',
+                        json={},
+                        headers={'Content-Type': 'application/json'}
+                    )
+                    # Since we can't make internal requests, call the test function directly
+                    with app.test_request_context(method='POST'):
+                        test_result = api_test_anilist()
+                        return json.loads(test_result[0].get_data(as_text=True))
+                        
+                elif source_type == 'syoboi':
+                    with app.test_request_context(method='POST'):
+                        test_result = api_test_syoboi()
+                        return json.loads(test_result[0].get_data(as_text=True))
+                        
+                elif source_type == 'rss':
+                    with app.test_request_context(
+                        method='POST',
+                        json={'feed_id': source_id}
+                    ):
+                        test_result = api_test_rss()
+                        return json.loads(test_result[0].get_data(as_text=True))
+                        
+            except Exception as e:
+                return {
+                    'source': source_id,
+                    'overall_status': 'error',
+                    'error': str(e)
+                }
+        
+        # Collect enabled sources
+        sources_to_test = []
+        
+        # APIs
+        if config.get('apis', {}).get('anilist', {}).get('enabled', True):
+            sources_to_test.append({'type': 'anilist', 'id': 'anilist'})
+        
+        if config.get('apis', {}).get('syoboi', {}).get('enabled', False):
+            sources_to_test.append({'type': 'syoboi', 'id': 'syoboi'})
+        
+        # RSS Feeds
+        rss_feeds = config.get('apis', {}).get('rss_feeds', {}).get('feeds', [])
+        for feed in rss_feeds:
+            if feed.get('enabled', False):
+                feed_id = feed.get('name', '').lower().replace(' ', '_').replace('＋', 'plus')
+                sources_to_test.append({'type': 'rss', 'id': feed_id})
+        
+        # Test sources in parallel
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            future_to_source = {
+                executor.submit(test_source, source): source
+                for source in sources_to_test
+            }
+            
+            for future in concurrent.futures.as_completed(future_to_source, timeout=30):
+                source = future_to_source[future]
+                try:
+                    result = future.result()
+                    results['sources'].append(result)
+                    
+                    # Update summary
+                    results['summary']['total'] += 1
+                    status = result.get('overall_status', 'error')
+                    if status == 'success':
+                        results['summary']['success'] += 1
+                    elif status == 'failed':
+                        results['summary']['failed'] += 1
+                    else:
+                        results['summary']['errors'] += 1
+                        
+                except Exception as e:
+                    results['sources'].append({
+                        'source': source['id'],
+                        'overall_status': 'error',
+                        'error': str(e)
+                    })
+                    results['summary']['total'] += 1
+                    results['summary']['errors'] += 1
+        
+        return jsonify(results)
+        
+    except Exception as e:
+        logger.error(f"Failed to test all sources: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == "__main__":
     # Initialize database if it doesn't exist
     if not os.path.exists(DATABASE_PATH):

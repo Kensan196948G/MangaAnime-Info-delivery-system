@@ -3,6 +3,99 @@
  * Additional styles for the collection settings page
  */
 
+/* Section headers */
+.collection-section-header {
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.collection-section-header h4 {
+    font-weight: 600;
+}
+
+.collection-section-header i {
+    font-size: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+/* API source cards */
+.source-config-card[data-api-id] {
+    position: relative;
+}
+
+.source-config-card[data-api-id]::before {
+    content: 'API';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    opacity: 0.8;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Rate limit badge */
+.alert-info.py-2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.2);
+    color: #0d6efd;
+}
+
+.alert-info.py-2 i {
+    flex-shrink: 0;
+}
+
+/* API settings inputs */
+.api-setting {
+    transition: all 0.2s ease;
+}
+
+.api-setting:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+}
+
+/* Test API button */
+.test-api-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.test-api-btn.testing::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+/* Section spacing */
+#apiSourcesContainer {
+    margin-bottom: 1rem;
+}
+
+#rssSourcesContainer {
+    margin-bottom: 1rem;
+}
+
+/* Test all buttons */
+#testAllApisBtn,
+#testAllRssBtn {
+    min-width: 120px;
+}
+
 /* Disabled feeds section */
 .disabled-feeds-section {
     margin-top: 2rem;
