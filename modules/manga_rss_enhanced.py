@@ -73,7 +73,7 @@ class EnhancedMangaRSSCollector:
             name="ジャンプBOOKストア (Jump BOOK Store)",
             url="https://jumpbookstore.com/rss/newrelease.xml",
             category="manga",
-            enabled=True,
+            enabled=False,  # ドメイン無効（DNSエラー）
             priority="high",
             timeout=20,
             parser_type="standard",
