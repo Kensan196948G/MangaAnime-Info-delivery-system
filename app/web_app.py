@@ -1396,6 +1396,7 @@ def api_test_configuration():
         rss_config = config.get("apis", {}).get("rss_feeds", {})
         feeds = rss_config.get("feeds", [])
         timeout = rss_config.get("timeout_seconds", 20)
+        user_agent = rss_config.get("user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
         feed_results = []
         success_count = 0
@@ -1416,7 +1417,12 @@ def api_test_configuration():
                 continue
 
             try:
-                response = requests.get(feed_url, timeout=timeout)
+                # User-Agentヘッダーを追加してボット対策を回避
+                headers = {
+                    'User-Agent': user_agent,
+                    'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+                }
+                response = requests.get(feed_url, headers=headers, timeout=timeout)
                 if response.status_code == 200:
                     success_count += 1
                     feed_results.append(
