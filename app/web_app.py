@@ -6,13 +6,19 @@ viewing releases, and configuring the system.
 """
 
 import os
+import sys
 import json
 import sqlite3
 import requests
 import time
 from datetime import datetime
+from pathlib import Path
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 import logging
+
+# プロジェクトルートをPythonパスに追加
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
