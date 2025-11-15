@@ -54,21 +54,92 @@ class EnhancedMangaRSSCollector:
     """
 
     # Pre-configured manga sources
+    # テスト済み: 2025-11-15 - 12個のRSSフィード中7個が正常に動作
     MANGA_SOURCES = {
-        "magapoke": MangaRSSFeedConfig(
-            name="マガジンポケット (Magazine Pocket)",
-            url="https://pocket.shonenmagazine.com/rss/series/",
+        "manba": MangaRSSFeedConfig(
+            name="マンバ",
+            url="https://manba.co.jp/feed",
             category="manga",
             enabled=True,
             priority="high",
             timeout=20,
-            parser_type="html",
-            custom_selectors={
-                "title": ".series-title",
-                "description": ".series-description",
-                "link": "a.series-link",
-            },
+            parser_type="standard",
         ),
+        "manba_magazines": MangaRSSFeedConfig(
+            name="マンバ通信",
+            url="https://manba.co.jp/manba_magazines/feed",
+            category="manga",
+            enabled=True,
+            priority="high",
+            timeout=20,
+            parser_type="standard",
+        ),
+        "manba_topics": MangaRSSFeedConfig(
+            name="マンバ クチコミ",
+            url="https://manba.co.jp/topics/feed",
+            category="manga",
+            enabled=True,
+            priority="medium",
+            timeout=20,
+            parser_type="standard",
+        ),
+        "manba_free_campaigns": MangaRSSFeedConfig(
+            name="マンバ 無料キャンペーン",
+            url="https://manba.co.jp/free_campaigns/feed",
+            category="manga",
+            enabled=True,
+            priority="medium",
+            timeout=20,
+            parser_type="standard",
+        ),
+        "manba_note": MangaRSSFeedConfig(
+            name="マンバ公式note",
+            url="https://note.com/manba/rss",
+            category="manga",
+            enabled=True,
+            priority="medium",
+            timeout=20,
+            parser_type="standard",
+        ),
+        "leed_cafe": MangaRSSFeedConfig(
+            name="LEED Cafe",
+            url="https://leedcafe.com/feed",
+            category="manga",
+            enabled=True,
+            priority="medium",
+            timeout=20,
+            parser_type="standard",
+        ),
+        "shonen_jump_plus": MangaRSSFeedConfig(
+            name="少年ジャンプ+",
+            url="https://shonenjumpplus.com/rss",
+            category="manga",
+            enabled=True,
+            priority="high",
+            timeout=20,
+            parser_type="standard",
+        ),
+        # テスト結果: 404 Not Found
+        "magapoke": MangaRSSFeedConfig(
+            name="マガジンポケット (Magazine Pocket)",
+            url="https://pocket.shonenmagazine.com/feed",
+            category="manga",
+            enabled=False,  # 404 Not Found
+            priority="high",
+            timeout=20,
+            parser_type="standard",
+        ),
+        # テスト結果: 無効なドメイン
+        "comix_fyi": MangaRSSFeedConfig(
+            name="comix.fyi",
+            url="https://comix.fyi/rss",
+            category="manga",
+            enabled=False,  # 404 Not Found
+            priority="medium",
+            timeout=20,
+            parser_type="standard",
+        ),
+        # レガシーソース（保持）
         "jump_book_store": MangaRSSFeedConfig(
             name="ジャンプBOOKストア (Jump BOOK Store)",
             url="https://jumpbookstore.com/rss/newrelease.xml",
@@ -82,7 +153,7 @@ class EnhancedMangaRSSCollector:
             name="楽天Kobo - コミック新刊",
             url="https://books.rakuten.co.jp/rss/comics/",
             category="manga",
-            enabled=True,
+            enabled=False,  # テスト未実施
             priority="medium",
             timeout=20,
             parser_type="standard",
@@ -100,7 +171,7 @@ class EnhancedMangaRSSCollector:
             name="マンガUP! - SQUARE ENIX",
             url="https://magazine.jp.square-enix.com/mangaup/rss/",
             category="manga",
-            enabled=True,
+            enabled=False,  # テスト未実施
             priority="medium",
             timeout=20,
             parser_type="html",
@@ -109,7 +180,7 @@ class EnhancedMangaRSSCollector:
             name="ComicWalker - 無料マンガ",
             url="https://comic-walker.com/rss/",
             category="manga",
-            enabled=True,
+            enabled=False,  # テスト未実施
             priority="medium",
             timeout=20,
             parser_type="standard",

@@ -1,0 +1,400 @@
+{
+  "anime": [
+    {
+      "name": "Anime News Network",
+      "url": "https://animenewsnetwork.com/all/rss",
+      "category": "anime",
+      "status": "not_found",
+      "http_code": 404,
+      "is_valid_xml": false,
+      "is_valid_rss": false,
+      "item_count": 0,
+      "error": "404 Not Found",
+      "sample_items": [],
+      "response_time": 1.29,
+      "timestamp": "2025-11-15T20:44:47.640022"
+    },
+    {
+      "name": "MyAnimeList News",
+      "url": "https://myanimelist.net/rss/news.xml",
+      "category": "anime",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 20,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "'Ninja to Gokudou' Announces Supporting Cast",
+          "link": "https://myanimelist.net/news/73497436?_location=rss",
+          "published": "Fri, 14 Nov 2025 21:07:19 -0800"
+        },
+        {
+          "title": "'Shinjiteita Nakama-tachi ni Dungeon Okuchi de Korosarekaketa ga Gift \"Mugen Gacha\" de Level 9999 no Nakama-tachi wo Te ni Irete Moto Party Member to Sekai ni Fukushuu & \"Zamaa!\" Shimasu!' Unveils Additional Cast, Second Promo",
+          "link": "https://myanimelist.net/news/73495538?_location=rss",
+          "published": "Fri, 14 Nov 2025 07:47:47 -0800"
+        },
+        {
+          "title": "'Nageki no Bourei wa Intai shitai Part 2' Reveals Additional Cast",
+          "link": "https://myanimelist.net/news/73494601?_location=rss",
+          "published": "Thu, 13 Nov 2025 22:10:54 -0800"
+        }
+      ],
+      "response_time": 0.95,
+      "timestamp": "2025-11-15T20:44:49.426599"
+    },
+    {
+      "name": "Crunchyroll News",
+      "url": "https://feeds.feedburner.com/crunchyroll/animenews",
+      "category": "anime",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 0,
+      "error": null,
+      "sample_items": [],
+      "response_time": 1.07,
+      "timestamp": "2025-11-15T20:44:50.917206"
+    },
+    {
+      "name": "Tokyo Otaku Mode",
+      "url": "https://otakumode.com/news/feed",
+      "category": "anime",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 10,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "Weekly Figure Roundup: 02 Nov, 2025 to 08 Nov, 2025",
+          "link": "https://otakumode.com/news/690f21ff3de914002939d7dc?utm_source=tom&utm_medium=feed&utm_campaign=news_feed",
+          "published": "Sat, 08 Nov 2025 10:59:18 GMT"
+        },
+        {
+          "title": "Weekly Figure Roundup: 26 Oct, 2025 to 01 Nov, 2025",
+          "link": "https://otakumode.com/news/69069ff35b58ff0029f56e55?utm_source=tom&utm_medium=feed&utm_campaign=news_feed",
+          "published": "Sun, 02 Nov 2025 00:07:35 GMT"
+        },
+        {
+          "title": "Weekly Figure Roundup: 19 Oct, 2025 to 24 Oct, 2025",
+          "link": "https://otakumode.com/news/68fca828bfe1a1001ee9f666?utm_source=tom&utm_medium=feed&utm_campaign=news_feed",
+          "published": "Sun, 26 Oct 2025 17:39:41 GMT"
+        }
+      ],
+      "response_time": 1.3,
+      "timestamp": "2025-11-15T20:44:52.488130"
+    },
+    {
+      "name": "Anime UK News",
+      "url": "https://animeuknews.net/feed",
+      "category": "anime",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 20,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "All You Need Is Kill Review",
+          "link": "https://animeuknews.net/2025/11/all-you-need-is-kill-review/",
+          "published": "Sat, 15 Nov 2025 10:00:45 +0000"
+        },
+        {
+          "title": "The Dark History of the Reincarnated Villainess: Short Story Collection Review",
+          "link": "https://animeuknews.net/2025/11/the-dark-history-of-the-reincarnated-villainess-short-story-collection-review/",
+          "published": "Fri, 14 Nov 2025 10:00:18 +0000"
+        },
+        {
+          "title": "Tokyo Aliens Volume 9 Review",
+          "link": "https://animeuknews.net/2025/11/tokyo-aliens-volume-9-review/",
+          "published": "Thu, 13 Nov 2025 10:00:06 +0000"
+        }
+      ],
+      "response_time": 1.93,
+      "timestamp": "2025-11-15T20:44:54.538003"
+    },
+    {
+      "name": "Anime Trending",
+      "url": "https://anitrendz.net/news/feed",
+      "category": "anime",
+      "status": "http_error",
+      "http_code": 403,
+      "is_valid_xml": false,
+      "is_valid_rss": false,
+      "item_count": 0,
+      "error": "HTTP 403",
+      "sample_items": [],
+      "response_time": 1.04,
+      "timestamp": "2025-11-15T20:44:57.024645"
+    },
+    {
+      "name": "Otaku News",
+      "url": "https://otakunews.com/rss/rss.xml",
+      "category": "anime",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 50,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "Manga Jiman 2025 Competition Details",
+          "link": "https://www.otakunews.com/Article/12142/manga-jiman-2025-competition-details",
+          "published": "Sat, 15 Nov 2025 09:44:05 Z"
+        },
+        {
+          "title": "The Guy She Was Interested In Wasn't a Guy at All Kinokuniya Pop Up Event Details",
+          "link": "https://www.otakunews.com/Article/12141/the-guy-she-was-interested-in-wasnt-a-guy-at-all-kinokuniya-pop-up-event-details",
+          "published": "Wed, 12 Nov 2025 20:33:06 Z"
+        },
+        {
+          "title": "Maison Ghibli Launch Studio Ghibli Pop Up Shop In London",
+          "link": "https://www.otakunews.com/Article/12140/maison-ghibli-launch-studio-ghibli-pop-up-shop-in-london",
+          "published": "Mon, 10 Nov 2025 20:54:19 Z"
+        }
+      ],
+      "response_time": 2.37,
+      "timestamp": "2025-11-15T20:44:58.562562"
+    }
+  ],
+  "manga": [
+    {
+      "name": "マンバ",
+      "url": "https://manba.co.jp/feed",
+      "category": "manga",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 21,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "エロ漫画 2000年くらいの古い絵柄でその作者さんのまとめた雑誌 思い出せないマンガ 思い出せない",
+          "link": "https://manba.co.jp/topics/73758",
+          "published": "Sat, 15 Nov 2025 19:18:59 +0900"
+        },
+        {
+          "title": "忘れた 思い出せないマンガ 思い出せない",
+          "link": "https://manba.co.jp/topics/73757",
+          "published": "Sat, 15 Nov 2025 16:45:57 +0900"
+        },
+        {
+          "title": "演劇部、女子高生、弟がいる 思い出せないマンガ 思い出せない",
+          "link": "https://manba.co.jp/topics/73756",
+          "published": "Sat, 15 Nov 2025 15:57:50 +0900"
+        }
+      ],
+      "response_time": 0.77,
+      "timestamp": "2025-11-15T20:45:01.491603"
+    },
+    {
+      "name": "マンバ通信",
+      "url": "https://manba.co.jp/manba_magazines/feed",
+      "category": "manga",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 20,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "超人生に、無駄という文字はない。──なぜ今の「キン肉マン」に心を揺さぶられてしまうのか？ | マンバ通信",
+          "link": "https://manba.co.jp/manba_magazines/27693",
+          "published": "Mon, 30 Sep 2024 13:10:41 +0900"
+        },
+        {
+          "title": "「芸術新潮」9月号で 萩尾望都のスケッチ画、初の一挙公開！ | マンバ通信",
+          "link": "https://manba.co.jp/manba_magazines/27683",
+          "published": "Thu, 22 Aug 2024 13:10:22 +0900"
+        },
+        {
+          "title": "黒歴史は意外に楽しい？ 平成のオタクライフを描く『～解放の刻来たれり～ えるぽぴの楽しい黒歴史ライフ』 | マンバ通信",
+          "link": "https://manba.co.jp/manba_magazines/27671",
+          "published": "Wed, 14 Aug 2024 13:10:06 +0900"
+        }
+      ],
+      "response_time": 0.12,
+      "timestamp": "2025-11-15T20:45:02.781137"
+    },
+    {
+      "name": "マンバ クチコミ",
+      "url": "https://manba.co.jp/topics/feed",
+      "category": "manga",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 20,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "こんな漫画を待っていた！ ゴンロン・エッグ 感想 レビュー",
+          "link": "https://manba.co.jp/topics/73742",
+          "published": "Fri, 14 Nov 2025 12:34:23 +0900"
+        },
+        {
+          "title": "22/7計算外はいいぞぉー ２２／７＋α 感想 レビュー",
+          "link": "https://manba.co.jp/topics/73729",
+          "published": "Thu, 13 Nov 2025 10:00:22 +0900"
+        },
+        {
+          "title": "下ネタ好きならハマる。 生徒会役員共 雑談 感想",
+          "link": "https://manba.co.jp/topics/73726",
+          "published": "Wed, 12 Nov 2025 22:45:29 +0900"
+        }
+      ],
+      "response_time": 0.85,
+      "timestamp": "2025-11-15T20:45:03.619946"
+    },
+    {
+      "name": "マンバ 無料キャンペーン",
+      "url": "https://manba.co.jp/free_campaigns/feed",
+      "category": "manga",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 100,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "【11/28(金)まで4冊無料】 シュルスの魔女",
+          "link": "https://manba.co.jp/boards/81647",
+          "published": "Sat, 15 Nov 2025 01:29:10 +0900"
+        },
+        {
+          "title": "【11/28(金)まで1冊無料】 カワイイ私の作り方",
+          "link": "https://manba.co.jp/boards/93002",
+          "published": "Sat, 15 Nov 2025 01:29:10 +0900"
+        },
+        {
+          "title": "【11/28(金)まで1冊無料】 完璧で最高の私にホレないのは天然バカなお前のせい！【単行本版】",
+          "link": "https://manba.co.jp/boards/195336",
+          "published": "Sat, 15 Nov 2025 01:29:10 +0900"
+        }
+      ],
+      "response_time": 0.24,
+      "timestamp": "2025-11-15T20:45:04.978096"
+    },
+    {
+      "name": "マンバ公式note",
+      "url": "https://note.com/manba/rss",
+      "category": "manga",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 25,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "【2024年7〜12月】アップデートのおしらせ",
+          "link": "https://note.com/manba/n/n00c0f3c27d17",
+          "published": "Tue, 31 Dec 2024 15:45:44 +0900"
+        },
+        {
+          "title": "この一年をマンガで振り返ろう！年末お楽しみ企画、リスト作成チャレンジ2024！",
+          "link": "https://note.com/manba/n/nbf1d35459f1f",
+          "published": "Sun, 24 Nov 2024 12:02:57 +0900"
+        },
+        {
+          "title": "【2024年6月】アップデートのおしらせ",
+          "link": "https://note.com/manba/n/n80863f8ba888",
+          "published": "Wed, 26 Jun 2024 13:10:31 +0900"
+        }
+      ],
+      "response_time": 0.66,
+      "timestamp": "2025-11-15T20:45:05.791565"
+    },
+    {
+      "name": "LEED Cafe",
+      "url": "https://leedcafe.com/feed",
+      "category": "manga",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 0,
+      "error": null,
+      "sample_items": [],
+      "response_time": 0.44,
+      "timestamp": "2025-11-15T20:45:07.006362"
+    },
+    {
+      "name": "少年ジャンプ+",
+      "url": "https://shonenjumpplus.com/rss",
+      "category": "manga",
+      "status": "valid_rss",
+      "http_code": 200,
+      "is_valid_xml": true,
+      "is_valid_rss": true,
+      "item_count": 267,
+      "error": null,
+      "sample_items": [
+        {
+          "title": "[4073回]猫田びより",
+          "link": "https://shonenjumpplus.com/episode/17107094912077655936",
+          "published": "Fri, 14 Nov 2025 15:00:00 +0000"
+        },
+        {
+          "title": "[168話]魔都精兵のスレイブ",
+          "link": "https://shonenjumpplus.com/episode/17107094912077655860",
+          "published": "Fri, 14 Nov 2025 15:00:00 +0000"
+        },
+        {
+          "title": "[設定資料大開放]2.5次元の誘惑",
+          "link": "https://shonenjumpplus.com/episode/17107094912077655874",
+          "published": "Fri, 14 Nov 2025 15:00:00 +0000"
+        }
+      ],
+      "response_time": 0.42,
+      "timestamp": "2025-11-15T20:45:07.945719"
+    },
+    {
+      "name": "マガポケ",
+      "url": "https://pocket.shonenmagazine.com/feed",
+      "category": "manga",
+      "status": "not_found",
+      "http_code": 404,
+      "is_valid_xml": false,
+      "is_valid_rss": false,
+      "item_count": 0,
+      "error": "404 Not Found",
+      "sample_items": [],
+      "response_time": 0.41,
+      "timestamp": "2025-11-15T20:45:09.042837"
+    },
+    {
+      "name": "comix.fyi",
+      "url": "https://comix.fyi/rss",
+      "category": "manga",
+      "status": "not_found",
+      "http_code": 404,
+      "is_valid_xml": false,
+      "is_valid_rss": false,
+      "item_count": 0,
+      "error": "404 Not Found",
+      "sample_items": [],
+      "response_time": 0.65,
+      "timestamp": "2025-11-15T20:45:09.958632"
+    }
+  ],
+  "summary": {
+    "anime_total": 7,
+    "anime_valid": 5,
+    "anime_valid_rate": "71.4%",
+    "manga_total": 9,
+    "manga_valid": 7,
+    "manga_valid_rate": "77.8%",
+    "total_valid": 12,
+    "total_feeds": 16
+  }
+}
