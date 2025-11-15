@@ -2079,7 +2079,61 @@ def api_sources():
             'health_status': 'unknown'
         }
         sources['apis'].append(anilist_source)
-        
+
+        # Kitsu API
+        kitsu_config = config.get('apis', {}).get('kitsu', {})
+        if kitsu_config:
+            kitsu_source = {
+                'id': 'kitsu',
+                'name': 'Kitsu API',
+                'type': 'api',
+                'enabled': kitsu_config.get('enabled', True),
+                'url': kitsu_config.get('base_url', 'https://kitsu.io/api/edge'),
+                'rate_limit': kitsu_config.get('rate_limit', {}).get('requests_per_minute', 90),
+                'timeout': kitsu_config.get('timeout_seconds', 30),
+                'description': 'アニメ・マンガ情報取得用REST API',
+                'data_type': 'anime_manga',
+                'last_test': None,
+                'health_status': 'unknown'
+            }
+            sources['apis'].append(kitsu_source)
+
+        # MangaDex API
+        mangadex_config = config.get('apis', {}).get('mangadex', {})
+        if mangadex_config:
+            mangadex_source = {
+                'id': 'mangadex',
+                'name': 'MangaDex API',
+                'type': 'api',
+                'enabled': mangadex_config.get('enabled', True),
+                'url': mangadex_config.get('base_url', 'https://api.mangadex.org'),
+                'rate_limit': mangadex_config.get('rate_limit', {}).get('requests_per_minute', 40),
+                'timeout': mangadex_config.get('timeout_seconds', 30),
+                'description': 'マンガ情報取得用REST API',
+                'data_type': 'manga',
+                'last_test': None,
+                'health_status': 'unknown'
+            }
+            sources['apis'].append(mangadex_source)
+
+        # MangaUpdates API
+        mangaupdates_config = config.get('apis', {}).get('mangaupdates', {})
+        if mangaupdates_config:
+            mangaupdates_source = {
+                'id': 'mangaupdates',
+                'name': 'MangaUpdates API',
+                'type': 'api',
+                'enabled': mangaupdates_config.get('enabled', True),
+                'url': mangaupdates_config.get('base_url', 'https://api.mangaupdates.com/v1'),
+                'rate_limit': mangaupdates_config.get('rate_limit', {}).get('requests_per_minute', 30),
+                'timeout': mangaupdates_config.get('timeout_seconds', 30),
+                'description': 'マンガリリース情報取得用REST API',
+                'data_type': 'manga',
+                'last_test': None,
+                'health_status': 'unknown'
+            }
+            sources['apis'].append(mangaupdates_source)
+
         # Syoboi Calendar API
         syoboi_config = config.get('apis', {}).get('syoboi', {})
         syoboi_source = {
