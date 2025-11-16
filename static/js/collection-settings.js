@@ -26,7 +26,9 @@
         rssContainer: null,
         saveAllBtn: null,
         testAllApisBtn: null,
-        testAllRssBtn: null
+        testAllRssBtn: null,
+        refreshAllApiStatsBtn: null,
+        refreshAllRssStatsBtn: null
     };
 
     /**
@@ -41,6 +43,8 @@
         elements.saveAllBtn = document.getElementById('saveAllBtn');
         elements.testAllApisBtn = document.getElementById('testAllApisBtn');
         elements.testAllRssBtn = document.getElementById('testAllRssBtn');
+        elements.refreshAllApiStatsBtn = document.getElementById('refreshAllApiStatsBtn');
+        elements.refreshAllRssStatsBtn = document.getElementById('refreshAllRssStatsBtn');
 
         // Load configurations
         loadApiConfigurations();
@@ -90,9 +94,11 @@
                         api.health_status === 'error' ? 'error' : 'unknown',
                 rateLimit: `${api.rate_limit} requests/min`,
                 timeout: api.timeout,
-                stats: {
-                    itemsCollected: 0,
-                    successRate: 0
+                stats: api.stats || {
+                    items_collected: 0,
+                    success_rate: 0,
+                    last_run: '未実行',
+                    response_time: 'N/A'
                 }
             }));
 
@@ -143,8 +149,71 @@
 
         console.log(`[CollectionSettings] Rendered ${state.apiSources.length} API sources`);
 
+        // Update API statistics summary
+        updateApiStatisticsSummary();
+
         // Initialize Bootstrap tooltips
         initializeTooltips();
+    }
+
+    /**
+     * Update API statistics summary
+     */
+    function updateApiStatisticsSummary() {
+        if (state.apiSources.length === 0) {
+            return;
+        }
+
+        console.log('[CollectionSettings] Updating API statistics summary...');
+        console.log('[CollectionSettings] API sources:', state.apiSources.map(api => ({
+            id: api.id,
+            stats: api.stats
+        })));
+
+        // Calculate statistics
+        const totalItems = state.apiSources.reduce((sum, api) => {
+            const items = api.stats?.items_collected || 0;
+            console.log(`[CollectionSettings] ${api.id}: items_collected = ${items}`);
+            return sum + items;
+        }, 0);
+
+        const avgSuccessRate = state.apiSources.reduce((sum, api) => {
+            const rate = api.stats?.success_rate || 0;
+            console.log(`[CollectionSettings] ${api.id}: success_rate = ${rate}`);
+            return sum + rate;
+        }, 0) / state.apiSources.length;
+
+        const avgResponseTime = state.apiSources.filter(api => api.stats?.response_time)
+            .reduce((sum, api) => {
+                const timeStr = api.stats.response_time;
+                if (typeof timeStr === 'string') {
+                    const match = timeStr.match(/(\d+\.?\d*)/);
+                    return sum + (match ? parseFloat(match[1]) : 0);
+                }
+                return sum;
+            }, 0) / Math.max(1, state.apiSources.filter(api => api.stats?.response_time).length);
+
+        // Update DOM elements
+        const totalItemsEl = document.getElementById('api-total-items');
+        if (totalItemsEl) {
+            totalItemsEl.textContent = totalItems + '件';
+        }
+
+        const avgSuccessEl = document.getElementById('api-avg-success');
+        if (avgSuccessEl) {
+            avgSuccessEl.textContent = avgSuccessRate.toFixed(1) + '%';
+        }
+
+        const avgResponseEl = document.getElementById('api-avg-response');
+        if (avgResponseEl) {
+            avgResponseEl.textContent = avgResponseTime.toFixed(1) + 's';
+        }
+
+        console.log('[CollectionSettings] API statistics summary updated:', {
+            totalItems,
+            avgSuccessRate: avgSuccessRate.toFixed(1),
+            avgResponseTime: avgResponseTime.toFixed(2)
+        });
     }
 
     /**
@@ -199,7 +268,9 @@
             `;
         }
 
-        if (api.status === 'error') {
+        // Check for error status
+        const status = api.status || api.health_status;
+        if (status === 'error') {
             const errorMsg = api.error_message || 'エラーが発生しました';
             return `
                 <span class="connection-status disconnected"
@@ -210,7 +281,17 @@
             `;
         }
 
-        if (api.status === 'connected') {
+        // If stats exist and have recent data, consider it connected
+        if (api.stats && (api.stats.items_collected > 0 || api.stats.last_run)) {
+            return `
+                <span class="connection-status connected">
+                    <i class="bi bi-check-circle"></i> 接続中
+                </span>
+            `;
+        }
+
+        // Check for explicit connected status
+        if (status === 'connected' || status === 'healthy') {
             return `
                 <span class="connection-status connected">
                     <i class="bi bi-check-circle"></i> 接続中
@@ -316,24 +397,35 @@
                     <i class="bi bi-arrow-clockwise"></i> デフォルト
                 </button>
             </div>
-        `;
 
-        // Statistics
-        if (api.stats) {
-            const statLabel = api.id === 'syobocal' ? '放送局数' : '取得作品数';
-            html += `
-                <div class="stats-grid mt-3">
-                    <div class="stats-card">
-                        <div class="stats-value">${api.stats.itemsCollected || 0}</div>
-                        <small class="text-muted">${statLabel}</small>
+            <!-- 統計情報 -->
+            <div class="row g-2 mt-3">
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-2 border rounded bg-light">
+                        <div class="fw-bold text-primary">${api.stats?.items_collected || 0}件</div>
+                        <small class="text-muted">取得作品数</small>
                     </div>
-                    <div class="stats-card">
-                        <div class="stats-value">${(api.stats.successRate || 0).toFixed(1)}%</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-2 border rounded bg-light">
+                        <div class="fw-bold text-success">${(api.stats?.success_rate || 0).toFixed(1)}%</div>
                         <small class="text-muted">成功率</small>
                     </div>
                 </div>
-            `;
-        }
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-2 border rounded bg-light">
+                        <div class="fw-bold text-info small">${api.stats?.last_run || '未実行'}</div>
+                        <small class="text-muted">最終実行</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-2 border rounded bg-light">
+                        <div class="fw-bold text-warning">${api.stats?.response_time || 'N/A'}</div>
+                        <small class="text-muted">レスポンス</small>
+                    </div>
+                </div>
+            </div>
+        `;
 
         return html;
     }
@@ -398,8 +490,71 @@
 
         console.log(`[CollectionSettings] Rendered ${activeFeeds.length} active and ${disabledFeeds.length} disabled feeds`);
 
+        // Update RSS statistics summary
+        updateRssStatisticsSummary();
+
         // Initialize Bootstrap tooltips
         initializeTooltips();
+    }
+
+    /**
+     * Update RSS statistics summary
+     */
+    function updateRssStatisticsSummary() {
+        if (state.rssFeeds.length === 0) {
+            return;
+        }
+
+        console.log('[CollectionSettings] Updating RSS statistics summary...');
+        console.log('[CollectionSettings] RSS feeds:', state.rssFeeds.map(feed => ({
+            id: feed.id,
+            stats: feed.stats
+        })));
+
+        // Calculate statistics
+        const totalItems = state.rssFeeds.reduce((sum, feed) => {
+            const items = feed.stats?.items_collected || 0;
+            console.log(`[CollectionSettings] ${feed.id}: items_collected = ${items}`);
+            return sum + items;
+        }, 0);
+
+        const avgSuccessRate = state.rssFeeds.reduce((sum, feed) => {
+            const rate = feed.stats?.success_rate || 0;
+            console.log(`[CollectionSettings] ${feed.id}: success_rate = ${rate}`);
+            return sum + rate;
+        }, 0) / state.rssFeeds.length;
+
+        const avgResponseTime = state.rssFeeds.filter(feed => feed.stats?.response_time)
+            .reduce((sum, feed) => {
+                const timeStr = feed.stats.response_time;
+                if (typeof timeStr === 'string') {
+                    const match = timeStr.match(/(\d+\.?\d*)/);
+                    return sum + (match ? parseFloat(match[1]) : 0);
+                }
+                return sum;
+            }, 0) / Math.max(1, state.rssFeeds.filter(feed => feed.stats?.response_time).length);
+
+        // Update DOM elements
+        const totalItemsEl = document.getElementById('rss-total-items');
+        if (totalItemsEl) {
+            totalItemsEl.textContent = totalItems + '件';
+        }
+
+        const avgSuccessEl = document.getElementById('rss-avg-success');
+        if (avgSuccessEl) {
+            avgSuccessEl.textContent = avgSuccessRate.toFixed(1) + '%';
+        }
+
+        const avgResponseEl = document.getElementById('rss-avg-response');
+        if (avgResponseEl) {
+            avgResponseEl.textContent = avgResponseTime.toFixed(1) + 's';
+        }
+
+        console.log('[CollectionSettings] RSS statistics summary updated:', {
+            totalItems,
+            avgSuccessRate: avgSuccessRate.toFixed(1),
+            avgResponseTime: avgResponseTime.toFixed(2)
+        });
     }
 
     /**
@@ -472,6 +627,15 @@
                       data-bs-toggle="tooltip"
                       title="${escapeHtml(errorMsg)}">
                     <i class="bi bi-exclamation-circle"></i> エラー
+                </span>
+            `;
+        }
+
+        // If stats exist and have recent data, consider it connected
+        if (feed.stats && (feed.stats.items_collected > 0 || feed.stats.last_run)) {
+            return `
+                <span class="connection-status connected">
+                    <i class="bi bi-check-circle"></i> 接続中
                 </span>
             `;
         }
@@ -555,23 +719,37 @@
                     </button>
                 ` : ''}
             </div>
-        `;
 
-        // Statistics
-        if (!isDisabled && feed.stats) {
-            html += `
-                <div class="stats-grid mt-3">
-                    <div class="stats-card">
-                        <div class="stats-value">${feed.stats.itemsCollected || 0}</div>
+            <!-- 統計情報 -->
+            ${!isDisabled ? `
+            <div class="row g-2 mt-3">
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-2 border rounded bg-light">
+                        <div class="fw-bold text-primary">${feed.stats?.items_collected || 0}件</div>
                         <small class="text-muted">取得作品数</small>
                     </div>
-                    <div class="stats-card">
-                        <div class="stats-value">${(feed.stats.successRate || 0).toFixed(1)}%</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-2 border rounded bg-light">
+                        <div class="fw-bold text-success">${(feed.stats?.success_rate || 0).toFixed(1)}%</div>
                         <small class="text-muted">成功率</small>
                     </div>
                 </div>
-            `;
-        }
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-2 border rounded bg-light">
+                        <div class="fw-bold text-info small">${feed.stats?.last_run || '未実行'}</div>
+                        <small class="text-muted">最終実行</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-2 border rounded bg-light">
+                        <div class="fw-bold text-warning">${feed.stats?.response_time || 'N/A'}</div>
+                        <small class="text-muted">レスポンス</small>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
+        `;
 
         return html;
     }
@@ -673,6 +851,16 @@
             elements.testAllRssBtn.addEventListener('click', testAllRssFeeds);
         }
 
+        // Refresh all API stats button
+        if (elements.refreshAllApiStatsBtn) {
+            elements.refreshAllApiStatsBtn.addEventListener('click', refreshAllApiStats);
+        }
+
+        // Refresh all RSS stats button
+        if (elements.refreshAllRssStatsBtn) {
+            elements.refreshAllRssStatsBtn.addEventListener('click', refreshAllRssStats);
+        }
+
         // Delegate events for dynamically created elements
         document.addEventListener('click', function(e) {
             // Test API connection button
@@ -701,6 +889,20 @@
                 const btn = e.target.closest('.diagnose-btn');
                 const feedId = btn.dataset.feedId;
                 diagnoseProblem(feedId);
+            }
+
+            // Refresh API stats button
+            if (e.target.closest('.refresh-api-stats')) {
+                const btn = e.target.closest('.refresh-api-stats');
+                const apiId = btn.dataset.apiId;
+                refreshApiStats(btn, apiId);
+            }
+
+            // Refresh RSS stats button
+            if (e.target.closest('.refresh-rss-stats')) {
+                const btn = e.target.closest('.refresh-rss-stats');
+                const feedId = btn.dataset.feedId;
+                refreshRssStats(btn, feedId);
             }
         });
 
@@ -1117,6 +1319,142 @@
     }
 
     /**
+     * Refresh API statistics
+     */
+    async function refreshApiStats(button, apiId) {
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i>';
+
+        try {
+            // Call refresh endpoint to update last_run timestamp
+            const response = await fetch('/api/collection-stats/refresh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ source_id: apiId })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || '統計更新に失敗しました');
+            }
+
+            // Reload sources to get latest stats
+            await loadApiConfigurations();
+
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+            showSuccessNotification(`${apiId} の統計を更新しました`);
+        } catch (error) {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+            showErrorNotification('統計の更新に失敗しました: ' + error.message);
+        }
+    }
+
+    /**
+     * Refresh RSS feed statistics
+     */
+    async function refreshRssStats(button, feedId) {
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i>';
+
+        try {
+            // Call refresh endpoint to update last_run timestamp
+            const response = await fetch('/api/collection-stats/refresh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ source_id: feedId })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || '統計更新に失敗しました');
+            }
+
+            // Reload feeds to get latest stats
+            await loadFeedConfigurations();
+
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+            showSuccessNotification(`${feedId} の統計を更新しました`);
+        } catch (error) {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+            showErrorNotification('統計の更新に失敗しました: ' + error.message);
+        }
+    }
+
+    /**
+     * Refresh all API statistics
+     */
+    async function refreshAllApiStats() {
+        try {
+            showInfoNotification('API統計を更新中...');
+
+            // Refresh each API source
+            const apiIds = ['anilist', 'syoboi', 'kitsu', 'annict', 'mangadex', 'mangaupdates'];
+            for (const apiId of apiIds) {
+                try {
+                    await fetch('/api/collection-stats/refresh', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({source_id: apiId})
+                    });
+                } catch (err) {
+                    console.warn(`Failed to refresh ${apiId}:`, err);
+                }
+            }
+
+            // Reload configurations to show updated data
+            await loadApiConfigurations();
+            showSuccessNotification('全API統計を更新しました');
+        } catch (error) {
+            console.error('[CollectionSettings] Failed to refresh API stats:', error);
+            showErrorNotification('API統計の更新に失敗しました: ' + error.message);
+        }
+    }
+
+    /**
+     * Refresh all RSS statistics
+     */
+    async function refreshAllRssStats() {
+        try {
+            showInfoNotification('RSS統計を更新中...');
+
+            // Get all RSS feed IDs from current state
+            const rssIds = state.rssFeeds.map(feed => feed.id || feed.name.toLowerCase().replace(/ /g, '_').replace(/＋/g, 'plus'));
+
+            // Refresh each RSS feed
+            for (const feedId of rssIds) {
+                try {
+                    await fetch('/api/collection-stats/refresh', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({source_id: feedId})
+                    });
+                } catch (err) {
+                    console.warn(`Failed to refresh ${feedId}:`, err);
+                }
+            }
+
+            // Reload configurations to show updated data
+            await loadFeedConfigurations();
+            showSuccessNotification('全RSS統計を更新しました');
+        } catch (error) {
+            console.error('[CollectionSettings] Failed to refresh RSS stats:', error);
+            showErrorNotification('RSS統計の更新に失敗しました: ' + error.message);
+        }
+    }
+
+    /**
      * Escape HTML to prevent XSS
      */
     function escapeHtml(text) {
@@ -1139,7 +1477,9 @@
         testApiConnection: testApiConnection,
         testConnection: testConnection,
         testAllApis: testAllApis,
-        testAllRssFeeds: testAllRssFeeds
+        testAllRssFeeds: testAllRssFeeds,
+        refreshAllApiStats: refreshAllApiStats,
+        refreshAllRssStats: refreshAllRssStats
     };
 
 })();

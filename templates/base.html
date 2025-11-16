@@ -245,6 +245,54 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
+
+    <!-- Initialize Bootstrap Dropdowns -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing Bootstrap dropdowns...');
+
+            // Initialize all Bootstrap dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl, {
+                    autoClose: true
+                });
+            });
+            console.log('Bootstrap dropdowns initialized:', dropdownList.length);
+
+            // Fallback: Manual click handler if Bootstrap fails
+            document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
+                toggle.addEventListener('click', function(e) {
+                    console.log('Dropdown clicked:', this.textContent.trim());
+
+                    // If dropdown is not working, manually toggle
+                    const menu = this.nextElementSibling;
+                    if (menu && menu.classList.contains('dropdown-menu')) {
+                        // Close all other dropdowns
+                        document.querySelectorAll('.dropdown-menu.show').forEach(function(m) {
+                            if (m !== menu) {
+                                m.classList.remove('show');
+                            }
+                        });
+
+                        // Toggle current dropdown
+                        menu.classList.toggle('show');
+                        console.log('Dropdown menu toggled:', menu.classList.contains('show'));
+                    }
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                        menu.classList.remove('show');
+                    });
+                }
+            });
+        });
+    </script>
+
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <!-- UI Enhancements JS -->
@@ -458,6 +506,33 @@
             .alert {
                 display: none !important;
             }
+        }
+
+        /* Dropdown hover functionality */
+        .navbar .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+
+        .navbar .nav-item.dropdown .dropdown-menu {
+            margin-top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        /* Ensure dropdown toggle is clickable */
+        .navbar .dropdown-toggle {
+            cursor: pointer;
+            pointer-events: auto !important;
+        }
+
+        /* Smooth dropdown animation */
+        .dropdown-menu {
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
         }
     </style>
     
