@@ -563,16 +563,38 @@
             <div class="container-fluid px-4">
                 <!-- API収集ソース -->
                 <div class="form-section">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="flex-grow-1">
                             <h4 class="form-section-title">
                                 <i class="bi bi-code-square text-primary"></i> API収集ソース
                             </h4>
-                            <p class="text-muted mb-0">外部APIからアニメ・マンガの最新情報を自動収集します</p>
+                            <p class="text-muted mb-2">外部APIからアニメ・マンガの最新情報を自動収集します</p>
+                            <!-- API統計サマリー -->
+                            <div class="alert alert-info py-2 px-3 mb-0" id="apiStatsSummary">
+                                <div class="row g-2 small">
+                                    <div class="col-auto">
+                                        <i class="bi bi-collection text-primary"></i>
+                                        <strong>総取得数:</strong> <span id="api-total-items">{{ stats.api.total_items }}件</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-percent text-success"></i>
+                                        <strong>平均成功率:</strong> <span id="api-avg-success">{{ stats.api.avg_success_rate }}%</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-speedometer2 text-warning"></i>
+                                        <strong>平均レスポンス:</strong> <span id="api-avg-response">{{ stats.api.avg_response_time }}s</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <button class="btn btn-sm btn-outline-primary" id="testAllApisBtn">
-                            <i class="bi bi-wifi"></i> すべてテスト
-                        </button>
+                        <div class="btn-group-vertical btn-group-sm ms-3">
+                            <button class="btn btn-outline-primary" id="refreshAllApiStatsBtn" title="API統計を更新">
+                                <i class="bi bi-arrow-clockwise"></i> 統計更新
+                            </button>
+                            <button class="btn btn-outline-secondary" id="testAllApisBtn" title="すべてのAPIをテスト">
+                                <i class="bi bi-wifi"></i> すべてテスト
+                            </button>
+                        </div>
                     </div>
                     <div class="row" id="apiSourcesContainer">
                         <!-- API sources will be dynamically loaded here by JavaScript -->
@@ -583,16 +605,38 @@
 
                 <!-- RSS収集ソース -->
                 <div class="form-section">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="flex-grow-1">
                             <h4 class="form-section-title">
                                 <i class="bi bi-rss text-warning"></i> RSS収集ソース
                             </h4>
-                            <p class="text-muted mb-0">RSSフィードからマンガ・アニメの最新情報を定期取得します</p>
+                            <p class="text-muted mb-2">RSSフィードからマンガ・アニメの最新情報を定期取得します</p>
+                            <!-- RSS統計サマリー -->
+                            <div class="alert alert-warning py-2 px-3 mb-0" id="rssStatsSummary">
+                                <div class="row g-2 small">
+                                    <div class="col-auto">
+                                        <i class="bi bi-collection text-primary"></i>
+                                        <strong>総取得数:</strong> <span id="rss-total-items">{{ stats.rss.total_items }}件</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-percent text-success"></i>
+                                        <strong>平均成功率:</strong> <span id="rss-avg-success">{{ stats.rss.avg_success_rate }}%</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-speedometer2 text-warning"></i>
+                                        <strong>平均レスポンス:</strong> <span id="rss-avg-response">{{ stats.rss.avg_response_time }}s</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <button class="btn btn-sm btn-outline-primary" id="testAllRssBtn">
-                            <i class="bi bi-wifi"></i> すべてテスト
-                        </button>
+                        <div class="btn-group-vertical btn-group-sm ms-3">
+                            <button class="btn btn-outline-warning" id="refreshAllRssStatsBtn" title="RSS統計を更新">
+                                <i class="bi bi-arrow-clockwise"></i> 統計更新
+                            </button>
+                            <button class="btn btn-outline-secondary" id="testAllRssBtn" title="すべてのRSSをテスト">
+                                <i class="bi bi-wifi"></i> すべてテスト
+                            </button>
+                        </div>
                     </div>
                     <div class="row" id="rssSourcesContainer">
                         <!-- RSSフィードはJavaScriptで動的に生成されます -->
@@ -1024,6 +1068,135 @@
                                             <div class="timeline-time">3日前 08:00</div>
                                             <div class="timeline-desc">定期収集完了（89件取得）</div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider my-4">
+
+                <!-- リリースカレンダー同期セクション -->
+                <div class="row">
+                    <div class="col-12 col-xl-8">
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <div>
+                                    <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>リリースカレンダー同期</h5>
+                                    <p class="card-subtitle">3ヶ月先までのリリース情報をカレンダーイベントに自動同期します</p>
+                                </div>
+                                <button class="btn btn-primary btn-sm" id="syncCalendarBtn">
+                                    <i class="bi bi-arrow-repeat"></i> 今すぐ同期
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <!-- 同期設定 -->
+                                <div class="mb-4">
+                                    <label for="monthsAheadSelect" class="form-label">同期期間</label>
+                                    <select class="form-select" id="monthsAheadSelect">
+                                        <option value="1">1ヶ月先まで</option>
+                                        <option value="2">2ヶ月先まで</option>
+                                        <option value="3" selected>3ヶ月先まで</option>
+                                        <option value="4">4ヶ月先まで</option>
+                                        <option value="6">6ヶ月先まで</option>
+                                    </select>
+                                    <small class="text-muted">指定期間内のリリース情報をカレンダーに登録します</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="forceResyncCheck">
+                                        <label class="form-check-label" for="forceResyncCheck">
+                                            既存イベントも強制更新
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">チェックを入れると、既に登録済みのイベントも最新情報で上書きします</small>
+                                </div>
+
+                                <!-- 同期結果表示エリア -->
+                                <div id="calendarSyncResult" class="mt-3" style="display: none;">
+                                    <!-- JavaScript で動的に更新 -->
+                                </div>
+
+                                <!-- 自動同期スケジュール -->
+                                <hr class="section-divider my-3">
+                                <div class="schedule-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="autoCalendarSyncCheck" checked>
+                                        <label class="form-check-label" for="autoCalendarSyncCheck">
+                                            <div class="schedule-name">自動カレンダー同期</div>
+                                            <div class="schedule-desc">毎月1日にリリースカレンダーを自動更新</div>
+                                        </label>
+                                    </div>
+                                    <div class="ms-auto d-flex align-items-center gap-2">
+                                        <select class="form-select form-select-sm" style="width: auto;">
+                                            <option value="1" selected>毎月1日</option>
+                                            <option value="15">毎月15日</option>
+                                            <option value="0">月末</option>
+                                        </select>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-gear"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- カレンダー統計パネル -->
+                    <div class="col-12 col-xl-4">
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">カレンダー統計</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="calendarStatsContainer">
+                                    <div class="text-center py-3">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">読み込み中...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 最近の同期履歴 -->
+                        <div class="settings-card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">同期履歴</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="calendarSyncHistory">
+                                    <p class="text-muted small mb-0">まだ同期が実行されていません</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider my-4">
+
+                <!-- 3ヶ月カレンダー表示セクション -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <div>
+                                    <h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>リリースカレンダー（3ヶ月表示）</h5>
+                                    <p class="card-subtitle">今月から3ヶ月先までのリリース予定を表示します</p>
+                                </div>
+                                <button class="btn btn-outline-secondary btn-sm" id="refreshCalendarBtn">
+                                    <i class="bi bi-arrow-clockwise"></i> 更新
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="threeMonthCalendar">
+                                    <div class="text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">読み込み中...</span>
+                                        </div>
+                                        <p class="text-muted mt-3">カレンダーを読み込んでいます...</p>
                                     </div>
                                 </div>
                             </div>
@@ -1515,7 +1688,545 @@ function resetAllData() {
 // 初期化
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Settings page loaded');
+    initializeScheduleHandlers();
+});
+
+// スケジュール管理イベントハンドラ
+function initializeScheduleHandlers() {
+    // 設定ボタン（歯車アイコン）のイベント
+    document.querySelectorAll('#scheduleList .btn-outline-secondary').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const scheduleItem = this.closest('.schedule-item');
+            const scheduleName = scheduleItem.querySelector('.schedule-name').textContent;
+            const scheduleDesc = scheduleItem.querySelector('.schedule-desc').textContent;
+            const scheduleId = scheduleItem.querySelector('.form-check-input').id;
+
+            // スケジュール設定モーダルを表示
+            showScheduleSettingsModal(scheduleId, scheduleName, scheduleDesc, scheduleItem);
+        });
+    });
+
+    // 削除ボタン（ゴミ箱アイコン）のイベント
+    document.querySelectorAll('#scheduleList .btn-outline-danger').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const scheduleItem = this.closest('.schedule-item');
+            const scheduleName = scheduleItem.querySelector('.schedule-name').textContent;
+
+            if (confirm(`「${scheduleName}」を削除してもよろしいですか？\n\nこの操作は取り消せません。`)) {
+                // アニメーション付きで削除
+                scheduleItem.style.transition = 'opacity 0.3s, transform 0.3s';
+                scheduleItem.style.opacity = '0';
+                scheduleItem.style.transform = 'translateX(-20px)';
+
+                setTimeout(() => {
+                    scheduleItem.remove();
+                    showNotification('success', `「${scheduleName}」を削除しました`);
+                }, 300);
+            }
+        });
+    });
+
+    // スケジュール追加ボタン
+    document.getElementById('addScheduleBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('新規スケジュール追加\n\n現在この機能は開発中です。\n以下のスケジュールタイプを追加できるようになります：\n- 毎日実行\n- 毎週実行\n- 毎月実行\n- カスタム間隔');
+    });
+
+    // トグルスイッチの変更イベント
+    document.querySelectorAll('#scheduleList .form-check-input').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const scheduleItem = this.closest('.schedule-item');
+            const scheduleName = scheduleItem.querySelector('.schedule-name').textContent;
+
+            if (this.checked) {
+                scheduleItem.classList.add('active');
+                showNotification('success', `「${scheduleName}」を有効化しました`);
+            } else {
+                scheduleItem.classList.remove('active');
+                showNotification('info', `「${scheduleName}」を無効化しました`);
+            }
+        });
+    });
+}
+
+// 通知表示関数
+function showNotification(type, message) {
+    // Bootstrap Toastまたはシンプルなアラートで通知
+    const alertClass = type === 'success' ? 'alert-success' :
+                      type === 'error' ? 'alert-danger' : 'alert-info';
+
+    const notification = document.createElement('div');
+    notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 150);
+    }, 3000);
+}
+
+// スケジュール設定モーダルを表示
+function showScheduleSettingsModal(scheduleId, scheduleName, scheduleDesc, scheduleItem) {
+    // 既存のモーダルを削除
+    const existingModal = document.getElementById('scheduleSettingsModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // 現在の設定値を取得
+    const timeSelect = scheduleItem.querySelector('.form-select');
+    const currentValue = timeSelect ? timeSelect.value : '8';
+    const isEnabled = scheduleItem.querySelector('.form-check-input').checked;
+
+    // モーダルHTML作成
+    const modalHTML = `
+        <div class="modal fade" id="scheduleSettingsModal" tabindex="-1" aria-labelledby="scheduleSettingsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="scheduleSettingsModalLabel">
+                            <i class="bi bi-gear"></i> スケジュール設定：${scheduleName}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="scheduleSettingsForm">
+                            <div class="mb-3">
+                                <label for="scheduleName" class="form-label">スケジュール名</label>
+                                <input type="text" class="form-control" id="scheduleName" value="${scheduleName}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="scheduleDescription" class="form-label">説明</label>
+                                <textarea class="form-control" id="scheduleDescription" rows="2">${scheduleDesc}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="scheduleTime" class="form-label">実行時刻</label>
+                                <select class="form-select" id="scheduleTime">
+                                    <option value="0" ${currentValue === '0' ? 'selected' : ''}>00:00</option>
+                                    <option value="1" ${currentValue === '1' ? 'selected' : ''}>01:00</option>
+                                    <option value="2" ${currentValue === '2' ? 'selected' : ''}>02:00</option>
+                                    <option value="3" ${currentValue === '3' ? 'selected' : ''}>03:00</option>
+                                    <option value="4" ${currentValue === '4' ? 'selected' : ''}>04:00</option>
+                                    <option value="5" ${currentValue === '5' ? 'selected' : ''}>05:00</option>
+                                    <option value="6" ${currentValue === '6' ? 'selected' : ''}>06:00</option>
+                                    <option value="7" ${currentValue === '7' ? 'selected' : ''}>07:00</option>
+                                    <option value="8" ${currentValue === '8' ? 'selected' : ''}>08:00</option>
+                                    <option value="9" ${currentValue === '9' ? 'selected' : ''}>09:00</option>
+                                    <option value="10" ${currentValue === '10' ? 'selected' : ''}>10:00</option>
+                                    <option value="11" ${currentValue === '11' ? 'selected' : ''}>11:00</option>
+                                    <option value="12" ${currentValue === '12' ? 'selected' : ''}>12:00</option>
+                                    <option value="13" ${currentValue === '13' ? 'selected' : ''}>13:00</option>
+                                    <option value="14" ${currentValue === '14' ? 'selected' : ''}>14:00</option>
+                                    <option value="15" ${currentValue === '15' ? 'selected' : ''}>15:00</option>
+                                    <option value="16" ${currentValue === '16' ? 'selected' : ''}>16:00</option>
+                                    <option value="17" ${currentValue === '17' ? 'selected' : ''}>17:00</option>
+                                    <option value="18" ${currentValue === '18' ? 'selected' : ''}>18:00</option>
+                                    <option value="19" ${currentValue === '19' ? 'selected' : ''}>19:00</option>
+                                    <option value="20" ${currentValue === '20' ? 'selected' : ''}>20:00</option>
+                                    <option value="21" ${currentValue === '21' ? 'selected' : ''}>21:00</option>
+                                    <option value="22" ${currentValue === '22' ? 'selected' : ''}>22:00</option>
+                                    <option value="23" ${currentValue === '23' ? 'selected' : ''}>23:00</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="schedulePriority" class="form-label">優先度</label>
+                                <select class="form-select" id="schedulePriority">
+                                    <option value="low">低</option>
+                                    <option value="normal" selected>標準</option>
+                                    <option value="high">高</option>
+                                    <option value="critical">緊急</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enableNotification" checked>
+                                    <label class="form-check-label" for="enableNotification">
+                                        実行完了時に通知を送信
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enableRetry" checked>
+                                    <label class="form-check-label" for="enableRetry">
+                                        失敗時に自動リトライ
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="retryOptions">
+                                <label for="retryCount" class="form-label">リトライ回数</label>
+                                <input type="number" class="form-control" id="retryCount" value="3" min="1" max="10">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                        <button type="button" class="btn btn-primary" id="saveScheduleSettings">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // モーダルをDOMに追加
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Bootstrapモーダル初期化
+    const modal = new bootstrap.Modal(document.getElementById('scheduleSettingsModal'));
+    modal.show();
+
+    // リトライオプションの表示/非表示
+    document.getElementById('enableRetry').addEventListener('change', function() {
+        document.getElementById('retryOptions').style.display = this.checked ? 'block' : 'none';
+    });
+
+    // 保存ボタンのイベント
+    document.getElementById('saveScheduleSettings').addEventListener('click', function() {
+        const newName = document.getElementById('scheduleName').value;
+        const newDesc = document.getElementById('scheduleDescription').value;
+        const newTime = document.getElementById('scheduleTime').value;
+
+        // スケジュールアイテムを更新
+        scheduleItem.querySelector('.schedule-name').textContent = newName;
+        scheduleItem.querySelector('.schedule-desc').textContent = newDesc;
+
+        const timeSelect = scheduleItem.querySelector('.form-select');
+        if (timeSelect) {
+            timeSelect.value = newTime;
+            // 時刻表示を更新（表示テキストがあれば）
+            const selectedOption = timeSelect.querySelector(`option[value="${newTime}"]`);
+            if (selectedOption) {
+                timeSelect.dispatchEvent(new Event('change'));
+            }
+        }
+
+        modal.hide();
+        showNotification('success', `「${newName}」の設定を保存しました`);
+    });
+
+    // モーダルが閉じられたら削除
+    document.getElementById('scheduleSettingsModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
+
+// ========== カレンダー同期機能 ==========
+
+// ページロード時にカレンダー統計と3ヶ月カレンダーを取得
+document.addEventListener('DOMContentLoaded', function() {
+    loadCalendarStats();
+    loadThreeMonthCalendar();
+});
+
+// カレンダー統計を読み込む
+async function loadCalendarStats() {
+    try {
+        const response = await fetch('/api/calendar/stats');
+        const data = await response.json();
+
+        if (data.success && data.stats) {
+            const stats = data.stats;
+            const container = document.getElementById('calendarStatsContainer');
+
+            container.innerHTML = `
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">総イベント数</small>
+                        <strong class="text-primary">${stats.total_events}件</strong>
+                    </div>
+                    <div class="progress" style="height: 0.5rem;">
+                        <div class="progress-bar bg-primary" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <hr class="my-2">
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">今月</small>
+                        <span class="badge bg-info">${stats.events_this_month}件</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">来月</small>
+                        <span class="badge bg-success">${stats.events_next_month}件</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">7日以内</small>
+                        <span class="badge bg-warning">${stats.upcoming_7days}件</span>
+                    </div>
+                </div>
+
+                <hr class="my-2">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">同期済み / 全リリース</small>
+                    <strong>${stats.synced_releases} / ${stats.total_releases}</strong>
+                </div>
+                <div class="progress mt-2" style="height: 0.5rem;">
+                    <div class="progress-bar bg-success"
+                         style="width: ${stats.total_releases > 0 ? (stats.synced_releases / stats.total_releases * 100) : 0}%"></div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('カレンダー統計の取得に失敗:', error);
+        document.getElementById('calendarStatsContainer').innerHTML = `
+            <div class="alert alert-warning small mb-0">
+                <i class="bi bi-exclamation-triangle"></i> 統計の取得に失敗しました
+            </div>
+        `;
+    }
+}
+
+// カレンダー同期ボタンのイベント
+document.getElementById('syncCalendarBtn')?.addEventListener('click', async function(e) {
+    e.preventDefault();
+
+    const btn = this;
+    const originalHTML = btn.innerHTML;
+
+    // ボタンを無効化してローディング表示
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>同期中...';
+
+    try {
+        const monthsAhead = parseInt(document.getElementById('monthsAheadSelect').value);
+        const forceResync = document.getElementById('forceResyncCheck').checked;
+
+        const response = await fetch('/api/calendar/sync', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                months_ahead: monthsAhead,
+                force_resync: forceResync
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // 成功時の表示
+            const resultContainer = document.getElementById('calendarSyncResult');
+            resultContainer.style.display = 'block';
+            resultContainer.innerHTML = `
+                <div class="alert alert-success">
+                    <h6 class="alert-heading mb-2">
+                        <i class="bi bi-check-circle"></i> カレンダー同期が完了しました
+                    </h6>
+                    <div class="row g-2 small">
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between">
+                                <span>スキャン済み:</span>
+                                <strong>${data.total_releases_scanned}件</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between">
+                                <span>新規作成:</span>
+                                <strong class="text-success">${data.new_events}件</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between">
+                                <span>更新:</span>
+                                <strong class="text-info">${data.updated_events}件</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between">
+                                <span>スキップ:</span>
+                                <strong class="text-muted">${data.skipped_events}件</strong>
+                            </div>
+                        </div>
+                    </div>
+                    ${data.errors && data.errors.length > 0 ? `
+                        <hr class="my-2">
+                        <div class="small text-warning">
+                            <i class="bi bi-exclamation-triangle"></i> ${data.errors.length}件のエラーが発生しました
+                        </div>
+                    ` : ''}
+                    <div class="small text-muted mt-2">
+                        <i class="bi bi-clock"></i> ${new Date(data.sync_date).toLocaleString('ja-JP')}
+                    </div>
+                </div>
+            `;
+
+            // 統計を再読み込み
+            loadCalendarStats();
+
+            // 同期履歴を更新
+            updateSyncHistory(data);
+
+            // 3ヶ月カレンダーを更新
+            loadThreeMonthCalendar();
+
+            showNotification('success', `カレンダー同期完了：${data.new_events}件の新規イベントを作成しました`);
+        } else {
+            throw new Error(data.error || '同期に失敗しました');
+        }
+    } catch (error) {
+        console.error('カレンダー同期エラー:', error);
+
+        const resultContainer = document.getElementById('calendarSyncResult');
+        resultContainer.style.display = 'block';
+        resultContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <h6 class="alert-heading mb-2">
+                    <i class="bi bi-x-circle"></i> 同期に失敗しました
+                </h6>
+                <p class="mb-0 small">${error.message}</p>
+            </div>
+        `;
+
+        showNotification('error', 'カレンダー同期に失敗しました');
+    } finally {
+        // ボタンを元に戻す
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    }
+});
+
+// 同期履歴を更新
+function updateSyncHistory(syncData) {
+    const historyContainer = document.getElementById('calendarSyncHistory');
+    const historyHTML = `
+        <div class="timeline-item mb-2">
+            <i class="bi bi-check-circle-fill text-success"></i>
+            <div class="timeline-content">
+                <div class="timeline-time small">${new Date(syncData.sync_date).toLocaleString('ja-JP')}</div>
+                <div class="timeline-desc small">
+                    ${syncData.new_events}件作成、${syncData.updated_events}件更新
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 既存の履歴の先頭に追加
+    if (historyContainer.querySelector('.timeline-item')) {
+        historyContainer.insertAdjacentHTML('afterbegin', historyHTML);
+
+        // 最大5件まで保持
+        const items = historyContainer.querySelectorAll('.timeline-item');
+        if (items.length > 5) {
+            items[items.length - 1].remove();
+        }
+    } else {
+        // 初回の場合は置き換え
+        historyContainer.innerHTML = historyHTML;
+    }
+}
+
+// 3ヶ月カレンダーを読み込む
+async function loadThreeMonthCalendar() {
+    const container = document.getElementById('threeMonthCalendar');
+
+    try {
+        const response = await fetch('/api/calendar/monthly?months=3');
+        const data = await response.json();
+
+        if (data.success && data.months) {
+            let html = '<div class="row g-3">';
+
+            for (const month of data.months) {
+                html += `
+                    <div class="col-12 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-calendar-month me-2"></i>
+                                    ${month.year}年 ${month.month_name}
+                                    <span class="badge bg-light text-dark ms-2">${month.event_count}件</span>
+                                </h6>
+                            </div>
+                            <div class="card-body p-2">
+                                ${month.events.length > 0 ? `
+                                    <div class="list-group list-group-flush">
+                                        ${month.events.map(event => `
+                                            <div class="list-group-item px-2 py-2">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="text-center me-2" style="min-width: 40px;">
+                                                        <div class="badge bg-secondary">${event.day}</div>
+                                                        <small class="text-muted d-block">日</small>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <div class="small fw-bold text-truncate" title="${event.title}">
+                                                            ${event.title}
+                                                        </div>
+                                                        <div class="small text-muted">
+                                                            ${event.work_type === 'anime' ?
+                                                                '<i class="bi bi-tv"></i> アニメ' :
+                                                                '<i class="bi bi-book"></i> マンガ'}
+                                                            ${event.platform ? ` · ${event.platform}` : ''}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="text-center text-muted py-5">
+                                        <i class="bi bi-calendar-x fs-1"></i>
+                                        <p class="mb-0 mt-2">予定なし</p>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+
+            if (data.total_events === 0) {
+                html = `
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        今後3ヶ月間のリリース予定がありません。<br>
+                        「今すぐ同期」ボタンでリリース情報を同期してください。
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        } else {
+            throw new Error(data.error || 'カレンダーの取得に失敗しました');
+        }
+    } catch (error) {
+        console.error('3ヶ月カレンダーの取得エラー:', error);
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                カレンダーの読み込みに失敗しました: ${error.message}
+            </div>
+        `;
+    }
+}
+
+// 更新ボタンのイベント
+document.getElementById('refreshCalendarBtn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    loadThreeMonthCalendar();
+    showNotification('info', 'カレンダーを更新しています...');
 });
 </script>
+
+<!-- 収集設定JavaScript -->
+<script src="{{ url_for('static', filename='js/collection-settings.js') }}?v={{ 'js/collection-settings.js'|file_mtime }}"></script>
 
 {% endblock %}
