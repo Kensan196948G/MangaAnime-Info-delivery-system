@@ -1,0 +1,994 @@
+{
+  "analyzed_at": "2025-12-06T11:20:10.970546",
+  "database_path": "/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/db.sqlite3",
+  "database_size_mb": 0.14,
+  "tables": {
+    "calendar_events": {
+      "schema": {
+        "columns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": null,
+            "pk": true
+          },
+          {
+            "cid": 1,
+            "name": "work_id",
+            "type": "INTEGER",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 2,
+            "name": "release_id",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 3,
+            "name": "event_title",
+            "type": "TEXT",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 4,
+            "name": "event_date",
+            "type": "DATE",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 5,
+            "name": "description",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 6,
+            "name": "location",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 7,
+            "name": "calendar_id",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 8,
+            "name": "event_id",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 9,
+            "name": "created_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          },
+          {
+            "cid": 10,
+            "name": "updated_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          }
+        ],
+        "create_sql": "CREATE TABLE calendar_events (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    work_id INTEGER NOT NULL,\n    release_id INTEGER,\n    event_title TEXT NOT NULL,\n    event_date DATE NOT NULL,\n    description TEXT,\n    location TEXT,\n    calendar_id TEXT,\n    event_id TEXT,\n    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n    FOREIGN KEY (work_id) REFERENCES works(id),\n    FOREIGN KEY (release_id) REFERENCES releases(id)\n)"
+      },
+      "statistics": {
+        "row_count": 35,
+        "columns": {
+          "id": {
+            "null_count": 0,
+            "distinct_count": 35
+          },
+          "work_id": {
+            "null_count": 0,
+            "distinct_count": 12
+          },
+          "release_id": {
+            "null_count": 0,
+            "distinct_count": 35
+          },
+          "event_title": {
+            "null_count": 0,
+            "distinct_count": 33
+          },
+          "event_date": {
+            "null_count": 0,
+            "distinct_count": 22
+          },
+          "description": {
+            "null_count": 0,
+            "distinct_count": 33
+          },
+          "location": {
+            "null_count": 35,
+            "distinct_count": 0
+          },
+          "calendar_id": {
+            "null_count": 35,
+            "distinct_count": 0
+          },
+          "event_id": {
+            "null_count": 35,
+            "distinct_count": 0
+          },
+          "created_at": {
+            "null_count": 0,
+            "distinct_count": 2
+          },
+          "updated_at": {
+            "null_count": 0,
+            "distinct_count": 1
+          }
+        }
+      }
+    },
+    "collection_stats": {
+      "schema": {
+        "columns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": null,
+            "pk": true
+          },
+          {
+            "cid": 1,
+            "name": "source_id",
+            "type": "TEXT",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 2,
+            "name": "source_name",
+            "type": "TEXT",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 3,
+            "name": "source_type",
+            "type": "TEXT",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 4,
+            "name": "total_attempts",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": "0",
+            "pk": false
+          },
+          {
+            "cid": 5,
+            "name": "successful_attempts",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": "0",
+            "pk": false
+          },
+          {
+            "cid": 6,
+            "name": "failed_attempts",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": "0",
+            "pk": false
+          },
+          {
+            "cid": 7,
+            "name": "items_collected",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": "0",
+            "pk": false
+          },
+          {
+            "cid": 8,
+            "name": "last_run",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 9,
+            "name": "last_success",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 10,
+            "name": "last_error",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 11,
+            "name": "success_rate",
+            "type": "REAL",
+            "notnull": false,
+            "default_value": "0.0",
+            "pk": false
+          },
+          {
+            "cid": 12,
+            "name": "avg_response_time",
+            "type": "REAL",
+            "notnull": false,
+            "default_value": "0.0",
+            "pk": false
+          },
+          {
+            "cid": 13,
+            "name": "created_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          },
+          {
+            "cid": 14,
+            "name": "updated_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          }
+        ],
+        "create_sql": "CREATE TABLE collection_stats (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    source_id TEXT NOT NULL UNIQUE,\n    source_name TEXT NOT NULL,\n    source_type TEXT CHECK(source_type IN ('api','rss')) NOT NULL,\n    total_attempts INTEGER DEFAULT 0,\n    successful_attempts INTEGER DEFAULT 0,\n    failed_attempts INTEGER DEFAULT 0,\n    items_collected INTEGER DEFAULT 0,\n    last_run DATETIME,\n    last_success DATETIME,\n    last_error TEXT,\n    success_rate REAL DEFAULT 0.0,\n    avg_response_time REAL DEFAULT 0.0,\n    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP\n)"
+      },
+      "statistics": {
+        "row_count": 17,
+        "columns": {
+          "id": {
+            "null_count": 0,
+            "distinct_count": 17
+          },
+          "source_id": {
+            "null_count": 0,
+            "distinct_count": 17
+          },
+          "source_name": {
+            "null_count": 0,
+            "distinct_count": 17
+          },
+          "source_type": {
+            "null_count": 0,
+            "distinct_count": 2
+          },
+          "total_attempts": {
+            "null_count": 0,
+            "distinct_count": 13
+          },
+          "successful_attempts": {
+            "null_count": 0,
+            "distinct_count": 15
+          },
+          "failed_attempts": {
+            "null_count": 0,
+            "distinct_count": 5
+          },
+          "items_collected": {
+            "null_count": 0,
+            "distinct_count": 17
+          },
+          "last_run": {
+            "null_count": 0,
+            "distinct_count": 2
+          },
+          "last_success": {
+            "null_count": 1,
+            "distinct_count": 9
+          },
+          "last_error": {
+            "null_count": 17,
+            "distinct_count": 0
+          },
+          "success_rate": {
+            "null_count": 0,
+            "distinct_count": 13
+          },
+          "avg_response_time": {
+            "null_count": 0,
+            "distinct_count": 9
+          },
+          "created_at": {
+            "null_count": 0,
+            "distinct_count": 1
+          },
+          "updated_at": {
+            "null_count": 0,
+            "distinct_count": 2
+          }
+        }
+      }
+    },
+    "error_logs": {
+      "schema": {
+        "columns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": null,
+            "pk": true
+          },
+          {
+            "cid": 1,
+            "name": "category",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 2,
+            "name": "message",
+            "type": "TEXT",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 3,
+            "name": "stack_trace",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 4,
+            "name": "severity",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 5,
+            "name": "created_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          }
+        ],
+        "create_sql": "CREATE TABLE error_logs (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    category TEXT CHECK(category IN ('notification', 'calendar', 'collection', 'system')),\n    message TEXT NOT NULL,\n    stack_trace TEXT,\n    severity TEXT CHECK(severity IN ('low', 'medium', 'high', 'critical')),\n    created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n)"
+      },
+      "statistics": {
+        "row_count": 0,
+        "columns": {
+          "id": {
+            "null_count": 0,
+            "distinct_count": 0
+          },
+          "category": {
+            "null_count": 0,
+            "distinct_count": 0
+          },
+          "message": {
+            "null_count": 0,
+            "distinct_count": 0
+          },
+          "stack_trace": {
+            "null_count": 0,
+            "distinct_count": 0
+          },
+          "severity": {
+            "null_count": 0,
+            "distinct_count": 0
+          },
+          "created_at": {
+            "null_count": 0,
+            "distinct_count": 0
+          }
+        }
+      }
+    },
+    "notification_history": {
+      "schema": {
+        "columns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": null,
+            "pk": true
+          },
+          {
+            "cid": 1,
+            "name": "notification_type",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 2,
+            "name": "executed_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          },
+          {
+            "cid": 3,
+            "name": "success",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": "1",
+            "pk": false
+          },
+          {
+            "cid": 4,
+            "name": "error_message",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 5,
+            "name": "releases_count",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": "0",
+            "pk": false
+          },
+          {
+            "cid": 6,
+            "name": "created_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          },
+          {
+            "cid": 7,
+            "name": "details",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 8,
+            "name": "metadata",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          }
+        ],
+        "create_sql": "CREATE TABLE notification_history (\n                        id INTEGER PRIMARY KEY AUTOINCREMENT,\n                        notification_type TEXT CHECK(notification_type IN ('email','calendar')),\n                        executed_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n                        success INTEGER DEFAULT 1,\n                        error_message TEXT,\n                        releases_count INTEGER DEFAULT 0,\n                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n                    , details TEXT, metadata TEXT)"
+      },
+      "statistics": {
+        "row_count": 5,
+        "columns": {
+          "id": {
+            "null_count": 0,
+            "distinct_count": 5
+          },
+          "notification_type": {
+            "null_count": 0,
+            "distinct_count": 2
+          },
+          "executed_at": {
+            "null_count": 0,
+            "distinct_count": 3
+          },
+          "success": {
+            "null_count": 0,
+            "distinct_count": 2
+          },
+          "error_message": {
+            "null_count": 4,
+            "distinct_count": 1
+          },
+          "releases_count": {
+            "null_count": 0,
+            "distinct_count": 5
+          },
+          "created_at": {
+            "null_count": 0,
+            "distinct_count": 3
+          },
+          "details": {
+            "null_count": 0,
+            "distinct_count": 5
+          },
+          "metadata": {
+            "null_count": 2,
+            "distinct_count": 3
+          }
+        }
+      }
+    },
+    "releases": {
+      "schema": {
+        "columns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": null,
+            "pk": true
+          },
+          {
+            "cid": 1,
+            "name": "work_id",
+            "type": "INTEGER",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 2,
+            "name": "release_type",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 3,
+            "name": "number",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 4,
+            "name": "platform",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 5,
+            "name": "release_date",
+            "type": "DATE",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 6,
+            "name": "source",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 7,
+            "name": "source_url",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 8,
+            "name": "notified",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": "0",
+            "pk": false
+          },
+          {
+            "cid": 9,
+            "name": "created_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          }
+        ],
+        "create_sql": "CREATE TABLE releases (\n                        id INTEGER PRIMARY KEY AUTOINCREMENT,\n                        work_id INTEGER NOT NULL,\n                        release_type TEXT CHECK(release_type IN ('episode','volume')),\n                        number TEXT,\n                        platform TEXT,\n                        release_date DATE,\n                        source TEXT,\n                        source_url TEXT,\n                        notified INTEGER DEFAULT 0,\n                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n                        FOREIGN KEY (work_id) REFERENCES works (id) ON DELETE CASCADE,\n                        UNIQUE(work_id, release_type, number, platform, release_date)\n                    )"
+      },
+      "statistics": {
+        "row_count": 36,
+        "columns": {
+          "id": {
+            "null_count": 0,
+            "distinct_count": 36
+          },
+          "work_id": {
+            "null_count": 0,
+            "distinct_count": 12
+          },
+          "release_type": {
+            "null_count": 0,
+            "distinct_count": 2
+          },
+          "number": {
+            "null_count": 0,
+            "distinct_count": 24
+          },
+          "platform": {
+            "null_count": 0,
+            "distinct_count": 5
+          },
+          "release_date": {
+            "null_count": 0,
+            "distinct_count": 23
+          },
+          "source": {
+            "null_count": 0,
+            "distinct_count": 1
+          },
+          "source_url": {
+            "null_count": 20,
+            "distinct_count": 10
+          },
+          "notified": {
+            "null_count": 0,
+            "distinct_count": 1
+          },
+          "created_at": {
+            "null_count": 0,
+            "distinct_count": 4
+          }
+        }
+      }
+    },
+    "settings": {
+      "schema": {
+        "columns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": null,
+            "pk": true
+          },
+          {
+            "cid": 1,
+            "name": "key",
+            "type": "TEXT",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 2,
+            "name": "value",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 3,
+            "name": "value_type",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 4,
+            "name": "description",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 5,
+            "name": "created_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          },
+          {
+            "cid": 6,
+            "name": "updated_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          }
+        ],
+        "create_sql": "CREATE TABLE settings (\n                        id INTEGER PRIMARY KEY AUTOINCREMENT,\n                        key TEXT UNIQUE NOT NULL,\n                        value TEXT,\n                        value_type TEXT CHECK(value_type IN ('string','integer','boolean','json')),\n                        description TEXT,\n                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP\n                    )"
+      },
+      "statistics": {
+        "row_count": 6,
+        "columns": {
+          "id": {
+            "null_count": 0,
+            "distinct_count": 6
+          },
+          "key": {
+            "null_count": 0,
+            "distinct_count": 6
+          },
+          "value": {
+            "null_count": 0,
+            "distinct_count": 6
+          },
+          "value_type": {
+            "null_count": 0,
+            "distinct_count": 3
+          },
+          "description": {
+            "null_count": 0,
+            "distinct_count": 6
+          },
+          "created_at": {
+            "null_count": 0,
+            "distinct_count": 2
+          },
+          "updated_at": {
+            "null_count": 0,
+            "distinct_count": 2
+          }
+        }
+      }
+    },
+    "works": {
+      "schema": {
+        "columns": [
+          {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": false,
+            "default_value": null,
+            "pk": true
+          },
+          {
+            "cid": 1,
+            "name": "title",
+            "type": "TEXT",
+            "notnull": true,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 2,
+            "name": "title_kana",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 3,
+            "name": "title_en",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 4,
+            "name": "type",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 5,
+            "name": "official_url",
+            "type": "TEXT",
+            "notnull": false,
+            "default_value": null,
+            "pk": false
+          },
+          {
+            "cid": 6,
+            "name": "created_at",
+            "type": "DATETIME",
+            "notnull": false,
+            "default_value": "CURRENT_TIMESTAMP",
+            "pk": false
+          }
+        ],
+        "create_sql": "CREATE TABLE works (\n                        id INTEGER PRIMARY KEY AUTOINCREMENT,\n                        title TEXT NOT NULL,\n                        title_kana TEXT,\n                        title_en TEXT,\n                        type TEXT CHECK(type IN ('anime','manga')),\n                        official_url TEXT,\n                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n                    )"
+      },
+      "statistics": {
+        "row_count": 12,
+        "columns": {
+          "id": {
+            "null_count": 0,
+            "distinct_count": 12
+          },
+          "title": {
+            "null_count": 0,
+            "distinct_count": 11
+          },
+          "title_kana": {
+            "null_count": 0,
+            "distinct_count": 10
+          },
+          "title_en": {
+            "null_count": 0,
+            "distinct_count": 10
+          },
+          "type": {
+            "null_count": 0,
+            "distinct_count": 2
+          },
+          "official_url": {
+            "null_count": 0,
+            "distinct_count": 10
+          },
+          "created_at": {
+            "null_count": 0,
+            "distinct_count": 2
+          }
+        }
+      }
+    }
+  },
+  "indexes": [
+    {
+      "name": "idx_calendar_events_created_at",
+      "table": "calendar_events",
+      "sql": "CREATE INDEX idx_calendar_events_created_at ON calendar_events(created_at DESC)"
+    },
+    {
+      "name": "idx_calendar_events_date",
+      "table": "calendar_events",
+      "sql": "CREATE INDEX idx_calendar_events_date ON calendar_events(event_date)"
+    },
+    {
+      "name": "idx_calendar_events_work_id",
+      "table": "calendar_events",
+      "sql": "CREATE INDEX idx_calendar_events_work_id ON calendar_events(work_id)"
+    },
+    {
+      "name": "idx_collection_stats_source_id",
+      "table": "collection_stats",
+      "sql": "CREATE INDEX idx_collection_stats_source_id ON collection_stats(source_id)"
+    },
+    {
+      "name": "idx_collection_stats_updated_at",
+      "table": "collection_stats",
+      "sql": "CREATE INDEX idx_collection_stats_updated_at ON collection_stats(updated_at DESC)"
+    },
+    {
+      "name": "idx_error_logs_category",
+      "table": "error_logs",
+      "sql": "CREATE INDEX idx_error_logs_category ON error_logs(category)"
+    },
+    {
+      "name": "idx_error_logs_created_at",
+      "table": "error_logs",
+      "sql": "CREATE INDEX idx_error_logs_created_at ON error_logs(created_at DESC)"
+    },
+    {
+      "name": "idx_created_at",
+      "table": "notification_history",
+      "sql": "CREATE INDEX idx_created_at\n                ON notification_history(created_at DESC)\n            "
+    },
+    {
+      "name": "idx_notification_history_executed_at",
+      "table": "notification_history",
+      "sql": "CREATE INDEX idx_notification_history_executed_at ON notification_history(executed_at)"
+    },
+    {
+      "name": "idx_notification_history_type",
+      "table": "notification_history",
+      "sql": "CREATE INDEX idx_notification_history_type ON notification_history(notification_type)"
+    },
+    {
+      "name": "idx_type_success",
+      "table": "notification_history",
+      "sql": "CREATE INDEX idx_type_success\n                ON notification_history(notification_type, success)\n            "
+    },
+    {
+      "name": "idx_releases_date",
+      "table": "releases",
+      "sql": "CREATE INDEX idx_releases_date ON releases(release_date)"
+    },
+    {
+      "name": "idx_releases_notified",
+      "table": "releases",
+      "sql": "CREATE INDEX idx_releases_notified ON releases(notified)"
+    },
+    {
+      "name": "idx_releases_work_id",
+      "table": "releases",
+      "sql": "CREATE INDEX idx_releases_work_id ON releases(work_id)"
+    },
+    {
+      "name": "idx_settings_key",
+      "table": "settings",
+      "sql": "CREATE INDEX idx_settings_key ON settings(key)"
+    },
+    {
+      "name": "idx_works_title",
+      "table": "works",
+      "sql": "CREATE INDEX idx_works_title ON works(title)"
+    },
+    {
+      "name": "idx_works_type",
+      "table": "works",
+      "sql": "CREATE INDEX idx_works_type ON works(type)"
+    }
+  ],
+  "pragma_settings": {
+    "journal_mode": "wal",
+    "synchronous": 2,
+    "cache_size": -2000,
+    "temp_store": 0,
+    "foreign_keys": 0,
+    "auto_vacuum": 0
+  },
+  "data_quality": {
+    "issues": [
+      {
+        "severity": "medium",
+        "table": "works",
+        "issue": "1件の重複タイトル",
+        "examples": [
+          {
+            "title": "僕のヒーローアカデミア",
+            "count": 2
+          }
+        ]
+      },
+      {
+        "severity": "info",
+        "table": "releases",
+        "issue": "16件の未通知レコード（配信日を過ぎている）"
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "configuration",
+      "suggestion": "外部キー制約を有効化してデータ整合性を保証してください",
+      "sql": "PRAGMA foreign_keys = ON;"
+    }
+  ]
+}
