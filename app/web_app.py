@@ -65,7 +65,8 @@ except ImportError:
 # Flask-Login 認証の初期化
 # ============================================================
 try:
-    from app.routes.auth import auth_bp, init_login_manager
+    from flask_login import login_required, current_user
+    from app.routes.auth import auth_bp, init_login_manager, admin_required
 
     # 認証Blueprintを登録
     app.register_blueprint(auth_bp)
@@ -73,9 +74,18 @@ try:
     # LoginManagerを初期化
     login_manager = init_login_manager(app)
     logger.info("認証機構を初期化しました")
+
+    HAS_AUTH = True
 except ImportError as e:
     logger.warning(f"認証モジュールの読み込みに失敗: {e}")
     login_manager = None
+    HAS_AUTH = False
+
+    # フォールバックダミーデコレータ
+    def login_required(f):
+        return f
+    def admin_required(f):
+        return f
 
 # ============================================================
 # CSRFエラーハンドラ
@@ -607,6 +617,7 @@ def calendar():
 
 
 @app.route("/config", methods=["GET", "POST"])
+@login_required
 def config():
     """Configuration management interface"""
     if request.method == "POST":
@@ -1046,6 +1057,7 @@ def api_rss_feeds():
 
 
 @app.route("/api/rss-feeds/toggle", methods=["POST"])
+@login_required
 def api_rss_feeds_toggle():
     """Toggle RSS feed enable/disable status"""
     try:
@@ -1553,6 +1565,7 @@ def api_add_to_watchlist():
 
 
 @app.route("/api/manual-collection", methods=["POST"])
+@login_required
 def api_manual_collection():
     """API endpoint to trigger manual collection"""
     # This would trigger the actual collection process
@@ -1613,6 +1626,7 @@ def api_refresh_history():
 
 
 @app.route("/api/settings", methods=["GET", "POST"])
+@login_required
 def api_settings():
     """API endpoint for settings management"""
     # Import database manager
@@ -3307,6 +3321,7 @@ def api_test_rss():
 
 
 @app.route('/api/sources/toggle', methods=['POST'])
+@login_required
 def api_toggle_source():
     """
     Toggle a collection source on/off.
@@ -3516,6 +3531,7 @@ def api_test_all_sources():
 
 
 @app.route("/api/calendar/sync", methods=["POST"])
+@login_required
 def api_calendar_sync():
     """Sync releases to calendar events (up to 3 months ahead)"""
     try:
@@ -3850,6 +3866,14 @@ def api_calendar_monthly():
             'error': str(e)
         }), 500
 
+
+# Register users management blueprint
+try:
+    from app.routes.users import users_bp
+    app.register_blueprint(users_bp)
+    logger.info("Users management blueprint registered: /users")
+except ImportError as e:
+    logger.warning(f"Users management blueprint not available: {e}")
 
 # Register health check blueprint
 try:

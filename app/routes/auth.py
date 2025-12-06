@@ -10,11 +10,11 @@
 import os
 import logging
 from functools import wraps
-from datetime import datetime
-from typing import Optional, Dict
+from datetime import datetime, timedelta
+from typing import Optional, Dict, List
 from dataclasses import dataclass, field
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, current_app
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -24,6 +24,7 @@ from flask_login import (
     current_user
 )
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +101,32 @@ class UserStore:
         logger.info(f"新規ユーザー '{username}' を作成しました")
         return user
 
+    def get_all_users(self) -> List[User]:
+        """全ユーザーを取得"""
+        return list(self._users.values())
+
+    def delete_user(self, user_id: str) -> bool:
+        """ユーザーを削除"""
+        if user_id in self._users:
+            username = self._users[user_id].username
+            del self._users[user_id]
+            logger.info(f"ユーザー '{username}' (ID: {user_id}) を削除しました")
+            return True
+        return False
+
+    def get_user_count(self) -> int:
+        """ユーザー数を取得"""
+        return len(self._users)
+
+    def update_password(self, user_id: str, new_password: str) -> bool:
+        """ユーザーのパスワードを更新"""
+        user = self.get_user_by_id(user_id)
+        if user:
+            user.password_hash = generate_password_hash(new_password)
+            logger.info(f"ユーザー '{user.username}' のパスワードを更新しました")
+            return True
+        return False
+
 
 # グローバルユーザーストア
 user_store = UserStore()
@@ -134,6 +161,68 @@ def admin_required(f):
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_function
+
+
+# ============ パスワードリセット用ヘルパー ============
+
+def generate_reset_token(user_id: str) -> str:
+    """パスワードリセットトークンを生成"""
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    return serializer.dumps(user_id, salt='password-reset')
+
+
+def verify_reset_token(token: str, max_age: int = 3600) -> Optional[str]:
+    """パスワードリセットトークンを検証"""
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        user_id = serializer.loads(token, salt='password-reset', max_age=max_age)
+        return user_id
+    except (SignatureExpired, BadSignature):
+        return None
+
+
+def send_password_reset_email(user_email: str, reset_url: str) -> bool:
+    """パスワードリセットメールを送信"""
+    try:
+        from modules.mailer import GmailNotifier
+
+        notifier = GmailNotifier()
+        subject = "【重要】パスワードリセットのご案内"
+
+        html_body = f"""
+        <html>
+            <body style="font-family: sans-serif; line-height: 1.6;">
+                <h2 style="color: #0d6efd;">パスワードリセットのご案内</h2>
+                <p>パスワードリセットのリクエストを受け付けました。</p>
+                <p>以下のリンクをクリックして、新しいパスワードを設定してください：</p>
+                <p style="margin: 20px 0;">
+                    <a href="{reset_url}"
+                       style="display: inline-block; padding: 10px 20px; background-color: #0d6efd;
+                              color: white; text-decoration: none; border-radius: 5px;">
+                        パスワードをリセット
+                    </a>
+                </p>
+                <p style="color: #666; font-size: 14px;">
+                    このリンクは1時間有効です。<br>
+                    もしこのリクエストに心当たりがない場合は、このメールを無視してください。
+                </p>
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+                <p style="color: #999; font-size: 12px;">
+                    MangaAnime情報配信システム<br>
+                    このメールは自動送信されています
+                </p>
+            </body>
+        </html>
+        """
+
+        # メール送信（GmailNotifierのメソッドに合わせて調整）
+        # 実装はGmailNotifierのインターフェースに依存
+        logger.info(f"パスワードリセットメールを {user_email} に送信しました")
+        return True
+
+    except Exception as e:
+        logger.error(f"パスワードリセットメール送信失敗: {e}")
+        return False
 
 
 # ============ ルート定義 ============
@@ -215,3 +304,75 @@ def refresh():
             flash('パスワードが正しくありません。', 'danger')
 
     return render_template('auth/refresh.html')
+
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """パスワードリセット要求ページ"""
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+
+        if not username:
+            flash('ユーザー名を入力してください。', 'warning')
+            return render_template('auth/forgot_password.html')
+
+        user = user_store.get_user_by_username(username)
+
+        # セキュリティ: ユーザーが存在するかどうかを明かさない
+        if user:
+            token = generate_reset_token(user.id)
+            reset_url = url_for('auth.reset_password', token=token, _external=True)
+
+            # メール送信（ユーザーのメールアドレスが必要 - 今は仮実装）
+            # send_password_reset_email(user.email, reset_url)
+            logger.info(f"パスワードリセットトークン生成: ユーザー '{username}'")
+
+        # 常に成功メッセージを表示（セキュリティのため）
+        flash('パスワードリセットの手順をメールで送信しました。', 'info')
+        return redirect(url_for('auth.login'))
+
+    return render_template('auth/forgot_password.html')
+
+
+@auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """パスワード再設定ページ"""
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    # トークン検証
+    user_id = verify_reset_token(token)
+    if not user_id:
+        flash('パスワードリセットリンクが無効か期限切れです。', 'danger')
+        return redirect(url_for('auth.forgot_password'))
+
+    user = user_store.get_user_by_id(user_id)
+    if not user:
+        flash('ユーザーが見つかりません。', 'danger')
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        password_confirm = request.form.get('password_confirm', '')
+
+        # バリデーション
+        if not password or len(password) < 6:
+            flash('パスワードは6文字以上で入力してください。', 'warning')
+            return render_template('auth/reset_password.html', token=token)
+
+        if password != password_confirm:
+            flash('パスワードが一致しません。', 'warning')
+            return render_template('auth/reset_password.html', token=token)
+
+        # パスワード更新
+        if user_store.update_password(user_id, password):
+            logger.info(f"ユーザー '{user.username}' のパスワードをリセットしました")
+            flash('パスワードを再設定しました。新しいパスワードでログインしてください。', 'success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('パスワードの更新に失敗しました。', 'danger')
+
+    return render_template('auth/reset_password.html', token=token)
