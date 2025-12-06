@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}ログイン - MangaAnime Info System{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">ログイン</h4>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('auth.login') }}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">ユーザー名</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   required autofocus placeholder="ユーザー名を入力">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">パスワード</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   required placeholder="パスワードを入力">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">ログイン状態を保持</label>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">ログイン</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-muted text-center small">
+                    <p class="mb-0">開発環境: admin / changeme123</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

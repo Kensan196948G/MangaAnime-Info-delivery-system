@@ -15,6 +15,10 @@ from pathlib import Path
 
 
 class DatabaseAnalyzer:
+    # 許可されたテーブル名のホワイトリスト（SQLインジェクション対策）
+    ALLOWED_TABLES = {'works', 'releases', 'notification_history', 'settings',
+                      'rss_feeds', 'api_sources', 'calendar_events'}
+
     def __init__(self, db_path):
         self.db_path = db_path
         self.conn = None
@@ -28,6 +32,18 @@ class DatabaseAnalyzer:
             'data_quality': {},
             'recommendations': []
         }
+
+    def _validate_identifier(self, identifier: str) -> bool:
+        """識別子（テーブル名/カラム名）の安全性を検証"""
+        import re
+        # 英数字とアンダースコアのみ許可
+        return bool(re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', identifier))
+
+    def _safe_identifier(self, identifier: str) -> str:
+        """安全な識別子を返す（検証失敗時は例外）"""
+        if not self._validate_identifier(identifier):
+            raise ValueError(f"不正な識別子: {identifier}")
+        return identifier
 
     def connect(self):
         """データベースに接続"""
@@ -102,10 +118,12 @@ class DatabaseAnalyzer:
 
     def get_table_statistics(self, table_name):
         """テーブル統計情報を取得"""
+        # テーブル名を検証（SQLインジェクション対策）
+        safe_table = self._safe_identifier(table_name)
         stats = {}
 
-        # レコード数
-        cursor = self.conn.execute(f"SELECT COUNT(*) FROM {table_name}")
+        # レコード数（識別子は検証済みなので安全）
+        cursor = self.conn.execute(f"SELECT COUNT(*) FROM [{safe_table}]")
         stats['row_count'] = cursor.fetchone()[0]
 
         # 各カラムのNULL数とユニーク数
@@ -114,21 +132,23 @@ class DatabaseAnalyzer:
 
         for col in schema['columns']:
             col_name = col['name']
+            # カラム名も検証
+            safe_col = self._safe_identifier(col_name)
             col_stats = {}
 
             # NULL数
             cursor = self.conn.execute(
-                f"SELECT COUNT(*) FROM {table_name} WHERE {col_name} IS NULL"
+                f"SELECT COUNT(*) FROM [{safe_table}] WHERE [{safe_col}] IS NULL"
             )
             col_stats['null_count'] = cursor.fetchone()[0]
 
             # ユニーク数
             try:
                 cursor = self.conn.execute(
-                    f"SELECT COUNT(DISTINCT {col_name}) FROM {table_name}"
+                    f"SELECT COUNT(DISTINCT [{safe_col}]) FROM [{safe_table}]"
                 )
                 col_stats['distinct_count'] = cursor.fetchone()[0]
-            except:
+            except Exception:
                 col_stats['distinct_count'] = None
 
             column_stats[col_name] = col_stats

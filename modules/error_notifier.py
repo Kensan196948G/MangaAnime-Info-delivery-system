@@ -39,7 +39,7 @@ class ErrorNotifier:
             with open(self.config_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception as e:
-            print(f"❌ 設定ファイル読み込みエラー: {e}")
+            logging.getLogger(__name__).error(f"設定ファイル読み込みエラー: {e}")
             return {}
 
     def _load_cooldown_data(self) -> Dict:

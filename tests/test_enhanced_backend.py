@@ -204,6 +204,7 @@ def test_error_recovery():
     logger.info("=== Testing Enhanced Error Recovery ===")
 
     try:
+        from modules.error_recovery import (
             EnhancedErrorRecovery,
             ErrorSeverity,
             initialize_error_recovery,
