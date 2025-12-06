@@ -11,9 +11,9 @@ import json
 import sqlite3
 import requests
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, make_response
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, make_response, g
 import logging
 
 # プロジェクトルートをPythonパスに追加
@@ -24,8 +24,115 @@ sys.path.insert(0, str(project_root))
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ============================================================
+# Flask アプリケーション初期化
+# ============================================================
 app = Flask(__name__)
+
+# ============================================================
+# セキュリティ設定
+# ============================================================
+# シークレットキー（本番環境では必ず環境変数で設定すること）
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+
+# セッション設定
+app.config.update(
+    # セッションCookie設定
+    SESSION_COOKIE_SECURE=os.environ.get("FLASK_ENV") == "production",  # 本番のみHTTPS
+    SESSION_COOKIE_HTTPONLY=True,  # JavaScript からのアクセスを禁止
+    SESSION_COOKIE_SAMESITE='Lax',  # CSRF対策補完
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=2),  # セッション有効期限
+
+    # CSRF設定
+    WTF_CSRF_ENABLED=True,
+    WTF_CSRF_TIME_LIMIT=3600,  # CSRFトークン有効期限（秒）
+    WTF_CSRF_SSL_STRICT=os.environ.get("FLASK_ENV") == "production",
+    WTF_CSRF_HEADERS=['X-CSRFToken', 'X-CSRF-Token'],
+)
+
+# ============================================================
+# CSRF保護の初期化
+# ============================================================
+try:
+    from flask_wtf.csrf import CSRFProtect, CSRFError
+    csrf = CSRFProtect(app)
+    logger.info("CSRF保護を有効化しました")
+except ImportError:
+    csrf = None
+    logger.warning("Flask-WTF がインストールされていません。CSRF保護は無効です。")
+
+# ============================================================
+# Flask-Login 認証の初期化
+# ============================================================
+try:
+    from app.routes.auth import auth_bp, init_login_manager
+
+    # 認証Blueprintを登録
+    app.register_blueprint(auth_bp)
+
+    # LoginManagerを初期化
+    login_manager = init_login_manager(app)
+    logger.info("認証機構を初期化しました")
+except ImportError as e:
+    logger.warning(f"認証モジュールの読み込みに失敗: {e}")
+    login_manager = None
+
+# ============================================================
+# CSRFエラーハンドラ
+# ============================================================
+if csrf:
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        """CSRFトークン検証エラーのハンドラ"""
+        logger.warning(f"CSRFエラー: {e.description}")
+
+        # APIリクエストの場合はJSONで応答
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({
+                'error': 'CSRF token invalid or missing',
+                'message': 'セッションが期限切れか、不正なリクエストです。ページを再読み込みしてください。'
+            }), 400
+
+        # 通常のリクエストはHTMLで応答
+        flash('セッションが期限切れか、不正なリクエストです。再度お試しください。', 'danger')
+        return redirect(request.referrer or url_for('index'))
+
+# ============================================================
+# API用CSRF除外設定
+# ============================================================
+if csrf:
+    # 読み取り専用APIエンドポイントをCSRF除外
+    @csrf.exempt
+    @app.route('/api/health')
+    def api_health_exempt():
+        """ヘルスチェック用（CSRF除外）"""
+        pass  # 実際のハンドラは別途定義
+
+# ============================================================
+# セキュリティヘッダーの設定
+# ============================================================
+@app.after_request
+def add_security_headers(response):
+    """レスポンスにセキュリティヘッダーを追加"""
+    # XSS対策
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+
+    # Referrerポリシー
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+
+    # CSP（開発時は緩め、本番では厳格に）
+    if os.environ.get("FLASK_ENV") == "production":
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "img-src 'self' data: https:; "
+            "font-src 'self' https://cdn.jsdelivr.net;"
+        )
+
+    return response
 
 # カスタムJinja2フィルター
 @app.template_filter('file_mtime')

@@ -23,6 +23,9 @@
                     {% endwith %}
 
                     <form method="POST" action="{{ url_for('auth.login') }}">
+                        <!-- CSRF Protection -->
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                         <div class="mb-3">
                             <label for="username" class="form-label">ユーザー名</label>
                             <input type="text" class="form-control" id="username" name="username"
