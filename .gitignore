@@ -71,6 +71,7 @@ config.json
 credentials.json
 token.json
 client_secret.json
+auth/google/
 
 # Backup files
 *.bak

@@ -1,0 +1,45 @@
+# Testing Framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+pytest-asyncio>=0.21.0
+pytest-xdist>=3.3.0
+pytest-timeout>=2.1.0
+pytest-env>=0.8.2
+
+# Test Data Generation
+factory-boy>=3.3.0
+faker>=19.0.0
+
+# HTTP Mocking
+responses>=0.23.0
+requests-mock>=1.11.0
+
+# Time Mocking
+freezegun>=1.2.0
+
+# Database Testing
+pytest-postgresql>=5.0.0
+pytest-sqlite>=0.3.0
+
+# API Testing
+httpx>=0.24.0
+
+# E2E Testing (Optional - Playwright)
+playwright>=1.40.0
+pytest-playwright>=0.4.3
+
+# Code Quality
+coverage>=7.3.0
+pytest-html>=4.0.0
+
+# Performance Testing
+pytest-benchmark>=4.0.0
+
+# Security Testing
+bandit>=1.7.5
+safety>=2.3.5
+
+# Utility
+pytest-json-report>=1.5.0
+pytest-metadata>=3.0.0

@@ -1,0 +1,96 @@
+{
+  "notifications": {
+    "email": {
+      "enabled": true,
+      "to": "production-email@example.com",
+      "subject_prefix": "[アニメ・マンガ情報]",
+      "send_time": "08:00",
+      "html_template": "templates/email_notification.html"
+    },
+    "calendar": {
+      "enabled": true,
+      "calendar_id": "primary",
+      "event_title_format": "{title} {type} {number}",
+      "color_by_genre": true,
+      "reminder_minutes": [1440, 60],
+      "default_duration_minutes": 30
+    }
+  },
+  "filters": {
+    "ng_keywords": [
+      "エロ",
+      "R18",
+      "成人向け",
+      "BL",
+      "百合",
+      "ボーイズラブ",
+      "アダルト",
+      "18禁"
+    ],
+    "min_rating": 6.0,
+    "excluded_genres": ["Hentai"],
+    "apply_to_description": true,
+    "case_sensitive": false
+  },
+  "sources": {
+    "anime": [
+      "anilist",
+      "syobocal"
+    ],
+    "manga": [
+      "bookwalker_rss",
+      "magapoke_rss",
+      "jumpbook_rss",
+      "rakuten_kobo_rss"
+    ],
+    "streaming": [
+      "danime_rss",
+      "anilist_streaming"
+    ],
+    "retry_on_failure": true,
+    "max_retries": 3,
+    "timeout_seconds": 30
+  },
+  "database": {
+    "path": "/var/lib/manga-anime-system/db.sqlite3",
+    "backup_enabled": true,
+    "backup_interval_days": 1,
+    "backup_path": "/var/backups/manga-anime-system/",
+    "max_backups": 30,
+    "vacuum_on_startup": true
+  },
+  "logging": {
+    "level": "WARNING",
+    "file": "/var/log/manga-anime-system/system.log",
+    "max_bytes": 52428800,
+    "backup_count": 10,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "error_notification": true
+  },
+  "scheduling": {
+    "cron_expression": "0 8 * * *",
+    "timezone": "Asia/Tokyo",
+    "max_execution_time_minutes": 30,
+    "concurrent_workers": 4
+  },
+  "api": {
+    "rate_limiting": {
+      "anilist_requests_per_minute": 85,
+      "rss_requests_per_minute": 30
+    },
+    "cache": {
+      "enabled": true,
+      "ttl_seconds": 3600
+    }
+  },
+  "security": {
+    "credentials_path": "/etc/manga-anime-system/credentials/",
+    "token_encryption": true,
+    "ssl_verify": true
+  },
+  "performance": {
+    "batch_size": 50,
+    "connection_pool_size": 10,
+    "enable_profiling": false
+  }
+}
