@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        max-width: 450px;
+        margin: 50px auto;
+    }
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 25px;
+    }
+    .card-header h3 {
+        margin: 0;
+        font-weight: 600;
+    }
+    .form-control {
+        border-radius: 8px;
+        padding: 12px;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-weight: 600;
+    }
+    .forgot-password-link {
+        text-align: right;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+    .forgot-password-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    .forgot-password-link a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container login-container">
+    <div class="card">
+        <div class="card-header text-center">
+            <h3><i class="fas fa-sign-in-alt"></i> ログイン</h3>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i> ユーザー名
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="username"
+                        name="username"
+                        required
+                        autocomplete="username"
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> パスワード
+                    </label>
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <div class="forgot-password-link">
+                    <a href="{{ url_for('auth.forgot_password') }}">
+                        <i class="fas fa-key"></i> パスワードをお忘れですか?
+                    </a>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> ログイン
+                    </button>
+                </div>
+            </form>
+
+            <hr class="my-4">
+
+            <div class="text-center">
+                <p class="mb-0">
+                    アカウントをお持ちでないですか?
+                    <a href="{{ url_for('auth.register') }}" style="color: #667eea;">
+                        新規登録
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

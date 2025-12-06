@@ -242,20 +242,101 @@ def login():
             flash('ユーザー名とパスワードを入力してください。', 'warning')
             return render_template('auth/login.html')
 
+        # ブルートフォース対策: アカウントロック確認
+        try:
+            from modules.brute_force_protection import attempt_tracker
+            is_locked, unlock_time = attempt_tracker.is_locked(username)
+
+            if is_locked:
+                remaining_minutes = int((unlock_time - datetime.now()).total_seconds() / 60)
+                flash(
+                    f'アカウントがロックされています。{remaining_minutes}分後に再試行してください。',
+                    'danger'
+                )
+
+                # 監査ログ記録
+                try:
+                    from modules.audit_log import audit_logger, AuditEventType
+                    audit_logger.log_event(
+                        event_type=AuditEventType.AUTH_LOGIN_FAILURE,
+                        username=username,
+                        ip_address=request.remote_addr,
+                        user_agent=request.user_agent.string,
+                        details={'reason': 'account_locked', 'unlock_time': unlock_time.isoformat()},
+                        success=False
+                    )
+                except ImportError:
+                    pass
+
+                return render_template('auth/login.html')
+        except ImportError:
+            attempt_tracker = None
+
         user = user_store.get_user_by_username(username)
 
         if user and user.check_password(password):
+            # ログイン成功
             user.update_last_login()
             login_user(user, remember=bool(remember))
             logger.info(f"ユーザー '{username}' がログインしました")
+
+            # ブルートフォース対策: 試行回数クリア
+            if attempt_tracker:
+                attempt_tracker.clear_attempts(username)
+
+            # 監査ログ記録
+            try:
+                from modules.audit_log import audit_logger, AuditEventType
+                audit_logger.log_event(
+                    event_type=AuditEventType.AUTH_LOGIN_SUCCESS,
+                    user_id=user.id,
+                    username=username,
+                    ip_address=request.remote_addr,
+                    user_agent=request.user_agent.string,
+                    details={'remember': bool(remember)},
+                    success=True
+                )
+            except ImportError:
+                pass
 
             next_page = request.args.get('next')
             if next_page and next_page.startswith('/'):
                 return redirect(next_page)
             return redirect(url_for('index'))
         else:
+            # ログイン失敗
             logger.warning(f"ログイン失敗: ユーザー名 '{username}'")
-            flash('ユーザー名またはパスワードが正しくありません。', 'danger')
+
+            # ブルートフォース対策: 失敗記録
+            if attempt_tracker:
+                attempt_tracker.record_failed_attempt(username)
+                remaining = attempt_tracker.get_remaining_attempts(username)
+                if remaining > 0:
+                    flash(
+                        f'ユーザー名またはパスワードが正しくありません。（残り試行回数: {remaining}回）',
+                        'danger'
+                    )
+                else:
+                    flash(
+                        'ログイン試行回数が上限に達しました。アカウントが一時的にロックされました。',
+                        'danger'
+                    )
+            else:
+                flash('ユーザー名またはパスワードが正しくありません。', 'danger')
+
+            # 監査ログ記録
+            try:
+                from modules.audit_log import audit_logger, AuditEventType
+                audit_logger.log_event(
+                    event_type=AuditEventType.AUTH_LOGIN_FAILURE,
+                    username=username,
+                    ip_address=request.remote_addr,
+                    user_agent=request.user_agent.string,
+                    details={'reason': 'invalid_credentials'},
+                    success=False
+                )
+            except ImportError:
+                pass
 
     return render_template('auth/login.html')
 
@@ -265,8 +346,25 @@ def login():
 def logout():
     """ログアウト"""
     username = current_user.username
+    user_id = current_user.id
+
     logout_user()
     logger.info(f"ユーザー '{username}' がログアウトしました")
+
+    # 監査ログ記録
+    try:
+        from modules.audit_log import audit_logger, AuditEventType
+        audit_logger.log_event(
+            event_type=AuditEventType.AUTH_LOGOUT,
+            user_id=user_id,
+            username=username,
+            ip_address=request.remote_addr,
+            user_agent=request.user_agent.string,
+            success=True
+        )
+    except ImportError:
+        pass
+
     flash('ログアウトしました。', 'info')
     return redirect(url_for('auth.login'))
 
@@ -294,6 +392,21 @@ def refresh():
             # セッションを更新
             login_user(current_user, fresh=True)
             logger.info(f"ユーザー '{current_user.username}' のセッションを更新しました")
+
+            # 監査ログ記録
+            try:
+                from modules.audit_log import audit_logger, AuditEventType
+                audit_logger.log_event(
+                    event_type=AuditEventType.AUTH_SESSION_REFRESH,
+                    user_id=current_user.id,
+                    username=current_user.username,
+                    ip_address=request.remote_addr,
+                    user_agent=request.user_agent.string,
+                    success=True
+                )
+            except ImportError:
+                pass
+
             flash('セッションを更新しました。', 'success')
 
             next_page = request.args.get('next')

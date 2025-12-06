@@ -144,6 +144,44 @@ def add_security_headers(response):
 
     return response
 
+# ============================================================
+# レート制限の初期化
+# ============================================================
+try:
+    from flask_limiter import Limiter
+    from flask_limiter.util import get_remote_address
+
+    limiter = Limiter(
+        app=app,
+        key_func=get_remote_address,
+        default_limits=["200 per day", "50 per hour"],
+        storage_uri="memory://",  # 開発環境（本番はRedis推奨）
+        # storage_uri=os.environ.get("REDIS_URL", "redis://localhost:6379"),
+    )
+    logger.info("レート制限を有効化しました (200/day, 50/hour)")
+except ImportError:
+    limiter = None
+    logger.warning("Flask-Limiter がインストールされていません。レート制限は無効です。")
+
+# レート制限エラーハンドラ
+if limiter:
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        """レート制限超過エラーのハンドラ"""
+        logger.warning(f"レート制限超過: {request.remote_addr} - {request.path}")
+
+        # APIリクエストの場合はJSONで応答
+        if request.is_json or request.headers.get('Accept') == 'application/json':
+            return jsonify({
+                'error': 'Rate limit exceeded',
+                'message': 'リクエスト制限を超えました。しばらくしてから再試行してください。',
+                'retry_after': e.description
+            }), 429
+
+        # 通常のリクエストはHTMLで応答
+        flash('リクエスト回数が多すぎます。しばらくしてからお試しください。', 'warning')
+        return redirect(request.referrer or url_for('index'))
+
 # カスタムJinja2フィルター
 @app.template_filter('file_mtime')
 def file_mtime_filter(filepath):
