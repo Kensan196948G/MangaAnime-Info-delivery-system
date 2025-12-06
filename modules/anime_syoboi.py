@@ -576,3 +576,89 @@ def fetch_syoboi_works_and_releases_sync(
 ) -> Tuple[List[Work], List[Release]]:
     """Synchronous wrapper for fetch_syoboi_works_and_releases."""
     return asyncio.run(fetch_syoboi_works_and_releases(days_ahead))
+
+
+# モジュールレベルのfetch_and_store関数（collect_all_data.pyから呼び出される）
+def fetch_and_store() -> dict:
+    """
+    しょぼいカレンダーAPIからアニメデータを収集しデータベースに保存する。
+
+    Returns:
+        dict: 収集結果のサマリー
+    """
+    import logging
+    from .db import get_db
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        # データ収集（同期版を使用）
+        works, releases = fetch_syoboi_works_and_releases_sync(days_ahead=14)
+
+        if not works:
+            logger.info("しょぼいカレンダーから収集されたデータはありません")
+            return {"success": True, "works": 0, "releases": 0}
+
+        # データベースに保存
+        db = get_db()
+        stored_works = 0
+        stored_releases = 0
+
+        # 作品IDのマッピング（Work.id -> DB work_id）
+        work_id_map = {}
+
+        for work in works:
+            try:
+                title = work.title if hasattr(work, 'title') else str(work)
+                if not title:
+                    continue
+
+                work_id = db.get_or_create_work(
+                    title=title,
+                    work_type="anime",
+                    title_kana=getattr(work, "title_kana", None),
+                    title_en=getattr(work, "title_en", None),
+                    official_url=getattr(work, "official_url", None),
+                )
+                work_id_map[getattr(work, 'id', title)] = work_id
+                stored_works += 1
+            except Exception as e:
+                logger.warning(f"作品保存エラー: {work} - {e}")
+                continue
+
+        for release in releases:
+            try:
+                # 対応する作品IDを取得
+                orig_work_id = getattr(release, 'work_id', None)
+                db_work_id = work_id_map.get(orig_work_id)
+                if not db_work_id:
+                    continue
+
+                release_date = getattr(release, 'release_date', None)
+                if release_date and hasattr(release_date, 'isoformat'):
+                    release_date = release_date.strftime("%Y-%m-%d")
+
+                release_type = getattr(release, 'release_type', 'episode')
+                if hasattr(release_type, 'value'):
+                    release_type = release_type.value
+
+                db.create_release(
+                    work_id=db_work_id,
+                    release_type=str(release_type),
+                    number=getattr(release, 'number', None),
+                    platform=getattr(release, "platform", "TV放送"),
+                    release_date=release_date,
+                    source="syoboi",
+                    source_url=getattr(release, "source_url", None),
+                )
+                stored_releases += 1
+            except Exception as e:
+                logger.warning(f"リリース保存エラー: {e}")
+                continue
+
+        logger.info(f"しょぼいカレンダー収集完了: {stored_works}作品, {stored_releases}リリース保存")
+        return {"success": True, "works": stored_works, "releases": stored_releases}
+
+    except Exception as e:
+        logger.error(f"しょぼいカレンダー fetch_and_store エラー: {e}")
+        return {"success": False, "error": str(e)}

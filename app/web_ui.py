@@ -5,12 +5,13 @@ Flask Web UI for Manga/Anime Information Delivery System
 """
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask_wtf.csrf import CSRFProtect
 import sqlite3
 import json
 import os
 from modules.db import DatabaseManager
 from modules.dashboard import dashboard_bp, dashboard_service
-from modules.monitoring import PerformanceMonitor
+from modules.monitoring import SystemMonitor
 import logging
 
 # ログ設定
@@ -18,14 +19,74 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = "your-secret-key-change-this-in-production"
+# セキュリティ: secret_keyを環境変数から取得
+app.secret_key = os.environ.get("SECRET_KEY")
+if not app.secret_key:
+    # 開発環境用フォールバック（本番では必ず環境変数を設定すること）
+    import warnings
+    warnings.warn("SECRET_KEY not set! Using fallback for development only.", RuntimeWarning)
+    app.secret_key = "dev-fallback-key-not-for-production-use"
+
+# CSRF保護を有効化
+csrf = CSRFProtect(app)
+
+# APIエンドポイントはCSRF除外（JSONリクエスト用）
+@app.before_request
+def csrf_protect_exclude_api():
+    if request.path.startswith('/api/') and request.method in ['POST', 'PUT', 'DELETE']:
+        # API呼び出しはCSRFトークン不要（代わりにAPI認証で保護）
+        pass
+
+# セキュリティヘッダーを追加
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
 
 # ダッシュボード Blueprint を登録
 app.register_blueprint(dashboard_bp)
 
 # グローバル変数
 db_manager = DatabaseManager()
-performance_monitor = PerformanceMonitor()
+
+# 設定ファイル読み込み
+_config = {}
+_config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
+if os.path.exists(_config_path):
+    with open(_config_path, "r", encoding="utf-8") as f:
+        _config = json.load(f)
+
+performance_monitor = SystemMonitor(_config)
+
+
+# カスタムテンプレートフィルター
+@app.template_filter('work_type_label')
+def work_type_label_filter(work_type):
+    """作品タイプのラベルを返す"""
+    labels = {
+        'anime': 'アニメ',
+        'manga': 'マンガ',
+        'novel': '小説',
+        'other': 'その他'
+    }
+    return labels.get(work_type, work_type or '不明')
+
+
+@app.template_filter('release_type_label')
+def release_type_label_filter(release_type):
+    """リリースタイプのラベルを返す"""
+    labels = {
+        'episode': '話',
+        'volume': '巻',
+        'chapter': '章',
+        'movie': '映画',
+        'ova': 'OVA',
+        'special': '特別編'
+    }
+    return labels.get(release_type, release_type or '不明')
 
 
 @app.route("/")

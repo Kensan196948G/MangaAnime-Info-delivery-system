@@ -71,19 +71,28 @@ class FeedConfig:
 
     name: str
     url: str
-    category: str
+    type: str = "anime"  # anime or manga
+    category: str = ""
     enabled: bool = True
+    description: str = ""
+    verified: bool = False
+    retry_count: int = 3
+    retry_delay: int = 2
+    timeout: int = 25
 
 
 @dataclass
 class RSSConfig:
     """RSS feeds configuration."""
 
+    enabled: bool = True
     timeout_seconds: int = 20
     user_agent: str = (
         "MangaAnimeNotifier/1.0 (https://github.com/user/manga-anime-notifier)"
     )
     feeds: List[FeedConfig] = field(default_factory=list)
+    max_parallel_workers: int = 5
+    stats: dict = field(default_factory=dict)
 
     def __post_init__(self):
         # Convert dict feeds to FeedConfig objects

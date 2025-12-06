@@ -1560,162 +1560,76 @@ class DAnimeRSSCollector(MangaRSSCollector):
         }
 
 
-@dataclass
-class FeedHealth:
-    """Feed health monitoring data."""
+# モジュールレベルのfetch_and_store関数（collect_all_data.pyから呼び出される）
+def fetch_and_store() -> dict:
+    """
+    マンガRSSフィードからデータを収集しデータベースに保存する。
 
-    url: str
-    last_success: Optional[datetime] = None
-    last_failure: Optional[datetime] = None
-    consecutive_failures: int = 0
-    total_requests: int = 0
-    total_failures: int = 0
-    total_response_time: float = 0.0
+    Returns:
+        dict: 収集結果のサマリー
+    """
+    import logging
+    from .config import get_config
+    from .db import get_db
 
-    @property
-    def is_healthy(self) -> bool:
-        """Check if feed is healthy (less than 5 consecutive failures)."""
-        return self.consecutive_failures < 5
+    logger = logging.getLogger(__name__)
 
-    @property
-    def average_response_time(self) -> float:
-        """Get average response time."""
-        return (
-            self.total_response_time / (self.total_requests - self.total_failures)
-            if (self.total_requests - self.total_failures) > 0
-            else 0.0
-        )
+    try:
+        # 設定取得
+        config_manager = get_config()
 
-    def record_success(self, response_time: float):
-        """Record successful feed access."""
-        self.last_success = datetime.now()
-        self.consecutive_failures = 0
-        self.total_requests += 1
-        self.total_response_time += response_time
+        # コレクター初期化
+        collector = MangaRSSCollector(config_manager)
 
-    def record_failure(self):
-        """Record failed feed access."""
-        self.last_failure = datetime.now()
-        self.consecutive_failures += 1
-        self.total_requests += 1
-        self.total_failures += 1
+        # データ収集
+        items = collector.collect()
 
+        if not items:
+            logger.info("マンガRSSから収集されたアイテムはありません")
+            return {"success": True, "collected": 0, "stored": 0}
 
-class EnhancedRSSParser:
-    """Enhanced RSS parsing utilities."""
+        # データベースに保存
+        db = get_db()
+        stored_count = 0
 
-    def __init__(self):
-        # Compiled regex patterns for better performance
-        self.title_patterns = [
-            re.compile(r"「([^」]+)」"),  # Japanese brackets
-            re.compile(r'"([^"]+)"'),  # English quotes
-            re.compile(r"【([^】]+)】"),  # Japanese square brackets
-            re.compile(r"\[([^\]]+)\]"),  # Square brackets
-            re.compile(r"『([^』]+)』"),  # Double Japanese brackets
-        ]
-
-        self.episode_patterns = [
-            re.compile(r"第(\d+)話"),
-            re.compile(r"#(\d+)"),
-            re.compile(r"Episode\s*(\d+)", re.IGNORECASE),
-            re.compile(r"ep\.?\s*(\d+)", re.IGNORECASE),
-            re.compile(r"(\d+)話"),
-            re.compile(r"第(\d+)回"),
-        ]
-
-        self.volume_patterns = [
-            re.compile(r"第(\d+)巻"),
-            re.compile(r"Vol\.?\s*(\d+)", re.IGNORECASE),
-            re.compile(r"Volume\s*(\d+)", re.IGNORECASE),
-            re.compile(r"(\d+)巻"),
-            re.compile(r"第(\d+)集"),
-        ]
-
-        # Date parsing patterns
-        self.date_patterns = [
-            "%Y-%m-%d %H:%M:%S",
-            "%Y-%m-%d",
-            "%a, %d %b %Y %H:%M:%S %Z",
-            "%a, %d %b %Y %H:%M:%S %z",
-            "%Y-%m-%dT%H:%M:%S%z",
-            "%Y-%m-%dT%H:%M:%SZ",
-            "%Y年%m月%d日",
-        ]
-
-    def extract_title(self, raw_title: str) -> str:
-        """Extract clean title from raw RSS title."""
-        if not raw_title:
-            return ""
-
-        # Try pattern matching first
-        for pattern in self.title_patterns:
-            match = pattern.search(raw_title)
-            if match:
-                return match.group(1).strip()
-
-        # Fallback: clean up common prefixes/suffixes
-        clean_title = raw_title
-
-        # Remove common prefixes
-        prefixes = [
-            "新刊：",
-            "New:",
-            "NEW:",
-            "更新：",
-            "Update:",
-            "Latest:",
-            "New Release:",
-        ]
-        for prefix in prefixes:
-            if clean_title.startswith(prefix):
-                clean_title = clean_title[len(prefix):].strip()
-
-        # Remove publication info at the end
-        clean_title = re.sub(r"\s*\([^)]*出版[^)]*\)$", "", clean_title)
-        clean_title = re.sub(r"\s*\([^)]*発売[^)]*\)$", "", clean_title)
-
-        return clean_title.strip()
-
-    def extract_number_and_type(
-        self, text: str
-    ) -> Tuple[Optional[str], Optional[ReleaseType]]:
-        """Extract episode/volume number and type from text."""
-        if not text:
-            return None, None
-
-        # Try episode patterns first
-        for pattern in self.episode_patterns:
-            match = pattern.search(text)
-            if match:
-                return match.group(1), ReleaseType.EPISODE
-
-        # Try volume patterns
-        for pattern in self.volume_patterns:
-            match = pattern.search(text)
-            if match:
-                return match.group(1), ReleaseType.VOLUME
-
-        return None, None
-
-    def extract_date(self, date_text: str) -> Optional[datetime]:
-        """Extract date from various text formats."""
-        if not date_text:
-            return None
-
-        date_text = date_text.strip()
-
-        for pattern in self.date_patterns:
+        for item in items:
             try:
-                return datetime.strptime(date_text, pattern)
-            except ValueError:
+                title = item.get("title", "Unknown")
+                if not title or title == "Unknown":
+                    continue
+
+                # 作品IDを取得または作成
+                work_id = db.get_or_create_work(
+                    title=title,
+                    work_type="manga",
+                    title_kana=item.get("title_kana"),
+                    title_en=item.get("title_en"),
+                    official_url=item.get("url"),
+                )
+
+                # リリース情報の保存
+                release_date = item.get("release_date")
+                if isinstance(release_date, datetime):
+                    release_date = release_date.strftime("%Y-%m-%d")
+
+                db.create_release(
+                    work_id=work_id,
+                    release_type=item.get("release_type", "volume"),
+                    number=item.get("number"),
+                    platform=item.get("platform", item.get("source")),
+                    release_date=release_date,
+                    source=item.get("source", "rss"),
+                    source_url=item.get("url"),
+                )
+                stored_count += 1
+
+            except Exception as e:
+                logger.warning(f"アイテム保存エラー: {item.get('title', 'Unknown')} - {e}")
                 continue
 
-        # Fallback: try parsing with dateutil if available
-        try:
-            from dateutil import parser as dateutil_parser
+        logger.info(f"マンガRSS収集完了: {len(items)}件収集, {stored_count}件保存")
+        return {"success": True, "collected": len(items), "stored": stored_count}
 
-            return dateutil_parser.parse(date_text)
-        except (ImportError, ValueError):
-            pass
-
-        return None
+    except Exception as e:
+        logger.error(f"マンガRSS fetch_and_store エラー: {e}")
+        return {"success": False, "error": str(e)}
