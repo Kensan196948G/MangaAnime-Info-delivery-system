@@ -11,7 +11,7 @@ Tests:
 """
 
 from modules.models import Work, WorkType
-from modules.filter_logic_enhanced import (
+from modules.filter_logic import (
     ConfigBasedFilterManager,
     EnhancedContentFilter,
     FilterAction,

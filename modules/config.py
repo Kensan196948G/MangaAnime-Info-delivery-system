@@ -723,7 +723,7 @@ class ConfigManager:
             timeout_seconds=anilist_config.get("timeout_seconds", 30),
         )
 
-    def get_rss_config(self) -> RSSConfig:
+    def get_rss_config_object(self) -> RSSConfig:
         """Get RSS feeds configuration object."""
         rss_config = self.get_section("apis").get("rss_feeds", {})
         return RSSConfig(**rss_config)

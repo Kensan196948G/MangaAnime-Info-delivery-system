@@ -30,6 +30,10 @@ if not app.secret_key:
 # CSRF保護を有効化
 csrf = CSRFProtect(app)
 
+# Jinja2グローバル関数の追加
+app.jinja_env.globals['min'] = min
+app.jinja_env.globals['max'] = max
+
 # APIエンドポイントはCSRF除外（JSONリクエスト用）
 @app.before_request
 def csrf_protect_exclude_api():
@@ -89,6 +93,29 @@ def release_type_label_filter(release_type):
     return labels.get(release_type, release_type or '不明')
 
 
+@app.template_filter('datetime_format')
+def datetime_format_filter(value, format='%Y-%m-%d'):
+    """日付/日時を指定フォーマットで文字列化するフィルター"""
+    if value is None:
+        return '-'
+    try:
+        if isinstance(value, str):
+            # 文字列の場合、まずパースを試みる
+            for fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%Y/%m/%d']:
+                try:
+                    value = datetime.strptime(value, fmt)
+                    break
+                except ValueError:
+                    continue
+            else:
+                return value  # パース失敗時は元の文字列を返す
+        if isinstance(value, datetime):
+            return value.strftime(format)
+        return str(value)
+    except (ValueError, TypeError):
+        return str(value) if value else '-'
+
+
 @app.route("/")
 def index():
     """メインページ"""
@@ -138,7 +165,7 @@ def index():
         "upcoming_releases": upcoming_releases,
     }
 
-    return render_template("index.html", releases=releases, stats=stats)
+    return render_template("index.html", releases=releases, stats=stats, now=datetime.now())
 
 
 @app.route("/works")
@@ -147,9 +174,28 @@ def works():
     try:
         search_query = request.args.get("search", "").strip()
         work_type = request.args.get("type", "").strip()
+        page = request.args.get("page", 1, type=int)
+        per_page = 20
+        offset = (page - 1) * per_page
 
         with sqlite3.connect("db.sqlite3") as conn:
             conn.row_factory = sqlite3.Row
+
+            # カウントクエリ
+            count_query = "SELECT COUNT(*) as total FROM works w WHERE 1=1"
+            count_params = []
+
+            if search_query:
+                count_query += " AND (w.title LIKE ? OR w.title_kana LIKE ? OR w.title_en LIKE ?)"
+                search_param = f"%{search_query}%"
+                count_params.extend([search_param, search_param, search_param])
+
+            if work_type:
+                count_query += " AND w.type = ?"
+                count_params.append(work_type)
+
+            count_cursor = conn.execute(count_query, count_params)
+            total = count_cursor.fetchone()["total"]
 
             # 基本クエリ
             query = """
@@ -174,17 +220,35 @@ def works():
                 query += " AND w.type = ?"
                 params.append(work_type)
 
-            query += " GROUP BY w.id ORDER BY w.created_at DESC"
+            query += " GROUP BY w.id ORDER BY w.created_at DESC LIMIT ? OFFSET ?"
+            params.extend([per_page, offset])
 
             cursor = conn.execute(query, params)
             works_data = [dict(row) for row in cursor.fetchall()]
 
+        # ページネーション情報
+        total_pages = (total + per_page - 1) // per_page if total > 0 else 1
+        pagination = {
+            'total_pages': total_pages,
+            'current_page': page,
+            'has_prev': page > 1,
+            'has_next': page < total_pages,
+            'prev_page': page - 1 if page > 1 else None,
+            'next_page': page + 1 if page < total_pages else None,
+            'total': total
+        }
+
     except Exception as e:
         logger.error(f"Error loading works page: {e}")
         works_data = []
+        pagination = {'total_pages': 1, 'current_page': 1, 'has_prev': False, 'has_next': False, 'total': 0}
+        search_query = ""
+        work_type = ""
 
     return render_template(
-        "works.html", works=works_data, search_query=search_query, work_type=work_type
+        "works.html", works=works_data, search_query=search_query,
+        current_type=work_type, pagination=pagination, now=datetime.now(),
+        total_count=pagination['total']
     )
 
 
@@ -344,6 +408,103 @@ def api_system_stats():
     except Exception as e:
         logger.error(f"Error getting system stats: {e}")
         return jsonify({"error": str(e), "timestamp": datetime.now().isoformat()}), 500
+
+
+@app.route("/releases")
+def releases():
+    """リリース履歴ページ"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = 20
+        offset = (page - 1) * per_page
+
+        with sqlite3.connect("db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
+
+            # 総件数を取得
+            count_cursor = conn.execute("SELECT COUNT(*) as total FROM releases")
+            total = count_cursor.fetchone()["total"]
+
+            cursor = conn.execute(
+                """
+                SELECT w.title, r.release_type, r.number, r.platform,
+                       r.release_date, r.notified, w.type, r.source_url, r.created_at
+                FROM releases r
+                JOIN works w ON r.work_id = w.id
+                ORDER BY r.release_date DESC, r.created_at DESC
+                LIMIT ? OFFSET ?
+            """, (per_page, offset)
+            )
+            releases_list = [dict(row) for row in cursor.fetchall()]
+
+        # ページネーション情報
+        total_pages = (total + per_page - 1) // per_page
+        pagination = {
+            'page': page,
+            'per_page': per_page,
+            'total': total,
+            'pages': total_pages,
+            'has_prev': page > 1,
+            'has_next': page < total_pages,
+            'prev_num': page - 1 if page > 1 else None,
+            'next_num': page + 1 if page < total_pages else None
+        }
+    except Exception as e:
+        logger.error(f"Error loading releases: {e}")
+        releases_list = []
+        pagination = {'page': 1, 'per_page': 20, 'total': 0, 'pages': 0, 'has_prev': False, 'has_next': False}
+    return render_template(
+        "releases.html", releases=releases_list, pagination=pagination, now=datetime.now(),
+        current_page=pagination['page'], total_pages=pagination['pages'],
+        work_type=request.args.get('type', ''), platform=request.args.get('platform', ''),
+        search=request.args.get('search', '')
+    )
+
+
+@app.route("/calendar")
+def calendar():
+    """カレンダーページ"""
+    return render_template("calendar.html")
+
+
+@app.route("/config")
+def config():
+    """設定ページ（configエンドポイント）"""
+    try:
+        config_exists = os.path.exists("config.json")
+        config_data = {}
+        if config_exists:
+            with open("config.json", "r", encoding="utf-8") as f:
+                config_data = json.load(f)
+    except Exception as e:
+        logger.error(f"Error loading config: {e}")
+        config_exists = False
+        config_data = {}
+    return render_template("config.html", config_exists=config_exists, config=config_data)
+
+
+@app.route("/logs")
+def logs():
+    """ログ表示ページ"""
+    return render_template("logs.html")
+
+
+@app.route("/collection-dashboard")
+def collection_dashboard():
+    """収集ダッシュボードページ"""
+    return render_template("collection_dashboard.html")
+
+
+@app.route("/data-browser")
+def data_browser():
+    """データブラウザページ"""
+    return render_template("data_browser.html")
+
+
+@app.route("/collection-settings")
+def collection_settings():
+    """収集設定ページ"""
+    return render_template("collection_settings.html")
 
 
 @app.errorhandler(404)

@@ -302,7 +302,8 @@ class MangaRSSCollector:
         manga_feeds = [
             feed
             for feed in self.enabled_feeds
-            if feed.get("category") == "manga" and feed.get("enabled", True)
+            if (feed.get("category") == "manga" or feed.get("type") == "manga")
+            and feed.get("enabled", True)
         ]
 
         if not manga_feeds:
@@ -1045,15 +1046,21 @@ class DuplicateDetector:
         # リリース情報がある場合は含める
         if "releases" in item and item["releases"]:
             release = item["releases"][0]  # 最初のリリース情報を使用
+            release_date = release.get("date", "")
+            # date/datetime オブジェクトを文字列に変換
+            if hasattr(release_date, 'isoformat'):
+                release_date = release_date.isoformat()
+            elif hasattr(release_date, 'strftime'):
+                release_date = release_date.strftime('%Y-%m-%d')
             key_fields.update(
                 {
                     "release_type": release.get("type", ""),
                     "release_number": release.get("number", ""),
-                    "release_date": release.get("date", ""),
+                    "release_date": str(release_date) if release_date else "",
                 }
             )
 
-        hash_string = json.dumps(key_fields, sort_keys=True)
+        hash_string = json.dumps(key_fields, sort_keys=True, default=str)
         return hashlib.sha256(hash_string.encode("utf-8")).hexdigest()
 
     def _is_similar_title_duplicate(self, item: Dict[str, Any]) -> bool:
