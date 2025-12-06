@@ -15,6 +15,9 @@
     </div>
 
     <form method="POST" id="config-form">
+        <!-- CSRF Protection -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <div class="row">
             <!-- General Settings -->
             <div class="col-lg-6 mb-4">
