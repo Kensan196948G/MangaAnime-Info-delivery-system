@@ -1,0 +1,61 @@
+# 自動修復システム（15回ループ・5分待機版）
+# Claude Code専用ワークフロー
+
+name: Auto Repair 15x Loop System
+
+description: |
+  エラー自動検知・修復を最大15回ループ実行
+  15回超過時は5分待機後、再度15回ループ
+  継続的な自動修復を実現
+
+config:
+  max_loops: 15
+  wait_time_seconds: 300  # 5分
+  retry_enabled: true
+  continuous_mode: true
+
+triggers:
+  - on_error
+  - manual
+  - scheduled  # オプション
+
+tasks:
+  - name: エラー検知
+    type: analysis
+    steps:
+      - check_syntax_errors
+      - check_import_errors
+      - check_test_failures
+      - check_lint_errors
+
+  - name: 自動修復実行
+    type: repair
+    steps:
+      - fix_syntax_errors
+      - fix_imports
+      - fix_lint_issues
+      - run_tests
+
+  - name: 検証
+    type: validation
+    steps:
+      - verify_fixes
+      - run_tests
+      - check_no_regression
+
+loop_strategy:
+  type: continuous
+  max_iterations: 15
+  on_max_reached: wait_and_retry
+  wait_duration: 300  # 5分
+  retry_forever: true
+
+error_handling:
+  on_failure:
+    - log_error
+    - create_issue
+    - notify_user
+  on_success:
+    - log_success
+    - update_metrics
+    - close_related_issues
