@@ -124,7 +124,7 @@ class MigrationManager:
             version = int(version_str)
 
             # すでに適用済みならスキップ
-            if version <= current_version:
+            if version <= int(current_version):
                 continue
 
             # ターゲットバージョン指定時はそれを超えたら終了
