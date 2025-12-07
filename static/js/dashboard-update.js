@@ -400,7 +400,7 @@ class DashboardUpdateManager {
                                 ? '<span class="badge bg-primary me-2"><i class="bi bi-tv"></i> アニメ</span>'
                                 : '<span class="badge bg-secondary me-2"><i class="bi bi-book"></i> マンガ</span>'
                             }
-                            <strong>${this.escapeHtml(release.title)}</strong>
+                            <strong>${this.escapeHtml(release.title_kana || release.title)}</strong>
                         </div>
                         <div class="text-muted small">
                             ${release.release_type === 'episode' ? '第' + release.number + '話' : '第' + release.number + '巻'}
@@ -447,7 +447,7 @@ class DashboardUpdateManager {
                                 ? '<span class="badge bg-primary me-2"><i class="bi bi-tv"></i> アニメ</span>'
                                 : '<span class="badge bg-secondary me-2"><i class="bi bi-book"></i> マンガ</span>'
                             }
-                            <strong>${this.escapeHtml(release.title)}</strong>
+                            <strong>${this.escapeHtml(release.title_kana || release.title)}</strong>
                         </div>
                         <div class="text-muted small">
                             ${release.release_type === 'episode' ? '第' + release.number + '話' : '第' + release.number + '巻'}
@@ -490,7 +490,7 @@ class DashboardUpdateManager {
                                 ? '<span class="badge bg-primary me-2"><i class="bi bi-tv"></i> アニメ</span>'
                                 : '<span class="badge bg-secondary me-2"><i class="bi bi-book"></i> マンガ</span>'
                             }
-                            <strong>${this.escapeHtml(release.title)}</strong>
+                            <strong>${this.escapeHtml(release.title_kana || release.title)}</strong>
                         </div>
                         <div class="text-muted small">
                             ${release.release_type === 'episode' ? '第' + release.number + '話' : '第' + release.number + '巻'}
