@@ -27,9 +27,14 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 import time
 import signal
+import os
+
+# 環境変数を.envファイルから読み込み
+from dotenv import load_dotenv
+load_dotenv()
 
 # プロジェクトのルートディレクトリをPythonパスに追加
-project_root = Path(__file__).parent
+project_root = Path(__file__).parent.parent  # app/の親ディレクトリ（プロジェクトルート）
 sys.path.insert(0, str(project_root))
 
 from modules import get_config
