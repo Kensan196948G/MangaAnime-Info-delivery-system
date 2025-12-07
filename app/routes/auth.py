@@ -66,7 +66,14 @@ class UserStore:
     def _init_default_user(self):
         """デフォルト管理者ユーザーを作成"""
         default_username = os.getenv('DEFAULT_ADMIN_USERNAME', 'admin')
-        default_password = os.getenv('DEFAULT_ADMIN_PASSWORD', 'changeme123')
+        default_password = os.getenv('DEFAULT_ADMIN_PASSWORD')
+
+        if not default_password:
+            logger.error('DEFAULT_ADMIN_PASSWORD environment variable is required')
+            raise ValueError(
+                'DEFAULT_ADMIN_PASSWORD environment variable must be set in .env file. '
+                'This is a security requirement to prevent using default passwords.'
+            )
 
         admin_user = User(
             id='1',
@@ -485,8 +492,8 @@ def reset_password(token):
         password_confirm = request.form.get('password_confirm', '')
 
         # バリデーション
-        if not password or len(password) < 6:
-            flash('パスワードは6文字以上で入力してください。', 'warning')
+        if not password or len(password) < 8:
+            flash('パスワードは8文字以上で入力してください。セキュリティ強化のため、大文字・小文字・数字を含めることを推奨します。', 'warning')
             return render_template('auth/reset_password.html', token=token)
 
         if password != password_confirm:
