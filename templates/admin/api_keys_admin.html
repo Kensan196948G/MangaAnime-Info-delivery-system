@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}APIキー管理（管理者）{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="fas fa-key"></i> APIキー管理（管理者）</h2>
+            <p class="text-muted">全ユーザーのAPIキーを管理</p>
+        </div>
+    </div>
+
+    <!-- 統計情報 -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">総キー数</h6>
+                    <h3>{{ stats.total_keys }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">アクティブ</h6>
+                    <h3>{{ stats.active_keys }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">無効化済み</h6>
+                    <h3>{{ stats.inactive_keys }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">総使用回数</h6>
+                    <h3>{{ stats.total_usage }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APIキー一覧 -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">全APIキー一覧</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ユーザーID</th>
+                                    <th>名前</th>
+                                    <th>キー</th>
+                                    <th>権限</th>
+                                    <th>使用回数</th>
+                                    <th>最終使用</th>
+                                    <th>状態</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key in api_keys %}
+                                <tr class="{% if not key.is_active %}table-secondary{% endif %}">
+                                    <td><code>{{ key.user_id }}</code></td>
+                                    <td>{{ key.name }}</td>
+                                    <td><code>{{ key.key[:10] }}...{{ key.key[-4:] }}</code></td>
+                                    <td>
+                                        {% for perm in key.permissions %}
+                                            <span class="badge badge-info">{{ perm }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{ key.usage_count }}</td>
+                                    <td>
+                                        {% if key.last_used %}
+                                            {{ key.last_used.strftime('%Y-%m-%d %H:%M') }}
+                                        {% else %}
+                                            未使用
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if key.is_active %}
+                                            <span class="badge badge-success">有効</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">無効</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

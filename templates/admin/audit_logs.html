@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+
+{% block title %}監査ログ - 管理者画面{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .event-success {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .event-failure {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .event-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .event-info {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+
+    .log-table {
+        font-size: 0.9rem;
+    }
+
+    .log-table td {
+        vertical-align: middle;
+    }
+
+    .filter-panel {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stats-card {
+        border-left: 4px solid;
+        transition: transform 0.2s;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .timestamp-cell {
+        white-space: nowrap;
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .detail-modal .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .json-viewer {
+        background-color: #f3f4f6;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        white-space: pre-wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">監査ログ</h2>
+                    <p class="text-muted mb-0">システムの全活動ログを監視・分析</p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-primary me-2" onclick="refreshLogs()">
+                        <i class="bi bi-arrow-clockwise"></i> 更新
+                    </button>
+                    <button class="btn btn-success" onclick="exportLogs()">
+                        <i class="bi bi-download"></i> CSV エクスポート
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 統計カード -->
+    <div class="row mb-4" id="stats-cards">
+        <div class="col-md-3">
+            <div class="card stats-card" style="border-left-color: #3b82f6;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">総イベント数</p>
+                            <h3 class="mb-0" id="stat-total">{{ total_count }}</h3>
+                        </div>
+                        <i class="bi bi-graph-up fs-2 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card" style="border-left-color: #10b981;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">成功</p>
+                            <h3 class="mb-0 text-success" id="stat-success">-</h3>
+                        </div>
+                        <i class="bi bi-check-circle fs-2 text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card" style="border-left-color: #ef4444;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">失敗</p>
+                            <h3 class="mb-0 text-danger" id="stat-failure">-</h3>
+                        </div>
+                        <i class="bi bi-x-circle fs-2 text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card" style="border-left-color: #f59e0b;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">警告</p>
+                            <h3 class="mb-0 text-warning" id="stat-warning">-</h3>
+                        </div>
+                        <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- フィルタパネル -->
+    <div class="filter-panel">
+        <form method="get" action="{{ url_for('audit.audit_logs') }}" id="filter-form">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">イベントタイプ</label>
+                    <select class="form-select" name="event_type" onchange="this.form.submit()">
+                        <option value="">すべて</option>
+                        {% for et in event_types %}
+                        <option value="{{ et }}" {% if filters.event_type == et %}selected{% endif %}>
+                            {{ et }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">ユーザー</label>
+                    <select class="form-select" name="user_id" onchange="this.form.submit()">
+                        <option value="">すべて</option>
+                        {% for user in users %}
+                        <option value="{{ user }}" {% if filters.user_id == user %}selected{% endif %}>
+                            {{ user }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">開始日</label>
+                    <input type="date" class="form-control" name="start_date" value="{{ filters.start_date }}" onchange="this.form.submit()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">終了日</label>
+                    <input type="date" class="form-control" name="end_date" value="{{ filters.end_date }}" onchange="this.form.submit()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">検索</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" value="{{ filters.search }}" placeholder="キーワード">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% if filters.event_type or filters.user_id or filters.start_date or filters.end_date or filters.search %}
+            <div class="mt-3">
+                <a href="{{ url_for('audit.audit_logs') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> フィルタをクリア
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- ログテーブル -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">ログエントリ ({{ total_count }}件)</h5>
+                <div>
+                    <select class="form-select form-select-sm" name="per_page" onchange="changePerPage(this.value)">
+                        <option value="25" {% if per_page == 25 %}selected{% endif %}>25件</option>
+                        <option value="50" {% if per_page == 50 %}selected{% endif %}>50件</option>
+                        <option value="100" {% if per_page == 100 %}selected{% endif %}>100件</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover log-table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 180px;">タイムスタンプ</th>
+                            <th style="width: 200px;">イベントタイプ</th>
+                            <th style="width: 120px;">ユーザー</th>
+                            <th style="width: 150px;">IPアドレス</th>
+                            <th>詳細</th>
+                            <th style="width: 100px;">ステータス</th>
+                            <th style="width: 80px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if logs %}
+                            {% for log in logs %}
+                            <tr>
+                                <td class="timestamp-cell">
+                                    <i class="bi bi-clock"></i>
+                                    {{ log.timestamp }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ log.event_type }}</span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-person-circle"></i>
+                                    {{ log.user_id or 'system' }}
+                                </td>
+                                <td>
+                                    <code>{{ log.ip_address or '-' }}</code>
+                                </td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 300px;" title="{{ log.details }}">
+                                        {{ log.details }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if log.status == 'success' %}
+                                    <span class="event-badge event-success">
+                                        <i class="bi bi-check-circle"></i> 成功
+                                    </span>
+                                    {% elif log.status == 'failure' %}
+                                    <span class="event-badge event-failure">
+                                        <i class="bi bi-x-circle"></i> 失敗
+                                    </span>
+                                    {% elif log.status == 'warning' %}
+                                    <span class="event-badge event-warning">
+                                        <i class="bi bi-exclamation-triangle"></i> 警告
+                                    </span>
+                                    {% else %}
+                                    <span class="event-badge event-info">
+                                        <i class="bi bi-info-circle"></i> 情報
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick='showDetail({{ log.id }}, {{ log|tojson }})'>
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                                    <p class="text-muted">ログが見つかりません</p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ページネーション -->
+        {% if total_pages > 1 %}
+        <div class="card-footer bg-white">
+            <nav aria-label="ログページネーション">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('audit.audit_logs', page=page-1, per_page=per_page, **filters) }}">
+                            前へ
+                        </a>
+                    </li>
+
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('audit.audit_logs', page=p, per_page=per_page, **filters) }}">
+                                {{ p }}
+                            </a>
+                        </li>
+                        {% elif p == page - 3 or p == page + 3 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('audit.audit_logs', page=page+1, per_page=per_page, **filters) }}">
+                            次へ
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 詳細モーダル -->
+<div class="modal fade detail-modal" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">ログ詳細</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <!-- 動的に挿入 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 統計情報を取得して表示
+function loadStats() {
+    fetch('/admin/api/audit-logs/stats?days=7')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                const stats = data.data;
+                document.getElementById('stat-success').textContent = stats.success || 0;
+                document.getElementById('stat-failure').textContent = stats.failure || 0;
+                document.getElementById('stat-warning').textContent = stats.warning || 0;
+            }
+        })
+        .catch(error => console.error('Error loading stats:', error));
+}
+
+// ログを更新
+function refreshLogs() {
+    location.reload();
+}
+
+// CSVエクスポート
+function exportLogs() {
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = '/admin/api/audit-logs/export?' + params.toString();
+}
+
+// 表示件数変更
+function changePerPage(value) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('per_page', value);
+    params.set('page', 1);
+    window.location.search = params.toString();
+}
+
+// 詳細モーダル表示
+function showDetail(logId, logData) {
+    const modalBody = document.getElementById('modal-body-content');
+
+    const html = `
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>ID:</strong> ${logData.id}</p>
+                <p><strong>タイムスタンプ:</strong> ${logData.timestamp}</p>
+                <p><strong>イベントタイプ:</strong> <span class="badge bg-secondary">${logData.event_type}</span></p>
+                <p><strong>ステータス:</strong> ${getStatusBadge(logData.status)}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>ユーザー:</strong> ${logData.user_id || 'system'}</p>
+                <p><strong>IPアドレス:</strong> <code>${logData.ip_address || '-'}</code></p>
+                <p><strong>ユーザーエージェント:</strong> ${logData.user_agent || '-'}</p>
+            </div>
+        </div>
+        <hr>
+        <h6>詳細情報</h6>
+        <div class="json-viewer">${escapeHtml(logData.details)}</div>
+        ${logData.metadata ? `
+        <h6 class="mt-3">メタデータ</h6>
+        <div class="json-viewer">${escapeHtml(JSON.stringify(JSON.parse(logData.metadata), null, 2))}</div>
+        ` : ''}
+    `;
+
+    modalBody.innerHTML = html;
+
+    const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+    modal.show();
+}
+
+// ステータスバッジを生成
+function getStatusBadge(status) {
+    const badges = {
+        'success': '<span class="event-badge event-success"><i class="bi bi-check-circle"></i> 成功</span>',
+        'failure': '<span class="event-badge event-failure"><i class="bi bi-x-circle"></i> 失敗</span>',
+        'warning': '<span class="event-badge event-warning"><i class="bi bi-exclamation-triangle"></i> 警告</span>',
+        'info': '<span class="event-badge event-info"><i class="bi bi-info-circle"></i> 情報</span>'
+    };
+    return badges[status] || badges['info'];
+}
+
+// HTMLエスケープ
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ページ読み込み時に統計を取得
+document.addEventListener('DOMContentLoaded', function() {
+    loadStats();
+
+    // 自動更新（オプション: 30秒ごと）
+    // setInterval(refreshLogs, 30000);
+});
+</script>
+{% endblock %}

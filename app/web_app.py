@@ -3926,6 +3926,14 @@ except ImportError as e:
             return f
         return decorator
 
+# Register audit log viewer blueprint
+try:
+    from app.routes.audit import audit_bp
+    app.register_blueprint(audit_bp)
+    logger.info("Audit log viewer blueprint registered: /admin/audit-logs")
+except ImportError as e:
+    logger.warning(f"Audit log viewer blueprint not available: {e}")
+
 # Register health check blueprint
 try:
     from app.routes.health import health_bp

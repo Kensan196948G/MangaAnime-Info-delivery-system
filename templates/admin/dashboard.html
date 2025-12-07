@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+
+{% block title %}管理ダッシュボード{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .stat-card h3 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .stat-card p {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .stat-card.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .stat-card.success {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .stat-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .stat-card.warning {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+    }
+
+    .stat-card.primary p,
+    .stat-card.success p,
+    .stat-card.info p,
+    .stat-card.warning p {
+        color: rgba(255,255,255,0.9);
+    }
+
+    .alert-card {
+        border-left: 4px solid;
+        margin-bottom: 10px;
+    }
+
+    .alert-card.danger {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+    }
+
+    .alert-card.warning {
+        border-color: #ffc107;
+        background-color: #fff3cd;
+    }
+
+    .alert-card.info {
+        border-color: #17a2b8;
+        background-color: #d1ecf1;
+    }
+
+    .timeline-item {
+        border-left: 3px solid #dee2e6;
+        padding-left: 20px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -7px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #dc3545;
+        border: 2px solid white;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .badge-custom {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    .refresh-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .refresh-btn:hover {
+        background: #764ba2;
+        transform: scale(1.1);
+    }
+
+    .refresh-btn.spinning {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">管理ダッシュボード</h1>
+            <p class="text-muted">システム全体の監視とセキュリティ管理</p>
+        </div>
+        <div class="col-auto">
+            <span class="text-muted" id="last-update">最終更新: -</span>
+        </div>
+    </div>
+
+    <!-- 統計カード -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card primary">
+                <h3 id="stat-total-users">{{ stats.total_users }}</h3>
+                <p>総ユーザー数</p>
+                <small>アクティブ: <span id="stat-active-users">{{ stats.active_users }}</span></small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card success">
+                <h3 id="stat-api-keys">{{ stats.active_api_keys }}</h3>
+                <p>アクティブAPIキー</p>
+                <small>有効なキーの総数</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card info">
+                <h3 id="stat-audit-logs">{{ stats.audit_logs_24h }}</h3>
+                <p>監査ログ（24h）</p>
+                <small>失敗ログイン: <span id="stat-failed-logins">{{ stats.failed_logins_24h }}</span></small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card warning">
+                <h3 id="stat-locked-accounts">{{ stats.locked_accounts }}</h3>
+                <p>ロック中アカウント</p>
+                <small>要注意</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- セキュリティアラート -->
+        <div class="col-md-6">
+            <h2 class="section-title">セキュリティアラート</h2>
+            <div id="security-alerts">
+                {% if security_alerts %}
+                    {% for alert in security_alerts %}
+                    <div class="alert alert-card {{ alert.level }}" role="alert">
+                        <strong>
+                            {% if alert.level == 'danger' %}
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            {% elif alert.level == 'warning' %}
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle-fill"></i>
+                            {% endif %}
+                            {{ alert.type }}
+                        </strong>
+                        <p class="mb-0 mt-2">{{ alert.message }}</p>
+                        <small class="text-muted">{{ alert.timestamp }}</small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle-fill"></i> 現在アラートはありません
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ロック中アカウント -->
+        <div class="col-md-6">
+            <h2 class="section-title">ロック中アカウント</h2>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th>ユーザー名</th>
+                            <th>メール</th>
+                            <th>ロック解除</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="locked-accounts-table">
+                        {% if locked_accounts %}
+                            {% for account in locked_accounts %}
+                            <tr>
+                                <td>{{ account.username }}</td>
+                                <td>{{ account.email }}</td>
+                                <td>{{ account.locked_until }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning unlock-btn"
+                                            data-user-id="{{ account.id }}"
+                                            data-username="{{ account.username }}">
+                                        <i class="bi bi-unlock"></i> 解除
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">ロック中のアカウントはありません</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近の失敗ログイン -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h2 class="section-title">最近の失敗ログイン</h2>
+            <div class="card">
+                <div class="card-body">
+                    <div id="recent-failures-timeline">
+                        {% if recent_failures %}
+                            {% for failure in recent_failures %}
+                            <div class="timeline-item">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ failure.username }}</strong>
+                                        <span class="badge bg-danger badge-custom">失敗</span>
+                                    </div>
+                                    <small class="text-muted">{{ failure.timestamp }}</small>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    IPアドレス: {{ failure.ip_address }}
+                                    {% if failure.details %}
+                                    <br>詳細: {{ failure.details }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-center text-muted">最近の失敗ログインはありません</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- クイックアクション -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h2 class="section-title">クイックアクション</h2>
+            <div class="btn-group" role="group">
+                <a href="/admin/security" class="btn btn-primary">
+                    <i class="bi bi-shield-lock"></i> セキュリティダッシュボード
+                </a>
+                <a href="/admin/users" class="btn btn-secondary">
+                    <i class="bi bi-people"></i> ユーザー管理
+                </a>
+                <a href="/admin/audit" class="btn btn-info">
+                    <i class="bi bi-list-ul"></i> 監査ログ
+                </a>
+                <a href="/admin/api-keys" class="btn btn-success">
+                    <i class="bi bi-key"></i> APIキー管理
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- リフレッシュボタン -->
+<button class="refresh-btn" id="refresh-btn" title="データを更新">
+    <i class="bi bi-arrow-clockwise"></i>
+</button>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 自動リフレッシュ設定
+    let autoRefreshInterval = null;
+
+    // 統計データを更新
+    function updateDashboard() {
+        const refreshBtn = document.getElementById('refresh-btn');
+        refreshBtn.classList.add('spinning');
+
+        fetch('/admin/api/dashboard-stats')
+            .then(response => response.json())
+            .then(data => {
+                // 統計カード更新
+                document.getElementById('stat-total-users').textContent = data.total_users;
+                document.getElementById('stat-active-users').textContent = data.active_users;
+                document.getElementById('stat-api-keys').textContent = data.active_api_keys;
+                document.getElementById('stat-audit-logs').textContent = data.audit_logs_24h;
+                document.getElementById('stat-failed-logins').textContent = data.failed_logins_24h;
+                document.getElementById('stat-locked-accounts').textContent = data.locked_accounts;
+
+                // 最終更新時刻
+                const now = new Date();
+                document.getElementById('last-update').textContent =
+                    '最終更新: ' + now.toLocaleTimeString('ja-JP');
+            })
+            .catch(error => console.error('Error updating dashboard:', error))
+            .finally(() => {
+                refreshBtn.classList.remove('spinning');
+            });
+
+        // セキュリティアラート更新
+        updateSecurityAlerts();
+    }
+
+    // セキュリティアラート更新
+    function updateSecurityAlerts() {
+        fetch('/admin/api/security-alerts')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('security-alerts');
+                if (data.alerts && data.alerts.length > 0) {
+                    container.innerHTML = data.alerts.map(alert => `
+                        <div class="alert alert-card ${alert.level}" role="alert">
+                            <strong>
+                                <i class="bi bi-${alert.level === 'danger' ? 'exclamation-triangle' : 'info-circle'}-fill"></i>
+                                ${alert.type}
+                            </strong>
+                            <p class="mb-0 mt-2">${alert.message}</p>
+                            <small class="text-muted">${alert.timestamp}</small>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle-fill"></i> 現在アラートはありません
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => console.error('Error updating alerts:', error));
+    }
+
+    // アカウントロック解除
+    function unlockAccount(userId, username) {
+        if (!confirm(`${username} のロックを解除しますか?`)) {
+            return;
+        }
+
+        fetch(`/admin/api/unlock-account/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('アカウントのロックを解除しました');
+                location.reload();
+            } else {
+                alert('エラー: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error unlocking account:', error);
+            alert('ロック解除に失敗しました');
+        });
+    }
+
+    // イベントリスナー設定
+    document.addEventListener('DOMContentLoaded', function() {
+        // リフレッシュボタン
+        document.getElementById('refresh-btn').addEventListener('click', updateDashboard);
+
+        // ロック解除ボタン
+        document.querySelectorAll('.unlock-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const username = this.dataset.username;
+                unlockAccount(userId, username);
+            });
+        });
+
+        // 自動リフレッシュ（30秒ごと）
+        autoRefreshInterval = setInterval(updateDashboard, 30000);
+    });
+
+    // ページを離れる前にクリーンアップ
+    window.addEventListener('beforeunload', function() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+        }
+    });
+</script>
+{% endblock %}
