@@ -69,7 +69,7 @@ try:
     from app.routes.auth import auth_bp, init_login_manager, admin_required
 
     # 認証Blueprintを登録
-    app.register_blueprint(auth_bp)
+    app.register_bluelogger.info(auth_bp)
 
     # LoginManagerを初期化
     login_manager = init_login_manager(app)
@@ -3908,7 +3908,7 @@ def api_calendar_monthly():
 # Register users management blueprint
 try:
     from app.routes.users import users_bp
-    app.register_blueprint(users_bp)
+    app.register_bluelogger.info(users_bp)
     logger.info("Users management blueprint registered: /users")
 except ImportError as e:
     logger.warning(f"Users management blueprint not available: {e}")
@@ -3916,7 +3916,7 @@ except ImportError as e:
 # Register API key management blueprint
 try:
     from app.routes.api_key import api_key_bp, api_key_required
-    app.register_blueprint(api_key_bp)
+    app.register_bluelogger.info(api_key_bp)
     logger.info("API key management blueprint registered: /api-keys")
 except ImportError as e:
     logger.warning(f"API key management blueprint not available: {e}")
@@ -3929,10 +3929,18 @@ except ImportError as e:
 # Register audit log viewer blueprint
 try:
     from app.routes.audit import audit_bp
-    app.register_blueprint(audit_bp)
+    app.register_bluelogger.info(audit_bp)
     logger.info("Audit log viewer blueprint registered: /admin/audit-logs")
 except ImportError as e:
     logger.warning(f"Audit log viewer blueprint not available: {e}")
+
+# Register watchlist blueprint
+try:
+    from app.routes.watchlist import watchlist_bp
+    app.register_blueprint(watchlist_bp)
+    logger.info("Watchlist blueprint registered: /watchlist")
+except ImportError as e:
+    logger.warning(f"Watchlist blueprint not available: {e}")
 
 # Register health check blueprint
 try:
