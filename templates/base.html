@@ -509,10 +509,20 @@
         
         // Enhanced error handling
         window.addEventListener('error', function(e) {
+            // ブラウザ拡張機能のエラーを無視
+            if (e.filename && (
+                e.filename.includes('all.iife.js') ||
+                e.filename.includes('chrome-extension://') ||
+                e.filename.includes('moz-extension://') ||
+                e.filename.includes('edge://')
+            )) {
+                return; // 拡張機能エラーは無視
+            }
+
             console.error('JavaScript Error:', e.error);
-            
-            // Show user-friendly error message
-            if (window.AnimeManagaSystem) {
+
+            // アプリケーション自身のエラーのみ通知
+            if (window.AnimeManagaSystem && e.filename && e.filename.includes('/static/')) {
                 window.AnimeManagaSystem.showNotification('エラーが発生しました。ページを更新してください。', 'error');
             }
         });
