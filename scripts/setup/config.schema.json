@@ -1,0 +1,363 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MangaAnime Info Delivery System Configuration",
+  "description": "アニメ・マンガ最新情報配信システムの設定スキーマ",
+  "type": "object",
+  "required": ["notifications", "filters", "sources"],
+  "properties": {
+    "notifications": {
+      "type": "object",
+      "description": "通知関連の設定",
+      "required": ["email", "calendar"],
+      "properties": {
+        "email": {
+          "type": "object",
+          "description": "メール通知設定",
+          "required": ["enabled", "to"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "メール通知の有効/無効"
+            },
+            "to": {
+              "type": "string",
+              "format": "email",
+              "description": "送信先メールアドレス"
+            },
+            "subject_prefix": {
+              "type": "string",
+              "description": "件名のプレフィックス",
+              "default": "[アニメ・マンガ情報]"
+            },
+            "send_time": {
+              "type": "string",
+              "pattern": "^([0-1][0-9]|2[0-3]):[0-5][0-9]$",
+              "description": "送信時刻 (HH:MM形式)",
+              "default": "08:00"
+            },
+            "html_template": {
+              "type": "string",
+              "description": "HTMLテンプレートファイルのパス"
+            }
+          }
+        },
+        "calendar": {
+          "type": "object",
+          "description": "Googleカレンダー設定",
+          "required": ["enabled", "calendar_id"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "カレンダー連携の有効/無効"
+            },
+            "calendar_id": {
+              "type": "string",
+              "description": "GoogleカレンダーID",
+              "default": "primary"
+            },
+            "event_title_format": {
+              "type": "string",
+              "description": "イベントタイトルのフォーマット",
+              "default": "{title} {type} {number}"
+            },
+            "color_by_genre": {
+              "type": "boolean",
+              "description": "ジャンル別の色分け",
+              "default": true
+            },
+            "reminder_minutes": {
+              "type": "array",
+              "description": "リマインダー設定（分前）",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "default": [1440, 60]
+            },
+            "default_duration_minutes": {
+              "type": "integer",
+              "description": "デフォルトイベント時間（分）",
+              "minimum": 1,
+              "default": 30
+            }
+          }
+        }
+      }
+    },
+    "filters": {
+      "type": "object",
+      "description": "フィルタリング設定",
+      "properties": {
+        "ng_keywords": {
+          "type": "array",
+          "description": "除外キーワードリスト",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "min_rating": {
+          "type": ["number", "null"],
+          "description": "最低評価（AniListスコア）",
+          "minimum": 0,
+          "maximum": 100,
+          "default": null
+        },
+        "excluded_genres": {
+          "type": "array",
+          "description": "除外ジャンル",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "apply_to_description": {
+          "type": "boolean",
+          "description": "説明文にもフィルタを適用",
+          "default": true
+        },
+        "case_sensitive": {
+          "type": "boolean",
+          "description": "大文字小文字を区別",
+          "default": false
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "description": "データソース設定",
+      "required": ["anime", "manga", "streaming"],
+      "properties": {
+        "anime": {
+          "type": "array",
+          "description": "アニメ情報ソース",
+          "items": {
+            "type": "string",
+            "enum": ["anilist", "syobocal", "annict"]
+          },
+          "minItems": 1
+        },
+        "manga": {
+          "type": "array",
+          "description": "マンガ情報ソース",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "streaming": {
+          "type": "array",
+          "description": "配信情報ソース",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "retry_on_failure": {
+          "type": "boolean",
+          "description": "失敗時のリトライ",
+          "default": true
+        },
+        "max_retries": {
+          "type": "integer",
+          "description": "最大リトライ回数",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 3
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "description": "タイムアウト（秒）",
+          "minimum": 1,
+          "maximum": 300,
+          "default": 30
+        }
+      }
+    },
+    "database": {
+      "type": "object",
+      "description": "データベース設定",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "SQLiteデータベースファイルのパス",
+          "default": "db.sqlite3"
+        },
+        "backup_enabled": {
+          "type": "boolean",
+          "description": "自動バックアップの有効化",
+          "default": true
+        },
+        "backup_interval_days": {
+          "type": "integer",
+          "description": "バックアップ間隔（日）",
+          "minimum": 1,
+          "default": 7
+        },
+        "backup_path": {
+          "type": "string",
+          "description": "バックアップ保存先"
+        },
+        "max_backups": {
+          "type": "integer",
+          "description": "最大バックアップ数",
+          "minimum": 1,
+          "default": 30
+        },
+        "vacuum_on_startup": {
+          "type": "boolean",
+          "description": "起動時にVACUUM実行",
+          "default": false
+        }
+      }
+    },
+    "logging": {
+      "type": "object",
+      "description": "ログ設定",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+          "description": "ログレベル",
+          "default": "INFO"
+        },
+        "file": {
+          "type": "string",
+          "description": "ログファイルのパス",
+          "default": "logs/system.log"
+        },
+        "max_bytes": {
+          "type": "integer",
+          "description": "ログファイルの最大サイズ（バイト）",
+          "minimum": 1024,
+          "default": 10485760
+        },
+        "backup_count": {
+          "type": "integer",
+          "description": "ログファイルのバックアップ数",
+          "minimum": 0,
+          "default": 5
+        },
+        "format": {
+          "type": "string",
+          "description": "ログフォーマット"
+        },
+        "error_notification": {
+          "type": "boolean",
+          "description": "エラー時のメール通知",
+          "default": false
+        }
+      }
+    },
+    "scheduling": {
+      "type": "object",
+      "description": "スケジューリング設定",
+      "properties": {
+        "cron_expression": {
+          "type": "string",
+          "description": "cron式",
+          "default": "0 8 * * *"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "タイムゾーン",
+          "default": "Asia/Tokyo"
+        },
+        "max_execution_time_minutes": {
+          "type": "integer",
+          "description": "最大実行時間（分）",
+          "minimum": 1,
+          "default": 30
+        },
+        "concurrent_workers": {
+          "type": "integer",
+          "description": "並列ワーカー数",
+          "minimum": 1,
+          "maximum": 16,
+          "default": 4
+        }
+      }
+    },
+    "api": {
+      "type": "object",
+      "description": "API設定",
+      "properties": {
+        "rate_limiting": {
+          "type": "object",
+          "description": "レート制限設定",
+          "properties": {
+            "anilist_requests_per_minute": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 90,
+              "default": 85
+            },
+            "rss_requests_per_minute": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 30
+            }
+          }
+        },
+        "cache": {
+          "type": "object",
+          "description": "キャッシュ設定",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "ttl_seconds": {
+              "type": "integer",
+              "minimum": 60,
+              "default": 3600
+            }
+          }
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "description": "セキュリティ設定",
+      "properties": {
+        "credentials_path": {
+          "type": "string",
+          "description": "認証情報ディレクトリのパス"
+        },
+        "token_encryption": {
+          "type": "boolean",
+          "description": "トークンの暗号化",
+          "default": false
+        },
+        "ssl_verify": {
+          "type": "boolean",
+          "description": "SSL証明書の検証",
+          "default": true
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "description": "パフォーマンス設定",
+      "properties": {
+        "batch_size": {
+          "type": "integer",
+          "description": "バッチ処理のサイズ",
+          "minimum": 1,
+          "default": 50
+        },
+        "connection_pool_size": {
+          "type": "integer",
+          "description": "コネクションプールサイズ",
+          "minimum": 1,
+          "default": 10
+        },
+        "enable_profiling": {
+          "type": "boolean",
+          "description": "プロファイリングの有効化",
+          "default": false
+        }
+      }
+    }
+  }
+}

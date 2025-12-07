@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}ウォッチリスト - MangaAnime Info{% endblock %}
+
+{% block extra_css %}
+<style>
+    .watchlist-card {
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+
+    .watchlist-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .watchlist-card.anime {
+        border-left-color: #007bff;
+    }
+
+    .watchlist-card.manga {
+        border-left-color: #28a745;
+    }
+
+    .notification-toggle {
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .notification-toggle.active {
+        color: #ffc107;
+    }
+
+    .notification-toggle.inactive {
+        color: #6c757d;
+    }
+
+    .watchlist-stats {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+
+    .priority-badge {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+
+    .priority-1 { background-color: #6c757d; }
+    .priority-2 { background-color: #17a2b8; }
+    .priority-3 { background-color: #ffc107; }
+    .priority-4 { background-color: #fd7e14; }
+    .priority-5 { background-color: #dc3545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-star-fill text-warning"></i>
+            ウォッチリスト
+        </h2>
+        <div>
+            <button class="btn btn-outline-primary" id="refreshBtn">
+                <i class="bi bi-arrow-clockwise"></i> 更新
+            </button>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- 統計情報 -->
+    <div class="watchlist-stats" id="statsContainer">
+        <div class="row">
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-number" id="statTotal">0</div>
+                <div class="stat-label">総作品数</div>
+            </div>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-number" id="statAnime">0</div>
+                <div class="stat-label">アニメ</div>
+            </div>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-number" id="statManga">0</div>
+                <div class="stat-label">マンガ</div>
+            </div>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-number" id="statNotify">0</div>
+                <div class="stat-label">通知有効</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ウォッチリスト一覧 -->
+    <div id="watchlistContainer">
+        {% if watchlist and watchlist|length > 0 %}
+        <div class="row" id="watchlistItems">
+            {% for item in watchlist %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card watchlist-card {{ item.type }}" data-work-id="{{ item.work_id }}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">
+                                <span class="badge bg-{{ 'primary' if item.type == 'anime' else 'success' }}">
+                                    {{ 'アニメ' if item.type == 'anime' else 'マンガ' }}
+                                </span>
+                            </h5>
+                            <button class="btn btn-sm btn-outline-danger remove-btn"
+                                    data-work-id="{{ item.work_id }}"
+                                    title="削除">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+
+                        <h6 class="mb-2">{{ item.title }}</h6>
+
+                        {% if item.title_en %}
+                        <p class="text-muted small mb-2">{{ item.title_en }}</p>
+                        {% endif %}
+
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i>
+                                登録日: {{ item.created_at[:10] }}
+                            </small>
+                        </div>
+
+                        {% if item.latest_release %}
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar-check"></i>
+                                最新配信: {{ item.latest_release }}
+                            </small>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <span class="notification-toggle {{ 'active' if item.notify_new_episodes else 'inactive' }}"
+                                      data-work-id="{{ item.work_id }}"
+                                      data-type="episodes"
+                                      data-enabled="{{ item.notify_new_episodes }}"
+                                      title="エピソード通知">
+                                    <i class="bi bi-bell{{ '-fill' if item.notify_new_episodes else '' }}"></i>
+                                    話
+                                </span>
+                                <span class="notification-toggle {{ 'active' if item.notify_new_volumes else 'inactive' }} ms-3"
+                                      data-work-id="{{ item.work_id }}"
+                                      data-type="volumes"
+                                      data-enabled="{{ item.notify_new_volumes }}"
+                                      title="巻数通知">
+                                    <i class="bi bi-bell{{ '-fill' if item.notify_new_volumes else '' }}"></i>
+                                    巻
+                                </span>
+                            </div>
+
+                            {% if item.official_url %}
+                            <a href="{{ item.official_url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-box-arrow-up-right"></i> 公式
+                            </a>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="bi bi-collection"></i>
+                                エピソード: {{ item.episode_count or 0 }} /
+                                巻: {{ item.volume_count or 0 }}
+                            </small>
+                        div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-star"></i>
+            <h3>ウォッチリストが空です</h3>
+            <p>気になる作品を追加して、新エピソードや新刊の通知を受け取りましょう</p>
+            <a href="/" class="btn btn-primary mt-3">
+                <i class="bi bi-search"></i> 作品を探す
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // 統計情報を取得
+    function loadStats() {
+        $.get('/watchlist/api/stats', function(response) {
+            if (response.success) {
+                $('#statTotal').text(response.stats.total);
+                $('#statAnime').text(response.stats.anime);
+                $('#statManga').text(response.stats.manga);
+                $('#statNotify').text(response.stats.notify_episodes + response.stats.notify_volumes);
+            }
+        });
+    }
+
+    // 初期ロード
+    loadStats();
+
+    // 更新ボタン
+    $('#refreshBtn').click(function() {
+        location.reload();
+    });
+
+    // 削除ボタン
+    $('.remove-btn').click(function() {
+        const workId = $(this).data('work-id');
+        const card = $(this).closest('.watchlist-card');
+
+        if (!confirm('この作品をウォッチリストから削除しますか？')) {
+            return;
+        }
+
+        $.ajax({
+            url: `/watchlist/api/remove/${workId}`,
+            method: 'DELETE',
+            success: function(response) {
+                if (response.success) {
+                    // カードをフェードアウト
+                    card.fadeOut(300, function() {
+                        $(this).remove();
+
+                        // 空の場合は空状態を表示
+                        if ($('.watchlist-card').length === 0) {
+                            $('#watchlistItems').html(`
+                                <div class="empty-state">
+                                    <i class="bi bi-star"></i>
+                                    <h3>ウォッチリストが空です</h3>
+                                    <p>気になる作品を追加して、新エピソードや新刊の通知を受け取りましょう</p>
+                                    <a href="/" class="btn btn-primary mt-3">
+                                        <i class="bi bi-search"></i> 作品を探す
+                                    </a>
+                                </div>
+                            `);
+                        }
+                    });
+
+                    // 統計情報を更新
+                    loadStats();
+
+                    // 成功通知
+                    showToast('success', response.message);
+                } else {
+                    showToast('error', response.error);
+                }
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                showToast('error', response?.error || '削除に失敗しました');
+            }
+        });
+    });
+
+    // 通知トグル
+    $('.notification-toggle').click(function() {
+        const $toggle = $(this);
+        const workId = $toggle.data('work-id');
+        const type = $toggle.data('type');
+        const currentEnabled = $toggle.data('enabled') === '1' || $toggle.data('enabled') === 1;
+        const newEnabled = !currentEnabled;
+
+        const updateData = {};
+        if (type === 'episodes') {
+            updateData.notify_new_episodes = newEnabled;
+        } else {
+            updateData.notify_new_volumes = newEnabled;
+        }
+
+        $.ajax({
+            url: `/watchlist/api/update/${workId}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(updateData),
+            success: function(response) {
+                if (response.success) {
+                    // UIを更新
+                    $toggle.data('enabled', newEnabled ? 1 : 0);
+                    $toggle.removeClass('active inactive');
+                    $toggle.addClass(newEnabled ? 'active' : 'inactive');
+
+                    const icon = $toggle.find('i');
+                    icon.removeClass('bi-bell bi-bell-fill');
+                    icon.addClass(newEnabled ? 'bi-bell-fill' : 'bi-bell');
+
+                    showToast('success', '通知設定を更新しました');
+                    loadStats();
+                } else {
+                    showToast('error', response.error);
+                }
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                showToast('error', response?.error || '設定の更新に失敗しました');
+            }
+        });
+    });
+
+    // トースト通知
+    function showToast(type, message) {
+        const bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
+        const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+
+        const toast = $(`
+            <div class="toast align-items-center text-white ${bgClass} border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi ${icon}"></i> ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `);
+
+        let container = $('.toast-container');
+        if (container.length === 0) {
+            container = $('<div class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            $('body').append(container);
+        }
+
+        container.append(toast);
+        const bsToast = new bootstrap.Toast(toast[0]);
+        bsToast.show();
+
+        toast.on('hidden.bs.toast', function() {
+            $(this).remove();
+        });
+    }
+});
+</script>
+{% endblock %}

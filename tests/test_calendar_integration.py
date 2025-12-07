@@ -4,8 +4,93 @@ Integration tests for Google Calendar API integration
 """
 
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime, timedelta
+
+
+@pytest.fixture
+def mock_calendar_service():
+    """Mock Google Calendar service"""
+    service = MagicMock()
+    # events().insert().execute() チェーン
+    service.events.return_value.insert.return_value.execute.return_value = {
+        "id": "event_12345",
+        "htmlLink": "https://calendar.google.com/event?eid=event_12345",
+        "summary": "Test Event",
+        "status": "confirmed",
+    }
+    # events().list().execute() チェーン
+    service.events.return_value.list.return_value.execute.return_value = {
+        "items": []
+    }
+    # events().update().execute() チェーン
+    service.events.return_value.update.return_value.execute.return_value = {
+        "id": "event_12345",
+        "status": "confirmed",
+    }
+    # events().delete().execute() チェーン
+    service.events.return_value.delete.return_value.execute.return_value = None
+    return service
+
+
+@pytest.fixture
+def sample_release_data():
+    """サンプルリリースデータ"""
+    return [
+        {
+            'id': 1,
+            'title': 'テストアニメ',
+            'type': 'anime',
+            'release_type': 'episode',
+            'number': '1',
+            'platform': 'dアニメストア',
+            'release_date': '2025-12-15',
+            'source_url': 'https://anime.example.com/test'
+        },
+        {
+            'id': 2,
+            'title': 'テストマンガ',
+            'type': 'manga',
+            'release_type': 'volume',
+            'number': '5',
+            'platform': 'BookWalker',
+            'release_date': '2025-12-20',
+            'source_url': 'https://manga.example.com/test'
+        }
+    ]
+
+
+@pytest.fixture
+def sample_work_data():
+    """サンプル作品データ"""
+    return [
+        {
+            'id': 1,
+            'title': 'テストアニメ',
+            'title_kana': 'てすとあにめ',
+            'title_en': 'Test Anime',
+            'type': 'anime',
+            'official_url': 'https://anime.example.com'
+        },
+        {
+            'id': 2,
+            'title': 'テストマンガ',
+            'title_kana': 'てすとまんが',
+            'title_en': 'Test Manga',
+            'type': 'manga',
+            'official_url': 'https://manga.example.com'
+        }
+    ]
+
+
+@pytest.fixture
+def performance_test_config():
+    """パフォーマンステスト設定"""
+    return {
+        'max_response_time': 1.0,  # 最大応答時間（秒）
+        'max_batch_size': 100,
+        'timeout': 30
+    }
 
 
 class TestCalendarIntegration:
@@ -592,7 +677,7 @@ class TestCalendarEventFormatting:
 
     def _format_anime_event_description(self, work: dict, release: dict) -> str:
         """Format anime event description."""
-        return """アニメ: {work['title']}
+        return f"""アニメ: {work['title']}
 エピソード: 第{release['number']}話
 配信プラットフォーム: {release['platform']}
 配信日: {release['release_date']}
@@ -603,7 +688,7 @@ class TestCalendarEventFormatting:
 
     def _format_manga_event_description(self, work: dict, release: dict) -> str:
         """Format manga event description."""
-        return """マンガ: {work['title']}
+        return f"""マンガ: {work['title']}
 巻数: 第{release['number']}巻
 配信プラットフォーム: {release['platform']}
 発売日: {release['release_date']}

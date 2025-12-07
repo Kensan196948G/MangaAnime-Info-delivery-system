@@ -23,7 +23,16 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from auth_config import AuthConfig
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'auth'))
+try:
+    from auth_config import AuthConfig
+except ImportError:
+    # Fallback: create a mock AuthConfig
+    class AuthConfig:
+        def __init__(self):
+            pass
 
 
 class GmailAuthTester:

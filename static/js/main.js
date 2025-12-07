@@ -694,8 +694,18 @@ function testConfiguration() {
 // Global Error Handler
 // =============================================================================
 window.addEventListener('error', function(event) {
+    // ブラウザ拡張機能のエラーを完全に無視
+    if (event.filename && (
+        event.filename.includes('all.iife.js') ||
+        event.filename.includes('chrome-extension://') ||
+        event.filename.includes('moz-extension://') ||
+        event.filename.includes('edge-extension://')
+    )) {
+        return; // 拡張機能エラーは無視
+    }
+
     console.error('Global error:', event.error);
-    
+
     // フィルタリング: 一般的な無害なエラーを除外
     const ignorableErrors = [
         'Non-Error promise rejection',

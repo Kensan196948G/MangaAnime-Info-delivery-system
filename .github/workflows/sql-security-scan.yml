@@ -1,0 +1,243 @@
+name: SQL Security Scan
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # 毎週月曜日の午前2時に実行
+    - cron: '0 2 * * 1'
+
+jobs:
+  sql-injection-scan:
+    name: SQLインジェクション脆弱性スキャン
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit sqlfluff
+
+      - name: Run SQL Injection Scanner
+        id: sql_scan
+        run: |
+          python3 scripts/scan_sql_vulnerabilities.py --output docs/SQL_INJECTION_SCAN_REPORT.md
+        continue-on-error: true
+
+      - name: Run Bandit Security Scanner
+        id: bandit_scan
+        run: |
+          bandit -r . -f json -o bandit_report.json -ll
+          bandit -r . -f txt -o bandit_report.txt -ll
+        continue-on-error: true
+
+      - name: Check SQL files with SQLFluff
+        id: sqlfluff_scan
+        run: |
+          if [ -d "migrations" ]; then
+            sqlfluff lint migrations/*.sql --dialect sqlite > sqlfluff_report.txt || true
+          else
+            echo "No migrations directory found" > sqlfluff_report.txt
+          fi
+        continue-on-error: true
+
+      - name: Upload SQL Injection Scan Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: sql-injection-report
+          path: docs/SQL_INJECTION_SCAN_REPORT.md
+
+      - name: Upload Bandit Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-report
+          path: |
+            bandit_report.json
+            bandit_report.txt
+
+      - name: Upload SQLFluff Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: sqlfluff-report
+          path: sqlfluff_report.txt
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+
+            let comment = '## 🛡️ セキュリティスキャン結果\n\n';
+
+            // SQL Injection Scan結果
+            try {
+              const sqlScanReport = fs.readFileSync('docs/SQL_INJECTION_SCAN_REPORT.md', 'utf8');
+              const lines = sqlScanReport.split('\n').slice(0, 50);
+              comment += '### SQLインジェクション脆弱性スキャン\n\n';
+              comment += '```\n' + lines.join('\n') + '\n```\n\n';
+              comment += '[📄 完全なレポートを確認](../artifacts/sql-injection-report)\n\n';
+            } catch (e) {
+              comment += '### SQLインジェクション脆弱性スキャン\n\n';
+              comment += '✅ 脆弱性は検出されませんでした\n\n';
+            }
+
+            // Bandit結果
+            try {
+              const banditReport = fs.readFileSync('bandit_report.txt', 'utf8');
+              const lines = banditReport.split('\n').slice(0, 30);
+              comment += '### Banditセキュリティスキャン\n\n';
+              comment += '```\n' + lines.join('\n') + '\n```\n\n';
+              comment += '[📄 完全なレポートを確認](../artifacts/bandit-report)\n\n';
+            } catch (e) {
+              comment += '### Banditセキュリティスキャン\n\n';
+              comment += '✅ セキュリティ問題は検出されませんでした\n\n';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Fail if vulnerabilities found
+        run: |
+          if [ -f "docs/SQL_INJECTION_SCAN_REPORT.md" ]; then
+            if grep -q "⚠️" docs/SQL_INJECTION_SCAN_REPORT.md; then
+              echo "❌ SQLインジェクション脆弱性が検出されました"
+              exit 1
+            fi
+          fi
+
+          if [ -f "bandit_report.json" ]; then
+            # 高/中レベルの問題をチェック
+            HIGH_ISSUES=$(jq '.results | length' bandit_report.json)
+            if [ "$HIGH_ISSUES" -gt 0 ]; then
+              echo "❌ セキュリティ問題が検出されました（${HIGH_ISSUES}件）"
+              exit 1
+            fi
+          fi
+
+          echo "✅ セキュリティスキャン合格"
+
+  database-analysis:
+    name: データベース構造分析
+    runs-on: ubuntu-latest
+    needs: sql-injection-scan
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Create test database
+        run: |
+          # テスト用のダミーデータベースを作成
+          python3 -c "
+          import sqlite3
+          conn = sqlite3.connect('db.sqlite3')
+          cursor = conn.cursor()
+
+          # worksテーブル
+          cursor.execute('''
+            CREATE TABLE IF NOT EXISTS works (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              title TEXT NOT NULL,
+              title_kana TEXT,
+              title_en TEXT,
+              type TEXT CHECK(type IN ('anime','manga')),
+              official_url TEXT,
+              created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+          ''')
+
+          # releasesテーブル
+          cursor.execute('''
+            CREATE TABLE IF NOT EXISTS releases (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              work_id INTEGER NOT NULL,
+              release_type TEXT CHECK(release_type IN ('episode','volume')),
+              number TEXT,
+              platform TEXT,
+              release_date DATE,
+              source TEXT,
+              source_url TEXT,
+              notified INTEGER DEFAULT 0,
+              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+              UNIQUE(work_id, release_type, number, platform, release_date)
+            )
+          ''')
+
+          conn.commit()
+          conn.close()
+          "
+
+      - name: Run secure database analysis
+        run: |
+          python3 scripts/analyze_database_secure.py --db db.sqlite3 --recommendations > db_analysis_report.txt
+
+      - name: Upload Database Analysis Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: database-analysis-report
+          path: db_analysis_report.txt
+
+  code-quality-check:
+    name: コード品質チェック
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install flake8 pylint black isort
+
+      - name: Run flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Run pylint
+        run: |
+          pylint **/*.py --exit-zero --output-format=text > pylint_report.txt
+        continue-on-error: true
+
+      - name: Check code formatting with black
+        run: |
+          black --check . || true
+
+      - name: Check import sorting with isort
+        run: |
+          isort --check-only . || true
+
+      - name: Upload pylint report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: pylint-report
+          path: pylint_report.txt

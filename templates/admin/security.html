@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}セキュリティダッシュボード{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 30px;
+    }
+
+    .section-card {
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+        background: white;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .metric-badge {
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+
+    .metric-badge.high {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .metric-badge.medium {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .metric-badge.low {
+        background-color: #28a745;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">セキュリティダッシュボード</h1>
+            <p class="text-muted">リアルタイムセキュリティ監視と分析</p>
+        </div>
+        <div class="col-auto">
+            <a href="/admin/dashboard" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> メインダッシュボード
+            </a>
+        </div>
+    </div>
+
+    <!-- セキュリティアラート -->
+    <div class="row">
+        <div class="col-12">
+            <div class="section-card">
+                <h2 class="section-title">アクティブアラート</h2>
+                <div id="security-alerts">
+                    {% if security_alerts %}
+                        {% for alert in security_alerts %}
+                        <div class="alert alert-{{ alert.level }}" role="alert">
+                            <strong>
+                                <i class="bi bi-shield-exclamation"></i> {{ alert.type }}
+                            </strong>
+                            <p class="mb-0 mt-2">{{ alert.message }}</p>
+                            <small class="text-muted">{{ alert.timestamp }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-shield-check"></i> 現在セキュリティアラートはありません
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- グラフエリア -->
+    <div class="row">
+        <!-- 監査ログアクション統計 -->
+        <div class="col-md-6">
+            <div class="section-card">
+                <h2 class="section-title">アクション別統計（24時間）</h2>
+                <div class="chart-container">
+                    <canvas id="actionStatsChart"></canvas>
+                </div>
+                <div class="mt-3">
+                    {% if audit_stats.action_stats %}
+                        {% for stat in audit_stats.action_stats %}
+                        <span class="metric-badge
+                            {% if stat.count > 100 %}high
+                            {% elif stat.count > 50 %}medium
+                            {% else %}low{% endif %}">
+                            {{ stat.action }}: {{ stat.count }}
+                        </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 時間別ログ統計 -->
+        <div class="col-md-6">
+            <div class="section-card">
+                <h2 class="section-title">時間別ログ統計</h2>
+                <div class="chart-container">
+                    <canvas id="hourlyStatsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API使用統計 -->
+    <div class="row">
+        <div class="col-12">
+            <div class="section-card">
+                <h2 class="section-title">API使用統計（24時間）</h2>
+                <div class="chart-container" style="height: 250px;">
+                    <canvas id="apiUsageChart"></canvas>
+                </div>
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>APIキー名</th>
+                                <th>プレフィックス</th>
+                                <th>リクエスト数</th>
+                                <th>ステータス</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if api_usage %}
+                                {% for usage in api_usage %}
+                                <tr>
+                                    <td>{{ usage.key_name }}</td>
+                                    <td><code>{{ usage.key_prefix }}...</code></td>
+                                    <td>{{ usage.request_count }}</td>
+                                    <td>
+                                        {% if usage.request_count > 100 %}
+                                        <span class="badge bg-danger">高使用</span>
+                                        {% elif usage.request_count > 50 %}
+                                        <span class="badge bg-warning">中使用</span>
+                                        {% else %}
+                                        <span class="badge bg-success">正常</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">データがありません</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- セキュリティ推奨事項 -->
+    <div class="row">
+        <div class="col-12">
+            <div class="section-card">
+                <h2 class="section-title">セキュリティ推奨事項</h2>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success"></i>
+                        定期的にパスワードを変更してください
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success"></i>
+                        使用していないAPIキーは無効化してください
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success"></i>
+                        監査ログを定期的に確認してください
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success"></i>
+                        不審なアクティビティを発見した場合は直ちに対処してください
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Chart.jsデフォルト設定
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    Chart.defaults.color = '#666';
+
+    // アクション別統計チャート
+    const actionStatsData = {{ audit_stats.action_stats | tojson }};
+    const actionLabels = actionStatsData.map(stat => stat.action);
+    const actionCounts = actionStatsData.map(stat => stat.count);
+
+    const actionStatsCtx = document.getElementById('actionStatsChart').getContext('2d');
+    new Chart(actionStatsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: actionLabels,
+            datasets: [{
+                data: actionCounts,
+                backgroundColor: [
+                    '#667eea',
+                    '#764ba2',
+                    '#f093fb',
+                    '#4facfe',
+                    '#43e97b',
+                    '#fa709a',
+                    '#fee140',
+                    '#30cfd0'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // 時間別統計チャート
+    const hourlyStatsData = {{ audit_stats.hourly_stats | tojson }};
+    const hourlyLabels = hourlyStatsData.map(stat => {
+        const date = new Date(stat.hour);
+        return date.getHours() + ':00';
+    });
+    const hourlyCounts = hourlyStatsData.map(stat => stat.count);
+
+    const hourlyStatsCtx = document.getElementById('hourlyStatsChart').getContext('2d');
+    new Chart(hourlyStatsCtx, {
+        type: 'line',
+        data: {
+            labels: hourlyLabels,
+            datasets: [{
+                label: 'ログ数',
+                data: hourlyCounts,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    // API使用統計チャート
+    const apiUsageData = {{ api_usage | tojson }};
+    const apiLabels = apiUsageData.map(usage => usage.key_name);
+    const apiCounts = apiUsageData.map(usage => usage.request_count);
+
+    const apiUsageCtx = document.getElementById('apiUsageChart').getContext('2d');
+    new Chart(apiUsageCtx, {
+        type: 'bar',
+        data: {
+            labels: apiLabels,
+            datasets: [{
+                label: 'リクエスト数',
+                data: apiCounts,
+                backgroundColor: '#4facfe',
+                borderColor: '#00f2fe',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    // 自動リフレッシュ（60秒ごと）
+    setInterval(function() {
+        location.reload();
+    }, 60000);
+</script>
+{% endblock %}

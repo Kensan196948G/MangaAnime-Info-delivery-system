@@ -27,9 +27,14 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 import time
 import signal
+import os
+
+# 環境変数を.envファイルから読み込み
+from dotenv import load_dotenv
+load_dotenv()
 
 # プロジェクトのルートディレクトリをPythonパスに追加
-project_root = Path(__file__).parent
+project_root = Path(__file__).parent.parent  # app/の親ディレクトリ（プロジェクトルート）
 sys.path.insert(0, str(project_root))
 
 from modules import get_config
@@ -640,7 +645,7 @@ class ReleaseNotifierSystem:
 
 def signal_handler(signum, frame):
     """シグナルハンドラー"""
-    print("\n🛑 終了シグナルを受信しました。処理を停止しています...")
+    logger.info("\n🛑 終了シグナルを受信しました。処理を停止しています...")
     sys.exit(0)
 
 
@@ -695,7 +700,7 @@ def main():
             exit_code = 0 if success else 1
 
     except Exception as e:
-        print(f"💥 システム初期化エラー: {e}", file=sys.stderr)
+        logger.info(f"💥 システム初期化エラー: {e}", file=sys.stderr)
         exit_code = 2
 
     sys.exit(exit_code)

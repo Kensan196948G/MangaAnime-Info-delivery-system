@@ -71,6 +71,7 @@ config.json
 credentials.json
 token.json
 client_secret.json
+auth/google/
 
 # Backup files
 *.bak
@@ -132,3 +133,8 @@ temp/
 tmp/
 *.temp
 *.temporary
+# Google API認証情報（重要：絶対にコミットしない）
+credentials.json
+token.json
+token.pickle
+client_secret*.json

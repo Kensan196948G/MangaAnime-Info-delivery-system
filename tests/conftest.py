@@ -13,6 +13,9 @@ project_root = os.path.dirname(os.path.dirname(__file__))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+# テスト環境用SECRET_KEYを設定
+os.environ.setdefault("SECRET_KEY", "test-secret-key-for-testing-only")
+
 
 @pytest.fixture
 def mock_config():

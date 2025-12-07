@@ -61,7 +61,10 @@
     <!-- Security headers (Note: X-Frame-Options should be set as HTTP header in Flask app, not meta tag) -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    
+
+    <!-- CSRF Token for AJAX requests -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     {% block head %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -80,7 +83,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto" role="menubar">
                     <li class="nav-item" role="none">
-                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" 
+                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}"
                            href="{{ url_for('dashboard') }}" role="menuitem"
                            {% if request.endpoint == 'dashboard' %}aria-current="page"{% endif %}>
                             <i class="bi bi-house me-1" aria-hidden="true"></i>ダッシュボード
@@ -129,12 +132,31 @@
                         </ul>
                     </li>
                     <li class="nav-item" role="none">
-                        <a class="nav-link {% if request.endpoint == 'logs' %}active{% endif %}" 
+                        <a class="nav-link {% if request.endpoint == 'logs' %}active{% endif %}"
                            href="{{ url_for('logs') }}" role="menuitem"
                            {% if request.endpoint == 'logs' %}aria-current="page"{% endif %}>
                             <i class="bi bi-journal-text me-1" aria-hidden="true"></i>ログ・状態
                         </a>
                     </li>
+                    {% if current_user is defined and current_user.is_authenticated and current_user.is_admin %}
+                    <li class="nav-item dropdown" role="none">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-shield-lock me-1" aria-hidden="true"></i>管理者
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('users.user_list') }}">
+                                <i class="bi bi-people me-1"></i>ユーザー管理
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('api_key.index') }}">
+                                <i class="bi bi-key me-1"></i>APIキー管理
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('audit.audit_logs') }}">
+                                <i class="bi bi-file-earmark-text me-1"></i>監査ログ
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
                 </ul>
                 
                 <!-- Status indicator -->
@@ -143,7 +165,29 @@
                         <i class="bi bi-circle-fill" aria-hidden="true"></i> システム稼働中
                     </span>
                 </div>
-                
+
+                <!-- User Authentication Status -->
+                {% if current_user is defined and current_user.is_authenticated %}
+                <div class="navbar-text ms-3">
+                    <span class="text-light me-2">
+                        <i class="bi bi-person-circle" aria-hidden="true"></i>
+                        {{ current_user.username }}
+                        {% if current_user.is_admin %}
+                        <span class="badge bg-warning text-dark ms-1">管理者</span>
+                        {% endif %}
+                    </span>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> ログアウト
+                    </a>
+                </div>
+                {% else %}
+                <div class="navbar-text ms-3">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> ログイン
+                    </a>
+                </div>
+                {% endif %}
+
                 <!-- PWA Install Button -->
                 <button id="pwa-install-btn" class="btn btn-outline-light btn-sm ms-2" style="display: none;" 
                         aria-label="アプリとしてインストール">
@@ -245,6 +289,90 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
+
+    <!-- CSRF Token Setup for AJAX -->
+    <script>
+        // グローバルAJAX設定にCSRFトークンを追加
+        (function() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (csrfToken) {
+                const token = csrfToken.getAttribute('content');
+
+                // jQuery AJAX設定
+                if (typeof $ !== 'undefined') {
+                    $.ajaxSetup({
+                        beforeSend: function(xhr, settings) {
+                            // GET, HEAD, OPTIONS, TRACE 以外のリクエストにCSRFトークンを追加
+                            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                                xhr.setRequestHeader('X-CSRFToken', token);
+                            }
+                        }
+                    });
+                }
+
+                // Fetch API用のヘルパー関数
+                window.csrfFetch = function(url, options = {}) {
+                    options.headers = options.headers || {};
+                    if (!options.method || !/^(GET|HEAD|OPTIONS|TRACE)$/i.test(options.method)) {
+                        options.headers['X-CSRFToken'] = token;
+                    }
+                    return fetch(url, options);
+                };
+
+                console.log('CSRF protection initialized for AJAX requests');
+            } else {
+                console.warn('CSRF token not found in meta tag');
+            }
+        })();
+    </script>
+
+    <!-- Initialize Bootstrap Dropdowns -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing Bootstrap dropdowns...');
+
+            // Initialize all Bootstrap dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl, {
+                    autoClose: true
+                });
+            });
+            console.log('Bootstrap dropdowns initialized:', dropdownList.length);
+
+            // Fallback: Manual click handler if Bootstrap fails
+            document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
+                toggle.addEventListener('click', function(e) {
+                    console.log('Dropdown clicked:', this.textContent.trim());
+
+                    // If dropdown is not working, manually toggle
+                    const menu = this.nextElementSibling;
+                    if (menu && menu.classList.contains('dropdown-menu')) {
+                        // Close all other dropdowns
+                        document.querySelectorAll('.dropdown-menu.show').forEach(function(m) {
+                            if (m !== menu) {
+                                m.classList.remove('show');
+                            }
+                        });
+
+                        // Toggle current dropdown
+                        menu.classList.toggle('show');
+                        console.log('Dropdown menu toggled:', menu.classList.contains('show'));
+                    }
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                        menu.classList.remove('show');
+                    });
+                }
+            });
+        });
+    </script>
+
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <!-- UI Enhancements JS -->
@@ -381,10 +509,20 @@
         
         // Enhanced error handling
         window.addEventListener('error', function(e) {
+            // ブラウザ拡張機能のエラーを無視
+            if (e.filename && (
+                e.filename.includes('all.iife.js') ||
+                e.filename.includes('chrome-extension://') ||
+                e.filename.includes('moz-extension://') ||
+                e.filename.includes('edge://')
+            )) {
+                return; // 拡張機能エラーは無視
+            }
+
             console.error('JavaScript Error:', e.error);
-            
-            // Show user-friendly error message
-            if (window.AnimeManagaSystem) {
+
+            // アプリケーション自身のエラーのみ通知
+            if (window.AnimeManagaSystem && e.filename && e.filename.includes('/static/')) {
                 window.AnimeManagaSystem.showNotification('エラーが発生しました。ページを更新してください。', 'error');
             }
         });
@@ -458,6 +596,33 @@
             .alert {
                 display: none !important;
             }
+        }
+
+        /* Dropdown hover functionality */
+        .navbar .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+
+        .navbar .nav-item.dropdown .dropdown-menu {
+            margin-top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        /* Ensure dropdown toggle is clickable */
+        .navbar .dropdown-toggle {
+            cursor: pointer;
+            pointer-events: auto !important;
+        }
+
+        /* Smooth dropdown animation */
+        .dropdown-menu {
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
         }
     </style>
     

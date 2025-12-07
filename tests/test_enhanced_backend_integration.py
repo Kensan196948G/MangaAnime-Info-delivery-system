@@ -9,17 +9,31 @@ Tests:
 - Enhanced data normalizer
 - Enhanced content filter
 """
+import pytest
+
+# Optional dependency check
+try:
+    import jellyfish
+    HAS_JELLYFISH = True
+except ImportError:
+    HAS_JELLYFISH = False
 
 from modules.models import Work, WorkType
-from modules.filter_logic_enhanced import (
+from modules.filter_logic import (
     ConfigBasedFilterManager,
     EnhancedContentFilter,
     FilterAction,
 )
-from modules.data_normalizer_enhanced import (
-    EnhancedDuplicateDetector,
-    EnhancedDataMerger,
-)
+
+# Skip import if jellyfish not available
+if HAS_JELLYFISH:
+    from modules.data_normalizer_enhanced import (
+        EnhancedDuplicateDetector,
+        EnhancedDataMerger,
+    )
+else:
+    EnhancedDuplicateDetector = None
+    EnhancedDataMerger = None
 from modules.streaming_platform_enhanced import (
     EnhancedStreamingCollector,
     StreamingPlatform,

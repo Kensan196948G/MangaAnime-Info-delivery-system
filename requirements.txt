@@ -1,5 +1,14 @@
 # Core dependencies for MangaAnime Info Delivery System
 
+# Web Framework & Security
+Flask>=3.0.0
+Flask-Login>=0.6.3
+Flask-WTF>=1.2.1
+Flask-Session>=0.5.0
+Flask-Limiter>=3.5.0
+Werkzeug>=3.0.0
+itsdangerous>=2.1.2
+
 # API and HTTP libraries
 requests>=2.31.0
 httpx>=0.25.0
@@ -26,3 +35,6 @@ structlog>=23.1.0
 # Utilities
 python-dotenv>=1.0.0
 colorama>=0.4.6
+
+# Text Processing
+jellyfish>=1.0.0

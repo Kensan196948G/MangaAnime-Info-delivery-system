@@ -1,0 +1,35 @@
+{
+  "ng_keywords": [
+    "エロ",
+    "R18",
+    "成人向け",
+    "BL",
+    "百合",
+    "ボーイズラブ"
+  ],
+  "notification_email": "kensan1969@gmail.com",
+  "check_interval_hours": 1,
+  "enabled_sources": {
+    "anilist": true,
+    "shobo_calendar": true,
+    "bookwalker_rss": false,
+    "mangapocket_rss": true
+  },
+  "email": {
+    "enabled": true,
+    "subject_prefix": "MangaAnime配信システム",
+    "format": "html"
+  },
+  "calendar": {
+    "enabled": true,
+    "calendar_id": "primary",
+    "event_duration": 60
+  },
+  "notifications": {
+    "anime": true,
+    "manga": true,
+    "updates": true,
+    "min_interval": 60,
+    "max_per_day": 50
+  }
+}

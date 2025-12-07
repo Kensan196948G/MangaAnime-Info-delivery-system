@@ -495,6 +495,9 @@
         }
 
         handleKeyPress(e) {
+            // e.keyが未定義の場合は無視
+            if (!e.key) return;
+
             const key = e.key.toLowerCase();
             const shortcutKey = this.createShortcutKey(key, {
                 ctrl: e.ctrlKey,

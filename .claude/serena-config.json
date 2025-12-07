@@ -1,0 +1,7 @@
+{
+  "initialized": true,
+  "timestamp": "$(date -Iseconds)",
+  "projectMarkers": $(printf '%s\n' "${DETECTED_MARKERS[@]}" | jq -R . | jq -s .),
+  "mode": "editing",
+  "interactive": true
+}

@@ -1,0 +1,160 @@
+name: Scheduled Daily Scraping
+
+on:
+  schedule:
+    # Run at 23:00 UTC (08:00 JST) every day
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  scrape-anime:
+    name: Scrape Anime Information
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run anime scraping
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
+          CALENDAR_API_KEY: ${{ secrets.CALENDAR_API_KEY }}
+          CALENDAR_CREDENTIALS_JSON: ${{ secrets.CALENDAR_CREDENTIALS_JSON }}
+        run: |
+          python -m modules.anime_anilist
+          python -m modules.anime_syoboi
+
+      - name: Upload scraping results
+        uses: actions/upload-artifact@v3
+        with:
+          name: anime-scraping-results
+          path: data/anime-*.json
+
+  scrape-manga:
+    name: Scrape Manga Information
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run manga scraping
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
+          CALENDAR_API_KEY: ${{ secrets.CALENDAR_API_KEY }}
+        run: |
+          python -m modules.manga_rss
+
+      - name: Upload scraping results
+        uses: actions/upload-artifact@v3
+        with:
+          name: manga-scraping-results
+          path: data/manga-*.json
+
+  process-and-notify:
+    name: Process Data and Send Notifications
+    runs-on: ubuntu-latest
+    needs: [scrape-anime, scrape-manga]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Download anime results
+        uses: actions/download-artifact@v3
+        with:
+          name: anime-scraping-results
+          path: data/
+
+      - name: Download manga results
+        uses: actions/download-artifact@v3
+        with:
+          name: manga-scraping-results
+          path: data/
+
+      - name: Filter and process data
+        run: |
+          python -m modules.filter_logic
+
+      - name: Send notifications
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
+          NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
+        run: |
+          python -m modules.mailer
+
+      - name: Update calendar
+        env:
+          CALENDAR_API_KEY: ${{ secrets.CALENDAR_API_KEY }}
+          CALENDAR_CREDENTIALS_JSON: ${{ secrets.CALENDAR_CREDENTIALS_JSON }}
+        run: |
+          python -m modules.calendar
+
+      - name: Commit updated database
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add data/*.db
+          git commit -m "chore: 自動データ更新 $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push || echo "Nothing to push"
+
+  notify:
+    name: Notify Scraping Status
+    runs-on: ubuntu-latest
+    needs: [process-and-notify]
+    if: always()
+
+    steps:
+      - name: Send Slack notification
+        if: secrets.SLACK_WEBHOOK != ''
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Daily scraping job completed with status: ${{ job.status }}
+            Date: ${{ github.event.head_commit.timestamp }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          username: 'Scraping Bot'
+          icon_emoji: ':robot_face:'

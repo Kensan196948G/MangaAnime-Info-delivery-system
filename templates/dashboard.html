@@ -201,7 +201,7 @@
                                                         <i class="bi bi-book"></i> マンガ
                                                     </span>
                                                 {% endif %}
-                                                <strong>{{ release.title }}</strong>
+                                                <strong>{{ release.title_kana or release.title }}</strong>
                                             </div>
                                             <div class="text-muted small">
                                                 {% if release.release_type == 'episode' %}
@@ -282,7 +282,7 @@
                                                         <i class="bi bi-book"></i> マンガ
                                                     </span>
                                                 {% endif %}
-                                                <strong>{{ release.title }}</strong>
+                                                <strong>{{ release.title_kana or release.title }}</strong>
                                             </div>
                                             <div class="text-muted small">
                                                 {% if release.release_type == 'episode' %}
@@ -478,6 +478,85 @@
         </div>
     </div>
 
+    <!-- Collection Process Status -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-activity me-2"></i>収集プロセス状況
+                    </h5>
+                    <a href="/collection-settings" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-gear me-1"></i>設定
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- API Sources -->
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">
+                                <i class="bi bi-cloud me-2"></i>API収集ソース (全5件)
+                            </h6>
+                            <div class="list-group list-group-flush" id="api-sources-status" style="max-height: 350px; overflow-y: auto;">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">読み込み中...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RSS Sources -->
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">
+                                <i class="bi bi-rss me-2"></i>RSS収集ソース (全12件)
+                            </h6>
+                            <div class="list-group list-group-flush" id="rss-sources-status" style="max-height: 350px; overflow-y: auto;">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">読み込み中...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Stats -->
+                    <div class="row mt-3 pt-3 border-top">
+                        <div class="col-md-3 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-check-circle text-success fs-4"></i>
+                            </div>
+                            <div class="fw-bold fs-5" id="sources-active">0</div>
+                            <small class="text-muted">稼働中</small>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-dash-circle text-warning fs-4"></i>
+                            </div>
+                            <div class="fw-bold fs-5" id="sources-disabled">0</div>
+                            <small class="text-muted">無効</small>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
+                            </div>
+                            <div class="fw-bold fs-5" id="sources-error">0</div>
+                            <small class="text-muted">エラー</small>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="mb-2">
+                                <i class="bi bi-collection fs-4 text-primary"></i>
+                            </div>
+                            <div class="fw-bold fs-5" id="sources-total">0</div>
+                            <small class="text-muted">総ソース数</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="row">
         <div class="col-12">
@@ -549,9 +628,62 @@ setInterval(function() {
     refreshCharts();
 }, 300000);
 
+// Load collection sources status
+async function loadCollectionSources() {
+    try {
+        const response = await fetch('/api/sources');
+        const data = await response.json();
+
+        // Update API sources
+        const apiContainer = document.getElementById('api-sources-status');
+        if (apiContainer && data.apis) {
+            apiContainer.innerHTML = data.apis.map(api => `
+                <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+                    <div>
+                        <i class="bi bi-${api.enabled ? 'check-circle text-success' : 'dash-circle text-secondary'} me-2"></i>
+                        <span class="${api.enabled ? '' : 'text-muted'}">${api.name}</span>
+                    </div>
+                    <span class="badge ${api.enabled ? 'bg-success' : 'bg-secondary'} rounded-pill">
+                        ${api.enabled ? '稼働中' : '無効'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // Update RSS sources (show all, including disabled)
+        const rssContainer = document.getElementById('rss-sources-status');
+        if (rssContainer && data.rss_feeds) {
+            rssContainer.innerHTML = data.rss_feeds.map(feed => `
+                <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+                    <div>
+                        <i class="bi bi-${feed.enabled ? 'check-circle text-success' : 'dash-circle text-secondary'} me-2"></i>
+                        <span class="${feed.enabled ? '' : 'text-muted'}">${feed.name}</span>
+                    </div>
+                    <span class="badge ${feed.enabled ? 'bg-success' : 'bg-secondary'} rounded-pill">
+                        ${feed.enabled ? '稼働中' : '無効'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // Update summary stats
+        if (data.summary) {
+            document.getElementById('sources-total').textContent = data.summary.total_sources;
+            document.getElementById('sources-active').textContent = data.summary.enabled_sources;
+            document.getElementById('sources-disabled').textContent = data.summary.disabled_sources;
+            document.getElementById('sources-error').textContent = '0'; // TODO: Implement error tracking
+        }
+    } catch (error) {
+        console.error('Failed to load collection sources:', error);
+    }
+}
+
 // Initialize charts when document is ready
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, setting up Chart.js event listeners...');
+
+    // Load collection sources status
+    loadCollectionSources();
     
     // Function to show chart loading state
     const showChartLoading = () => {
