@@ -129,7 +129,20 @@ class UserStore:
 
 
 # グローバルユーザーストア
-user_store = UserStore()
+# 環境変数でDB版とメモリ版を切り替え
+USE_DB_STORE = os.getenv('USE_DB_STORE', 'true').lower() == 'true'
+
+if USE_DB_STORE:
+    try:
+        from app.models.user_db import UserDBStore
+        user_store = UserDBStore()
+        logger.info("UserDBStore（DB版）を使用します")
+    except ImportError as e:
+        logger.warning(f"UserDBStoreの読み込み失敗: {e}。メモリ版を使用します")
+        user_store = UserStore()
+else:
+    user_store = UserStore()
+    logger.info("UserStore（メモリ版）を使用します")
 
 
 def init_login_manager(app) -> LoginManager:
