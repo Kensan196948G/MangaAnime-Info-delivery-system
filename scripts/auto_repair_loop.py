@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-自動修復ループシステム（15回ループ・5分待機版）
+自動修復ループシステム（15回ループ・15分待機版）
 
 機能:
 - エラー自動検知
 - 自動修復実行（最大15回）
-- 15回超過時: 5分待機
-- 5分後: 再度15回ループ
+- 15回超過時: 15分待機
+- 15分後: 再度15回ループ
 - 継続実行（ユーザー中断まで）
 """
 
@@ -24,7 +24,7 @@ sys.path.insert(0, str(project_root))
 
 # 設定
 MAX_LOOPS = 15
-WAIT_TIME_SECONDS = 300  # 5分
+WAIT_TIME_SECONDS = 900  # 15分
 CONTINUOUS_MODE = True
 
 class AutoRepairSystem:
@@ -179,13 +179,13 @@ class AutoRepairSystem:
                 time.sleep(2)
 
         self.log(f"⚠️ サイクル{cycle_num}完了（{MAX_LOOPS}回実行）")
-        self.log(f"   残存エラーあり → 5分待機後に再試行")
+        self.log(f"   残存エラーあり → 15分待機後に再試行")
         return False
 
     def run_continuous(self):
         """継続実行（無限ループ）"""
         self.log("="*70)
-        self.log("🚀 自動修復システム起動（15回ループ・5分待機版）")
+        self.log("🚀 自動修復システム起動（15回ループ・15分待機版）")
         self.log("="*70)
         self.log(f"設定: MAX_LOOPS={MAX_LOOPS}, WAIT={WAIT_TIME_SECONDS}秒")
         self.log(f"モード: {'継続実行' if CONTINUOUS_MODE else '1サイクルのみ'}")
@@ -209,7 +209,7 @@ class AutoRepairSystem:
                     time.sleep(WAIT_TIME_SECONDS)
                 else:
                     self.log(f"\n⏳ サイクル{self.cycle_count}完了（エラー残存）")
-                    self.log(f"   {WAIT_TIME_SECONDS}秒（5分）待機後、再試行...")
+                    self.log(f"   {WAIT_TIME_SECONDS}秒（15分）待機後、再試行...")
                     time.sleep(WAIT_TIME_SECONDS)
 
         except KeyboardInterrupt:
@@ -239,6 +239,8 @@ class AutoRepairSystem:
         self.log(f"ログファイル: {self.log_file}")
 
 def main():
+    global MAX_LOOPS, WAIT_TIME_SECONDS, CONTINUOUS_MODE
+
     import argparse
 
     parser = argparse.ArgumentParser(description='自動修復ループシステム')
@@ -247,7 +249,6 @@ def main():
     parser.add_argument('--once', action='store_true', help='1サイクルのみ実行')
     args = parser.parse_args()
 
-    global MAX_LOOPS, WAIT_TIME_SECONDS, CONTINUOUS_MODE
     MAX_LOOPS = args.max_loops
     WAIT_TIME_SECONDS = args.wait
     CONTINUOUS_MODE = not args.once

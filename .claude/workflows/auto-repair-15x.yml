@@ -1,16 +1,16 @@
-# 自動修復システム（15回ループ・5分待機版）
+# 自動修復システム（15回ループ・15分待機版）
 # Claude Code専用ワークフロー
 
 name: Auto Repair 15x Loop System
 
 description: |
   エラー自動検知・修復を最大15回ループ実行
-  15回超過時は5分待機後、再度15回ループ
+  15回超過時は15分待機後、再度15回ループ
   継続的な自動修復を実現
 
 config:
   max_loops: 15
-  wait_time_seconds: 300  # 5分
+  wait_time_seconds: 900  # 15分
   retry_enabled: true
   continuous_mode: true
 
@@ -47,7 +47,7 @@ loop_strategy:
   type: continuous
   max_iterations: 15
   on_max_reached: wait_and_retry
-  wait_duration: 300  # 5分
+  wait_duration: 900  # 15分
   retry_forever: true
 
 error_handling:
