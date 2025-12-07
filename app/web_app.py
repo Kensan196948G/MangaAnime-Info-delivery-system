@@ -20,9 +20,51 @@ import logging
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+# 環境変数を.envファイルから読み込み（Phase 14セキュリティ強化）
+from dotenv import load_dotenv
+load_dotenv()
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# ============================================================
+# 環境変数バリデーション（Phase 14セキュリティ強化）
+# ============================================================
+REQUIRED_ENV_VARS = [
+    'SECRET_KEY',
+    'GMAIL_ADDRESS',
+    'GMAIL_APP_PASSWORD',
+    'DEFAULT_ADMIN_PASSWORD'
+]
+
+def validate_environment():
+    """起動時環境変数チェック"""
+    missing = []
+
+    for var in REQUIRED_ENV_VARS:
+        value = os.getenv(var)
+        if not value:
+            missing.append(var)
+        elif var == 'DEFAULT_ADMIN_PASSWORD' and value == 'changeme123':
+            logger.warning(f"⚠️ {var} is using a weak default! Change it!")
+        elif var == 'SECRET_KEY' and len(value) < 32:
+            logger.warning(f"⚠️ {var} is weak! Use a strong key in production!")
+
+    if missing:
+        error_msg = f"❌ Required env vars not set: {', '.join(missing)}"
+        logger.error(error_msg)
+        raise EnvironmentError(error_msg)
+
+    logger.info("✅ Environment variables validated")
+
+# 環境変数チェック実行
+try:
+    validate_environment()
+except EnvironmentError as e:
+    print(str(e), file=sys.stderr)
+    print("\n💡 Hint: Set variables in .env file", file=sys.stderr)
+    sys.exit(1)
 
 # ============================================================
 # Flask アプリケーション初期化
