@@ -10,7 +10,7 @@ from datetime import datetime
 import secrets
 import hashlib
 
-users_bp = Bluelogger.info('users', __name__, url_prefix='/users')
+users_bp = Blueprint('users', __name__, url_prefix='/users')
 
 
 def admin_required(f):
@@ -152,14 +152,7 @@ def toggle_admin(user_id):
 @admin_required
 def user_stats():
     """ユーザー統計情報API"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     users = user_store.get_all_users()
-
-logger = logging.getLogger(__name__)
-
 
     stats = {
         'total_users': len(users),

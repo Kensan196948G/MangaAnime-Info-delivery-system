@@ -29,7 +29,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 logger = logging.getLogger(__name__)
 
 # 認証用Blueprint
-auth_bp = Bluelogger.info('auth', __name__, url_prefix='/auth')
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @dataclass

@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 from flask import Blueprint, jsonify
 
-health_bp = Bluelogger.info('health', __name__)
+health_bp = Blueprint('health', __name__)
 
 # Database path
 DATABASE_PATH = os.environ.get('DATABASE_PATH', 'db.sqlite3')
@@ -224,9 +224,6 @@ def prometheus_metrics():
     """
     Basic Prometheus-compatible metrics endpoint.
 
-logger = logging.getLogger(__name__)
-
-
     Returns metrics in Prometheus text format.
     """
     db_status = check_database_connection()
@@ -264,5 +261,4 @@ logger = logging.getLogger(__name__)
     response_text = '\n'.join(metrics) + '\n'
 
     from flask import Response
-import logging
     return Response(response_text, mimetype='text/plain; charset=utf-8')
