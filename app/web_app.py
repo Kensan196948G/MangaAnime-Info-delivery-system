@@ -3913,6 +3913,19 @@ try:
 except ImportError as e:
     logger.warning(f"Users management blueprint not available: {e}")
 
+# Register API key management blueprint
+try:
+    from app.routes.api_key import api_key_bp, api_key_required
+    app.register_blueprint(api_key_bp)
+    logger.info("API key management blueprint registered: /api-keys")
+except ImportError as e:
+    logger.warning(f"API key management blueprint not available: {e}")
+    # フォールバックダミーデコレータ
+    def api_key_required(permissions=None):
+        def decorator(f):
+            return f
+        return decorator
+
 # Register health check blueprint
 try:
     from app.routes.health import health_bp
