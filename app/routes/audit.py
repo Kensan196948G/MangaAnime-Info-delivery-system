@@ -14,7 +14,7 @@ import sys
 # プロジェクトルートをパスに追加
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-audit_bp = Bluelogger.info('audit', __name__, url_prefix='/admin')
+audit_bp = Blueprint('audit', __name__, url_prefix='/admin')
 
 
 # 認証システムから admin_required をインポート
@@ -204,13 +204,9 @@ def export_audit_logs():
 def audit_logs_stats():
     """
     監査ログ統計情報API
-
-logger = logging.getLogger(__name__)
-
     ダッシュボード用の統計データを返す
     """
     from modules.audit_log import audit_logger
-import logging
 
     # 統計情報取得
     stats = audit_logger.get_statistics()

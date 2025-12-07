@@ -11,7 +11,7 @@ import sqlite3
 from functools import wraps
 
 # ブループリント定義
-admin_dash_bp = Bluelogger.info('admin_dashboard', __name__, url_prefix='/admin')
+admin_dash_bp = Blueprint('admin_dashboard', __name__, url_prefix='/admin')
 
 # 管理者権限チェックデコレーター
 def admin_required(f):

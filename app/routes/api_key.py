@@ -10,7 +10,7 @@ from app.models.api_key_db import api_key_store, APIKey
 
 logger = logging.getLogger(__name__)
 
-api_key_bp = Bluelogger.info('api_key', __name__, url_prefix='/api-keys')
+api_key_bp = Blueprint('api_key', __name__, url_prefix='/api-keys')
 
 
 def api_key_required(permissions: list = None):
