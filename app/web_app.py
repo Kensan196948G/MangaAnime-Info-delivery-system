@@ -1990,6 +1990,7 @@ def websocket_collection_status():
 
 
 @app.route("/api/test-notification", methods=["POST"])
+@csrf.exempt  # 個人開発用にCSRF除外
 def api_test_notification():
     """API endpoint for sending test notifications"""
     import smtplib
