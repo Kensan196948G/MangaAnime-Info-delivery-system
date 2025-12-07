@@ -655,7 +655,7 @@ def calendar():
 
 
 @app.route("/config", methods=["GET", "POST"])
-@login_required
+# @login_required  # 個人開発用にログイン不要
 def config():
     """Configuration management interface"""
     if request.method == "POST":
@@ -1095,7 +1095,7 @@ def api_rss_feeds():
 
 
 @app.route("/api/rss-feeds/toggle", methods=["POST"])
-@login_required
+# @login_required  # 個人開発用にログイン不要
 def api_rss_feeds_toggle():
     """Toggle RSS feed enable/disable status"""
     try:
@@ -1603,7 +1603,7 @@ def api_add_to_watchlist():
 
 
 @app.route("/api/manual-collection", methods=["POST"])
-@login_required
+# @login_required  # 個人開発用にログイン不要
 def api_manual_collection():
     """API endpoint to trigger manual collection"""
     # This would trigger the actual collection process
@@ -1664,7 +1664,7 @@ def api_refresh_history():
 
 
 @app.route("/api/settings", methods=["GET", "POST"])
-@login_required
+# @login_required  # 個人開発用にログイン不要
 def api_settings():
     """API endpoint for settings management"""
     # Import database manager
@@ -3359,7 +3359,7 @@ def api_test_rss():
 
 
 @app.route('/api/sources/toggle', methods=['POST'])
-@login_required
+# @login_required  # 個人開発用にログイン不要
 def api_toggle_source():
     """
     Toggle a collection source on/off.
@@ -3569,7 +3569,7 @@ def api_test_all_sources():
 
 
 @app.route("/api/calendar/sync", methods=["POST"])
-@login_required
+# @login_required  # 個人開発用にログイン不要
 def api_calendar_sync():
     """Sync releases to calendar events (up to 3 months ahead)"""
     try:
