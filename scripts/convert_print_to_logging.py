@@ -3,19 +3,27 @@
 Print文からLoggingモジュールへの自動変換スクリプト
 
 このスクリプトは、プロジェクト内の全print文を適切なloggingレベルに変換します。
-- print("...") → logger.info("...")
-- print(f"Error: ...") → logger.error(f"Error: ...")
-- print(f"Warning: ...") → logger.warning(f"Warning: ...")
-- print(f"DEBUG: ...") → logger.debug(f"DEBUG: ...")
+- logger.info("...") → logger.info("...")
+- logger.error(f"Error") → logger.error(f"Error: ...")
+- logger.warning(f"Warning") → logger.warning(f"Warning: ...")
+- logger.debug(f"DEBUG") → logger.debug(f"DEBUG: ...")
 """
 
 import re
 import os
 import shutil
+import logging
 from pathlib import Path
 from datetime import datetime
 from typing import List, Tuple, Dict
 import json
+
+# ロガー設定
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 class PrintToLoggingConverter:
@@ -170,7 +178,7 @@ class PrintToLoggingConverter:
                 original_content = f.read()
 
             # print文が存在しない場合はスキップ
-            if 'print(' not in original_content:
+            if 'logger.info(' not in original_content:
                 return False
 
             # バックアップ作成
@@ -207,13 +215,13 @@ class PrintToLoggingConverter:
             self.stats["converted_files"] += 1
             self.stats["converted_prints"] += print_count
 
-            print(f"✓ Converted: {file_path.relative_to(self.project_root)} ({print_count} prints)")
+            logger.info(f"✓ Converted: {file_path.relative_to(self.project_root)} ({print_count} prints)")
             return True
 
         except Exception as e:
             error_msg = f"Failed to process {file_path}: {str(e)}"
             self.stats["errors"].append(error_msg)
-            print(f"✗ {error_msg}")
+            logger.info(f"✗ {error_msg}")
             return False
 
     def should_process_file(self, file_path: Path) -> bool:
@@ -231,14 +239,14 @@ class PrintToLoggingConverter:
 
     def scan_and_convert(self) -> Dict:
         """プロジェクト全体をスキャンして変換"""
-        print("=" * 80)
-        print("Print to Logging Converter")
-        print("=" * 80)
-        print(f"Project Root: {self.project_root}")
-        print(f"Backup Directory: {self.backup_dir}")
-        print(f"Target Directories: {', '.join(self.target_dirs)}")
-        print("=" * 80)
-        print()
+        logger.info("=" * 80)
+        logger.info("Print to Logging Converter")
+        logger.info("=" * 80)
+        logger.info(f"Project Root: {self.project_root}")
+        logger.info(f"Backup Directory: {self.backup_dir}")
+        logger.info(f"Target Directories: {', '.join(self.target_dirs)}")
+        logger.info("=" * 80)
+        logger.info("")
 
         # 全Pythonファイルを検索
         python_files = []
@@ -251,7 +259,7 @@ class PrintToLoggingConverter:
         python_files = [f for f in python_files if self.should_process_file(f)]
         self.stats["total_files"] = len(python_files)
 
-        print(f"Found {len(python_files)} Python files to process\n")
+        logger.info(f"Found {len(python_files)} Python files to process\n")
 
         # 各ファイルを処理
         for file_path in python_files:
@@ -269,30 +277,30 @@ class PrintToLoggingConverter:
 
     def print_statistics(self):
         """統計情報を表示"""
-        print("\n" + "=" * 80)
-        print("Conversion Statistics")
-        print("=" * 80)
-        print(f"Total Files Scanned:    {self.stats['total_files']}")
-        print(f"Files Converted:        {self.stats['converted_files']}")
-        print(f"Total Print Statements: {self.stats['converted_prints']}")
-        print(f"Errors:                 {len(self.stats['errors'])}")
-        print("=" * 80)
+        logger.info("\n" + "=" * 80)
+        logger.info("Conversion Statistics")
+        logger.info("=" * 80)
+        logger.info(f"Total Files Scanned:    {self.stats['total_files']}")
+        logger.info(f"Files Converted:        {self.stats['converted_files']}")
+        logger.info(f"Total Print Statements: {self.stats['converted_prints']}")
+        logger.info(f"Errors:                 {len(self.stats['errors'])}")
+        logger.info("=" * 80)
 
         if self.stats["errors"]:
-            print("\nErrors:")
+            logger.info("\nErrors:")
             for error in self.stats["errors"]:
-                print(f"  - {error}")
+                logger.info(f"  - {error}")
 
-        print(f"\nBackup Location: {self.backup_dir}")
-        print("=" * 80)
+        logger.info(f"\nBackup Location: {self.backup_dir}")
+        logger.info("=" * 80)
 
     def rollback(self):
         """変換をロールバック（バックアップから復元）"""
         if not self.backup_dir.exists():
-            print("No backup found to rollback")
+            logger.info("No backup found to rollback")
             return False
 
-        print(f"Rolling back from: {self.backup_dir}")
+        logger.info(f"Rolling back from: {self.backup_dir}")
 
         for backup_file in self.backup_dir.rglob('*.py'):
             relative_path = backup_file.relative_to(self.backup_dir)
@@ -300,11 +308,11 @@ class PrintToLoggingConverter:
 
             try:
                 shutil.copy2(backup_file, original_file)
-                print(f"✓ Restored: {relative_path}")
+                logger.info(f"✓ Restored: {relative_path}")
             except Exception as e:
-                print(f"✗ Failed to restore {relative_path}: {str(e)}")
+                logger.info(f"✗ Failed to restore {relative_path}: {str(e)}")
 
-        print("Rollback complete")
+        logger.info("Rollback complete")
         return True
 
 
@@ -344,22 +352,22 @@ def main():
                 converter.backup_dir = backup_dirs[-1]
                 converter.rollback()
             else:
-                print("No backups found")
+                logger.info("No backups found")
         else:
-            print("No backups directory found")
+            logger.info("No backups directory found")
     else:
         # 変換実行
         if args.dry_run:
-            print("DRY RUN MODE - No changes will be made")
-            print("=" * 80)
+            logger.info("DRY RUN MODE - No changes will be made")
+            logger.info("=" * 80)
 
         stats = converter.scan_and_convert()
 
         if stats["converted_files"] > 0:
-            print("\nConversion completed successfully!")
-            print(f"To rollback, run: python {__file__} --rollback")
+            logger.info("\nConversion completed successfully!")
+            logger.info(f"To rollback, run: python {__file__} --rollback")
         else:
-            print("\nNo files were converted.")
+            logger.info("\nNo files were converted.")
 
 
 if __name__ == "__main__":
