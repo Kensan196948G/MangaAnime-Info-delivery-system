@@ -12,14 +12,13 @@ Features:
 - フォールバック機能
 """
 
-import os
+import hashlib
 import json
 import logging
+import os
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
 from datetime import datetime, timedelta
-from functools import lru_cache
-import hashlib
+from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -30,22 +29,18 @@ class SecretProvider(ABC):
     @abstractmethod
     def get_secret(self, key: str) -> Optional[str]:
         """シークレットを取得"""
-        pass
 
     @abstractmethod
     def set_secret(self, key: str, value: str) -> bool:
         """シークレットを設定"""
-        pass
 
     @abstractmethod
     def delete_secret(self, key: str) -> bool:
         """シークレットを削除"""
-        pass
 
     @abstractmethod
     def list_secrets(self) -> list:
         """シークレット一覧を取得"""
-        pass
 
 
 class EnvSecretProvider(SecretProvider):
@@ -141,9 +136,7 @@ class VaultSecretProvider(SecretProvider):
 
     def list_secrets(self) -> list:
         try:
-            response = self.client.secrets.kv.v2.list_secrets(
-                path="", mount_point=self.mount_point
-            )
+            response = self.client.secrets.kv.v2.list_secrets(path="", mount_point=self.mount_point)
             return response.get("data", {}).get("keys", [])
         except Exception as e:
             logger.error(f"Failed to list secrets: {e}")
@@ -168,9 +161,7 @@ class AWSSecretProvider(SecretProvider):
             try:
                 import boto3
 
-                self._client = boto3.client(
-                    "secretsmanager", region_name=self.region_name
-                )
+                self._client = boto3.client("secretsmanager", region_name=self.region_name)
             except ImportError:
                 logger.warning("boto3 package not installed. Install with: pip install boto3")
                 raise
@@ -201,9 +192,7 @@ class AWSSecretProvider(SecretProvider):
 
     def delete_secret(self, key: str) -> bool:
         try:
-            self.client.delete_secret(
-                SecretId=self._full_key(key), ForceDeleteWithoutRecovery=True
-            )
+            self.client.delete_secret(SecretId=self._full_key(key), ForceDeleteWithoutRecovery=True)
             return True
         except Exception as e:
             logger.error(f"Failed to delete secret {key}: {e}")
@@ -281,9 +270,7 @@ class SecretsManager:
             return VaultSecretProvider(url=os.environ.get("VAULT_ADDR"))
 
         # AWS
-        if os.environ.get("AWS_SECRET_ACCESS_KEY") or os.environ.get(
-            "AWS_PROFILE"
-        ):
+        if os.environ.get("AWS_SECRET_ACCESS_KEY") or os.environ.get("AWS_PROFILE"):
             logger.info("Using AWS Secrets Manager as secret provider")
             return AWSSecretProvider()
 

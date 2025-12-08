@@ -14,9 +14,9 @@ Features:
 - Permissions-Policy
 """
 
-from functools import wraps
-from typing import Any, Callable, Dict, Optional
 import os
+from functools import wraps
+from typing import Callable, Dict, Optional
 
 
 class SecurityHeaders:
@@ -86,23 +86,17 @@ class SecurityHeaders:
         headers = {
             # Content Security Policy
             "Content-Security-Policy": self._csp_to_string(),
-
             # HTTP Strict Transport Security
             # max-age=31536000 (1年), includeSubDomains, preload
             "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
-
             # X-Frame-Options (CSPのframe-ancestorsと併用)
             "X-Frame-Options": "DENY",
-
             # X-Content-Type-Options
             "X-Content-Type-Options": "nosniff",
-
             # X-XSS-Protection (レガシーブラウザ向け)
             "X-XSS-Protection": "1; mode=block",
-
             # Referrer-Policy
             "Referrer-Policy": "strict-origin-when-cross-origin",
-
             # Permissions-Policy (旧Feature-Policy)
             "Permissions-Policy": (
                 "accelerometer=(), "
@@ -114,16 +108,12 @@ class SecurityHeaders:
                 "payment=(), "
                 "usb=()"
             ),
-
             # Cross-Origin-Opener-Policy
             "Cross-Origin-Opener-Policy": "same-origin",
-
             # Cross-Origin-Embedder-Policy
             "Cross-Origin-Embedder-Policy": "require-corp",
-
             # Cross-Origin-Resource-Policy
             "Cross-Origin-Resource-Policy": "same-origin",
-
             # Cache-Control for sensitive pages
             "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
             "Pragma": "no-cache",
@@ -191,14 +181,16 @@ def security_headers_required(func: Callable) -> Callable:
         def sensitive_route():
             return 'Sensitive data'
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         response = func(*args, **kwargs)
         # 追加のセキュリティヘッダー
-        if hasattr(response, 'headers'):
+        if hasattr(response, "headers"):
             response.headers["X-Content-Type-Options"] = "nosniff"
             response.headers["X-Frame-Options"] = "DENY"
         return response
+
     return wrapper
 
 
@@ -227,7 +219,11 @@ class CORSConfig:
         """
         self.allowed_origins = allowed_origins or ["http://localhost:3000"]
         self.allowed_methods = allowed_methods or ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-        self.allowed_headers = allowed_headers or ["Content-Type", "Authorization", "X-Requested-With"]
+        self.allowed_headers = allowed_headers or [
+            "Content-Type",
+            "Authorization",
+            "X-Requested-With",
+        ]
         self.expose_headers = expose_headers or ["X-Total-Count", "X-Page-Count"]
         self.max_age = max_age
         self.supports_credentials = supports_credentials
@@ -276,6 +272,7 @@ def init_cors(app, config: Optional[CORSConfig] = None):
     def add_cors_headers(response):
         """CORSヘッダーを追加"""
         from flask import request
+
         origin = request.headers.get("Origin")
         cors_headers = config.get_cors_headers(origin)
 

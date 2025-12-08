@@ -3,22 +3,23 @@ Distributed Tracing Module
 OpenTelemetry統合とJaegerエクスポーター設定
 """
 
-import logging
 import functools
+import logging
 import time
-from typing import Optional, Dict, Any
 from contextlib import contextmanager
+from typing import Any, Dict, Optional
 
 try:
     from opentelemetry import trace
-    from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import BatchSpanProcessor
     from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-    from opentelemetry.sdk.resources import SERVICE_NAME, Resource
     from opentelemetry.instrumentation.flask import FlaskInstrumentor
     from opentelemetry.instrumentation.requests import RequestsInstrumentor
     from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
+    from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
     from opentelemetry.trace import Status, StatusCode
+
     TRACING_AVAILABLE = True
 except ImportError:
     TRACING_AVAILABLE = False
@@ -36,7 +37,7 @@ def init_tracing(
     jaeger_port: int = 6831,
     enable_flask: bool = True,
     enable_requests: bool = True,
-    enable_sqlite: bool = True
+    enable_sqlite: bool = True,
 ) -> bool:
     """
     分散トレーシングを初期化
@@ -64,9 +65,7 @@ def init_tracing(
 
     try:
         # リソース定義
-        resource = Resource(attributes={
-            SERVICE_NAME: service_name
-        })
+        resource = Resource(attributes={SERVICE_NAME: service_name})
 
         # トレーサープロバイダー設定
         provider = TracerProvider(resource=resource)
@@ -96,7 +95,9 @@ def init_tracing(
             logger.info("SQLite3 instrumentation enabled")
 
         _initialized = True
-        logger.info(f"Tracing initialized: service={service_name}, jaeger={jaeger_host}:{jaeger_port}")
+        logger.info(
+            f"Tracing initialized: service={service_name}, jaeger={jaeger_host}:{jaeger_port}"
+        )
         return True
 
     except Exception as e:
@@ -128,7 +129,7 @@ def get_tracer() -> Optional[trace.Tracer]:
 def trace_span(
     name: str,
     attributes: Optional[Dict[str, Any]] = None,
-    kind: trace.SpanKind = trace.SpanKind.INTERNAL
+    kind: trace.SpanKind = trace.SpanKind.INTERNAL,
 ):
     """
     トレーシングスパンコンテキストマネージャー
@@ -167,6 +168,7 @@ def trace_function(span_name: Optional[str] = None, attributes: Optional[Dict[st
         span_name: スパン名（指定しない場合は関数名）
         attributes: スパン属性
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -179,7 +181,9 @@ def trace_function(span_name: Optional[str] = None, attributes: Optional[Dict[st
                     result = func(*args, **kwargs)
 
                     if span:
-                        span.set_attribute("function.duration_ms", (time.time() - start_time) * 1000)
+                        span.set_attribute(
+                            "function.duration_ms", (time.time() - start_time) * 1000
+                        )
                         span.set_status(Status(StatusCode.OK))
 
                     return result
@@ -191,6 +195,7 @@ def trace_function(span_name: Optional[str] = None, attributes: Optional[Dict[st
                     raise
 
         return wrapper
+
     return decorator
 
 
@@ -240,80 +245,96 @@ class TracedOperation:
 
 # ドメイン固有のトレーシングヘルパー
 
+
 @trace_function(attributes={"component": "anime_fetcher"})
 def trace_anime_fetch(source: str):
     """アニメ情報取得トレーシング"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             with trace_span(f"fetch_anime_{source}", {"source": source, "type": "anime"}):
                 return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 @trace_function(attributes={"component": "manga_fetcher"})
 def trace_manga_fetch(source: str):
     """マンガ情報取得トレーシング"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             with trace_span(f"fetch_manga_{source}", {"source": source, "type": "manga"}):
                 return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 @trace_function(attributes={"component": "notifier"})
 def trace_notification(notification_type: str):
     """通知送信トレーシング"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             with trace_span(f"send_{notification_type}", {"notification_type": notification_type}):
                 return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 @trace_function(attributes={"component": "calendar"})
 def trace_calendar_operation(operation: str):
     """カレンダー操作トレーシング"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             with trace_span(f"calendar_{operation}", {"operation": operation}):
                 return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 def trace_db_query(table: str, operation: str):
     """データベースクエリトレーシング"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             with trace_span(
                 f"db_{operation}_{table}",
-                {"db.table": table, "db.operation": operation, "component": "database"}
+                {"db.table": table, "db.operation": operation, "component": "database"},
             ):
                 return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 # エクスポート
 __all__ = [
-    'init_tracing',
-    'init_flask_tracing',
-    'get_tracer',
-    'trace_span',
-    'trace_function',
-    'TracedOperation',
-    'trace_anime_fetch',
-    'trace_manga_fetch',
-    'trace_notification',
-    'trace_calendar_operation',
-    'trace_db_query',
-    'TRACING_AVAILABLE',
+    "init_tracing",
+    "init_flask_tracing",
+    "get_tracer",
+    "trace_span",
+    "trace_function",
+    "TracedOperation",
+    "trace_anime_fetch",
+    "trace_manga_fetch",
+    "trace_notification",
+    "trace_calendar_operation",
+    "trace_db_query",
+    "TRACING_AVAILABLE",
 ]
