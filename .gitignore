@@ -139,3 +139,7 @@ token.json
 token.pickle
 client_secret*.json
 auth/calendar_token.json
+
+# SQLite WAL files (auto-generated, should not be tracked)
+*.sqlite3-shm
+*.sqlite3-wal
