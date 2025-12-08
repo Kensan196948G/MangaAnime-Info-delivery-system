@@ -1,0 +1,77 @@
+# Prometheus Configuration
+
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'mangaanime-prod'
+    environment: 'production'
+
+# Alertmanager設定
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+# アラートルール読み込み
+rule_files:
+  - '/etc/prometheus/alerts.yml'
+
+# スクレイプ設定
+scrape_configs:
+  # Prometheus自身の監視
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - 'localhost:9090'
+        labels:
+          service: 'prometheus'
+
+  # MangaAnimeアプリケーション
+  - job_name: 'mangaanime-app'
+    scrape_interval: 10s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets:
+          - 'app:5000'
+        labels:
+          service: 'mangaanime'
+          component: 'application'
+
+  # Node Exporter (システムメトリクス)
+  - job_name: 'node-exporter'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - 'node-exporter:9100'
+        labels:
+          service: 'node-exporter'
+          component: 'infrastructure'
+
+  # cAdvisor (コンテナメトリクス)
+  - job_name: 'cadvisor'
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - 'cadvisor:8080'
+        labels:
+          service: 'cadvisor'
+          component: 'infrastructure'
+
+  # Alertmanager
+  - job_name: 'alertmanager'
+    static_configs:
+      - targets:
+          - 'alertmanager:9093'
+        labels:
+          service: 'alertmanager'
+
+  # Grafana
+  - job_name: 'grafana'
+    static_configs:
+      - targets:
+          - 'grafana:3000'
+        labels:
+          service: 'grafana'

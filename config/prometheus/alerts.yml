@@ -1,0 +1,332 @@
+# Prometheus Alert Rules
+# アラートルール定義
+
+groups:
+  # システムリソースアラート
+  - name: system_alerts
+    interval: 30s
+    rules:
+      - alert: HighCPUUsage
+        expr: system_cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}% on instance {{ $labels.instance }}"
+          runbook_url: "https://runbooks.example.com/HighCPUUsage"
+
+      - alert: CriticalCPUUsage
+        expr: system_cpu_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Critical CPU usage detected"
+          description: "CPU usage is {{ $value }}% on instance {{ $labels.instance }}"
+          runbook_url: "https://runbooks.example.com/CriticalCPUUsage"
+
+      - alert: HighMemoryUsage
+        expr: (system_memory_usage_bytes / 1024 / 1024 / 1024) > 7
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}GB on instance {{ $labels.instance }}"
+
+      - alert: CriticalMemoryUsage
+        expr: (system_memory_usage_bytes / 1024 / 1024 / 1024) > 14
+        for: 2m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Critical memory usage detected"
+          description: "Memory usage is {{ $value }}GB on instance {{ $labels.instance }}"
+
+      - alert: HighDiskUsage
+        expr: system_disk_usage_percent > 85
+        for: 10m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "High disk usage detected"
+          description: "Disk usage is {{ $value }}% on {{ $labels.path }}"
+
+      - alert: CriticalDiskUsage
+        expr: system_disk_usage_percent > 95
+        for: 5m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Critical disk usage detected"
+          description: "Disk usage is {{ $value }}% on {{ $labels.path }}"
+
+  # HTTPリクエストアラート
+  - name: http_alerts
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_request_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+          service: api
+        annotations:
+          summary: "High HTTP error rate detected"
+          description: "Error rate is {{ $value }} errors/sec for {{ $labels.endpoint }}"
+          runbook_url: "https://runbooks.example.com/HighErrorRate"
+
+      - alert: CriticalErrorRate
+        expr: rate(http_request_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          category: application
+          service: api
+        annotations:
+          summary: "Critical HTTP error rate detected"
+          description: "Error rate is {{ $value }} errors/sec for {{ $labels.endpoint }}"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+          service: api
+        annotations:
+          summary: "High API latency detected"
+          description: "P95 latency is {{ $value }}s for {{ $labels.endpoint }}"
+
+      - alert: CriticalLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 5
+        for: 2m
+        labels:
+          severity: critical
+          category: application
+          service: api
+        annotations:
+          summary: "Critical API latency detected"
+          description: "P95 latency is {{ $value }}s for {{ $labels.endpoint }}"
+
+      - alert: LowRequestRate
+        expr: rate(http_requests_total[10m]) < 0.01
+        for: 15m
+        labels:
+          severity: warning
+          category: application
+          service: api
+        annotations:
+          summary: "Low request rate detected"
+          description: "Request rate is {{ $value }} req/sec - service may be down"
+
+  # データベースアラート
+  - name: database_alerts
+    interval: 30s
+    rules:
+      - alert: HighDatabaseLatency
+        expr: histogram_quantile(0.95, rate(db_operation_duration_seconds_bucket[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "High database operation latency"
+          description: "P95 latency is {{ $value }}s for {{ $labels.operation }} on {{ $labels.table }}"
+
+      - alert: DatabaseErrorRate
+        expr: rate(db_operations_total{status="error"}[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Database operation errors detected"
+          description: "Error rate is {{ $value }} errors/sec for {{ $labels.table }}"
+
+      - alert: CriticalDatabaseErrors
+        expr: rate(db_operations_total{status="error"}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          category: database
+        annotations:
+          summary: "Critical database error rate"
+          description: "Error rate is {{ $value }} errors/sec for {{ $labels.table }}"
+
+  # API取得アラート
+  - name: api_fetch_alerts
+    interval: 30s
+    rules:
+      - alert: APIFetchFailure
+        expr: rate(api_fetch_total{status="error"}[10m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+          service: fetcher
+        annotations:
+          summary: "API fetch failures detected"
+          description: "Fetch failure rate is {{ $value }} failures/sec for {{ $labels.source }}"
+
+      - alert: CriticalAPIFetchFailure
+        expr: rate(api_fetch_total{status="error"}[5m]) > 0.5
+        for: 2m
+        labels:
+          severity: critical
+          category: application
+          service: fetcher
+        annotations:
+          summary: "Critical API fetch failure rate"
+          description: "Fetch failure rate is {{ $value }} failures/sec for {{ $labels.source }}"
+
+      - alert: SlowAPIFetch
+        expr: histogram_quantile(0.95, rate(api_fetch_duration_seconds_bucket[5m])) > 30
+        for: 10m
+        labels:
+          severity: warning
+          category: application
+          service: fetcher
+        annotations:
+          summary: "Slow API fetch detected"
+          description: "P95 fetch duration is {{ $value }}s for {{ $labels.source }}"
+
+      - alert: NoAPIFetchActivity
+        expr: rate(api_fetch_total[30m]) == 0
+        for: 1h
+        labels:
+          severity: warning
+          category: application
+          service: fetcher
+        annotations:
+          summary: "No API fetch activity"
+          description: "No fetch activity for {{ $labels.source }} in the last hour"
+
+  # 通知アラート
+  - name: notification_alerts
+    interval: 30s
+    rules:
+      - alert: NotificationFailure
+        expr: rate(notifications_sent_total{status="error"}[10m]) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+          service: notifier
+        annotations:
+          summary: "Notification failures detected"
+          description: "Notification failure rate is {{ $value }} failures/sec for {{ $labels.type }}"
+
+      - alert: NoNotificationActivity
+        expr: rate(notifications_sent_total[6h]) == 0
+        for: 6h
+        labels:
+          severity: warning
+          category: application
+          service: notifier
+        annotations:
+          summary: "No notification activity"
+          description: "No notifications sent in the last 6 hours"
+
+  # カレンダー同期アラート
+  - name: calendar_alerts
+    interval: 30s
+    rules:
+      - alert: CalendarSyncFailure
+        expr: rate(calendar_sync_total{status="error"}[10m]) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+          service: calendar
+        annotations:
+          summary: "Calendar sync failures detected"
+          description: "Calendar sync failure rate is {{ $value }} failures/sec"
+
+      - alert: NoCalendarSyncActivity
+        expr: rate(calendar_sync_total[24h]) == 0
+        for: 24h
+        labels:
+          severity: warning
+          category: application
+          service: calendar
+        annotations:
+          summary: "No calendar sync activity"
+          description: "No calendar sync in the last 24 hours"
+
+  # 作品数アラート
+  - name: content_alerts
+    interval: 1h
+    rules:
+      - alert: LowAnimeWorks
+        expr: anime_works_total < 10
+        for: 1h
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "Low anime works count"
+          description: "Only {{ $value }} anime works in database"
+
+      - alert: LowMangaWorks
+        expr: manga_works_total < 10
+        for: 1h
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "Low manga works count"
+          description: "Only {{ $value }} manga works in database"
+
+      - alert: HighPendingReleases
+        expr: releases_pending > 100
+        for: 6h
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "High number of pending releases"
+          description: "{{ $value }} pending releases for {{ $labels.type }}"
+
+      - alert: CriticalPendingReleases
+        expr: releases_pending > 500
+        for: 1h
+        labels:
+          severity: critical
+          category: application
+        annotations:
+          summary: "Critical number of pending releases"
+          description: "{{ $value }} pending releases for {{ $labels.type }} - notification system may be down"
+
+  # サービス死活監視
+  - name: service_health_alerts
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} on {{ $labels.instance }} is down"
+          runbook_url: "https://runbooks.example.com/ServiceDown"
+
+      - alert: InstanceDown
+        expr: up{job="mangaanime-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Application instance is down"
+          description: "MangaAnime application instance {{ $labels.instance }} is down"
