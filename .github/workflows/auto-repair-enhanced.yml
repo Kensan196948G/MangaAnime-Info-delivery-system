@@ -1,9 +1,8 @@
-name: 🔧 自動修復システム強化版（包括的エラー検知・Issue自動作成）
+name: Auto Repair System Enhanced
 
-# 15分ごとに自動実行 + プッシュ時
 on:
   schedule:
-    - cron: '*/15 * * * *'  # 15分ごと
+    - cron: '*/15 * * * *'
   push:
     branches: [main]
     paths:
@@ -12,13 +11,8 @@ on:
       - 'tests/**'
   workflow_dispatch:
     inputs:
-      create_issue:
-        description: 'エラー時にIssueを作成する'
-        required: false
-        default: 'true'
-        type: boolean
       run_tests:
-        description: 'テストを実行する'
+        description: 'Run tests'
         required: false
         default: 'true'
         type: boolean
@@ -32,424 +26,220 @@ env:
   PYTHON_VERSION: '3.12'
 
 jobs:
-  # ============================================
-  # Job 1: エラー検知
-  # ============================================
   detect-errors:
-    name: 🔍 エラー検知
+    name: Detect Errors
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      has_syntax_errors: ${{ steps.syntax.outputs.has_errors }}
-      has_import_errors: ${{ steps.imports.outputs.has_errors }}
-      has_security_issues: ${{ steps.security.outputs.has_issues }}
       error_summary: ${{ steps.summary.outputs.summary }}
       total_errors: ${{ steps.summary.outputs.total }}
 
     steps:
-      - name: 📥 チェックアウト
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 🐍 Python環境セットアップ
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: 📦 依存関係インストール
+      - name: Install dependencies
         run: |
-          pip install flake8 black isort mypy bandit safety
+          pip install flake8 black isort bandit
           pip install -r requirements.txt || true
 
-      - name: 🔍 構文エラー検知
+      - name: Check syntax errors
         id: syntax
         continue-on-error: true
         run: |
-          echo "## 🔍 構文エラー検知" >> $GITHUB_STEP_SUMMARY
-
-          # 重大な構文エラーをチェック
           flake8 app modules --count --select=E9,F63,F7,F82 --show-source --statistics > syntax_errors.txt 2>&1 || true
-
           error_count=$(tail -1 syntax_errors.txt | grep -oE '^[0-9]+' || echo "0")
+          echo "count=$error_count" >> $GITHUB_OUTPUT
 
-          if [ "$error_count" -gt 0 ]; then
-            echo "has_errors=true" >> $GITHUB_OUTPUT
-            echo "count=$error_count" >> $GITHUB_OUTPUT
-            echo "❌ 構文エラー: $error_count 件" >> $GITHUB_STEP_SUMMARY
-            cat syntax_errors.txt >> $GITHUB_STEP_SUMMARY
-          else
-            echo "has_errors=false" >> $GITHUB_OUTPUT
-            echo "count=0" >> $GITHUB_OUTPUT
-            echo "✅ 構文エラーなし" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: 🔍 インポートエラー検知
+      - name: Check import errors
         id: imports
         continue-on-error: true
         run: |
-          echo "## 🔍 インポートエラー検知" >> $GITHUB_STEP_SUMMARY
-
-          # Pythonファイルのインポートチェック
           import_errors=0
           for file in $(find app modules -name "*.py" -type f 2>/dev/null); do
-            python3 -c "import ast; ast.parse(open('$file').read())" 2>/dev/null || {
-              echo "❌ $file" >> import_errors.txt
-              ((import_errors++)) || true
-            }
+            python3 -c "import ast; ast.parse(open('$file').read())" 2>/dev/null || ((import_errors++)) || true
           done
+          echo "count=$import_errors" >> $GITHUB_OUTPUT
 
-          if [ "$import_errors" -gt 0 ]; then
-            echo "has_errors=true" >> $GITHUB_OUTPUT
-            echo "count=$import_errors" >> $GITHUB_OUTPUT
-            echo "❌ インポートエラー: $import_errors 件" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "has_errors=false" >> $GITHUB_OUTPUT
-            echo "count=0" >> $GITHUB_OUTPUT
-            echo "✅ インポートエラーなし" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: 🔒 セキュリティスキャン
+      - name: Security scan
         id: security
         continue-on-error: true
         run: |
-          echo "## 🔒 セキュリティスキャン" >> $GITHUB_STEP_SUMMARY
-
-          # Banditでセキュリティスキャン
           bandit -r app modules -ll -ii -f txt > security_report.txt 2>&1 || true
-
           high_issues=$(grep -c "Severity: High" security_report.txt 2>/dev/null || echo "0")
-          medium_issues=$(grep -c "Severity: Medium" security_report.txt 2>/dev/null || echo "0")
+          echo "high=$high_issues" >> $GITHUB_OUTPUT
 
-          if [ "$high_issues" -gt 0 ]; then
-            echo "has_issues=true" >> $GITHUB_OUTPUT
-            echo "high=$high_issues" >> $GITHUB_OUTPUT
-            echo "medium=$medium_issues" >> $GITHUB_OUTPUT
-            echo "❌ セキュリティ問題: High=$high_issues, Medium=$medium_issues" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "has_issues=false" >> $GITHUB_OUTPUT
-            echo "high=0" >> $GITHUB_OUTPUT
-            echo "medium=$medium_issues" >> $GITHUB_OUTPUT
-            echo "✅ 重大なセキュリティ問題なし" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: 📊 エラーサマリー作成
+      - name: Create summary
         id: summary
         run: |
-          syntax_errors="${{ steps.syntax.outputs.count || '0' }}"
-          import_errors="${{ steps.imports.outputs.count || '0' }}"
-          security_high="${{ steps.security.outputs.high || '0' }}"
+          syntax_errors="${{ steps.syntax.outputs.count }}"
+          import_errors="${{ steps.imports.outputs.count }}"
+          security_high="${{ steps.security.outputs.high }}"
+
+          syntax_errors=${syntax_errors:-0}
+          import_errors=${import_errors:-0}
+          security_high=${security_high:-0}
 
           total=$((syntax_errors + import_errors + security_high))
-
-          summary="構文エラー: ${syntax_errors}件, インポートエラー: ${import_errors}件, セキュリティ(High): ${security_high}件"
+          summary="Syntax:${syntax_errors} Import:${import_errors} Security:${security_high}"
 
           echo "summary=$summary" >> $GITHUB_OUTPUT
           echo "total=$total" >> $GITHUB_OUTPUT
 
-          echo "## 📊 エラーサマリー" >> $GITHUB_STEP_SUMMARY
-          echo "| カテゴリ | 件数 |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 構文エラー | $syntax_errors |" >> $GITHUB_STEP_SUMMARY
-          echo "| インポートエラー | $import_errors |" >> $GITHUB_STEP_SUMMARY
-          echo "| セキュリティ(High) | $security_high |" >> $GITHUB_STEP_SUMMARY
-          echo "| **合計** | **$total** |" >> $GITHUB_STEP_SUMMARY
+          echo "## Error Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Category | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Syntax | $syntax_errors |" >> $GITHUB_STEP_SUMMARY
+          echo "| Import | $import_errors |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security (High) | $security_high |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Total** | **$total** |" >> $GITHUB_STEP_SUMMARY
 
-      - name: 📤 エラーレポートをアップロード
+      - name: Upload error reports
         if: steps.summary.outputs.total != '0'
         uses: actions/upload-artifact@v4
         with:
           name: error-reports
           path: |
             syntax_errors.txt
-            import_errors.txt
             security_report.txt
           retention-days: 7
 
-  # ============================================
-  # Job 2: 自動修復
-  # ============================================
   auto-repair:
-    name: 🔧 自動修復
+    name: Auto Repair
     needs: detect-errors
     runs-on: ubuntu-latest
     if: needs.detect-errors.outputs.total_errors != '0'
     timeout-minutes: 10
+    outputs:
+      repair_status: ${{ steps.repair.outputs.status }}
 
     steps:
-      - name: 📥 チェックアウト
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🐍 Python環境セットアップ
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: 📦 修復ツールインストール
+      - name: Install repair tools
         run: pip install black isort autoflake
 
-      - name: 🔧 自動修復実行
+      - name: Run auto repair
         id: repair
         run: |
-          echo "🔧 自動修復を開始します..."
-
-          # 未使用インポート削除
           autoflake --in-place --remove-all-unused-imports --recursive app modules || true
-
-          # コードフォーマット
           black app modules --quiet || true
-
-          # インポート整理
           isort app modules --quiet || true
 
-          # 修復後の確認
           flake8 app modules --count --select=E9,F63,F7,F82 > post_repair.txt 2>&1 || true
           remaining=$(tail -1 post_repair.txt | grep -oE '^[0-9]+' || echo "0")
 
-          echo "remaining_errors=$remaining" >> $GITHUB_OUTPUT
-
           if [ "$remaining" -eq 0 ]; then
-            echo "repair_status=success" >> $GITHUB_OUTPUT
-            echo "✅ 全エラー修復完了"
+            echo "status=success" >> $GITHUB_OUTPUT
           else
-            echo "repair_status=partial" >> $GITHUB_OUTPUT
-            echo "⚠️ 残存エラー: $remaining 件（手動対応必要）"
+            echo "status=partial" >> $GITHUB_OUTPUT
           fi
 
-      - name: 💾 修復コミット
-        id: commit
+      - name: Commit repairs
         run: |
           git config user.name "Auto Repair Bot"
           git config user.email "auto-repair@github-actions"
 
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "[Auto Repair] Fix errors - ${{ needs.detect-errors.outputs.error_summary }}" \
-              -m "Repair status: ${{ steps.repair.outputs.repair_status }}" \
-              -m "Remaining errors: ${{ steps.repair.outputs.remaining_errors }}" \
-              -m "Auto Repair System (Enhanced) - Closes #56"
+            git commit -m "[Auto Repair] ${{ needs.detect-errors.outputs.error_summary }}"
             git push
-            echo "committed=true" >> $GITHUB_OUTPUT
-            echo "Repair committed and pushed"
-          else
-            echo "committed=false" >> $GITHUB_OUTPUT
-            echo "No changes to commit"
           fi
 
-  # ============================================
-  # Job 3: Issue自動作成
-  # ============================================
   create-issue:
-    name: 📝 Issue自動作成
+    name: Create Issue
     needs: [detect-errors, auto-repair]
     runs-on: ubuntu-latest
-    if: |
-      always() &&
-      needs.detect-errors.outputs.total_errors != '0' &&
-      (needs.auto-repair.result == 'failure' || needs.auto-repair.outputs.repair_status == 'partial')
+    if: always() && needs.detect-errors.outputs.total_errors != '0' && needs.auto-repair.outputs.repair_status == 'partial'
     timeout-minutes: 5
 
     steps:
-      - name: 📥 チェックアウト
-        uses: actions/checkout@v4
-
-      - name: 🔍 既存Issue確認
-        id: check_issue
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { data: issues } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'auto-repair,error'
-            });
-
-            const today = new Date().toISOString().split('T')[0];
-            const existingIssue = issues.find(issue =>
-              issue.title.includes('自動修復') &&
-              issue.created_at.startsWith(today)
-            );
-
-            if (existingIssue) {
-              core.setOutput('exists', 'true');
-              core.setOutput('issue_number', existingIssue.number);
-              console.log(`既存Issue #${existingIssue.number} が見つかりました`);
-            } else {
-              core.setOutput('exists', 'false');
-              console.log('新規Issue作成が必要です');
-            }
-
-      - name: 📝 新規Issue作成
-        if: steps.check_issue.outputs.exists != 'true'
+      - name: Create issue for manual fix
         uses: actions/github-script@v7
         with:
           script: |
             const errorSummary = '${{ needs.detect-errors.outputs.error_summary }}';
             const totalErrors = '${{ needs.detect-errors.outputs.total_errors }}';
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date().toISOString().split('T')[0];
 
-            const issue = await github.rest.issues.create({
+            const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🚨 [自動検知] エラー ${totalErrors}件 - ${new Date().toISOString().split('T')[0]}`,
-              body: `## 🔍 自動エラー検知レポート
-
-**検知日時**: ${new Date().toISOString()}
-**ワークフロー実行**: [Run #${context.runNumber}](${runUrl})
-
-## 📊 エラーサマリー
-
-${errorSummary}
-
-## 🔧 自動修復結果
-
-自動修復を試みましたが、一部のエラーは手動対応が必要です。
-
-## 📋 対応手順
-
-1. ワークフローログを確認
-2. エラーレポート（Artifacts）をダウンロード
-3. 手動で修正を実施
-4. 修正後、このIssueをCloseしてください
-
-## 🔗 関連リンク
-
-- [開発状況レポート](docs/reports/development-status-report-2025-12-08.md)
-- [自動修復システム強化Issue](#56)
-
----
-🤖 Auto Repair System (Enhanced)
-`,
-              labels: ['auto-repair', 'error', 'bug']
+              state: 'open',
+              labels: 'auto-repair'
             });
 
-            console.log(`Issue #${issue.data.number} を作成しました`);
+            const existingIssue = issues.data.find(i => i.title.includes(today));
 
-      - name: 📝 既存Issueにコメント追加
-        if: steps.check_issue.outputs.exists == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const issueNumber = ${{ steps.check_issue.outputs.issue_number }};
-            const errorSummary = '${{ needs.detect-errors.outputs.error_summary }}';
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '[Auto Detect] Errors ' + totalErrors + ' - ' + today,
+                body: '## Error Detection Report\n\n' + errorSummary + '\n\nManual fix required.\n\n---\nAuto Repair System',
+                labels: ['auto-repair', 'bug']
+              });
+            }
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              body: `## 🔄 追加エラー検知
-
-**検知日時**: ${new Date().toISOString()}
-**ワークフロー実行**: [Run #${context.runNumber}](${runUrl})
-
-### 📊 エラーサマリー
-${errorSummary}
-
----
-🤖 Auto Repair System`
-            });
-
-            console.log(`Issue #${issueNumber} にコメントを追加しました`);
-
-  # ============================================
-  # Job 4: テスト実行（オプション）
-  # ============================================
   run-tests:
-    name: 🧪 テスト実行
+    name: Run Tests
     needs: [detect-errors, auto-repair]
     runs-on: ubuntu-latest
-    if: |
-      always() &&
-      (github.event.inputs.run_tests == 'true' || github.event_name == 'push')
+    if: always() && (github.event.inputs.run_tests == 'true' || github.event_name == 'push')
     timeout-minutes: 15
 
     steps:
-      - name: 📥 チェックアウト
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 🐍 Python環境セットアップ
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: 📦 依存関係インストール
+      - name: Install dependencies
         run: |
-          pip install pytest pytest-cov pytest-xdist
+          pip install pytest pytest-cov
           pip install -r requirements.txt || true
 
-      - name: 🧪 テスト実行
-        id: tests
+      - name: Run tests
         continue-on-error: true
         run: |
-          pytest tests/ \
-            --tb=short \
-            --cov=app --cov=modules \
-            --cov-report=term-missing \
-            --cov-report=xml \
-            -x \
-            --timeout=60 \
-            2>&1 | tee test_output.txt || true
+          pytest tests/ --tb=short -x --timeout=60 2>&1 | tee test_output.txt || true
 
-          # テスト結果を解析
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
           if grep -q "passed" test_output.txt; then
             passed=$(grep -oE '[0-9]+ passed' test_output.txt | grep -oE '[0-9]+' || echo "0")
             failed=$(grep -oE '[0-9]+ failed' test_output.txt | grep -oE '[0-9]+' || echo "0")
-
-            echo "passed=$passed" >> $GITHUB_OUTPUT
-            echo "failed=$failed" >> $GITHUB_OUTPUT
-
-            if [ "$failed" -eq 0 ]; then
-              echo "status=success" >> $GITHUB_OUTPUT
-            else
-              echo "status=failure" >> $GITHUB_OUTPUT
-            fi
+            echo "Passed: $passed, Failed: $failed" >> $GITHUB_STEP_SUMMARY
           else
-            echo "status=error" >> $GITHUB_OUTPUT
+            echo "Test execution error" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: 📊 テスト結果をサマリーに追加
-        run: |
-          echo "## 🧪 テスト結果" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ steps.tests.outputs.status }}" == "success" ]; then
-            echo "✅ **テスト成功**" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ steps.tests.outputs.status }}" == "failure" ]; then
-            echo "❌ **テスト失敗**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ **テストエラー**" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| 項目 | 件数 |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Passed | ${{ steps.tests.outputs.passed || '0' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Failed | ${{ steps.tests.outputs.failed || '0' }} |" >> $GITHUB_STEP_SUMMARY
-
-  # ============================================
-  # Job 5: 成功通知
-  # ============================================
   notify-success:
-    name: ✅ 成功通知
-    needs: [detect-errors, auto-repair, run-tests]
+    name: Notify Success
+    needs: [detect-errors]
     runs-on: ubuntu-latest
-    if: |
-      always() &&
-      needs.detect-errors.outputs.total_errors == '0'
+    if: always() && needs.detect-errors.outputs.total_errors == '0'
     timeout-minutes: 2
 
     steps:
-      - name: ✅ 成功メッセージ
+      - name: Success message
         run: |
-          echo "## ✅ 自動修復システム - 正常完了" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "エラーは検出されませんでした。" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**次回実行**: 15分後" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "🤖 Auto Repair System (Enhanced)" >> $GITHUB_STEP_SUMMARY
+          echo "## Auto Repair System - OK" >> $GITHUB_STEP_SUMMARY
+          echo "No errors detected." >> $GITHUB_STEP_SUMMARY
