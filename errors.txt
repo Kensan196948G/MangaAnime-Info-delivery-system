@@ -1,16 +1,264 @@
+app/dashboard_main.py:49:9: F821 undefined name 'logger'
+        logger.info("Dashboard-enabled Release Notifier initialized")
+        ^
+app/dashboard_main.py:56:13: F821 undefined name 'logger'
+            logger.info("Configuration loaded successfully")
+            ^
+app/dashboard_main.py:58:13: F821 undefined name 'logger'
+            logger.error(f"Failed to load configuration: {e}")
+            ^
+app/dashboard_main.py:64:9: F821 undefined name 'logger'
+        logger.info("Starting anime data collection...")
+        ^
+app/dashboard_main.py:102:21: F821 undefined name 'logger'
+                    logger.error(f"Error processing anime {anime.get('title', 'Unknown')}: {e}")
+                    ^
+app/dashboard_main.py:105:13: F821 undefined name 'logger'
+            logger.info(f"Collected {collected_count} anime entries")
+            ^
+app/dashboard_main.py:117:13: F821 undefined name 'logger'
+            logger.error(f"Failed to collect anime data: {e}")
+            ^
+app/dashboard_main.py:126:9: F821 undefined name 'logger'
+        logger.info("Starting manga data collection...")
+        ^
+app/dashboard_main.py:137:17: F821 undefined name 'logger'
+                logger.info(f"Processing RSS source: {source_name}")
+                ^
+app/dashboard_main.py:175:25: F821 undefined name 'logger'
+                        logger.error(f"Error processing manga from {source_name}: {e}")
+                        ^
+app/dashboard_main.py:178:17: F821 undefined name 'logger'
+                logger.info(f"Collected {source_collected} manga entries from {source_name}")
+                ^
+app/dashboard_main.py:181:17: F821 undefined name 'logger'
+                logger.error(f"Error processing RSS source {source.get('name', 'unknown')}: {e}")
+                ^
+app/dashboard_main.py:184:9: F821 undefined name 'logger'
+        logger.info(f"Total manga collected: {total_collected}")
+        ^
+app/dashboard_main.py:198:9: F821 undefined name 'logger'
+        logger.info("Processing notifications...")
+        ^
+app/dashboard_main.py:205:17: F821 undefined name 'logger'
+                logger.info("No pending notifications")
+                ^
+app/dashboard_main.py:227:25: F821 undefined name 'logger'
+                        logger.info(f"Notification sent for: {release['title']}")
+                        ^
+app/dashboard_main.py:233:21: F821 undefined name 'logger'
+                    logger.error(f"Error sending notification for release {release['id']}: {e}")
+                    ^
+app/dashboard_main.py:236:13: F821 undefined name 'logger'
+            logger.info(f"Sent {sent_count} notifications")
+            ^
+app/dashboard_main.py:248:13: F821 undefined name 'logger'
+            logger.error(f"Failed to process notifications: {e}")
+            ^
+app/dashboard_main.py:257:9: F821 undefined name 'logger'
+        logger.info("=== Starting full system cycle ===")
+        ^
+app/dashboard_main.py:271:13: F821 undefined name 'logger'
+            logger.info("=== Cycle completed successfully ===")
+            ^
+app/dashboard_main.py:272:13: F821 undefined name 'logger'
+            logger.info(f"Anime collected: {anime_count}")
+            ^
+app/dashboard_main.py:273:13: F821 undefined name 'logger'
+            logger.info(f"Manga collected: {manga_count}")
+            ^
+app/dashboard_main.py:274:13: F821 undefined name 'logger'
+            logger.info(f"Notifications sent: {notification_count}")
+            ^
+app/dashboard_main.py:289:13: F821 undefined name 'logger'
+            logger.error(f"System cycle failed: {e}")
+            ^
+app/dashboard_main.py:297:9: F821 undefined name 'logger'
+        logger.info("Starting data cleanup...")
+        ^
+app/dashboard_main.py:306:13: F821 undefined name 'logger'
+            logger.info(f"Cleanup completed: {cleanup_result}")
+            ^
+app/dashboard_main.py:309:13: F821 undefined name 'logger'
+            logger.error(f"Cleanup failed: {e}")
+            ^
+app/dashboard_main.py:317:9: F821 undefined name 'logger'
+        logger.info(f"System startup at {start_time}")
+        ^
+app/dashboard_main.py:329:9: F821 undefined name 'logger'
+        logger.info(f"System cycle completed in {duration:.2f} seconds")
+        ^
+app/dashboard_main.py:330:9: F821 undefined name 'logger'
+        logger.info(f"Results: {result}")
+        ^
+app/dashboard_main.py:337:9: F821 undefined name 'logger'
+        logger.error(f"System failed: {e}")
+        ^
 app/release_notifier.py:630:5: F821 undefined name 'logger'
     logger.info("\n🛑 終了シグナルを受信しました。処理を停止しています...")
     ^
 app/release_notifier.py:687:9: F821 undefined name 'logger'
         logger.info(f"💥 システム初期化エラー: {e}", file=sys.stderr)
         ^
-app/routes/admin_dashboard.py:347:2: E999 SyntaxError: invalid syntax
-import logging
- ^
-app/start_web_ui.py:17:2: E999 IndentationError: expected an indented block after function definition on line 15
-logger = logging.getLogger(__name__)
- ^
-app/web_app_with_api_auth.py:450:5: E999 IndentationError: unexpected indent
+app/start_web_ui.py:29:5: F821 undefined name 'logger'
+    logger.info("=" * 60)
+    ^
+app/start_web_ui.py:30:5: F821 undefined name 'logger'
+    logger.info("アニメ・マンガ情報配信システム Web UI")
+    ^
+app/start_web_ui.py:31:5: F821 undefined name 'logger'
+    logger.info("=" * 60)
+    ^
+app/start_web_ui.py:32:5: F821 undefined name 'logger'
+    logger.info(f"Host: {args.host}")
+    ^
+app/start_web_ui.py:33:5: F821 undefined name 'logger'
+    logger.info(f"Port: {args.port}")
+    ^
+app/start_web_ui.py:34:5: F821 undefined name 'logger'
+    logger.debug(f"Debug")
+    ^
+app/start_web_ui.py:35:5: F821 undefined name 'logger'
+    logger.info(f"URL: http://{args.host}:{args.port}")
+    ^
+app/start_web_ui.py:36:5: F821 undefined name 'logger'
+    logger.info("=" * 60)
+    ^
+app/start_web_ui.py:37:5: F821 undefined name 'logger'
+    logger.info()
+    ^
+app/start_web_ui.py:48:9: F821 undefined name 'logger'
+        logger.info("⚠️  警告: 以下のファイルが見つかりません:")
+        ^
+app/start_web_ui.py:50:13: F821 undefined name 'logger'
+            logger.info(f"   - {file}")
+            ^
+app/start_web_ui.py:51:9: F821 undefined name 'logger'
+        logger.info()
+        ^
+app/start_web_ui.py:52:9: F821 undefined name 'logger'
+        logger.info("メインシステムを最初に実行してデータベースを初期化してください。")
+        ^
+app/start_web_ui.py:53:9: F821 undefined name 'logger'
+        logger.info("Web UIは設定ファイルなしでも起動できますが、一部機能が制限されます。")
+        ^
+app/start_web_ui.py:54:9: F821 undefined name 'logger'
+        logger.info()
+        ^
+app/start_web_ui.py:70:9: F821 undefined name 'logger'
+        logger.info("\n\nWeb UIを終了しています...")
+        ^
+app/start_web_ui.py:73:9: F821 undefined name 'logger'
+        logger.info(f"\nエラーが発生しました: {e}")
+        ^
+modules/anime_annict.py:325:9: F821 undefined name 'logger'
+        logger.info("Annict API is disabled in config")
+        ^
+modules/anime_annict.py:341:13: F821 undefined name 'logger'
+            logger.info(
+            ^
+modules/anime_annict.py:353:9: F821 undefined name 'logger'
+        logger.error(f"Annict API error: {str(e)}")
+        ^
+modules/anime_annict.py:356:9: F821 undefined name 'logger'
+        logger.error(f"Unexpected error collecting Annict data: {str(e)}")
+        ^
+modules/anime_annict.py:374:9: F821 undefined name 'logger'
+        logger.info("⚠️  Please set your Annict access token in config.json")
+        ^
+modules/anime_annict.py:375:9: F821 undefined name 'logger'
+        logger.info("   Get it from: https://annict.com/settings/apps")
+        ^
+modules/anime_annict.py:378:5: F821 undefined name 'logger'
+    logger.info("🔍 Testing Annict API integration...")
+    ^
+modules/anime_annict.py:381:5: F821 undefined name 'logger'
+    logger.info(f"\n📊 Results:")
+    ^
+modules/anime_annict.py:382:5: F821 undefined name 'logger'
+    logger.info(f"   Works: {len(result['works'])}")
+    ^
+modules/anime_annict.py:383:5: F821 undefined name 'logger'
+    logger.info(f"   Programs: {len(result['programs'])}")
+    ^
+modules/anime_annict.py:386:9: F821 undefined name 'logger'
+        logger.info(f"\n📺 Sample work:")
+        ^
+modules/anime_annict.py:387:9: F821 undefined name 'logger'
+        logger.info(json.dumps(result["works"][0], indent=2, ensure_ascii=False))
+        ^
+modules/anime_kitsu.py:278:5: F821 undefined name 'logger'
+    logger.info("Starting Kitsu anime collection...")
+    ^
+modules/anime_kitsu.py:300:13: F821 undefined name 'logger'
+            logger.info(f"Collected {len(seasonal_anime)} seasonal anime")
+            ^
+modules/anime_kitsu.py:305:13: F821 undefined name 'logger'
+            logger.info(f"Collected {len(trending_anime)} trending anime")
+            ^
+modules/anime_kitsu.py:308:13: F821 undefined name 'logger'
+            logger.error(f"Kitsu API error: {str(e)}")
+            ^
+modules/anime_kitsu.py:310:13: F821 undefined name 'logger'
+            logger.error(f"Unexpected error in Kitsu anime collection: {str(e)}")
+            ^
+modules/anime_kitsu.py:312:5: F821 undefined name 'logger'
+    logger.info(f"Kitsu anime collection complete: {len(all_anime)} total items")
+    ^
+modules/anime_kitsu.py:326:5: F821 undefined name 'logger'
+    logger.info("Starting Kitsu manga collection...")
+    ^
+modules/anime_kitsu.py:335:13: F821 undefined name 'logger'
+            logger.info(f"Collected {len(manga_updates)} manga updates")
+            ^
+modules/anime_kitsu.py:338:13: F821 undefined name 'logger'
+            logger.error(f"Kitsu API error: {str(e)}")
+            ^
+modules/anime_kitsu.py:340:13: F821 undefined name 'logger'
+            logger.error(f"Unexpected error in Kitsu manga collection: {str(e)}")
+            ^
+modules/anime_kitsu.py:342:5: F821 undefined name 'logger'
+    logger.info(f"Kitsu manga collection complete: {len(all_manga)} total items")
+    ^
+modules/anime_kitsu.py:359:9: F821 undefined name 'logger'
+        logger.info(f"Collected {len(anime_data)} anime and {len(manga_data)} manga")
+        ^
+modules/anime_syoboi.py:589:13: F821 undefined name 'logger'
+            logger.info("しょぼいカレンダーから収集されたデータはありません")
+            ^
+modules/anime_syoboi.py:616:17: F821 undefined name 'logger'
+                logger.warning(f"作品保存エラー: {work} - {e}")
+                ^
+modules/anime_syoboi.py:646:17: F821 undefined name 'logger'
+                logger.warning(f"リリース保存エラー: {e}")
+                ^
+modules/anime_syoboi.py:649:9: F821 undefined name 'logger'
+        logger.info(
+        ^
+modules/anime_syoboi.py:655:9: F821 undefined name 'logger'
+        logger.error(f"しょぼいカレンダー fetch_and_store エラー: {e}")
+        ^
+modules/audit_log.py:108:9: F821 undefined name 'logger'
+        logger.log(
+        ^
+modules/audit_log_db.py:21:9: F821 undefined name 'logger'
+        logger.info(f"AuditLoggerDB初期化: {db_path}")
+        ^
+modules/audit_log_db.py:33:13: F821 undefined name 'logger'
+            logger.error(f"監査ログDBエラー: {e}")
+            ^
+modules/audit_log_db.py:68:9: F821 undefined name 'logger'
+        logger.log(
+        ^
+modules/audit_log_db.py:215:9: F821 undefined name 'logger'
+        logger.info("AuditLoggerDB（DB版）を使用します")
+        ^
+modules/audit_log_db.py:217:9: F821 undefined name 'logger'
+        logger.warning(f"AuditLoggerDB初期化失敗: {e}。メモリ版を使用します")
+        ^
+modules/audit_log_db.py:225:5: F821 undefined name 'logger'
+    logger.info("AuditLogger（メモリ版）を使用します")
+    ^
 modules/backend_validator.py:987:9: F821 undefined name 'logger'
         logger.info("Starting backend validation...")
         ^
@@ -50,6 +298,375 @@ modules/backend_validator.py:1007:21: F821 undefined name 'logger'
 modules/backend_validator.py:1014:13: F821 undefined name 'logger'
             logger.info(f"Validation failed with error: {e}")
             ^
+modules/brute_force_protection.py:34:9: F821 undefined name 'logger'
+        logger.warning(f"ログイン失敗記録: '{username}' ({recent_attempts}/{self.MAX_ATTEMPTS})")
+        ^
+modules/brute_force_protection.py:43:17: F821 undefined name 'logger'
+                logger.info(f"ロック中のアカウント: '{username}' (残り {remaining:.1f}分)")
+                ^
+modules/brute_force_protection.py:49:17: F821 undefined name 'logger'
+                logger.info(f"ロック解除: '{username}'")
+                ^
+modules/brute_force_protection.py:61:13: F821 undefined name 'logger'
+            logger.warning(
+            ^
+modules/brute_force_protection.py:73:9: F821 undefined name 'logger'
+        logger.info(f"ログイン試行記録クリア: '{username}'")
+        ^
+modules/brute_force_protection.py:88:13: F821 undefined name 'logger'
+            logger.info(f"管理者によるロック解除: '{username}'")
+            ^
+modules/cache.py:145:13: F821 undefined name 'logger'
+            logger.warning("Redis not available. Using memory cache only.")
+            ^
+modules/cache.py:159:13: F821 undefined name 'logger'
+            logger.info("Redis connection established successfully")
+            ^
+modules/cache.py:162:13: F821 undefined name 'logger'
+            logger.warning(f"Failed to connect to Redis: {e}. Using memory cache fallback.")
+            ^
+modules/cache.py:170:13: F821 undefined name 'logger'
+            logger.info("Redis connection closed")
+            ^
+modules/cache.py:226:17: F821 undefined name 'logger'
+                logger.warning(f"Redis get failed: {e}. Trying memory cache...")
+                ^
+modules/cache.py:251:17: F821 undefined name 'logger'
+                logger.warning(f"Redis set failed: {e}. Falling back to memory cache...")
+                ^
+modules/cache.py:269:17: F821 undefined name 'logger'
+                logger.warning(f"Redis delete failed: {e}")
+                ^
+modules/cache.py:292:17: F821 undefined name 'logger'
+                logger.warning(f"Redis clear failed: {e}")
+                ^
+modules/cache.py:313:17: F821 undefined name 'logger'
+                logger.warning(f"Failed to get Redis stats: {e}")
+                ^
+modules/cache.py:363:17: F821 undefined name 'logger'
+                logger.debug(f"Cache HIT: {cache_key}")
+                ^
+modules/cache.py:367:13: F821 undefined name 'logger'
+            logger.debug(f"Cache MISS: {cache_key}")
+            ^
+modules/calendar_api.py:95:9: F821 undefined name 'logger'
+        logger.info(f"GoogleCalendarAPI initialized: calendar_id={calendar_id}")
+        ^
+modules/calendar_api.py:105:13: F821 undefined name 'logger'
+            logger.error(f"Failed to initialize Google Calendar API: {e}")
+            ^
+modules/calendar_api.py:172:17: F821 undefined name 'logger'
+                logger.info("Access token refreshed successfully")
+                ^
+modules/calendar_api.py:176:17: F821 undefined name 'logger'
+                logger.error(f"Failed to refresh token: {e}")
+                ^
+modules/calendar_api.py:203:9: F821 undefined name 'logger'
+        logger.debug(f"Credentials saved to {self.token_file}")
+        ^
+modules/calendar_api.py:283:13: F821 undefined name 'logger'
+            logger.info(f"Event created: {summary} at {start_time} " f"(ID: {event.get('id')})")
+            ^
+modules/calendar_api.py:287:13: F821 undefined name 'logger'
+            logger.error(f"Failed to create event '{summary}': {e}")
+            ^
+modules/calendar_api.py:311:13: F821 undefined name 'logger'
+            logger.debug(f"Event retrieved: {event_id}")
+            ^
+modules/calendar_api.py:348:13: F821 undefined name 'logger'
+            logger.info(f"Event updated: {event_id}")
+            ^
+modules/calendar_api.py:352:13: F821 undefined name 'logger'
+            logger.error(f"Failed to update event {event_id}: {e}")
+            ^
+modules/calendar_api.py:378:13: F821 undefined name 'logger'
+            logger.info(f"Event deleted: {event_id}")
+            ^
+modules/calendar_api.py:432:13: F821 undefined name 'logger'
+            logger.info(
+            ^
+modules/calendar_api.py:438:13: F821 undefined name 'logger'
+            logger.error(f"Failed to list events: {e}")
+            ^
+modules/calendar_api.py:470:13: F821 undefined name 'logger'
+            logger.info(f"Found {len(events)} events for query: '{query}'")
+            ^
+modules/calendar_api.py:474:13: F821 undefined name 'logger'
+            logger.error(f"Failed to search events: {e}")
+            ^
+modules/calendar_api.py:529:9: F821 undefined name 'logger'
+        logger.info(f"Starting batch event creation: {total} events, " f"batch_size={batch_size}")
+        ^
+modules/calendar_api.py:536:13: F821 undefined name 'logger'
+            logger.debug(f"Processing batch {batch_num}: " f"{len(batch)} events")
+            ^
+modules/calendar_api.py:547:21: F821 undefined name 'logger'
+                    logger.warning(error_msg)
+                    ^
+modules/calendar_api.py:553:9: F821 undefined name 'logger'
+        logger.info(f"Batch creation completed: " f"success={success_count}, failed={failed_count}")
+        ^
+modules/calendar_api.py:572:9: F821 undefined name 'logger'
+        logger.info(f"Starting batch update: {len(updates_data)} events")
+        ^
+modules/calendar_api.py:581:17: F821 undefined name 'logger'
+                logger.warning(f"Failed to update {event_id}: {e}")
+                ^
+modules/calendar_api.py:583:9: F821 undefined name 'logger'
+        logger.info(f"Batch update completed: " f"success={success_count}, failed={failed_count}")
+        ^
+modules/calendar_api.py:600:9: F821 undefined name 'logger'
+        logger.info(f"Starting batch deletion: {len(event_ids)} events")
+        ^
+modules/calendar_api.py:609:17: F821 undefined name 'logger'
+                logger.warning(f"Failed to delete {event_id}: {e}")
+                ^
+modules/calendar_api.py:611:9: F821 undefined name 'logger'
+        logger.info(f"Batch deletion completed: " f"success={success_count}, failed={failed_count}")
+        ^
+modules/calendar_api.py:669:21: F821 undefined name 'logger'
+                    logger.warning(
+                    ^
+modules/calendar_api.py:676:21: F821 undefined name 'logger'
+                    logger.error(f"API call failed after {max_retries} retries: {e}")
+                    ^
+modules/calendar_api.py:680:17: F821 undefined name 'logger'
+                logger.error(f"Unexpected error: {e}")
+                ^
+modules/calendar_api.py:715:17: F821 undefined name 'logger'
+                logger.error(f"Missing required field: {field}")
+                ^
+modules/calendar_api.py:720:13: F821 undefined name 'logger'
+            logger.error("Missing 'dateTime' in start")
+            ^
+modules/calendar_api.py:724:13: F821 undefined name 'logger'
+            logger.error("Missing 'dateTime' in end")
+            ^
+modules/calendar_api.py:742:13: F821 undefined name 'logger'
+            logger.info(
+            ^
+modules/calendar_api.py:748:13: F821 undefined name 'logger'
+            logger.error(f"Failed to get calendar info: {e}")
+            ^
+modules/calendar_api.py:764:13: F821 undefined name 'logger'
+            logger.debug("Color definitions retrieved")
+            ^
+modules/calendar_api.py:768:13: F821 undefined name 'logger'
+            logger.error(f"Failed to get color definitions: {e}")
+            ^
+modules/calendar_sync_manager.py:131:9: F821 undefined name 'logger'
+        logger.info("未同期リリースの同期を開始...")
+        ^
+modules/calendar_sync_manager.py:137:13: F821 undefined name 'logger'
+            logger.info("同期すべきリリースはありません")
+            ^
+modules/calendar_sync_manager.py:140:9: F821 undefined name 'logger'
+        logger.info(f"{len(releases)}件のリリースを同期します")
+        ^
+modules/calendar_sync_manager.py:150:13: F821 undefined name 'logger'
+            logger.info(f"バッチ {i//batch_size + 1}: {len(batch)}件処理中...")
+            ^
+modules/calendar_sync_manager.py:168:21: F821 undefined name 'logger'
+                    logger.error(f"リリース{release['id']}の同期に失敗: {e}")
+                    ^
+modules/calendar_sync_manager.py:180:17: F821 undefined name 'logger'
+                logger.info("次のバッチまで5秒待機...")
+                ^
+modules/calendar_sync_manager.py:189:9: F821 undefined name 'logger'
+        logger.info(
+        ^
+modules/calendar_sync_manager.py:218:13: F821 undefined name 'logger'
+            logger.debug(f"スキップ: {title}")
+            ^
+modules/calendar_sync_manager.py:247:13: F821 undefined name 'logger'
+            logger.info(f"✅ 同期成功: {event_title}")
+            ^
+modules/calendar_sync_manager.py:257:13: F821 undefined name 'logger'
+            logger.error(f"❌ カレンダーAPI エラー: {e}")
+            ^
+modules/calendar_sync_manager.py:263:13: F821 undefined name 'logger'
+            logger.error(f"❌ 予期しないエラー: {e}")
+            ^
+modules/calendar_sync_manager.py:303:9: F821 undefined name 'logger'
+        logger.error(f"Release {release_id}: {error_message}")
+        ^
+modules/calendar_sync_manager.py:342:9: F821 undefined name 'logger'
+        logger.info("失敗した同期のリトライ機能は未実装です")
+        ^
+modules/config_helper.py:34:13: F821 undefined name 'logger'
+            logger.info(f"Configuration loaded from {self.config_path}")
+            ^
+modules/config_helper.py:40:9: F821 undefined name 'logger'
+        logger.info("Reloading configuration...")
+        ^
+modules/config_helper.py:56:17: F821 undefined name 'logger'
+                logger.info(f"Backup created: {backup_path}")
+                ^
+modules/config_helper.py:60:9: F821 undefined name 'logger'
+        logger.info(f"Configuration saved to {self.config_path}")
+        ^
+modules/config_helper.py:428:17: F821 undefined name 'logger'
+                logger.error(f"Missing required section: {section}")
+                ^
+modules/config_helper.py:434:17: F821 undefined name 'logger'
+                logger.error("Email notification is enabled but 'to' is not set")
+                ^
+modules/config_helper.py:437:17: F821 undefined name 'logger'
+                logger.error(f"Invalid email address: {self.email_to}")
+                ^
+modules/config_helper.py:442:13: F821 undefined name 'logger'
+            logger.error("No data sources configured")
+            ^
+modules/config_helper.py:445:9: F821 undefined name 'logger'
+        logger.info("Configuration validation passed")
+        ^
+modules/config_helper.py:499:5: F821 undefined name 'logger'
+    logger.info("=" * 60)
+    ^
+modules/config_helper.py:500:5: F821 undefined name 'logger'
+    logger.info("Configuration Summary")
+    ^
+modules/config_helper.py:501:5: F821 undefined name 'logger'
+    logger.info("=" * 60)
+    ^
+modules/config_helper.py:502:5: F821 undefined name 'logger'
+    logger.info(f"Email Enabled: {config.email_enabled}")
+    ^
+modules/config_helper.py:503:5: F821 undefined name 'logger'
+    logger.info(f"Email To: {config.email_to}")
+    ^
+modules/config_helper.py:504:5: F821 undefined name 'logger'
+    logger.info(f"Calendar Enabled: {config.calendar_enabled}")
+    ^
+modules/config_helper.py:505:5: F821 undefined name 'logger'
+    logger.info(f"NG Keywords: {', '.join(config.ng_keywords)}")
+    ^
+modules/config_helper.py:506:5: F821 undefined name 'logger'
+    logger.info(f"Anime Sources: {', '.join(config.anime_sources)}")
+    ^
+modules/config_helper.py:507:5: F821 undefined name 'logger'
+    logger.info(f"Manga Sources: {', '.join(config.manga_sources)}")
+    ^
+modules/config_helper.py:508:5: F821 undefined name 'logger'
+    logger.info(f"DB Path: {config.db_path}")
+    ^
+modules/config_helper.py:509:5: F821 undefined name 'logger'
+    logger.info(f"Log Level: {config.log_level}")
+    ^
+modules/config_helper.py:510:5: F821 undefined name 'logger'
+    logger.info("=" * 60)
+    ^
+modules/config_helper.py:514:9: F821 undefined name 'logger'
+        logger.info("✓ Configuration is valid")
+        ^
+modules/config_helper.py:516:9: F821 undefined name 'logger'
+        logger.info("✗ Configuration validation failed")
+        ^
+modules/config_loader.py:78:17: F821 undefined name 'logger'
+                logger.info(f"Loaded environment variables from {self.env_file}")
+                ^
+modules/config_loader.py:82:13: F821 undefined name 'logger'
+            logger.warning(f"Config file not found: {self.config_path}")
+            ^
+modules/config_loader.py:88:17: F821 undefined name 'logger'
+                logger.info(f"Loaded config from {self.config_path}")
+                ^
+modules/config_loader.py:90:17: F821 undefined name 'logger'
+                logger.error(f"Failed to parse config file: {e}")
+                ^
+modules/config_loader.py:154:9: F821 undefined name 'logger'
+        logger.debug("Applied environment variable overrides")
+        ^
+modules/config_loader.py:291:9: F821 undefined name 'logger'
+        logger.info(f"Saved config to {save_path}")
+        ^
+modules/config_loader.py:371:5: F821 undefined name 'logger'
+    logger.info("Testing ConfigLoader...")
+    ^
+modules/config_loader.py:377:5: F821 undefined name 'logger'
+    logger.info("\n--- Configuration ---")
+    ^
+modules/config_loader.py:378:5: F821 undefined name 'logger'
+    logger.info(f"AniList enabled: {config.is_enabled('anime_sources.anilist')}")
+    ^
+modules/config_loader.py:379:5: F821 undefined name 'logger'
+    logger.info(f"AniList URL: {config.get_api_url('anime_sources.anilist')}")
+    ^
+modules/config_loader.py:380:5: F821 undefined name 'logger'
+    logger.info(f"NG Keywords: {config.get_ng_keywords()}")
+    ^
+modules/config_loader.py:381:5: F821 undefined name 'logger'
+    logger.info(f"Notification emails: {config.get_notification_emails()}")
+    ^
+modules/config_loader.py:382:5: F821 undefined name 'logger'
+    logger.info(f"Database path: {config.get_database_path()}")
+    ^
+modules/config_loader.py:383:5: F821 undefined name 'logger'
+    logger.info(f"Log level: {config.get_log_level()}")
+    ^
+modules/config_loader.py:384:5: F821 undefined name 'logger'
+    logger.info(f"Test mode: {config.is_test_mode()}")
+    ^
+modules/config_loader.py:387:5: F821 undefined name 'logger'
+    logger.info("\n--- Validation ---")
+    ^
+modules/config_loader.py:390:9: F821 undefined name 'logger'
+        logger.info("Validation errors:")
+        ^
+modules/config_loader.py:392:13: F821 undefined name 'logger'
+            logger.info(f"  - {error}")
+            ^
+modules/config_loader.py:394:9: F821 undefined name 'logger'
+        logger.info("All validations passed!")
+        ^
+modules/config_loader.py:397:5: F821 undefined name 'logger'
+    logger.info("\n--- Nested Config ---")
+    ^
+modules/config_loader.py:398:5: F821 undefined name 'logger'
+    logger.info(f"Schedule timezone: {config.get('schedule.timezone')}")
+    ^
+modules/config_loader.py:399:5: F821 undefined name 'logger'
+    logger.info(f"Calendar ID: {config.get('notification.calendar.calendar_id')}")
+    ^
+modules/dashboard_integration.py:45:13: F821 undefined name 'logger'
+            logger.error(f"Operation {operation_name} failed: {e}")
+            ^
+modules/dashboard_integration.py:75:17: F821 undefined name 'logger'
+                logger.warning(f"Failed to record dashboard metrics: {e}")
+                ^
+modules/dashboard_integration.py:224:13: F821 undefined name 'logger'
+            logger.error(f"Failed to get performance summary: {e}")
+            ^
+modules/dashboard_integration.py:241:17: F821 undefined name 'logger'
+                logger.info(f"Cleaned up {deleted_count} old metric records")
+                ^
+modules/dashboard_integration.py:253:17: F821 undefined name 'logger'
+                logger.info(f"Cleaned up {deleted_health_count} old health records")
+                ^
+modules/dashboard_integration.py:261:13: F821 undefined name 'logger'
+            logger.error(f"Failed to cleanup old metrics: {e}")
+            ^
+modules/db_typed.py:88:5: F821 undefined name 'logger'
+    logger.info("データベース初期化完了")
+    ^
+modules/db_typed.py:144:9: F821 undefined name 'logger'
+        logger.info(f"作品登録: {title} (ID: {work_id})")
+        ^
+modules/db_typed.py:194:9: F821 undefined name 'logger'
+        logger.info(f"リリース登録: work_id={work_id}, {release_type} {number}")
+        ^
+modules/db_typed.py:198:9: F821 undefined name 'logger'
+        logger.debug(f"リリース重複: work_id={work_id}, {release_type} {number}")
+        ^
+modules/db_typed.py:256:5: F821 undefined name 'logger'
+    logger.info(f"通知済みマーク: release_id={release_id}")
+    ^
+modules/db_typed.py:323:9: F821 undefined name 'logger'
+        logger.warning(f"カレンダーイベント重複: event_id={event_id}")
+        ^
+modules/db_typed.py:327:5: F821 undefined name 'logger'
+    logger.info(f"カレンダー同期済みマーク: release_id={release_id}, event_id={event_id}")
+    ^
 modules/error_notifier.py:299:9: F821 undefined name 'logger'
         logger.info(
         ^
@@ -62,6 +679,249 @@ modules/error_notifier.py:318:9: F821 undefined name 'logger'
 modules/error_notifier.py:321:9: F821 undefined name 'logger'
         logger.info("❌ エラー通知メール送信失敗")
         ^
+modules/filter_logic_typed.py:149:13: F821 undefined name 'logger'
+            logger.info(f"NGキーワード追加: {keyword}")
+            ^
+modules/filter_logic_typed.py:164:13: F821 undefined name 'logger'
+            logger.info(f"NGキーワード削除: {keyword}")
+            ^
+modules/filter_logic_typed.py:201:13: F821 undefined name 'logger'
+            logger.debug(f"フィルタリング: {media.get('title')} - {matched_keywords}")
+            ^
+modules/filter_logic_typed.py:205:5: F821 undefined name 'logger'
+    logger.info(f"フィルタリング結果: 許可={len(allowed)}件, 除外={len(filtered)}件")
+    ^
+modules/filter_logic_typed.py:233:13: F821 undefined name 'logger'
+            logger.debug(f"フィルタリング: {entry.get('title')} - {matched_keywords}")
+            ^
+modules/filter_logic_typed.py:237:5: F821 undefined name 'logger'
+    logger.info(f"フィルタリング結果: 許可={len(allowed)}件, 除外={len(filtered)}件")
+    ^
+modules/filter_logic_typed.py:297:5: F821 undefined name 'logger'
+    logger.info(f"評価フィルタリング結果: 許可={len(allowed)}件, 除外={len(filtered)}件")
+    ^
+modules/filter_logic_typed.py:339:13: F821 undefined name 'logger'
+            logger.error(f"日付比較エラー: {e}")
+            ^
+modules/filter_logic_typed.py:342:5: F821 undefined name 'logger'
+    logger.info(f"日付フィルタリング結果: 許可={len(allowed)}件, 除外={len(filtered)}件")
+    ^
+modules/filter_logic_typed.py:371:5: F821 undefined name 'logger'
+    logger.info(f"複合フィルタリング結果: 最終許可={len(current_items)}件")
+    ^
+modules/graphql_client.py:146:17: F821 undefined name 'logger'
+                logger.info(f"Rate limit reached. Waiting {wait_time:.2f} seconds...")
+                ^
+modules/graphql_client.py:191:25: F821 undefined name 'logger'
+                        logger.warning(f"Rate limited. Waiting {retry_after} seconds...")
+                        ^
+modules/graphql_client.py:199:25: F821 undefined name 'logger'
+                        logger.error(f"GraphQL errors: {data['errors']}")
+                        ^
+modules/graphql_client.py:205:17: F821 undefined name 'logger'
+                logger.warning(f"Request failed (attempt {attempt + 1}/{self.max_retries}): {e}")
+                ^
+modules/graphql_client.py:231:13: F821 undefined name 'logger'
+            logger.info(f"Fetching batch {i//self.MAX_BATCH_SIZE + 1}: {len(batch)} anime")
+            ^
+modules/graphql_client.py:245:25: F821 undefined name 'logger'
+                        logger.warning(f"No data for anime ID {anime_id}")
+                        ^
+modules/graphql_client.py:248:17: F821 undefined name 'logger'
+                logger.error(f"Failed to fetch batch: {e}")
+                ^
+modules/graphql_client.py:252:9: F821 undefined name 'logger'
+        logger.info(f"Successfully fetched {len(results)}/{len(anime_ids)} anime")
+        ^
+modules/graphql_client.py:314:13: F821 undefined name 'logger'
+            logger.error(f"Failed to search anime by season: {e}")
+            ^
+modules/graphql_client.py:382:17: F821 undefined name 'logger'
+                logger.error(f"Failed to fetch upcoming releases: {e}")
+                ^
+modules/graphql_client.py:385:9: F821 undefined name 'logger'
+        logger.info(f"Found {len(all_schedules)} upcoming releases in next {days_ahead} days")
+        ^
+modules/logger.py:172:5: F821 undefined name 'logger'
+    logger.info(f"ログシステムが初期化されました (レベル: {config_manager.get_log_level()})")
+    ^
+modules/logger.py:173:5: F821 undefined name 'logger'
+    logger.info(f"ログファイル: {log_file_path}")
+    ^
+modules/manga_mangadex.py:303:5: F821 undefined name 'logger'
+    logger.info("Starting MangaDex manga collection...")
+    ^
+modules/manga_mangadex.py:312:13: F821 undefined name 'logger'
+            logger.info(f"Collected {len(recent_manga)} recent manga")
+            ^
+modules/manga_mangadex.py:315:13: F821 undefined name 'logger'
+            logger.error(f"MangaDex API error: {str(e)}")
+            ^
+modules/manga_mangadex.py:317:13: F821 undefined name 'logger'
+            logger.error(f"Unexpected error in MangaDex manga collection: {str(e)}")
+            ^
+modules/manga_mangadex.py:319:5: F821 undefined name 'logger'
+    logger.info(f"MangaDex manga collection complete: {len(all_manga)} total items")
+    ^
+modules/manga_mangadex.py:336:5: F821 undefined name 'logger'
+    logger.info(f"Starting MangaDex chapter collection (last {hours} hours)...")
+    ^
+modules/manga_mangadex.py:345:13: F821 undefined name 'logger'
+            logger.info(f"Collected {len(latest_chapters)} chapter updates")
+            ^
+modules/manga_mangadex.py:348:13: F821 undefined name 'logger'
+            logger.error(f"MangaDex API error: {str(e)}")
+            ^
+modules/manga_mangadex.py:350:13: F821 undefined name 'logger'
+            logger.error(f"Unexpected error in MangaDex chapter collection: {str(e)}")
+            ^
+modules/manga_mangadex.py:352:5: F821 undefined name 'logger'
+    logger.info(f"MangaDex chapter collection complete: {len(all_chapters)} total items")
+    ^
+modules/manga_mangadex.py:371:9: F821 undefined name 'logger'
+        logger.info(f"Collected {len(manga_data)} manga and {len(chapter_data)} chapter updates")
+        ^
+modules/manga_mangadex.py:373:13: F821 undefined name 'logger'
+            logger.info("\nSample manga:")
+            ^
+modules/manga_mangadex.py:374:13: F821 undefined name 'logger'
+            logger.info(json.dumps(manga_data[0], indent=2, ensure_ascii=False))
+            ^
+modules/manga_mangaupdates.py:270:5: F821 undefined name 'logger'
+    logger.info("Starting MangaUpdates releases collection...")
+    ^
+modules/manga_mangaupdates.py:279:17: F821 undefined name 'logger'
+                logger.info(f"Collected {len(releases)} releases from page {page}")
+                ^
+modules/manga_mangaupdates.py:286:13: F821 undefined name 'logger'
+            logger.error(f"MangaUpdates API error: {str(e)}")
+            ^
+modules/manga_mangaupdates.py:288:13: F821 undefined name 'logger'
+            logger.error(f"Unexpected error in MangaUpdates releases collection: {str(e)}")
+            ^
+modules/manga_mangaupdates.py:290:5: F821 undefined name 'logger'
+    logger.info(f"MangaUpdates releases collection complete: {len(all_releases)} total items")
+    ^
+modules/manga_mangaupdates.py:305:5: F821 undefined name 'logger'
+    logger.info(f"Searching MangaUpdates for: {query}")
+    ^
+modules/manga_mangaupdates.py:312:13: F821 undefined name 'logger'
+            logger.info(f"Found {len(results)} series matching '{query}'")
+            ^
+modules/manga_mangaupdates.py:315:13: F821 undefined name 'logger'
+            logger.error(f"MangaUpdates API error: {str(e)}")
+            ^
+modules/manga_mangaupdates.py:317:13: F821 undefined name 'logger'
+            logger.error(f"Unexpected error in MangaUpdates search: {str(e)}")
+            ^
+modules/manga_mangaupdates.py:336:9: F821 undefined name 'logger'
+        logger.info(f"Collected {len(releases)} releases")
+        ^
+modules/manga_mangaupdates.py:338:13: F821 undefined name 'logger'
+            logger.info("\nSample release:")
+            ^
+modules/manga_mangaupdates.py:339:13: F821 undefined name 'logger'
+            logger.info(json.dumps(releases[0], indent=2, ensure_ascii=False))
+            ^
+modules/manga_mangaupdates.py:343:9: F821 undefined name 'logger'
+        logger.info(f"\nSearch results: {len(results)}")
+        ^
+modules/manga_rss.py:1532:13: F821 undefined name 'logger'
+            logger.info("マンガRSSから収集されたアイテムはありません")
+            ^
+modules/manga_rss.py:1571:17: F821 undefined name 'logger'
+                logger.warning(f"アイテム保存エラー: {item.get('title', 'Unknown')} - {e}")
+                ^
+modules/manga_rss.py:1574:9: F821 undefined name 'logger'
+        logger.info(f"マンガRSS収集完了: {len(items)}件収集, {stored_count}件保存")
+        ^
+modules/manga_rss.py:1578:9: F821 undefined name 'logger'
+        logger.error(f"マンガRSS fetch_and_store エラー: {e}")
+        ^
+modules/manga_rss_typed.py:38:17: F821 undefined name 'logger'
+                logger.warning(f"フィード解析警告: {self.feed_url} - {feed.bozo_exception}")
+                ^
+modules/manga_rss_typed.py:43:13: F821 undefined name 'logger'
+            logger.error(f"フィード取得エラー: {self.feed_url} - {e}")
+            ^
+modules/manga_rss_typed.py:65:9: F821 undefined name 'logger'
+        logger.info(f"{self.source_name}: {len(entries)}件取得")
+        ^
+modules/manga_rss_typed.py:98:13: F821 undefined name 'logger'
+            logger.error(f"エントリー解析エラー: {e}")
+            ^
+modules/manga_rss_typed.py:327:13: F821 undefined name 'logger'
+            logger.info(f"{source_name}: {len(entries)}件取得")
+            ^
+modules/manga_rss_typed.py:330:13: F821 undefined name 'logger'
+            logger.error(f"{source_name} 取得エラー: {e}")
+            ^
+modules/manga_rss_typed.py:367:13: F821 undefined name 'logger'
+            logger.warning(f"フィード解析警告: {feed.bozo_exception}")
+            ^
+modules/manga_rss_typed.py:379:9: F821 undefined name 'logger'
+        logger.error(f"フィード情報取得エラー: {e}")
+        ^
+modules/notification_history.py:47:21: F821 undefined name 'logger'
+                    logger.info("details カラムを追加しました")
+                    ^
+modules/notification_history.py:51:21: F821 undefined name 'logger'
+                    logger.info("metadata カラムを追加しました")
+                    ^
+modules/notification_history.py:53:17: F821 undefined name 'logger'
+                logger.info("notification_history テーブルを確認しました（既存）")
+                ^
+modules/notification_history.py:71:17: F821 undefined name 'logger'
+                logger.info("notification_history テーブルを作成しました")
+                ^
+modules/notification_history.py:92:13: F821 undefined name 'logger'
+            logger.error(f"テーブル作成エラー: {e}")
+            ^
+modules/notification_history.py:147:13: F821 undefined name 'logger'
+            logger.info(
+            ^
+modules/notification_history.py:154:13: F821 undefined name 'logger'
+            logger.error(f"履歴記録エラー: {e}")
+            ^
+modules/notification_history.py:218:13: F821 undefined name 'logger'
+            logger.error(f"履歴取得エラー: {e}")
+            ^
+modules/notification_history.py:301:13: F821 undefined name 'logger'
+            logger.error(f"統計取得エラー: {e}")
+            ^
+modules/notification_history.py:370:13: F821 undefined name 'logger'
+            logger.info(f"{deleted_count}件の古い履歴を削除しました")
+            ^
+modules/notification_history.py:374:13: F821 undefined name 'logger'
+            logger.error(f"履歴削除エラー: {e}")
+            ^
+modules/notification_history.py:410:13: F821 undefined name 'logger'
+            logger.info(f"履歴を {output_path} にエクスポートしました")
+            ^
+modules/notification_history.py:414:13: F821 undefined name 'logger'
+            logger.error(f"履歴エクスポートエラー: {e}")
+            ^
+modules/notification_history.py:467:5: F821 undefined name 'logger'
+    logger.info(f"\n最近の履歴 ({len(history)}件):")
+    ^
+modules/notification_history.py:469:9: F821 undefined name 'logger'
+        logger.info(
+        ^
+modules/notification_history.py:475:5: F821 undefined name 'logger'
+    logger.info(f"\n統計情報:")
+    ^
+modules/notification_history.py:476:5: F821 undefined name 'logger'
+    logger.info(f"  総通知数: {stats['total_notifications']}")
+    ^
+modules/notification_history.py:477:5: F821 undefined name 'logger'
+    logger.info(f"  成功率: {stats['success_rate']}%")
+    ^
+modules/notification_history.py:478:5: F821 undefined name 'logger'
+    logger.info(f"  最終実行: {stats['last_execution']}")
+    ^
+modules/notification_history.py:482:5: F821 undefined name 'logger'
+    logger.info(f"  次回実行: {next_run}")
+    ^
 modules/qa_validation.py:1114:5: F821 undefined name 'logger'
     logger.info("Starting comprehensive QA audit...")
     ^
@@ -94,6 +954,105 @@ modules/qa_validation.py:1128:13: F821 undefined name 'logger'
             ^
 modules/qa_validation.py:1133:9: F821 undefined name 'logger'
         logger.info(f"\nDetailed report saved to: {output_file}")
+        ^
+modules/rate_limiter.py:56:9: F821 undefined name 'logger'
+        logger.info(f"{self.name} initialized: {calls} calls per {period} seconds")
+        ^
+modules/rate_limiter.py:81:21: F821 undefined name 'logger'
+                    logger.warning(
+                    ^
+modules/rate_limiter.py:93:17: F821 undefined name 'logger'
+                logger.debug(f"{self.name}: {len(self.timestamps)}/{self.calls} calls used")
+                ^
+modules/rate_limiter.py:138:13: F821 undefined name 'logger'
+            logger.info(f"{self.name}: Rate limiter reset")
+            ^
+modules/rate_limiter.py:170:9: F821 undefined name 'logger'
+        logger.info(f"Call {n} at {time.time():.2f}")
+        ^
+modules/rate_limiter.py:173:5: F821 undefined name 'logger'
+    logger.info("Testing rate limiter with 10 calls (should take ~2 seconds)...")
+    ^
+modules/rate_limiter.py:180:5: F821 undefined name 'logger'
+    logger.info(f"\nCompleted in {elapsed:.2f} seconds")
+    ^
+modules/rate_limiter.py:181:5: F821 undefined name 'logger'
+    logger.info(f"Remaining calls: {test_limiter.get_remaining_calls()}")
+    ^
+modules/rate_limiter.py:182:5: F821 undefined name 'logger'
+    logger.info(f"Time until next call: {test_limiter.get_time_until_next_call():.2f}s")
+    ^
+modules/retry_handler.py:61:21: F821 undefined name 'logger'
+                    logger.info(f"リトライ成功: {attempt}回目の試行で成功")
+                    ^
+modules/retry_handler.py:68:21: F821 undefined name 'logger'
+                    logger.warning(
+                    ^
+modules/retry_handler.py:76:21: F821 undefined name 'logger'
+                    logger.error(f"最大リトライ回数に達しました: {self.max_retries}回")
+                    ^
+modules/retry_handler.py:121:25: F821 undefined name 'logger'
+                        logger.warning(
+                        ^
+modules/retry_handler.py:129:25: F821 undefined name 'logger'
+                        logger.error(f"{func.__name__}() 最大リトライ回数に達しました")
+                        ^
+modules/retry_handler.py:200:21: F821 undefined name 'logger'
+                    logger.info(f"リトライ成功: {attempt}回目の試行で成功")
+                    ^
+modules/retry_handler.py:209:25: F821 undefined name 'logger'
+                        logger.warning(f"レート制限検出: {self.rate_limit_delay}秒待機")
+                        ^
+modules/retry_handler.py:214:21: F821 undefined name 'logger'
+                    logger.warning(
+                    ^
+modules/retry_handler.py:222:21: F821 undefined name 'logger'
+                    logger.error(f"最大リトライ回数に達しました: {self.max_retries}回")
+                    ^
+modules/secrets.py:100:17: F821 undefined name 'logger'
+                logger.warning("hvac package not installed. Install with: pip install hvac")
+                ^
+modules/secrets.py:112:13: F821 undefined name 'logger'
+            logger.error(f"Failed to get secret {key}: {e}")
+            ^
+modules/secrets.py:122:13: F821 undefined name 'logger'
+            logger.error(f"Failed to set secret {key}: {e}")
+            ^
+modules/secrets.py:132:13: F821 undefined name 'logger'
+            logger.error(f"Failed to delete secret {key}: {e}")
+            ^
+modules/secrets.py:140:13: F821 undefined name 'logger'
+            logger.error(f"Failed to list secrets: {e}")
+            ^
+modules/secrets.py:164:17: F821 undefined name 'logger'
+                logger.warning("boto3 package not installed. Install with: pip install boto3")
+                ^
+modules/secrets.py:176:13: F821 undefined name 'logger'
+            logger.error(f"Failed to get secret {key}: {e}")
+            ^
+modules/secrets.py:188:13: F821 undefined name 'logger'
+            logger.error(f"Failed to set secret {key}: {e}")
+            ^
+modules/secrets.py:196:13: F821 undefined name 'logger'
+            logger.error(f"Failed to delete secret {key}: {e}")
+            ^
+modules/secrets.py:210:13: F821 undefined name 'logger'
+            logger.error(f"Failed to list secrets: {e}")
+            ^
+modules/secrets.py:267:13: F821 undefined name 'logger'
+            logger.info("Using HashiCorp Vault as secret provider")
+            ^
+modules/secrets.py:272:13: F821 undefined name 'logger'
+            logger.info("Using AWS Secrets Manager as secret provider")
+            ^
+modules/secrets.py:276:9: F821 undefined name 'logger'
+        logger.info("Using environment variables as secret provider")
+        ^
+modules/secrets.py:344:13: F821 undefined name 'logger'
+            logger.info(f"Secret {key} rotated successfully")
+            ^
+modules/secrets.py:347:9: F821 undefined name 'logger'
+        logger.error(f"Failed to rotate secret {key}")
         ^
 modules/security_compliance.py:893:5: F821 undefined name 'logger'
     logger.info("Starting security audit...")
@@ -131,9 +1090,89 @@ modules/security_compliance.py:912:9: F821 undefined name 'logger'
 modules/security_compliance.py:918:5: F821 undefined name 'logger'
     logger.info(
     ^
-modules/title_translator.py:173:5: E999 IndentationError: unexpected indent
-    translator = TitleTranslator()
+modules/smtp_mailer.py:53:9: F821 undefined name 'logger'
+        logger.info(f"SMTP Gmail Sender initialized for {self.sender_email}")
+        ^
+modules/smtp_mailer.py:58:13: F821 undefined name 'logger'
+            logger.error("Sender email not configured")
+            ^
+modules/smtp_mailer.py:62:13: F821 undefined name 'logger'
+            logger.error("Recipient email not configured")
+            ^
+modules/smtp_mailer.py:66:13: F821 undefined name 'logger'
+            logger.error("Gmail App Password not configured")
+            ^
+modules/smtp_mailer.py:118:13: F821 undefined name 'logger'
+            logger.info(f"Email sent successfully to {recipient}: {subject}")
+            ^
+modules/smtp_mailer.py:123:13: F821 undefined name 'logger'
+            logger.error(f"SMTP Authentication failed: {e}")
+            ^
+modules/smtp_mailer.py:124:13: F821 undefined name 'logger'
+            logger.error("Please check GMAIL_APP_PASSWORD in .env file")
+            ^
+modules/smtp_mailer.py:129:13: F821 undefined name 'logger'
+            logger.error(f"SMTP error occurred: {e}")
+            ^
+modules/smtp_mailer.py:134:13: F821 undefined name 'logger'
+            logger.error(f"Failed to send email: {e}")
+            ^
+modules/smtp_mailer.py:197:5: F821 undefined name 'logger'
+    logger.info("=" * 60)
     ^
-4     E999 SyntaxError: invalid syntax
-42    F821 undefined name 'logger'
-46
+modules/smtp_mailer.py:198:5: F821 undefined name 'logger'
+    logger.info("Gmail SMTP送信テスト")
+    ^
+modules/smtp_mailer.py:199:5: F821 undefined name 'logger'
+    logger.info("=" * 60)
+    ^
+modules/smtp_mailer.py:203:5: F821 undefined name 'logger'
+    logger.info(f"\n設定情報:")
+    ^
+modules/smtp_mailer.py:204:5: F821 undefined name 'logger'
+    logger.info(f"  送信元: {sender.sender_email}")
+    ^
+modules/smtp_mailer.py:205:5: F821 undefined name 'logger'
+    logger.info(f"  送信先: {sender.recipient_email}")
+    ^
+modules/smtp_mailer.py:206:5: F821 undefined name 'logger'
+    logger.info(f"  App Password: {'設定済み' if sender.app_password else '未設定'}")
+    ^
+modules/smtp_mailer.py:209:9: F821 undefined name 'logger'
+        logger.info("\n✅ 設定OK - テストメールを送信します...")
+        ^
+modules/smtp_mailer.py:211:13: F821 undefined name 'logger'
+            logger.info("✅ テストメール送信成功!")
+            ^
+modules/smtp_mailer.py:212:13: F821 undefined name 'logger'
+            logger.info(f"\n統計: {sender.get_stats()}")
+            ^
+modules/smtp_mailer.py:214:13: F821 undefined name 'logger'
+            logger.info("❌ テストメール送信失敗")
+            ^
+modules/smtp_mailer.py:216:9: F821 undefined name 'logger'
+        logger.info("\n❌ 設定エラー - .envファイルを確認してください")
+        ^
+modules/title_translator.py:185:5: F821 undefined name 'logger'
+    logger.info("タイトル変換テスト:")
+    ^
+modules/title_translator.py:186:5: F821 undefined name 'logger'
+    logger.info("=" * 50)
+    ^
+modules/title_translator.py:189:9: F821 undefined name 'logger'
+        logger.info(f"{title:30} → {japanese}")
+        ^
+modules/title_translator.py:192:5: F821 undefined name 'logger'
+    logger.info("\nデータベースのタイトルを更新中...")
+    ^
+modules/title_translator.py:194:5: F821 undefined name 'logger'
+    logger.info(f"✅ {updated}件のタイトルを日本語化しました")
+    ^
+modules/utils/formatting.py:39:9: F821 undefined name 'logger'
+        logger.warning(f"Date formatting error: {e}")
+        ^
+modules/utils/formatting.py:318:9: F821 undefined name 'logger'
+        logger.error(f"JSON formatting error: {e}")
+        ^
+392   F821 undefined name 'logger'
+392
