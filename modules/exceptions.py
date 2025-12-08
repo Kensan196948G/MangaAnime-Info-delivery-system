@@ -5,7 +5,7 @@
 エラーハンドリングの一貫性と保守性を向上させる。
 """
 
-from typing import Optional, Any, Dict
+from typing import Any, Dict, Optional
 
 
 class MangaAnimeSystemError(Exception):

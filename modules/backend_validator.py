@@ -7,23 +7,20 @@ including database operations, API clients, RSS collectors, and filtering logic.
 """
 
 import asyncio
+import json
 import logging
 import time
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-from dataclasses import dataclass, field
 import traceback
-import json
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
+from .anime_anilist import AniListClient, CircuitBreakerOpen
 # Import all modules to test
 from .db import get_db
-from .anime_anilist import AniListClient, CircuitBreakerOpen
-from .manga_rss import MangaRSSCollector, FeedHealth, EnhancedRSSParser
 from .filter_logic import ContentFilter
-from .models import (
-    Work,
-    WorkType,
-)
+from .manga_rss import EnhancedRSSParser, FeedHealth, MangaRSSCollector
+from .models import Work, WorkType
 
 
 @dataclass
@@ -169,6 +166,7 @@ class BackendValidator:
         """Gather system information for the report."""
         try:
             import platform
+
             import psutil
 
             return {

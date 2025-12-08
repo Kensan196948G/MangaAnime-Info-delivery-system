@@ -4,10 +4,11 @@ Web UI Startup Script for Anime/Manga Information Delivery System
 This script provides an easy way to start the web interface.
 """
 
-import os
-import logging
-import sys
 import argparse
+import logging
+import os
+import sys
+
 from web_app import app
 
 

@@ -3,17 +3,17 @@
 作成日: 2025-12-07
 """
 
-from flask import Blueprint, jsonify, request, render_template
-from flask_login import login_required, current_user
-import sqlite3
-from datetime import datetime
 import logging
+import sqlite3
+
+from flask import Blueprint, jsonify, render_template, request
+from flask_login import current_user, login_required
 
 logger = logging.getLogger(__name__)
 
-watchlist_bp = Blueprint('watchlist', __name__, url_prefix='/watchlist')
+watchlist_bp = Blueprint("watchlist", __name__, url_prefix="/watchlist")
 
-DB_PATH = 'db.sqlite3'
+DB_PATH = "db.sqlite3"
 
 
 def get_db_connection():
@@ -23,7 +23,7 @@ def get_db_connection():
     return conn
 
 
-@watchlist_bp.route('/')
+@watchlist_bp.route("/")
 @login_required
 def watchlist_page():
     """ウォッチリストページを表示"""
@@ -60,19 +60,21 @@ def watchlist_page():
 
         conn.close()
 
-        return render_template('watchlist.html',
-                             watchlist=watchlist_items,
-                             user=current_user)
+        return render_template(
+            "watchlist.html", watchlist=watchlist_items, user=current_user
+        )
 
     except Exception as e:
         logger.error(f"ウォッチリスト取得エラー: {str(e)}")
-        return render_template('watchlist.html',
-                             watchlist=[],
-                             error="ウォッチリストの取得に失敗しました",
-                             user=current_user)
+        return render_template(
+            "watchlist.html",
+            watchlist=[],
+            error="ウォッチリストの取得に失敗しました",
+            user=current_user,
+        )
 
 
-@watchlist_bp.route('/api/list', methods=['GET'])
+@watchlist_bp.route("/api/list", methods=["GET"])
 @login_required
 def get_watchlist_api():
     """ウォッチリストをJSON形式で取得（API）"""
@@ -103,50 +105,47 @@ def get_watchlist_api():
 
         watchlist = []
         for row in rows:
-            watchlist.append({
-                'id': row['id'],
-                'work_id': row['work_id'],
-                'notify_new_episodes': bool(row['notify_new_episodes']),
-                'notify_new_volumes': bool(row['notify_new_volumes']),
-                'created_at': row['created_at'],
-                'work': {
-                    'title': row['title'],
-                    'title_kana': row['title_kana'],
-                    'title_en': row['title_en'],
-                    'type': row['type'],
-                    'official_url': row['official_url']
+            watchlist.append(
+                {
+                    "id": row["id"],
+                    "work_id": row["work_id"],
+                    "notify_new_episodes": bool(row["notify_new_episodes"]),
+                    "notify_new_volumes": bool(row["notify_new_volumes"]),
+                    "created_at": row["created_at"],
+                    "work": {
+                        "title": row["title"],
+                        "title_kana": row["title_kana"],
+                        "title_en": row["title_en"],
+                        "type": row["type"],
+                        "official_url": row["official_url"],
+                    },
                 }
-            })
+            )
 
         conn.close()
 
-        return jsonify({
-            'success': True,
-            'watchlist': watchlist,
-            'count': len(watchlist)
-        })
+        return jsonify(
+            {"success": True, "watchlist": watchlist, "count": len(watchlist)}
+        )
 
     except Exception as e:
         logger.error(f"ウォッチリスト取得エラー（API）: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
-@watchlist_bp.route('/api/add', methods=['POST'])
+@watchlist_bp.route("/api/add", methods=["POST"])
 @login_required
 def add_to_watchlist():
     """作品をウォッチリストに追加"""
     try:
         data = request.get_json()
-        work_id = data.get('work_id')
+        work_id = data.get("work_id")
 
         if not work_id:
-            return jsonify({
-                'success': False,
-                'error': 'work_idが指定されていません'
-            }), 400
+            return (
+                jsonify({"success": False, "error": "work_idが指定されていません"}),
+                400,
+            )
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -157,17 +156,20 @@ def add_to_watchlist():
 
         if not work:
             conn.close()
-            return jsonify({
-                'success': False,
-                'error': '指定された作品が見つかりません'
-            }), 404
+            return (
+                jsonify({"success": False, "error": "指定された作品が見つかりません"}),
+                404,
+            )
 
         # ウォッチリストに追加（既に存在する場合は無視）
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO watchlist (user_id, work_id, notify_new_episodes, notify_new_volumes)
                 VALUES (?, ?, 1, 1)
-            """, (current_user.id, work_id))
+            """,
+                (current_user.id, work_id),
+            )
 
             conn.commit()
             watchlist_id = cursor.lastrowid
@@ -176,32 +178,33 @@ def add_to_watchlist():
 
             conn.close()
 
-            return jsonify({
-                'success': True,
-                'message': f'「{work["title"]}」をウォッチリストに追加しました',
-                'watchlist_id': watchlist_id,
-                'work': {
-                    'id': work['id'],
-                    'title': work['title']
+            return jsonify(
+                {
+                    "success": True,
+                    "message": f'「{work["title"]}」をウォッチリストに追加しました',
+                    "watchlist_id": watchlist_id,
+                    "work": {"id": work["id"], "title": work["title"]},
                 }
-            })
+            )
 
         except sqlite3.IntegrityError:
             conn.close()
-            return jsonify({
-                'success': False,
-                'error': 'この作品は既にウォッチリストに登録されています'
-            }), 409
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "この作品は既にウォッチリストに登録されています",
+                    }
+                ),
+                409,
+            )
 
     except Exception as e:
         logger.error(f"ウォッチリスト追加エラー: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
-@watchlist_bp.route('/api/remove/<int:work_id>', methods=['DELETE'])
+@watchlist_bp.route("/api/remove/<int:work_id>", methods=["DELETE"])
 @login_required
 def remove_from_watchlist(work_id):
     """作品をウォッチリストから削除"""
@@ -210,27 +213,35 @@ def remove_from_watchlist(work_id):
         cursor = conn.cursor()
 
         # 作品情報を取得
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT w.id, works.title
             FROM watchlist w
             JOIN works ON w.work_id = works.id
             WHERE w.user_id = ? AND w.work_id = ?
-        """, (current_user.id, work_id))
+        """,
+            (current_user.id, work_id),
+        )
 
         item = cursor.fetchone()
 
         if not item:
             conn.close()
-            return jsonify({
-                'success': False,
-                'error': 'ウォッチリストに登録されていません'
-            }), 404
+            return (
+                jsonify(
+                    {"success": False, "error": "ウォッチリストに登録されていません"}
+                ),
+                404,
+            )
 
         # 削除実行
-        cursor.execute("""
+        cursor.execute(
+            """
             DELETE FROM watchlist
             WHERE user_id = ? AND work_id = ?
-        """, (current_user.id, work_id))
+        """,
+            (current_user.id, work_id),
+        )
 
         conn.commit()
 
@@ -238,69 +249,72 @@ def remove_from_watchlist(work_id):
 
         conn.close()
 
-        return jsonify({
-            'success': True,
-            'message': f'「{item["title"]}」をウォッチリストから削除しました'
-        })
+        return jsonify(
+            {
+                "success": True,
+                "message": f'「{item["title"]}」をウォッチリストから削除しました',
+            }
+        )
 
     except Exception as e:
         logger.error(f"ウォッチリスト削除エラー: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
-@watchlist_bp.route('/api/update/<int:work_id>', methods=['PUT'])
+@watchlist_bp.route("/api/update/<int:work_id>", methods=["PUT"])
 @login_required
 def update_watchlist_settings(work_id):
     """ウォッチリストの通知設定を更新"""
     try:
         data = request.get_json()
-        notify_episodes = data.get('notify_new_episodes', True)
-        notify_volumes = data.get('notify_new_volumes', True)
+        notify_episodes = data.get("notify_new_episodes", True)
+        notify_volumes = data.get("notify_new_volumes", True)
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
         # 更新実行
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE watchlist
             SET notify_new_episodes = ?,
                 notify_new_volumes = ?
             WHERE user_id = ? AND work_id = ?
-        """, (int(notify_episodes), int(notify_volumes), current_user.id, work_id))
+        """,
+            (int(notify_episodes), int(notify_volumes), current_user.id, work_id),
+        )
 
         if cursor.rowcount == 0:
             conn.close()
-            return jsonify({
-                'success': False,
-                'error': 'ウォッチリストに登録されていません'
-            }), 404
+            return (
+                jsonify(
+                    {"success": False, "error": "ウォッチリストに登録されていません"}
+                ),
+                404,
+            )
 
         conn.commit()
         conn.close()
 
         logger.info(f"ウォッチリスト設定更新: user={current_user.id}, work={work_id}")
 
-        return jsonify({
-            'success': True,
-            'message': '通知設定を更新しました',
-            'settings': {
-                'notify_new_episodes': notify_episodes,
-                'notify_new_volumes': notify_volumes
+        return jsonify(
+            {
+                "success": True,
+                "message": "通知設定を更新しました",
+                "settings": {
+                    "notify_new_episodes": notify_episodes,
+                    "notify_new_volumes": notify_volumes,
+                },
             }
-        })
+        )
 
     except Exception as e:
         logger.error(f"ウォッチリスト設定更新エラー: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
-@watchlist_bp.route('/api/check/<int:work_id>', methods=['GET'])
+@watchlist_bp.route("/api/check/<int:work_id>", methods=["GET"])
 @login_required
 def check_watchlist_status(work_id):
     """作品がウォッチリストに登録されているか確認"""
@@ -308,37 +322,36 @@ def check_watchlist_status(work_id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id, notify_new_episodes, notify_new_volumes
             FROM watchlist
             WHERE user_id = ? AND work_id = ?
-        """, (current_user.id, work_id))
+        """,
+            (current_user.id, work_id),
+        )
 
         item = cursor.fetchone()
         conn.close()
 
         if item:
-            return jsonify({
-                'success': True,
-                'in_watchlist': True,
-                'notify_new_episodes': bool(item['notify_new_episodes']),
-                'notify_new_volumes': bool(item['notify_new_volumes'])
-            })
+            return jsonify(
+                {
+                    "success": True,
+                    "in_watchlist": True,
+                    "notify_new_episodes": bool(item["notify_new_episodes"]),
+                    "notify_new_volumes": bool(item["notify_new_volumes"]),
+                }
+            )
         else:
-            return jsonify({
-                'success': True,
-                'in_watchlist': False
-            })
+            return jsonify({"success": True, "in_watchlist": False})
 
     except Exception as e:
         logger.error(f"ウォッチリスト状態確認エラー: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
-@watchlist_bp.route('/api/stats', methods=['GET'])
+@watchlist_bp.route("/api/stats", methods=["GET"])
 @login_required
 def get_watchlist_stats():
     """ウォッチリストの統計情報を取得"""
@@ -347,7 +360,8 @@ def get_watchlist_stats():
         cursor = conn.cursor()
 
         # 統計情報取得
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 COUNT(*) as total_count,
                 SUM(CASE WHEN works.type = 'anime' THEN 1 ELSE 0 END) as anime_count,
@@ -357,25 +371,26 @@ def get_watchlist_stats():
             FROM watchlist w
             JOIN works ON w.work_id = works.id
             WHERE w.user_id = ?
-        """, (current_user.id,))
+        """,
+            (current_user.id,),
+        )
 
         stats = cursor.fetchone()
         conn.close()
 
-        return jsonify({
-            'success': True,
-            'stats': {
-                'total': stats['total_count'] or 0,
-                'anime': stats['anime_count'] or 0,
-                'manga': stats['manga_count'] or 0,
-                'notify_episodes': stats['notify_episodes_count'] or 0,
-                'notify_volumes': stats['notify_volumes_count'] or 0
+        return jsonify(
+            {
+                "success": True,
+                "stats": {
+                    "total": stats["total_count"] or 0,
+                    "anime": stats["anime_count"] or 0,
+                    "manga": stats["manga_count"] or 0,
+                    "notify_episodes": stats["notify_episodes_count"] or 0,
+                    "notify_volumes": stats["notify_volumes_count"] or 0,
+                },
             }
-        })
+        )
 
     except Exception as e:
         logger.error(f"ウォッチリスト統計取得エラー: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500

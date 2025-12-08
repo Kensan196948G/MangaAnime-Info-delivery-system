@@ -18,8 +18,8 @@
         pass
 """
 
-import time
 import logging
+import time
 from collections import deque
 from functools import wraps
 from threading import Lock
@@ -55,9 +55,7 @@ class RateLimiter:
         self.timestamps = deque()
         self.lock = Lock()
 
-        logger.info(
-            f"{self.name} initialized: {calls} calls per {period} seconds"
-        )
+        logger.info(f"{self.name} initialized: {calls} calls per {period} seconds")
 
     def __call__(self, func: Callable) -> Callable:
         """
@@ -69,6 +67,7 @@ class RateLimiter:
         Returns:
             ラップされた関数
         """
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             with self.lock:
@@ -164,7 +163,7 @@ if __name__ == "__main__":
     # テスト実行
     logging.basicConfig(
         level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     # テスト用のレート制限（5呼び出し/秒）

@@ -5,18 +5,18 @@ This module provides functionality to send HTML emails with release notification
 using the Gmail API with OAuth2 authentication.
 """
 
-import os
 import base64
 import logging
-import time
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.image import MIMEImage
-from datetime import datetime, timedelta
-from typing import List, Dict, Optional, Any
-from dataclasses import dataclass, field
+import os
 import threading
+import time
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from functools import wraps
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -606,9 +606,7 @@ class GmailNotifier:
                 raise  # Trigger retry
             elif status_code == 403:  # Forbidden
                 if any("rate" in str(detail).lower() for detail in error_details):
-                    logger.warning(
-                        "Gmail API rate limit error, will retry with backo"
-                    )
+                    logger.warning("Gmail API rate limit error, will retry with backo")
                     time.sleep(2)  # Additional delay
                     raise  # Trigger retry
                 else:
@@ -640,7 +638,10 @@ class GmailNotifier:
                 return False
 
     def send_notification(
-        self, notification: EmailNotification, recipient: str = None, releases_count: int = 0
+        self,
+        notification: EmailNotification,
+        recipient: str = None,
+        releases_count: int = 0,
     ) -> bool:
         """
         Send email notification with history recording.
@@ -697,7 +698,9 @@ class GmailNotifier:
                         releases_count=releases_count,
                     )
                 except Exception as db_error:
-                    logger.warning(f"Failed to record email notification history: {db_error}")
+                    logger.warning(
+                        f"Failed to record email notification history: {db_error}"
+                    )
 
 
 class EmailTemplateGenerator:

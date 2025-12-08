@@ -14,22 +14,20 @@ Rate Limits: 90 requests per minute
 """
 
 import asyncio
-import aiohttp
 import logging
 import time
 from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
-from dataclasses import dataclass
-import json
+from typing import Any, Dict, List, Optional, Tuple
 
-from .models import WorkType, ReleaseType, DataSource
+import aiohttp
+
+from .models import DataSource, WorkType
 
 logger = logging.getLogger(__name__)
 
 
 class KitsuAPIError(Exception):
     """Custom exception for Kitsu API errors."""
-    pass
 
 
 class RateLimiter:
@@ -368,8 +366,6 @@ async def collect_kitsu_manga(config: Dict[str, Any]) -> List[Dict[str, Any]]:
 if __name__ == "__main__":
     # Test code
     logging.basicConfig(level=logging.INFO)
-
-    import json
 
     config = {
         "base_url": "https://kitsu.io/api/edge",

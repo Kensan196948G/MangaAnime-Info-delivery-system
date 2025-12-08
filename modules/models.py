@@ -8,11 +8,11 @@ This module defines:
 - Type definitions for consistent data handling
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime, date
-from typing import Optional, List, Dict, Any
-from enum import Enum
 import re
+from dataclasses import dataclass, field
+from datetime import date, datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
 

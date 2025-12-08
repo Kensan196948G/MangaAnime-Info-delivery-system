@@ -11,14 +11,14 @@ This module provides:
 """
 
 import hashlib
-import re
 import logging
+import re
 import unicodedata
-from datetime import datetime
-from typing import Dict, List, Any
-from difflib import SequenceMatcher
 from dataclasses import dataclass
+from datetime import datetime
+from difflib import SequenceMatcher
 from enum import Enum
+from typing import Any, Dict, List
 
 from .models import Work, WorkType
 

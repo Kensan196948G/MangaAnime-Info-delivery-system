@@ -3,7 +3,6 @@ Database utility functions for the Flask web application.
 """
 
 import sqlite3
-from pathlib import Path
 
 # Default database path
 DATABASE_PATH = "db.sqlite3"

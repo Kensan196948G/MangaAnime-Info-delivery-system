@@ -2,17 +2,17 @@
 リトライハンドラーモジュール
 APIコールやネットワークリクエストのリトライ処理を提供
 """
-import time
+
 import logging
-from typing import Callable, Any, Optional
+import time
 from functools import wraps
+from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
 
 
 class RetryException(Exception):
     """リトライ失敗時の例外"""
-    pass
 
 
 class RetryHandler:
@@ -23,7 +23,7 @@ class RetryHandler:
         max_retries: int = 3,
         backoff_factor: float = 2.0,
         initial_delay: float = 1.0,
-        max_delay: float = 60.0
+        max_delay: float = 60.0,
     ):
         """
         初期化
@@ -39,12 +39,7 @@ class RetryHandler:
         self.initial_delay = initial_delay
         self.max_delay = max_delay
 
-    def execute_with_retry(
-        self,
-        func: Callable,
-        *args,
-        **kwargs
-    ) -> Any:
+    def execute_with_retry(self, func: Callable, *args, **kwargs) -> Any:
         """
         リトライ付きで関数を実行
 
@@ -81,9 +76,7 @@ class RetryHandler:
                     time.sleep(delay)
                     delay = min(delay * self.backoff_factor, self.max_delay)
                 else:
-                    logger.error(
-                        f"最大リトライ回数に達しました: {self.max_retries}回"
-                    )
+                    logger.error(f"最大リトライ回数に達しました: {self.max_retries}回")
 
         raise RetryException(
             f"最大リトライ回数({self.max_retries})に達しました"
@@ -94,7 +87,7 @@ def retry_on_exception(
     max_retries: int = 3,
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
-    exceptions: tuple = (Exception,)
+    exceptions: tuple = (Exception,),
 ):
     """
     デコレーター: 指定した例外が発生した場合にリトライ
@@ -108,13 +101,14 @@ def retry_on_exception(
     Returns:
         デコレートされた関数
     """
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
             handler = RetryHandler(
                 max_retries=max_retries,
                 backoff_factor=backoff_factor,
-                initial_delay=initial_delay
+                initial_delay=initial_delay,
             )
 
             last_exception = None
@@ -135,15 +129,14 @@ def retry_on_exception(
                         time.sleep(delay)
                         delay = min(delay * backoff_factor, 60.0)
                     else:
-                        logger.error(
-                            f"{func.__name__}() 最大リトライ回数に達しました"
-                        )
+                        logger.error(f"{func.__name__}() 最大リトライ回数に達しました")
                         raise
 
             if last_exception:
                 raise last_exception
 
         return wrapper
+
     return decorator
 
 
@@ -155,7 +148,7 @@ class RateLimitedRetryHandler(RetryHandler):
         max_retries: int = 3,
         backoff_factor: float = 2.0,
         initial_delay: float = 1.0,
-        rate_limit_delay: float = 60.0
+        rate_limit_delay: float = 60.0,
     ):
         """
         初期化
@@ -181,10 +174,10 @@ class RateLimitedRetryHandler(RetryHandler):
         """
         error_msg = str(exception).lower()
         rate_limit_keywords = [
-            'rate limit',
-            'too many requests',
-            '429',
-            'quota exceeded'
+            "rate limit",
+            "too many requests",
+            "429",
+            "quota exceeded",
         ]
         return any(keyword in error_msg for keyword in rate_limit_keywords)
 
@@ -216,9 +209,7 @@ class RateLimitedRetryHandler(RetryHandler):
                 # レート制限エラーの場合は特別な処理
                 if self.is_rate_limit_error(e):
                     if attempt < self.max_retries:
-                        logger.warning(
-                            f"レート制限検出: {self.rate_limit_delay}秒待機"
-                        )
+                        logger.warning(f"レート制限検出: {self.rate_limit_delay}秒待機")
                         time.sleep(self.rate_limit_delay)
                         continue
 
@@ -231,9 +222,7 @@ class RateLimitedRetryHandler(RetryHandler):
                     time.sleep(delay)
                     delay = min(delay * self.backoff_factor, self.max_delay)
                 else:
-                    logger.error(
-                        f"最大リトライ回数に達しました: {self.max_retries}回"
-                    )
+                    logger.error(f"最大リトライ回数に達しました: {self.max_retries}回")
 
         raise RetryException(
             f"最大リトライ回数({self.max_retries})に達しました"
@@ -241,12 +230,13 @@ class RateLimitedRetryHandler(RetryHandler):
 
 
 # 使用例
-if __name__ == '__main__':
+if __name__ == "__main__":
     # 基本的なリトライ
     handler = RetryHandler(max_retries=3)
 
     def unstable_function():
         import random
+
         if random.random() < 0.7:
             raise Exception("一時的なエラー")
         return "成功"
@@ -258,6 +248,7 @@ if __name__ == '__main__':
     @retry_on_exception(max_retries=3, exceptions=(ValueError, ConnectionError))
     def api_call():
         import random
+
         if random.random() < 0.5:
             raise ConnectionError("接続エラー")
         return {"status": "ok"}

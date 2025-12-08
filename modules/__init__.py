@@ -19,20 +19,11 @@ Usage:
     from modules.models import Work, Release, WorkType, ReleaseType
 """
 
+from .config import ConfigManager, get_config, load_config_file
 # Import main components for easy access
 from .db import DatabaseManager, get_db
-from .config import ConfigManager, get_config, load_config_file
-from .models import (
-    Work,
-    Release,
-    AniListWork,
-    RSSFeedItem,
-    WorkType,
-    ReleaseType,
-    DataSource,
-    DataValidator,
-    DataNormalizer,
-)
+from .models import (AniListWork, DataNormalizer, DataSource, DataValidator,
+                     Release, ReleaseType, RSSFeedItem, Work, WorkType)
 
 # Version information
 __version__ = "1.0.0"

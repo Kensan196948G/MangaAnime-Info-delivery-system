@@ -4,18 +4,20 @@ Dashboard Enhanced Release Notifier
 ダッシュボード機能統合版リリース通知システム
 """
 
-import time
-import sys
 import json
 import logging
+import sys
+import time
 from datetime import datetime
-from modules.db import DatabaseManager
+
 from modules.anime_anilist import AniListCollector
-from modules.manga_rss import MangaRSSCollector
+from modules.calendar_integration import GoogleCalendarManager
+from modules.dashboard_integration import (dashboard_integration,
+                                           track_performance)
+from modules.db import DatabaseManager
 from modules.filter_logic import ContentFilter
 from modules.mailer import GmailNotifier
-from modules.calendar_integration import GoogleCalendarManager
-from modules.dashboard_integration import dashboard_integration, track_performance
+from modules.manga_rss import MangaRSSCollector
 
 # ログ設定
 logging.basicConfig(

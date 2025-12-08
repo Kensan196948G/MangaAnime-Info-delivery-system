@@ -5,14 +5,14 @@ This module provides functionality to create calendar events for new releases
 using the Google Calendar API with OAuth2 authentication.
 """
 
-import os
 import logging
-import time
-from datetime import datetime, timedelta
-from typing import List, Dict, Optional, Any
-from dataclasses import dataclass, field
+import os
 import threading
+import time
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from functools import wraps
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -309,7 +309,9 @@ class GoogleCalendarManager:
             logger.error(f"Calendar authentication failed: {str(e)}")
             return False
 
-    def create_event(self, event: CalendarEvent, releases_count: int = 1) -> Optional[str]:
+    def create_event(
+        self, event: CalendarEvent, releases_count: int = 1
+    ) -> Optional[str]:
         """
         Create a calendar event with history recording.
 
@@ -338,7 +340,9 @@ class GoogleCalendarManager:
                         releases_count=releases_count,
                     )
                 except Exception as db_error:
-                    logger.warning(f"Failed to record calendar notification history: {db_error}")
+                    logger.warning(
+                        f"Failed to record calendar notification history: {db_error}"
+                    )
 
             return None
 
@@ -400,7 +404,9 @@ class GoogleCalendarManager:
                         releases_count=releases_count,
                     )
                 except Exception as db_error:
-                    logger.warning(f"Failed to record calendar notification history: {db_error}")
+                    logger.warning(
+                        f"Failed to record calendar notification history: {db_error}"
+                    )
 
         return event_id
 

@@ -5,16 +5,16 @@ This module provides advanced error recovery and monitoring functionality for th
 anime/manga information delivery system with improved resilience and self-healing capabilities.
 """
 
-import logging
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Callable
-from dataclasses import dataclass, field
-from enum import Enum
-import threading
 import json
+import logging
+import threading
+import time
 import traceback
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 
 class ErrorSeverity(Enum):
@@ -230,7 +230,7 @@ class EnhancedErrorRecovery:
             self.error_events.append(error_event)
             # Limit stored events
             if len(self.error_events) > self.max_error_events:
-                self.error_events = self.error_events[-self.max_error_events:]
+                self.error_events = self.error_events[-self.max_error_events :]
 
         # Update component health
         self._update_component_health(component, error_event)

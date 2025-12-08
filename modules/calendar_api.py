@@ -11,39 +11,35 @@ Phase 17: カレンダー統合実装
 - イベント検索と日付範囲クエリ
 """
 
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from datetime import datetime, timedelta
+import json
 import logging
 import time
-import json
-import os
-from typing import List, Dict, Any, Tuple, Optional
+from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 logger = logging.getLogger(__name__)
 
 
 class GoogleCalendarAPIError(Exception):
     """Google Calendar API エラーの基底クラス"""
-    pass
 
 
 class AuthenticationError(GoogleCalendarAPIError):
     """認証エラー"""
-    pass
 
 
 class QuotaExceededError(GoogleCalendarAPIError):
     """クォータ超過エラー"""
-    pass
 
 
 class EventNotFoundError(GoogleCalendarAPIError):
     """イベント未検出エラー"""
-    pass
 
 
 class GoogleCalendarAPI:
@@ -66,9 +62,9 @@ class GoogleCalendarAPI:
     """
 
     # API設定
-    SCOPES = ['https://www.googleapis.com/auth/calendar']
-    API_SERVICE_NAME = 'calendar'
-    API_VERSION = 'v3'
+    SCOPES = ["https://www.googleapis.com/auth/calendar"]
+    API_SERVICE_NAME = "calendar"
+    API_VERSION = "v3"
 
     # リトライ設定
     MAX_RETRIES = 3
@@ -80,9 +76,7 @@ class GoogleCalendarAPI:
     BATCH_DELAY = 1.0  # 秒
 
     def __init__(
-        self,
-        token_file: str = 'auth/calendar_token.json',
-        calendar_id: str = 'primary'
+        self, token_file: str = "auth/calendar_token.json", calendar_id: str = "primary"
     ):
         """
         初期化
@@ -102,18 +96,14 @@ class GoogleCalendarAPI:
         # 認証とサービス初期化
         self._initialize()
 
-        logger.info(
-            f"GoogleCalendarAPI initialized: calendar_id={calendar_id}"
-        )
+        logger.info(f"GoogleCalendarAPI initialized: calendar_id={calendar_id}")
 
     def _initialize(self) -> None:
         """認証とAPIサービスの初期化"""
         try:
             self.credentials = self._load_credentials()
             self.service = build(
-                self.API_SERVICE_NAME,
-                self.API_VERSION,
-                credentials=self.credentials
+                self.API_SERVICE_NAME, self.API_VERSION, credentials=self.credentials
             )
         except Exception as e:
             logger.error(f"Failed to initialize Google Calendar API: {e}")
@@ -138,16 +128,16 @@ class GoogleCalendarAPI:
             )
 
         try:
-            with open(token_path, 'r', encoding='utf-8') as f:
+            with open(token_path, "r", encoding="utf-8") as f:
                 token_data = json.load(f)
 
             credentials = Credentials(
-                token=token_data.get('token'),
-                refresh_token=token_data.get('refresh_token'),
-                token_uri=token_data.get('token_uri'),
-                client_id=token_data.get('client_id'),
-                client_secret=token_data.get('client_secret'),
-                scopes=token_data.get('scopes', self.SCOPES)
+                token=token_data.get("token"),
+                refresh_token=token_data.get("refresh_token"),
+                token_uri=token_data.get("token_uri"),
+                client_id=token_data.get("client_id"),
+                client_secret=token_data.get("client_secret"),
+                scopes=token_data.get("scopes", self.SCOPES),
             )
 
             # トークンの有効性チェックと更新
@@ -162,8 +152,7 @@ class GoogleCalendarAPI:
             raise AuthenticationError(f"Failed to load credentials: {e}")
 
     def _refresh_token_if_needed(
-        self,
-        credentials: Optional[Credentials] = None
+        self, credentials: Optional[Credentials] = None
     ) -> bool:
         """
         必要に応じてトークンをリフレッシュ
@@ -206,15 +195,15 @@ class GoogleCalendarAPI:
         token_path.parent.mkdir(parents=True, exist_ok=True)
 
         token_data = {
-            'token': credentials.token,
-            'refresh_token': credentials.refresh_token,
-            'token_uri': credentials.token_uri,
-            'client_id': credentials.client_id,
-            'client_secret': credentials.client_secret,
-            'scopes': credentials.scopes
+            "token": credentials.token,
+            "refresh_token": credentials.refresh_token,
+            "token_uri": credentials.token_uri,
+            "client_id": credentials.client_id,
+            "client_secret": credentials.client_secret,
+            "scopes": credentials.scopes,
         }
 
-        with open(token_path, 'w', encoding='utf-8') as f:
+        with open(token_path, "w", encoding="utf-8") as f:
             json.dump(token_data, f, ensure_ascii=False, indent=2)
 
         logger.debug(f"Credentials saved to {self.token_file}")
@@ -228,10 +217,10 @@ class GoogleCalendarAPI:
         summary: str,
         start_time: datetime,
         duration_minutes: int = 60,
-        description: str = '',
-        location: str = '',
+        description: str = "",
+        location: str = "",
         color_id: Optional[str] = None,
-        reminders: Optional[List[Dict[str, Any]]] = None
+        reminders: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
         """
         カレンダーイベントを作成
@@ -262,31 +251,28 @@ class GoogleCalendarAPI:
         end_time = start_time + timedelta(minutes=duration_minutes)
 
         event_data = {
-            'summary': summary,
-            'description': description,
-            'location': location,
-            'start': {
-                'dateTime': self._convert_to_iso(start_time),
-                'timeZone': 'Asia/Tokyo',
+            "summary": summary,
+            "description": description,
+            "location": location,
+            "start": {
+                "dateTime": self._convert_to_iso(start_time),
+                "timeZone": "Asia/Tokyo",
             },
-            'end': {
-                'dateTime': self._convert_to_iso(end_time),
-                'timeZone': 'Asia/Tokyo',
-            }
+            "end": {
+                "dateTime": self._convert_to_iso(end_time),
+                "timeZone": "Asia/Tokyo",
+            },
         }
 
         # カラー設定
         if color_id:
-            event_data['colorId'] = str(color_id)
+            event_data["colorId"] = str(color_id)
 
         # リマインダー設定
         if reminders:
-            event_data['reminders'] = {
-                'useDefault': False,
-                'overrides': reminders
-            }
+            event_data["reminders"] = {"useDefault": False, "overrides": reminders}
         else:
-            event_data['reminders'] = {'useDefault': True}
+            event_data["reminders"] = {"useDefault": True}
 
         # イベントデータ検証
         if not self._validate_event_data(event_data):
@@ -294,16 +280,16 @@ class GoogleCalendarAPI:
 
         # API呼び出し
         def _create():
-            return self.service.events().insert(
-                calendarId=self.calendar_id,
-                body=event_data
-            ).execute()
+            return (
+                self.service.events()
+                .insert(calendarId=self.calendar_id, body=event_data)
+                .execute()
+            )
 
         try:
             event = self._retry_with_backoff(_create)
             logger.info(
-                f"Event created: {summary} at {start_time} "
-                f"(ID: {event.get('id')})"
+                f"Event created: {summary} at {start_time} " f"(ID: {event.get('id')})"
             )
             return event
 
@@ -324,11 +310,13 @@ class GoogleCalendarAPI:
         Raises:
             EventNotFoundError: イベントが見つからない場合
         """
+
         def _get():
-            return self.service.events().get(
-                calendarId=self.calendar_id,
-                eventId=event_id
-            ).execute()
+            return (
+                self.service.events()
+                .get(calendarId=self.calendar_id, eventId=event_id)
+                .execute()
+            )
 
         try:
             event = self._retry_with_backoff(_get)
@@ -340,11 +328,7 @@ class GoogleCalendarAPI:
                 raise EventNotFoundError(f"Event not found: {event_id}")
             raise GoogleCalendarAPIError(f"Failed to get event: {e}")
 
-    def update_event(
-        self,
-        event_id: str,
-        updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def update_event(self, event_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
         """
         既存イベントを更新
 
@@ -365,11 +349,11 @@ class GoogleCalendarAPI:
         event.update(updates)
 
         def _update():
-            return self.service.events().update(
-                calendarId=self.calendar_id,
-                eventId=event_id,
-                body=event
-            ).execute()
+            return (
+                self.service.events()
+                .update(calendarId=self.calendar_id, eventId=event_id, body=event)
+                .execute()
+            )
 
         try:
             updated_event = self._retry_with_backoff(_update)
@@ -393,11 +377,13 @@ class GoogleCalendarAPI:
         Raises:
             EventNotFoundError: イベントが見つからない場合
         """
+
         def _delete():
-            return self.service.events().delete(
-                calendarId=self.calendar_id,
-                eventId=event_id
-            ).execute()
+            return (
+                self.service.events()
+                .delete(calendarId=self.calendar_id, eventId=event_id)
+                .execute()
+            )
 
         try:
             self._retry_with_backoff(_delete)
@@ -418,8 +404,8 @@ class GoogleCalendarAPI:
         time_min: Optional[datetime] = None,
         time_max: Optional[datetime] = None,
         max_results: int = 100,
-        order_by: str = 'startTime',
-        single_events: bool = True
+        order_by: str = "startTime",
+        single_events: bool = True,
     ) -> List[Dict[str, Any]]:
         """
         イベント一覧を取得
@@ -438,22 +424,22 @@ class GoogleCalendarAPI:
             time_min = datetime.now()
 
         params = {
-            'calendarId': self.calendar_id,
-            'timeMin': self._convert_to_iso(time_min),
-            'maxResults': max_results,
-            'singleEvents': single_events,
-            'orderBy': order_by
+            "calendarId": self.calendar_id,
+            "timeMin": self._convert_to_iso(time_min),
+            "maxResults": max_results,
+            "singleEvents": single_events,
+            "orderBy": order_by,
         }
 
         if time_max:
-            params['timeMax'] = self._convert_to_iso(time_max)
+            params["timeMax"] = self._convert_to_iso(time_max)
 
         def _list():
             return self.service.events().list(**params).execute()
 
         try:
             result = self._retry_with_backoff(_list)
-            events = result.get('items', [])
+            events = result.get("items", [])
 
             logger.info(
                 f"Retrieved {len(events)} events "
@@ -465,11 +451,7 @@ class GoogleCalendarAPI:
             logger.error(f"Failed to list events: {e}")
             raise GoogleCalendarAPIError(f"Event listing failed: {e}")
 
-    def search_events(
-        self,
-        query: str,
-        max_results: int = 100
-    ) -> List[Dict[str, Any]]:
+    def search_events(self, query: str, max_results: int = 100) -> List[Dict[str, Any]]:
         """
         キーワードでイベントを検索
 
@@ -480,22 +462,25 @@ class GoogleCalendarAPI:
         Returns:
             list: 検索結果のイベントリスト
         """
+
         def _search():
-            return self.service.events().list(
-                calendarId=self.calendar_id,
-                q=query,
-                maxResults=max_results,
-                singleEvents=True,
-                orderBy='startTime'
-            ).execute()
+            return (
+                self.service.events()
+                .list(
+                    calendarId=self.calendar_id,
+                    q=query,
+                    maxResults=max_results,
+                    singleEvents=True,
+                    orderBy="startTime",
+                )
+                .execute()
+            )
 
         try:
             result = self._retry_with_backoff(_search)
-            events = result.get('items', [])
+            events = result.get("items", [])
 
-            logger.info(
-                f"Found {len(events)} events for query: '{query}'"
-            )
+            logger.info(f"Found {len(events)} events for query: '{query}'")
             return events
 
         except Exception as e:
@@ -503,9 +488,7 @@ class GoogleCalendarAPI:
             raise GoogleCalendarAPIError(f"Event search failed: {e}")
 
     def get_events_by_date_range(
-        self,
-        start_date: datetime,
-        end_date: datetime
+        self, start_date: datetime, end_date: datetime
     ) -> List[Dict[str, Any]]:
         """
         日付範囲でイベントを取得
@@ -517,20 +500,14 @@ class GoogleCalendarAPI:
         Returns:
             list: 指定期間内のイベントリスト
         """
-        return self.list_events(
-            time_min=start_date,
-            time_max=end_date,
-            max_results=250
-        )
+        return self.list_events(time_min=start_date, time_max=end_date, max_results=250)
 
     # ========================================
     # バッチ操作
     # ========================================
 
     def batch_create_events(
-        self,
-        events_data: List[Dict[str, Any]],
-        batch_size: int = DEFAULT_BATCH_SIZE
+        self, events_data: List[Dict[str, Any]], batch_size: int = DEFAULT_BATCH_SIZE
     ) -> Tuple[int, int, List[str]]:
         """
         複数イベントを一括作成（バッチ処理）
@@ -569,13 +546,10 @@ class GoogleCalendarAPI:
 
         # バッチ処理
         for i in range(0, total, batch_size):
-            batch = events_data[i:i + batch_size]
+            batch = events_data[i : i + batch_size]
             batch_num = i // batch_size + 1
 
-            logger.debug(
-                f"Processing batch {batch_num}: "
-                f"{len(batch)} events"
-            )
+            logger.debug(f"Processing batch {batch_num}: " f"{len(batch)} events")
 
             for event_data in batch:
                 try:
@@ -584,9 +558,7 @@ class GoogleCalendarAPI:
 
                 except Exception as e:
                     failed_count += 1
-                    error_msg = (
-                        f"Failed to create '{event_data.get('summary')}': {e}"
-                    )
+                    error_msg = f"Failed to create '{event_data.get('summary')}': {e}"
                     errors.append(error_msg)
                     logger.warning(error_msg)
 
@@ -602,8 +574,7 @@ class GoogleCalendarAPI:
         return success_count, failed_count, errors
 
     def batch_update_events(
-        self,
-        updates_data: List[Tuple[str, Dict[str, Any]]]
+        self, updates_data: List[Tuple[str, Dict[str, Any]]]
     ) -> Tuple[int, int]:
         """
         複数イベントを一括更新
@@ -635,10 +606,7 @@ class GoogleCalendarAPI:
 
         return success_count, failed_count
 
-    def batch_delete_events(
-        self,
-        event_ids: List[str]
-    ) -> Tuple[int, int]:
+    def batch_delete_events(self, event_ids: List[str]) -> Tuple[int, int]:
         """
         複数イベントを一括削除
 
@@ -696,11 +664,7 @@ class GoogleCalendarAPI:
         else:
             raise GoogleCalendarAPIError(f"HTTP {status}: {error}")
 
-    def _retry_with_backoff(
-        self,
-        func,
-        max_retries: int = MAX_RETRIES
-    ) -> Any:
+    def _retry_with_backoff(self, func, max_retries: int = MAX_RETRIES) -> Any:
         """
         指数バックオフによるリトライ処理
 
@@ -734,9 +698,7 @@ class GoogleCalendarAPI:
                     time.sleep(backoff)
                     backoff *= self.BACKOFF_MULTIPLIER
                 else:
-                    logger.error(
-                        f"API call failed after {max_retries} retries: {e}"
-                    )
+                    logger.error(f"API call failed after {max_retries} retries: {e}")
                     self._handle_http_error(e)
 
             except Exception as e:
@@ -771,7 +733,7 @@ class GoogleCalendarAPI:
         Returns:
             bool: 有効な場合True
         """
-        required_fields = ['summary', 'start', 'end']
+        required_fields = ["summary", "start", "end"]
 
         for field in required_fields:
             if field not in event_data:
@@ -779,11 +741,11 @@ class GoogleCalendarAPI:
                 return False
 
         # 開始・終了時刻の検証
-        if 'dateTime' not in event_data['start']:
+        if "dateTime" not in event_data["start"]:
             logger.error("Missing 'dateTime' in start")
             return False
 
-        if 'dateTime' not in event_data['end']:
+        if "dateTime" not in event_data["end"]:
             logger.error("Missing 'dateTime' in end")
             return False
 
@@ -796,10 +758,9 @@ class GoogleCalendarAPI:
         Returns:
             dict: カレンダー情報
         """
+
         def _get_calendar():
-            return self.service.calendars().get(
-                calendarId=self.calendar_id
-            ).execute()
+            return self.service.calendars().get(calendarId=self.calendar_id).execute()
 
         try:
             calendar_info = self._retry_with_backoff(_get_calendar)
@@ -820,6 +781,7 @@ class GoogleCalendarAPI:
         Returns:
             dict: カラー定義
         """
+
         def _get_colors():
             return self.service.colors().get().execute()
 
@@ -837,7 +799,8 @@ class GoogleCalendarAPI:
 # ヘルパー関数
 # ========================================
 
-def create_reminder(method: str = 'popup', minutes: int = 30) -> Dict[str, Any]:
+
+def create_reminder(method: str = "popup", minutes: int = 30) -> Dict[str, Any]:
     """
     リマインダー設定を作成
 
@@ -856,10 +819,7 @@ def create_reminder(method: str = 'popup', minutes: int = 30) -> Dict[str, Any]:
         ...     reminders=[reminder]
         ... )
     """
-    return {
-        'method': method,
-        'minutes': minutes
-    }
+    return {"method": method, "minutes": minutes}
 
 
 def format_event_summary(title: str, episode: Optional[str] = None) -> str:
@@ -882,11 +842,11 @@ def format_event_summary(title: str, episode: Optional[str] = None) -> str:
     return title
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # 簡易テスト
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     print("Google Calendar API Wrapper Module")

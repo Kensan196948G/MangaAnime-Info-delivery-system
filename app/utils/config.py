@@ -3,8 +3,7 @@ Configuration utility functions for the Flask web application.
 """
 
 import json
-from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 # Default config path
 CONFIG_PATH = "config.json"

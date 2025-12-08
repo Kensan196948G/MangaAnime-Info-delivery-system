@@ -14,15 +14,16 @@ API Documentation: https://docs.cal.syoboi.jp/spec/
 """
 
 import asyncio
-import aiohttp
+import json
 import logging
 import time
-import json
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
 
-from .models import Work, Release, WorkType, ReleaseType, DataSource
+import aiohttp
+
+from .models import DataSource, Release, ReleaseType, Work, WorkType
 
 
 class SyoboiAPIError(Exception):
@@ -587,6 +588,7 @@ def fetch_and_store() -> dict:
         dict: 収集結果のサマリー
     """
     import logging
+
     from .db import get_db
 
     logger = logging.getLogger(__name__)
@@ -609,7 +611,7 @@ def fetch_and_store() -> dict:
 
         for work in works:
             try:
-                title = work.title if hasattr(work, 'title') else str(work)
+                title = work.title if hasattr(work, "title") else str(work)
                 if not title:
                     continue
 
@@ -620,7 +622,7 @@ def fetch_and_store() -> dict:
                     title_en=getattr(work, "title_en", None),
                     official_url=getattr(work, "official_url", None),
                 )
-                work_id_map[getattr(work, 'id', title)] = work_id
+                work_id_map[getattr(work, "id", title)] = work_id
                 stored_works += 1
             except Exception as e:
                 logger.warning(f"作品保存エラー: {work} - {e}")
@@ -629,23 +631,23 @@ def fetch_and_store() -> dict:
         for release in releases:
             try:
                 # 対応する作品IDを取得
-                orig_work_id = getattr(release, 'work_id', None)
+                orig_work_id = getattr(release, "work_id", None)
                 db_work_id = work_id_map.get(orig_work_id)
                 if not db_work_id:
                     continue
 
-                release_date = getattr(release, 'release_date', None)
-                if release_date and hasattr(release_date, 'isoformat'):
+                release_date = getattr(release, "release_date", None)
+                if release_date and hasattr(release_date, "isoformat"):
                     release_date = release_date.strftime("%Y-%m-%d")
 
-                release_type = getattr(release, 'release_type', 'episode')
-                if hasattr(release_type, 'value'):
+                release_type = getattr(release, "release_type", "episode")
+                if hasattr(release_type, "value"):
                     release_type = release_type.value
 
                 db.create_release(
                     work_id=db_work_id,
                     release_type=str(release_type),
-                    number=getattr(release, 'number', None),
+                    number=getattr(release, "number", None),
                     platform=getattr(release, "platform", "TV放送"),
                     release_date=release_date,
                     source="syoboi",
@@ -656,7 +658,9 @@ def fetch_and_store() -> dict:
                 logger.warning(f"リリース保存エラー: {e}")
                 continue
 
-        logger.info(f"しょぼいカレンダー収集完了: {stored_works}作品, {stored_releases}リリース保存")
+        logger.info(
+            f"しょぼいカレンダー収集完了: {stored_works}作品, {stored_releases}リリース保存"
+        )
         return {"success": True, "works": stored_works, "releases": stored_releases}
 
     except Exception as e:

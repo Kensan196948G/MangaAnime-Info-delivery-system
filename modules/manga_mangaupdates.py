@@ -14,22 +14,20 @@ Rate Limits: 30 requests per minute
 """
 
 import asyncio
-import aiohttp
+import json
 import logging
 import time
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass
-import json
+from typing import Any, Dict, List, Optional
 
-from .models import WorkType, ReleaseType, DataSource
+import aiohttp
+
+from .models import DataSource, WorkType
 
 logger = logging.getLogger(__name__)
 
 
 class MangaUpdatesAPIError(Exception):
     """Custom exception for MangaUpdates API errors."""
-    pass
 
 
 class RateLimiter:
@@ -200,8 +198,7 @@ class MangaUpdatesAPIClient:
                     "volume": record.get("volume", ""),
                     "release_date": record.get("release_date", ""),
                     "groups": [
-                        group.get("name", "")
-                        for group in record.get("groups", [])
+                        group.get("name", "") for group in record.get("groups", [])
                     ],
                     "type": WorkType.MANGA.value,
                     "source": DataSource.MANGAUPDATES.value,
@@ -230,12 +227,10 @@ class MangaUpdatesAPIClient:
                     "year": record.get("year", ""),
                     "description": record.get("description", ""),
                     "genres": [
-                        genre.get("genre", "")
-                        for genre in record.get("genres", [])
+                        genre.get("genre", "") for genre in record.get("genres", [])
                     ],
                     "categories": [
-                        cat.get("category", "")
-                        for cat in record.get("categories", [])
+                        cat.get("category", "") for cat in record.get("categories", [])
                     ],
                     "latest_chapter": record.get("latest_chapter", ""),
                     "cover_image": image.get("url", {}).get("original", ""),
@@ -265,10 +260,11 @@ class MangaUpdatesAPIClient:
                 "year": series.get("year", ""),
                 "status": series.get("status", ""),
                 "licensed": series.get("licensed", False),
-                "genres": [genre.get("genre", "") for genre in series.get("genres", [])],
+                "genres": [
+                    genre.get("genre", "") for genre in series.get("genres", [])
+                ],
                 "categories": [
-                    cat.get("category", "")
-                    for cat in series.get("categories", [])
+                    cat.get("category", "") for cat in series.get("categories", [])
                 ],
                 "latest_chapter": series.get("latest_chapter", ""),
                 "cover_image": image.get("url", {}).get("original", ""),

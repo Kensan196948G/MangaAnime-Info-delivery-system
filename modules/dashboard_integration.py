@@ -3,13 +3,14 @@ Dashboard Integration Module
 監視・統計ダッシュボード統合機能
 """
 
-import time
-import sqlite3
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
-from contextlib import contextmanager
-from .monitoring import MetricsCollector
 import logging
+import sqlite3
+import time
+from contextlib import contextmanager
+from datetime import datetime, timedelta
+from typing import Any, Dict, Optional
+
+from .monitoring import MetricsCollector
 
 logger = logging.getLogger(__name__)
 
@@ -89,9 +90,7 @@ class DashboardIntegration:
 
         # 成功/失敗カウンターも更新
         metric_name = f"{api_name}_{'success' if success else 'error'}"
-        service.record_metric(
-            metric_name, 1, "counter", source=f"{api_name}_api"
-        )
+        service.record_metric(metric_name, 1, "counter", source=f"{api_name}_api")
 
     def track_rss_collection(self, source: str, success: bool, items_count: int = 0):
         """RSS収集結果を追跡"""
@@ -133,9 +132,7 @@ class DashboardIntegration:
             },
         )
 
-        service.record_metric(
-            f"db_{operation}_count", 1, "counter", source="database"
-        )
+        service.record_metric(f"db_{operation}_count", 1, "counter", source="database")
 
     def track_notification_sent(
         self, notification_type: str, success: bool, recipient_count: int = 1

@@ -11,19 +11,17 @@ This module extends data_normalizer.py with:
 """
 
 import logging
-from datetime import datetime
-from typing import Dict, List, Any, Optional, Set
-from difflib import SequenceMatcher
 from dataclasses import dataclass
+from datetime import datetime
+from difflib import SequenceMatcher
 from enum import Enum
+from typing import Any, Dict, List, Optional, Set
+
 import jellyfish  # For phonetic matching (install: pip install jellyfish)
 
-from .models import Work, DataSource
-from .data_normalizer import (
-    TitleNormalizer,
-    DataQualityAnalyzer,
-    NormalizationLevel,
-)
+from .data_normalizer import (DataQualityAnalyzer, NormalizationLevel,
+                              TitleNormalizer)
+from .models import DataSource, Work
 
 
 class MatchAlgorithm(Enum):

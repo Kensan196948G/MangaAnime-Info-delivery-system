@@ -14,22 +14,21 @@ Rate Limits: 60 requests per minute (recommended)
 """
 
 import asyncio
-import aiohttp
+import json
 import logging
 import time
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass
-import json
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
-from .models import WorkType, ReleaseType, DataSource
+import aiohttp
+
+from .models import DataSource, WorkType
 
 logger = logging.getLogger(__name__)
 
 
 class AnnictAPIError(Exception):
     """Custom exception for Annict API errors."""
-    pass
 
 
 class RateLimiter:
@@ -68,17 +67,18 @@ class AnnictAPIClient:
         self.logger = logging.getLogger(__name__)
 
         if not self.access_token:
-            raise AnnictAPIError("Annict access token is required. Get it from https://annict.com/settings/apps")
+            raise AnnictAPIError(
+                "Annict access token is required. Get it from https://annict.com/settings/apps"
+            )
 
     async def __aenter__(self):
         """Async context manager entry."""
         headers = {
             "Authorization": f"Bearer {self.access_token}",
-            "User-Agent": "MangaAnime-Info-Delivery-System/1.0"
+            "User-Agent": "MangaAnime-Info-Delivery-System/1.0",
         }
         self.session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=self.timeout),
-            headers=headers
+            timeout=aiohttp.ClientTimeout(total=self.timeout), headers=headers
         )
         return self
 
@@ -88,9 +88,7 @@ class AnnictAPIClient:
             await self.session.close()
 
     async def _make_request(
-        self,
-        endpoint: str,
-        params: Optional[Dict[str, Any]] = None
+        self, endpoint: str, params: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         Make a request to Annict API with rate limiting.
@@ -112,12 +110,16 @@ class AnnictAPIClient:
         try:
             async with self.session.get(url, params=params) as response:
                 if response.status == 401:
-                    raise AnnictAPIError("Invalid access token. Please check your Annict API credentials.")
+                    raise AnnictAPIError(
+                        "Invalid access token. Please check your Annict API credentials."
+                    )
                 elif response.status == 404:
                     raise AnnictAPIError(f"Endpoint not found: {endpoint}")
                 elif response.status != 200:
                     error_text = await response.text()
-                    raise AnnictAPIError(f"API request failed with status {response.status}: {error_text}")
+                    raise AnnictAPIError(
+                        f"API request failed with status {response.status}: {error_text}"
+                    )
 
                 data = await response.json()
                 return data
@@ -129,7 +131,7 @@ class AnnictAPIClient:
         self,
         season: Optional[str] = None,
         year: Optional[int] = None,
-        per_page: int = 50
+        per_page: int = 50,
     ) -> List[Dict[str, Any]]:
         """
         Get anime works for a specific season.
@@ -150,7 +152,7 @@ class AnnictAPIClient:
             "filter_season": season,
             "per_page": min(per_page, 50),
             "sort_watchers_count": "desc",
-            "fields": "id,title,title_kana,title_en,media,media_text,season_name,season_name_text,episodes_count,watchers_count,reviews_count,no_episodes,started_on,official_site_url,wikipedia_url,twitter_username,images"
+            "fields": "id,title,title_kana,title_en,media,media_text,season_name,season_name_text,episodes_count,watchers_count,reviews_count,no_episodes,started_on,official_site_url,wikipedia_url,twitter_username,images",
         }
 
         self.logger.info(f"Fetching Annict works for season: {season}")
@@ -165,7 +167,7 @@ class AnnictAPIClient:
         self,
         start_date: Optional[datetime] = None,
         work_ids: Optional[List[int]] = None,
-        per_page: int = 50
+        per_page: int = 50,
     ) -> List[Dict[str, Any]]:
         """
         Get broadcast programs/schedules.
@@ -181,7 +183,7 @@ class AnnictAPIClient:
         params = {
             "per_page": min(per_page, 50),
             "sort_started_at": "asc",
-            "fields": "id,started_at,is_rebroadcast,channel,work,episode"
+            "fields": "id,started_at,is_rebroadcast,channel,work,episode",
         }
 
         if start_date:
@@ -199,9 +201,7 @@ class AnnictAPIClient:
         return programs
 
     async def get_episodes(
-        self,
-        work_id: int,
-        per_page: int = 50
+        self, work_id: int, per_page: int = 50
     ) -> List[Dict[str, Any]]:
         """
         Get episodes for a specific work.
@@ -217,7 +217,7 @@ class AnnictAPIClient:
             "filter_work_id": work_id,
             "per_page": min(per_page, 50),
             "sort_sort_number": "asc",
-            "fields": "id,number,number_text,title,records_count,prev_episode,next_episode"
+            "fields": "id,number,number_text,title,records_count,prev_episode,next_episode",
         }
 
         self.logger.info(f"Fetching episodes for work ID: {work_id}")
@@ -315,7 +315,9 @@ class AnnictAPIClient:
         }
 
 
-async def collect_annict_data(config: Dict[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
+async def collect_annict_data(
+    config: Dict[str, Any],
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     Collect anime data from Annict API.
 
@@ -350,7 +352,7 @@ async def collect_annict_data(config: Dict[str, Any]) -> Dict[str, List[Dict[str
             return {
                 "works": normalized_works,
                 "programs": normalized_programs,
-                "episodes": []
+                "episodes": [],
             }
 
     except AnnictAPIError as e:
@@ -365,15 +367,16 @@ async def collect_annict_data(config: Dict[str, Any]) -> Dict[str, List[Dict[str
 async def main():
     """Test function."""
     import sys
-    sys.path.insert(0, '..')
+
+    sys.path.insert(0, "..")
 
     # Load config
-    with open('../config.json', 'r', encoding='utf-8') as f:
+    with open("../config.json", "r", encoding="utf-8") as f:
         config_data = json.load(f)
 
-    annict_config = config_data.get('apis', {}).get('annict', {})
+    annict_config = config_data.get("apis", {}).get("annict", {})
 
-    if not annict_config.get('access_token') and not annict_config.get('api_key'):
+    if not annict_config.get("access_token") and not annict_config.get("api_key"):
         logger.info("⚠️  Please set your Annict access token in config.json")
         logger.info("   Get it from: https://annict.com/settings/apps")
         return
@@ -385,9 +388,9 @@ async def main():
     logger.info(f"   Works: {len(result['works'])}")
     logger.info(f"   Programs: {len(result['programs'])}")
 
-    if result['works']:
+    if result["works"]:
         logger.info(f"\n📺 Sample work:")
-        logger.info(json.dumps(result['works'][0], indent=2, ensure_ascii=False))
+        logger.info(json.dumps(result["works"][0], indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

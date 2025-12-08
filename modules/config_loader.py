@@ -17,10 +17,11 @@ JSON設定ファイルと環境変数を統合した設定管理システム。
 """
 
 import json
-import os
 import logging
+import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
+
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ class ConfigLoader:
         self,
         config_path: str = "config.json",
         env_file: Optional[str] = ".env",
-        auto_load: bool = True
+        auto_load: bool = True,
     ):
         """
         Args:
@@ -84,7 +85,7 @@ class ConfigLoader:
             self._config = self._get_default_config()
         else:
             try:
-                with open(self.config_path, 'r', encoding='utf-8') as f:
+                with open(self.config_path, "r", encoding="utf-8") as f:
                     self._config = json.load(f)
                 logger.info(f"Loaded config from {self.config_path}")
             except json.JSONDecodeError as e:
@@ -105,71 +106,52 @@ class ConfigLoader:
         """
         return {
             "anime_sources": {
-                "anilist": {
-                    "enabled": True,
-                    "api_url": "https://graphql.anilist.co"
-                },
-                "syoboi": {
-                    "enabled": True,
-                    "api_url": "https://cal.syoboi.jp/db.php"
-                }
+                "anilist": {"enabled": True, "api_url": "https://graphql.anilist.co"},
+                "syoboi": {"enabled": True, "api_url": "https://cal.syoboi.jp/db.php"},
             },
-            "manga_sources": {
-                "rss_feeds": []
-            },
+            "manga_sources": {"rss_feeds": []},
             "notification": {
-                "email": {
-                    "enabled": True,
-                    "recipients": []
-                },
-                "calendar": {
-                    "enabled": True,
-                    "calendar_id": "primary"
-                }
+                "email": {"enabled": True, "recipients": []},
+                "calendar": {"enabled": True, "calendar_id": "primary"},
             },
-            "filter": {
-                "ng_keywords": []
-            },
-            "schedule": {
-                "run_time": "08:00",
-                "timezone": "Asia/Tokyo"
-            }
+            "filter": {"ng_keywords": []},
+            "schedule": {"run_time": "08:00", "timezone": "Asia/Tokyo"},
         }
 
     def _apply_env_overrides(self):
         """環境変数による設定のオーバーライド"""
         # 通知メールアドレス
-        if email := os.getenv('NOTIFICATION_EMAIL'):
-            recipients = [e.strip() for e in email.split(',')]
-            self._set_nested('notification.email.recipients', recipients)
+        if email := os.getenv("NOTIFICATION_EMAIL"):
+            recipients = [e.strip() for e in email.split(",")]
+            self._set_nested("notification.email.recipients", recipients)
 
         # データベースパス
-        if db_path := os.getenv('DATABASE_PATH'):
-            self._config['database_path'] = db_path
+        if db_path := os.getenv("DATABASE_PATH"):
+            self._config["database_path"] = db_path
 
         # ログレベル
-        if log_level := os.getenv('LOG_LEVEL'):
-            self._config['log_level'] = log_level
+        if log_level := os.getenv("LOG_LEVEL"):
+            self._config["log_level"] = log_level
 
         # NGキーワード
-        if ng_keywords := os.getenv('NG_KEYWORDS'):
-            keywords = [k.strip() for k in ng_keywords.split(',')]
-            self._set_nested('filter.ng_keywords', keywords)
+        if ng_keywords := os.getenv("NG_KEYWORDS"):
+            keywords = [k.strip() for k in ng_keywords.split(",")]
+            self._set_nested("filter.ng_keywords", keywords)
 
         # API URL
-        if anilist_url := os.getenv('ANILIST_API_URL'):
-            self._set_nested('anime_sources.anilist.api_url', anilist_url)
+        if anilist_url := os.getenv("ANILIST_API_URL"):
+            self._set_nested("anime_sources.anilist.api_url", anilist_url)
 
-        if syoboi_url := os.getenv('SYOBOI_API_URL'):
-            self._set_nested('anime_sources.syoboi.api_url', syoboi_url)
+        if syoboi_url := os.getenv("SYOBOI_API_URL"):
+            self._set_nested("anime_sources.syoboi.api_url", syoboi_url)
 
         # タイムゾーン
-        if timezone := os.getenv('TIMEZONE'):
-            self._set_nested('schedule.timezone', timezone)
+        if timezone := os.getenv("TIMEZONE"):
+            self._set_nested("schedule.timezone", timezone)
 
         # テストモード
-        if test_mode := os.getenv('TEST_MODE'):
-            self._config['test_mode'] = test_mode.lower() == 'true'
+        if test_mode := os.getenv("TEST_MODE"):
+            self._config["test_mode"] = test_mode.lower() == "true"
 
         logger.debug("Applied environment variable overrides")
 
@@ -191,7 +173,7 @@ class ConfigLoader:
             >>> config.get('non.existent.key', 'default')
             'default'
         """
-        keys = key.split('.')
+        keys = key.split(".")
         value = self._config
 
         for k in keys:
@@ -212,7 +194,7 @@ class ConfigLoader:
             key: ドット区切りの設定キー
             value: 設定する値
         """
-        keys = key.split('.')
+        keys = key.split(".")
         config = self._config
 
         for k in keys[:-1]:
@@ -258,7 +240,7 @@ class ConfigLoader:
         Returns:
             NGキーワードのリスト
         """
-        return self.get('filter.ng_keywords', [])
+        return self.get("filter.ng_keywords", [])
 
     def get_notification_emails(self) -> List[str]:
         """
@@ -267,7 +249,7 @@ class ConfigLoader:
         Returns:
             メールアドレスのリスト
         """
-        return self.get('notification.email.recipients', [])
+        return self.get("notification.email.recipients", [])
 
     def get_database_path(self) -> str:
         """
@@ -276,7 +258,7 @@ class ConfigLoader:
         Returns:
             データベースパス
         """
-        return self.get('database_path', 'db.sqlite3')
+        return self.get("database_path", "db.sqlite3")
 
     def get_log_level(self) -> str:
         """
@@ -285,7 +267,7 @@ class ConfigLoader:
         Returns:
             ログレベル文字列（DEBUG, INFO, WARNING, ERROR, CRITICAL）
         """
-        return self.get('log_level', 'INFO')
+        return self.get("log_level", "INFO")
 
     def is_test_mode(self) -> bool:
         """
@@ -294,7 +276,7 @@ class ConfigLoader:
         Returns:
             テストモードの場合True
         """
-        return self.get('test_mode', False)
+        return self.get("test_mode", False)
 
     def save(self, path: Optional[str] = None):
         """
@@ -305,7 +287,7 @@ class ConfigLoader:
         """
         save_path = Path(path) if path else self.config_path
 
-        with open(save_path, 'w', encoding='utf-8') as f:
+        with open(save_path, "w", encoding="utf-8") as f:
             json.dump(self._config, f, indent=2, ensure_ascii=False)
 
         logger.info(f"Saved config to {save_path}")
@@ -321,7 +303,8 @@ class ConfigLoader:
 
         # メールアドレスの検証
         import re
-        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+        email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 
         for email in self.get_notification_emails():
             if not re.match(email_regex, email):
@@ -335,7 +318,8 @@ class ConfigLoader:
         # タイムゾーンの検証
         try:
             import pytz
-            timezone = self.get('schedule.timezone', 'Asia/Tokyo')
+
+            timezone = self.get("schedule.timezone", "Asia/Tokyo")
             pytz.timezone(timezone)
         except Exception as e:
             errors.append(f"Invalid timezone: {e}")
@@ -344,7 +328,9 @@ class ConfigLoader:
 
     def __repr__(self) -> str:
         """設定の文字列表現"""
-        return f"ConfigLoader(config_path={self.config_path}, loaded={bool(self._config)})"
+        return (
+            f"ConfigLoader(config_path={self.config_path}, loaded={bool(self._config)})"
+        )
 
 
 # グローバルインスタンス（シングルトンパターン）
@@ -354,7 +340,7 @@ _global_config: Optional[ConfigLoader] = None
 def get_config(
     config_path: str = "config.json",
     env_file: Optional[str] = ".env",
-    reload: bool = False
+    reload: bool = False,
 ) -> ConfigLoader:
     """
     グローバル設定インスタンスを取得
@@ -383,7 +369,7 @@ if __name__ == "__main__":
     # テスト実行
     logging.basicConfig(
         level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     logger.info("Testing ConfigLoader...")

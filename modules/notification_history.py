@@ -4,12 +4,11 @@
 通知の実行履歴を記録・管理し、ダッシュボードやAPIで参照可能にする
 """
 
+import json
+import logging
 import sqlite3
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
-import json
-from pathlib import Path
-import logging
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +33,9 @@ class NotificationHistoryManager:
             cursor = conn.cursor()
 
             # 既存テーブルの構造を確認
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='notification_history'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='notification_history'"
+            )
             table_exists = cursor.fetchone() is not None
 
             if table_exists:
@@ -43,18 +44,23 @@ class NotificationHistoryManager:
                 columns = {col[1] for col in cursor.fetchall()}
 
                 # 必要なカラムを追加（存在しない場合）
-                if 'details' not in columns:
-                    cursor.execute("ALTER TABLE notification_history ADD COLUMN details TEXT")
+                if "details" not in columns:
+                    cursor.execute(
+                        "ALTER TABLE notification_history ADD COLUMN details TEXT"
+                    )
                     logger.info("details カラムを追加しました")
 
-                if 'metadata' not in columns:
-                    cursor.execute("ALTER TABLE notification_history ADD COLUMN metadata TEXT")
+                if "metadata" not in columns:
+                    cursor.execute(
+                        "ALTER TABLE notification_history ADD COLUMN metadata TEXT"
+                    )
                     logger.info("metadata カラムを追加しました")
 
                 logger.info("notification_history テーブルを確認しました（既存）")
             else:
                 # 新規テーブルを作成（既存スキーマ互換）
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE IF NOT EXISTS notification_history (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         notification_type TEXT NOT NULL,
@@ -66,19 +72,24 @@ class NotificationHistoryManager:
                         details TEXT,
                         metadata TEXT
                     )
-                """)
+                """
+                )
                 logger.info("notification_history テーブルを作成しました")
 
             # インデックスを作成
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_created_at
                 ON notification_history(created_at DESC)
-            """)
+            """
+            )
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_type_success
                 ON notification_history(notification_type, success)
-            """)
+            """
+            )
 
             conn.commit()
             conn.close()
@@ -94,7 +105,7 @@ class NotificationHistoryManager:
         details: str = "",
         count: int = 0,
         error_message: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> int:
         """
         通知履歴を記録（既存スキーマ互換）
@@ -115,15 +126,25 @@ class NotificationHistoryManager:
             cursor = conn.cursor()
 
             # status文字列をsuccess整数値に変換
-            success_value = 1 if status in ['success', 'partial'] else 0
+            success_value = 1 if status in ["success", "partial"] else 0
 
             metadata_json = json.dumps(metadata) if metadata else None
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO notification_history
                 (notification_type, success, details, releases_count, error_message, metadata, executed_at)
                 VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            """, (notification_type, success_value, details, count, error_message, metadata_json))
+            """,
+                (
+                    notification_type,
+                    success_value,
+                    details,
+                    count,
+                    error_message,
+                    metadata_json,
+                ),
+            )
 
             record_id = cursor.lastrowid
             conn.commit()
@@ -144,7 +165,7 @@ class NotificationHistoryManager:
         self,
         limit: int = 100,
         notification_type: Optional[str] = None,
-        status: Optional[str] = None
+        status: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """
         最近の通知履歴を取得（既存スキーマ互換）
@@ -171,7 +192,7 @@ class NotificationHistoryManager:
 
             if status:
                 # status文字列をsuccess整数値に変換
-                success_value = 1 if status == 'success' else 0
+                success_value = 1 if status == "success" else 0
                 query += " AND success = ?"
                 params.append(success_value)
 
@@ -185,14 +206,18 @@ class NotificationHistoryManager:
             for row in rows:
                 record = dict(row)
                 # success整数値をstatus文字列に変換
-                record['status'] = 'success' if record.get('success', 0) == 1 else 'failed'
-                record['count'] = record.get('releases_count', 0)
-                record['timestamp'] = record.get('executed_at') or record.get('created_at')
+                record["status"] = (
+                    "success" if record.get("success", 0) == 1 else "failed"
+                )
+                record["count"] = record.get("releases_count", 0)
+                record["timestamp"] = record.get("executed_at") or record.get(
+                    "created_at"
+                )
 
                 # メタデータをJSONから復元
-                if record.get('metadata'):
+                if record.get("metadata"):
                     try:
-                        record['metadata'] = json.loads(record['metadata'])
+                        record["metadata"] = json.loads(record["metadata"])
                     except:
                         pass
                 history.append(record)
@@ -204,10 +229,7 @@ class NotificationHistoryManager:
             logger.error(f"履歴取得エラー: {e}")
             return []
 
-    def get_statistics(
-        self,
-        days: int = 7
-    ) -> Dict[str, Any]:
+    def get_statistics(self, days: int = 7) -> Dict[str, Any]:
         """
         統計情報を取得（既存スキーマ互換）
 
@@ -221,74 +243,85 @@ class NotificationHistoryManager:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            cutoff_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+            cutoff_date = (datetime.now() - timedelta(days=days)).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
             # 総通知数（releases_count）
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT SUM(releases_count) FROM notification_history
                 WHERE executed_at >= ?
-            """, (cutoff_date,))
+            """,
+                (cutoff_date,),
+            )
             total_notifications = cursor.fetchone()[0] or 0
 
             # 成功率
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     SUM(CASE WHEN success = 1 THEN releases_count ELSE 0 END) as success_count,
                     SUM(releases_count) as total_count
                 FROM notification_history
                 WHERE executed_at >= ?
-            """, (cutoff_date,))
+            """,
+                (cutoff_date,),
+            )
             row = cursor.fetchone()
             success_count = row[0] or 0
             total_count = row[1] or 1  # ゼロ除算回避
             success_rate = (success_count / total_count * 100) if total_count > 0 else 0
 
             # タイプ別集計
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT notification_type, COUNT(*), SUM(releases_count)
                 FROM notification_history
                 WHERE executed_at >= ?
                 GROUP BY notification_type
-            """, (cutoff_date,))
+            """,
+                (cutoff_date,),
+            )
             type_stats = {}
             for row in cursor.fetchall():
                 type_stats[row[0]] = {
-                    'executions': row[1],
-                    'total_notifications': row[2] or 0
+                    "executions": row[1],
+                    "total_notifications": row[2] or 0,
                 }
 
             # 最終実行時刻
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT executed_at FROM notification_history
                 ORDER BY executed_at DESC LIMIT 1
-            """)
+            """
+            )
             last_execution = cursor.fetchone()
             last_execution = last_execution[0] if last_execution else None
 
             conn.close()
 
             return {
-                'total_notifications': total_notifications,
-                'success_rate': round(success_rate, 2),
-                'type_statistics': type_stats,
-                'last_execution': last_execution,
-                'period_days': days
+                "total_notifications": total_notifications,
+                "success_rate": round(success_rate, 2),
+                "type_statistics": type_stats,
+                "last_execution": last_execution,
+                "period_days": days,
             }
 
         except Exception as e:
             logger.error(f"統計取得エラー: {e}")
             return {
-                'total_notifications': 0,
-                'success_rate': 0.0,
-                'type_statistics': {},
-                'last_execution': None,
-                'period_days': days
+                "total_notifications": 0,
+                "success_rate": 0.0,
+                "type_statistics": {},
+                "last_execution": None,
+                "period_days": days,
             }
 
     def calculate_next_execution(
-        self,
-        schedule_hour: int = 8,
-        schedule_minute: int = 0
+        self, schedule_hour: int = 8, schedule_minute: int = 0
     ) -> str:
         """
         次回実行時刻を計算
@@ -302,10 +335,7 @@ class NotificationHistoryManager:
         """
         now = datetime.now()
         next_run = now.replace(
-            hour=schedule_hour,
-            minute=schedule_minute,
-            second=0,
-            microsecond=0
+            hour=schedule_hour, minute=schedule_minute, second=0, microsecond=0
         )
 
         # 今日の実行時刻を過ぎていたら翌日に設定
@@ -314,10 +344,7 @@ class NotificationHistoryManager:
 
         return next_run.strftime("%Y-%m-%d %H:%M:%S")
 
-    def get_error_history(
-        self,
-        limit: int = 20
-    ) -> List[Dict[str, Any]]:
+    def get_error_history(self, limit: int = 20) -> List[Dict[str, Any]]:
         """
         エラー履歴を取得
 
@@ -327,15 +354,9 @@ class NotificationHistoryManager:
         Returns:
             エラー履歴のリスト
         """
-        return self.get_recent_history(
-            limit=limit,
-            status='failed'
-        )
+        return self.get_recent_history(limit=limit, status="failed")
 
-    def cleanup_old_records(
-        self,
-        days: int = 90
-    ) -> int:
+    def cleanup_old_records(self, days: int = 90) -> int:
         """
         古い履歴レコードを削除
 
@@ -349,12 +370,17 @@ class NotificationHistoryManager:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            cutoff_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+            cutoff_date = (datetime.now() - timedelta(days=days)).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 DELETE FROM notification_history
                 WHERE executed_at < ?
-            """, (cutoff_date,))
+            """,
+                (cutoff_date,),
+            )
 
             deleted_count = cursor.rowcount
             conn.commit()
@@ -367,11 +393,7 @@ class NotificationHistoryManager:
             logger.error(f"履歴削除エラー: {e}")
             return 0
 
-    def export_history(
-        self,
-        output_path: str,
-        days: int = 30
-    ) -> bool:
+    def export_history(self, output_path: str, days: int = 30) -> bool:
         """
         履歴をJSONファイルにエクスポート
 
@@ -389,17 +411,23 @@ class NotificationHistoryManager:
             filtered_history = []
             for record in history:
                 # executed_atまたはcreated_atを使用
-                timestamp_str = record.get('timestamp') or record.get('executed_at') or record.get('created_at')
+                timestamp_str = (
+                    record.get("timestamp")
+                    or record.get("executed_at")
+                    or record.get("created_at")
+                )
                 if timestamp_str:
                     try:
-                        record_date = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+                        record_date = datetime.strptime(
+                            timestamp_str, "%Y-%m-%d %H:%M:%S"
+                        )
                         if record_date >= cutoff_date:
                             filtered_history.append(record)
                     except:
                         # パース失敗時もレコードを含める
                         filtered_history.append(record)
 
-            with open(output_path, 'w', encoding='utf-8') as f:
+            with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(filtered_history, f, ensure_ascii=False, indent=2)
 
             logger.info(f"履歴を {output_path} にエクスポートしました")
@@ -438,10 +466,7 @@ if __name__ == "__main__":
 
     # テストデータ挿入
     manager.record_notification(
-        notification_type="email",
-        status="success",
-        details="5件のメール送信",
-        count=5
+        notification_type="email", status="success", details="5件のメール送信", count=5
     )
 
     manager.record_notification(
@@ -449,7 +474,7 @@ if __name__ == "__main__":
         status="success",
         details="3件のイベント登録",
         count=3,
-        metadata={"platform": "Google Calendar"}
+        metadata={"platform": "Google Calendar"},
     )
 
     manager.record_notification(
@@ -457,14 +482,16 @@ if __name__ == "__main__":
         status="failed",
         details="送信失敗",
         count=0,
-        error_message="SMTP authentication error"
+        error_message="SMTP authentication error",
     )
 
     # 履歴取得
     history = manager.get_recent_history(limit=10)
     logger.info(f"\n最近の履歴 ({len(history)}件):")
     for record in history:
-        logger.info(f"  - {record['created_at']}: {record['notification_type']} / {record['status']}")
+        logger.info(
+            f"  - {record['created_at']}: {record['notification_type']} / {record['status']}"
+        )
 
     # 統計情報
     stats = manager.get_statistics(days=7)

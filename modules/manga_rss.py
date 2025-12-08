@@ -4,21 +4,22 @@
 各種マンガサイトのRSSフィードから新刊情報を収集
 """
 
-import logging
-import feedparser
-import requests
-from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
-from .models import RSSFeedItem, WorkType, ReleaseType, DataSource
-import time
+import asyncio
 import hashlib
+import json
+import logging
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-import asyncio
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Set, Tuple
+
 import aiohttp
-from typing import Set
-import json
+import feedparser
+import requests
+
+from .models import DataSource, ReleaseType, RSSFeedItem, WorkType
 
 
 @dataclass
@@ -1048,10 +1049,10 @@ class DuplicateDetector:
             release = item["releases"][0]  # 最初のリリース情報を使用
             release_date = release.get("date", "")
             # date/datetime オブジェクトを文字列に変換
-            if hasattr(release_date, 'isoformat'):
+            if hasattr(release_date, "isoformat"):
                 release_date = release_date.isoformat()
-            elif hasattr(release_date, 'strftime'):
-                release_date = release_date.strftime('%Y-%m-%d')
+            elif hasattr(release_date, "strftime"):
+                release_date = release_date.strftime("%Y-%m-%d")
             key_fields.update(
                 {
                     "release_type": release.get("type", ""),
@@ -1576,6 +1577,7 @@ def fetch_and_store() -> dict:
         dict: 収集結果のサマリー
     """
     import logging
+
     from .config import get_config
     from .db import get_db
 
@@ -1631,7 +1633,9 @@ def fetch_and_store() -> dict:
                 stored_count += 1
 
             except Exception as e:
-                logger.warning(f"アイテム保存エラー: {item.get('title', 'Unknown')} - {e}")
+                logger.warning(
+                    f"アイテム保存エラー: {item.get('title', 'Unknown')} - {e}"
+                )
                 continue
 
         logger.info(f"マンガRSS収集完了: {len(items)}件収集, {stored_count}件保存")

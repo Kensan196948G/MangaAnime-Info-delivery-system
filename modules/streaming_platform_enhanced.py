@@ -11,15 +11,16 @@ This module provides enhanced support for:
 """
 
 import asyncio
-import aiohttp
 import logging
-from datetime import datetime, date
-from typing import List, Dict, Any, Optional, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import re
+from dataclasses import dataclass, field
+from datetime import date, datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
-from .models import Work, Release, WorkType, ReleaseType, DataSource
+import aiohttp
+
+from .models import DataSource, Release, ReleaseType, Work, WorkType
 
 
 class StreamingPlatform(Enum):

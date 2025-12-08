@@ -11,8 +11,6 @@ This package contains modular route definitions organized by functionality:
 - api_settings: Settings management API
 """
 
-from flask import Blueprint
-
 # Note: Blueprints are defined in their respective modules
 # and registered in web_app.py
 

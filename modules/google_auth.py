@@ -5,11 +5,11 @@ GmailとGoogle Calendarで共通する認証ロジックを統合し、
 コードの重複を排除し保守性を向上させる。
 """
 
-import os
 import logging
-from typing import Optional, List
-from pathlib import Path
+import os
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import List, Optional
 
 try:
     from google.auth.transport.requests import Request

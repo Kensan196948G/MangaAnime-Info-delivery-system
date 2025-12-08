@@ -12,23 +12,26 @@ Web Application with API Key Authentication
     python app/web_app_with_api_auth.py
 """
 
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, g
-from datetime import datetime, timedelta
-import sys
 import os
+import sys
+from datetime import datetime, timedelta
+
+from flask import (Flask, flash, g, jsonify, redirect, render_template,
+                   request, session, url_for)
 
 # プロジェクトルートをパスに追加
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from modules.db import get_db_connection
-from modules.config import load_config
 import logging
+
+from modules.config import load_config
+from modules.db import get_db_connection
 
 logger = logging.getLogger(__name__)
 
 # APIキー認証モジュールのインポート
 try:
-    from app.routes.api_auth import api_key_required, api_auth_bp, user_store
+    from app.routes.api_auth import api_auth_bp, api_key_required, user_store
     API_AUTH_ENABLED = True
 except ImportError:
     logger.warning("API authentication module not available")

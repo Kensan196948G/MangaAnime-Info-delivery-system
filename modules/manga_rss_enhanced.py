@@ -10,19 +10,21 @@ This module extends the manga_rss module with:
 - Feed-specific parsing rules
 """
 
-import logging
-import feedparser
-from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
-from dataclasses import dataclass
-from urllib.parse import urljoin, urlparse
-import re
-import json
 import asyncio
+import json
+import logging
+import re
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urljoin, urlparse
+
 import aiohttp
+import feedparser
 from bs4 import BeautifulSoup
 
-from .models import RSSFeedItem, Work, Release, WorkType, ReleaseType, DataSource
+from .models import (DataSource, Release, ReleaseType, RSSFeedItem, Work,
+                     WorkType)
 
 
 @dataclass

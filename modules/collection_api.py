@@ -19,21 +19,20 @@ Features:
 
 import asyncio
 import logging
-import time
-from datetime import datetime
-from typing import Dict, List, Any, Optional
-from dataclasses import dataclass
-from enum import Enum
 import threading
+import time
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 from .anime_anilist import AniListCollector
-from .anime_kitsu import collect_kitsu_anime, collect_kitsu_manga
-from .manga_mangadex import collect_mangadex_manga, collect_mangadex_chapters
-from .manga_mangaupdates import collect_mangaupdates_releases
-from .manga_rss import MangaRSSCollector, BookWalkerRSSCollector, DAnimeRSSCollector
-from .data_normalizer import DataIntegrator, DataQualityAnalyzer, analyze_data_quality
-from .models import Work
+from .data_normalizer import (DataIntegrator, DataQualityAnalyzer,
+                              analyze_data_quality)
 from .db import get_db
+from .manga_rss import (BookWalkerRSSCollector, DAnimeRSSCollector,
+                        MangaRSSCollector)
+from .models import Work
 
 
 class CollectionStatus(Enum):

@@ -5,15 +5,14 @@
 ウォッチリストに登録された作品の新エピソード/巻をユーザーに通知
 """
 
-import sqlite3
 import logging
+import sqlite3
 from datetime import datetime, timedelta
-from typing import List, Dict, Tuple
-import json
+from typing import Dict, List, Tuple
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = 'db.sqlite3'
+DB_PATH = "db.sqlite3"
 
 
 class WatchlistNotifier:
@@ -29,8 +28,7 @@ class WatchlistNotifier:
         return conn
 
     def get_new_releases_for_watchlist(
-        self,
-        days_back: int = 7
+        self, days_back: int = 7
     ) -> Dict[str, List[Dict]]:
         """
         ウォッチリスト登録作品の新規リリースを取得
@@ -44,7 +42,7 @@ class WatchlistNotifier:
         conn = self.get_db_connection()
         cursor = conn.cursor()
 
-        cutoff_date = (datetime.now() - timedelta(days=days_back)).strftime('%Y-%m-%d')
+        cutoff_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
 
         query = """
         SELECT
@@ -82,29 +80,33 @@ class WatchlistNotifier:
         # ユーザー別にグループ化
         user_releases = {}
         for row in rows:
-            user_id = row['user_id']
+            user_id = row["user_id"]
             if user_id not in user_releases:
                 user_releases[user_id] = []
 
-            user_releases[user_id].append({
-                'work_id': row['work_id'],
-                'work_title': row['title'],
-                'work_title_en': row['title_en'],
-                'work_type': row['type'],
-                'official_url': row['official_url'],
-                'release_id': row['release_id'],
-                'release_type': row['release_type'],
-                'number': row['number'],
-                'platform': row['platform'],
-                'release_date': row['release_date'],
-                'source': row['source'],
-                'source_url': row['source_url']
-            })
+            user_releases[user_id].append(
+                {
+                    "work_id": row["work_id"],
+                    "work_title": row["title"],
+                    "work_title_en": row["title_en"],
+                    "work_type": row["type"],
+                    "official_url": row["official_url"],
+                    "release_id": row["release_id"],
+                    "release_type": row["release_type"],
+                    "number": row["number"],
+                    "platform": row["platform"],
+                    "release_date": row["release_date"],
+                    "source": row["source"],
+                    "source_url": row["source_url"],
+                }
+            )
 
         conn.close()
 
-        logger.info(f"ウォッチリスト新規リリース取得: {len(user_releases)}人のユーザー、"
-                   f"合計{sum(len(releases) for releases in user_releases.values())}件")
+        logger.info(
+            f"ウォッチリスト新規リリース取得: {len(user_releases)}人のユーザー、"
+            f"合計{sum(len(releases) for releases in user_releases.values())}件"
+        )
 
         return user_releases
 
@@ -124,7 +126,7 @@ class WatchlistNotifier:
         conn = self.get_db_connection()
         cursor = conn.cursor()
 
-        placeholders = ','.join('?' * len(release_ids))
+        placeholders = ",".join("?" * len(release_ids))
         query = f"""
         UPDATE releases
         SET notified = 1
@@ -154,28 +156,29 @@ class WatchlistNotifier:
         conn = self.get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id, username, email, email_verified
             FROM users
             WHERE id = ?
-        """, (user_id,))
+        """,
+            (user_id,),
+        )
 
         row = cursor.fetchone()
         conn.close()
 
         if row:
             return {
-                'id': row['id'],
-                'username': row['username'],
-                'email': row['email'],
-                'email_verified': bool(row['email_verified'])
+                "id": row["id"],
+                "username": row["username"],
+                "email": row["email"],
+                "email_verified": bool(row["email_verified"]),
             }
         return None
 
     def format_notification_email(
-        self,
-        user_info: Dict,
-        releases: List[Dict]
+        self, user_info: Dict, releases: List[Dict]
     ) -> Tuple[str, str]:
         """
         通知メールのHTMLを生成
@@ -190,25 +193,25 @@ class WatchlistNotifier:
         # 作品別にグループ化
         works_map = {}
         for release in releases:
-            work_id = release['work_id']
+            work_id = release["work_id"]
             if work_id not in works_map:
                 works_map[work_id] = {
-                    'title': release['work_title'],
-                    'title_en': release['work_title_en'],
-                    'type': release['work_type'],
-                    'official_url': release['official_url'],
-                    'episodes': [],
-                    'volumes': []
+                    "title": release["work_title"],
+                    "title_en": release["work_title_en"],
+                    "type": release["work_type"],
+                    "official_url": release["official_url"],
+                    "episodes": [],
+                    "volumes": [],
                 }
 
-            if release['release_type'] == 'episode':
-                works_map[work_id]['episodes'].append(release)
+            if release["release_type"] == "episode":
+                works_map[work_id]["episodes"].append(release)
             else:
-                works_map[work_id]['volumes'].append(release)
+                works_map[work_id]["volumes"].append(release)
 
         # 件数集計
-        total_episodes = sum(len(w['episodes']) for w in works_map.values())
-        total_volumes = sum(len(w['volumes']) for w in works_map.values())
+        total_episodes = sum(len(w["episodes"]) for w in works_map.values())
+        total_volumes = sum(len(w["volumes"]) for w in works_map.values())
 
         # 件名
         subject_parts = []
@@ -339,8 +342,8 @@ class WatchlistNotifier:
 
         # 作品ごとの詳細
         for work_id, work in works_map.items():
-            type_class = 'manga' if work['type'] == 'manga' else 'anime'
-            type_label = 'マンガ' if work['type'] == 'manga' else 'アニメ'
+            type_class = "manga" if work["type"] == "manga" else "anime"
+            type_label = "マンガ" if work["type"] == "manga" else "アニメ"
 
             html_body += f"""
         <div class="work-card {type_class}">
@@ -353,11 +356,11 @@ class WatchlistNotifier:
             </div>
 """
 
-            if work['title_en']:
+            if work["title_en"]:
                 html_body += f"<div style='color: #6c757d; font-size: 14px; margin-bottom: 10px;'>{work['title_en']}</div>"
 
             # エピソード
-            for ep in work['episodes']:
+            for ep in work["episodes"]:
                 html_body += f"""
             <div class="release-item">
                 <span class="release-type">エピソード</span>
@@ -370,7 +373,7 @@ class WatchlistNotifier:
 """
 
             # 巻
-            for vol in work['volumes']:
+            for vol in work["volumes"]:
                 html_body += f"""
             <div class="release-item">
                 <span class="release-type volume">巻</span>
@@ -382,7 +385,7 @@ class WatchlistNotifier:
             </div>
 """
 
-            if work['official_url']:
+            if work["official_url"]:
                 html_body += f"""
             <a href="{work['official_url']}" class="btn" target="_blank">公式サイトへ</a>
 """
@@ -422,7 +425,8 @@ class WatchlistNotifier:
         conn = self.get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 COUNT(*) as total,
                 SUM(CASE WHEN works.type = 'anime' THEN 1 ELSE 0 END) as anime_count,
@@ -432,21 +436,23 @@ class WatchlistNotifier:
             FROM watchlist w
             JOIN works ON w.work_id = works.id
             WHERE w.user_id = ?
-        """, (user_id,))
+        """,
+            (user_id,),
+        )
 
         row = cursor.fetchone()
         conn.close()
 
         return {
-            'total': row['total'] or 0,
-            'anime': row['anime_count'] or 0,
-            'manga': row['manga_count'] or 0,
-            'notify_episodes': row['notify_episodes_count'] or 0,
-            'notify_volumes': row['notify_volumes_count'] or 0
+            "total": row["total"] or 0,
+            "anime": row["anime_count"] or 0,
+            "manga": row["manga_count"] or 0,
+            "notify_episodes": row["notify_episodes_count"] or 0,
+            "notify_volumes": row["notify_volumes_count"] or 0,
         }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # テスト実行
     logging.basicConfig(level=logging.INFO)
 

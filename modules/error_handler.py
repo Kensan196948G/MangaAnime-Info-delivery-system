@@ -14,11 +14,11 @@ API呼び出しやネットワーク処理のエラー処理とリトライロ�
         pass
 """
 
-import time
 import logging
+import time
+from dataclasses import dataclass
 from functools import wraps
 from typing import Callable, Optional, Tuple, Type
-from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +35,7 @@ class RetryConfig:
         retry_on_status: リトライ対象のHTTPステータスコード
         max_backoff: 最大待機時間（秒）
     """
+
     max_retries: int = 3
     backoff_factor: float = 2.0
     retry_on: Tuple[Type[Exception], ...] = (Exception,)
@@ -54,7 +55,7 @@ def calculate_backoff(attempt: int, backoff_factor: float, max_backoff: float) -
     Returns:
         待機時間（秒）
     """
-    wait_time = backoff_factor ** attempt
+    wait_time = backoff_factor**attempt
     return min(wait_time, max_backoff)
 
 
@@ -102,11 +103,14 @@ def with_retry(config: Optional[RetryConfig] = None):
                     last_exception = e
 
                     # HTTPステータスコードをチェック（requestsライブラリの場合）
-                    if hasattr(e, 'response') and hasattr(e.response, 'status_code'):
+                    if hasattr(e, "response") and hasattr(e.response, "status_code"):
                         status_code = e.response.status_code
 
                         # リトライ対象外のステータスコードの場合は即座に失敗
-                        if status_code not in config.retry_on_status and status_code >= 400:
+                        if (
+                            status_code not in config.retry_on_status
+                            and status_code >= 400
+                        ):
                             logger.error(
                                 f"{func.__name__} failed with non-retryable status "
                                 f"{status_code}: {e}"
@@ -119,9 +123,7 @@ def with_retry(config: Optional[RetryConfig] = None):
 
                     # バックオフ時間の計算
                     wait_time = calculate_backoff(
-                        attempt,
-                        config.backoff_factor,
-                        config.max_backoff
+                        attempt, config.backoff_factor, config.max_backoff
                     )
 
                     logger.warning(
@@ -132,9 +134,7 @@ def with_retry(config: Optional[RetryConfig] = None):
                     time.sleep(wait_time)
 
             # 全てのリトライが失敗した場合
-            logger.error(
-                f"{func.__name__} failed after {config.max_retries} retries"
-            )
+            logger.error(f"{func.__name__} failed after {config.max_retries} retries")
             raise last_exception
 
         return wrapper
@@ -170,7 +170,7 @@ class CircuitBreaker:
         self,
         failure_threshold: int = 5,
         timeout: float = 60.0,
-        name: Optional[str] = None
+        name: Optional[str] = None,
     ):
         """
         Args:
@@ -200,6 +200,7 @@ class CircuitBreaker:
         Returns:
             ラップされた関数
         """
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             # OPEN状態のチェック
@@ -208,9 +209,7 @@ class CircuitBreaker:
                     logger.info(f"{self.name}: Moving to HALF_OPEN state")
                     self.state = self.HALF_OPEN
                 else:
-                    raise Exception(
-                        f"{self.name} is OPEN. Circuit breaker triggered."
-                    )
+                    raise Exception(f"{self.name} is OPEN. Circuit breaker triggered.")
 
             try:
                 result = func(*args, **kwargs)
@@ -249,22 +248,12 @@ class CircuitBreaker:
 
 
 # 各API用のサーキットブレーカー
-anilist_breaker = CircuitBreaker(
-    failure_threshold=5,
-    timeout=60,
-    name="AniListBreaker"
-)
+anilist_breaker = CircuitBreaker(failure_threshold=5, timeout=60, name="AniListBreaker")
 
-gmail_breaker = CircuitBreaker(
-    failure_threshold=3,
-    timeout=120,
-    name="GmailBreaker"
-)
+gmail_breaker = CircuitBreaker(failure_threshold=3, timeout=120, name="GmailBreaker")
 
 calendar_breaker = CircuitBreaker(
-    failure_threshold=3,
-    timeout=120,
-    name="CalendarBreaker"
+    failure_threshold=3, timeout=120, name="CalendarBreaker"
 )
 
 
@@ -272,7 +261,7 @@ if __name__ == "__main__":
     # テスト実行
     logging.basicConfig(
         level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     # リトライのテスト
@@ -297,7 +286,7 @@ if __name__ == "__main__":
         logger.error(f"Failed")
 
     # サーキットブレーカーのテスト
-    logger.info("\n" + "="*50)
+    logger.info("\n" + "=" * 50)
     logger.info("Testing circuit breaker...")
 
     test_breaker = CircuitBreaker(failure_threshold=3, timeout=5, name="Test")

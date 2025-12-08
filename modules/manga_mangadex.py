@@ -14,22 +14,21 @@ Rate Limits: 40 requests per minute (5 bursts allowed)
 """
 
 import asyncio
-import aiohttp
+import json
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass
-import json
+from typing import Any, Dict, List, Optional
 
-from .models import WorkType, ReleaseType, DataSource
+import aiohttp
+
+from .models import DataSource, WorkType
 
 logger = logging.getLogger(__name__)
 
 
 class MangaDexAPIError(Exception):
     """Custom exception for MangaDex API errors."""
-    pass
 
 
 class RateLimiter:
@@ -93,7 +92,10 @@ class MangaDexAPIClient:
             "limit": min(limit, 100),
             "order[updatedAt]": "desc",
             "includes[]": ["cover_art", "author", "artist"],
-            "contentRating[]": ["safe", "suggestive"],  # Exclude erotica and pornographic
+            "contentRating[]": [
+                "safe",
+                "suggestive",
+            ],  # Exclude erotica and pornographic
         }
 
         try:
@@ -222,7 +224,9 @@ class MangaDexAPIClient:
                 title_en = titles.get("en", "")
 
                 # Use first available title as canonical
-                canonical_title = title_en or title_ja or list(titles.values())[0] if titles else ""
+                canonical_title = (
+                    title_en or title_ja or list(titles.values())[0] if titles else ""
+                )
 
                 # Get cover image
                 cover_url = ""
@@ -367,7 +371,9 @@ async def collect_mangadex_chapters(
         except Exception as e:
             logger.error(f"Unexpected error in MangaDex chapter collection: {str(e)}")
 
-    logger.info(f"MangaDex chapter collection complete: {len(all_chapters)} total items")
+    logger.info(
+        f"MangaDex chapter collection complete: {len(all_chapters)} total items"
+    )
     return all_chapters
 
 

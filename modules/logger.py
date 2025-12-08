@@ -4,12 +4,12 @@
 アニメ・マンガ情報配信システムのログ設定と管理
 """
 
+import json
 import logging
 import logging.handlers
-from pathlib import Path
 import sys
-import json
 from datetime import datetime
+from pathlib import Path
 
 
 class JSONFormatter(logging.Formatter):

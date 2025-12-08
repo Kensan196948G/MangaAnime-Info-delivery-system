@@ -11,7 +11,6 @@ Phase 17: カレンダー統合実装
 - 同期ログ記録
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -19,13 +18,14 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
-import sqlite3
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Tuple, Optional
 import logging
+import sqlite3
 import time
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from modules.calendar_api import GoogleCalendarAPI, GoogleCalendarAPIError
 
@@ -48,7 +48,7 @@ class CalendarSyncManager:
         >>> print(f"成功: {result['success']}件")
     """
 
-    def __init__(self, db_path: str = 'db.sqlite3', calendar_id: str = 'primary'):
+    def __init__(self, db_path: str = "db.sqlite3", calendar_id: str = "primary"):
         """
         初期化
 
@@ -60,10 +60,10 @@ class CalendarSyncManager:
         self.calendar_id = calendar_id
         self.calendar_api = None
         self.stats = {
-            'total_processed': 0,
-            'success_count': 0,
-            'failure_count': 0,
-            'skipped_count': 0
+            "total_processed": 0,
+            "success_count": 0,
+            "failure_count": 0,
+            "skipped_count": 0,
         }
 
     def _get_calendar_api(self) -> GoogleCalendarAPI:
@@ -78,7 +78,9 @@ class CalendarSyncManager:
         conn.row_factory = sqlite3.Row
         return conn
 
-    def get_unsynced_releases(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    def get_unsynced_releases(
+        self, limit: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
         """
         未同期リリース取得
 
@@ -118,9 +120,7 @@ class CalendarSyncManager:
         return releases
 
     def sync_unsynced_releases(
-        self,
-        limit: Optional[int] = None,
-        batch_size: int = 20
+        self, limit: Optional[int] = None, batch_size: int = 20
     ) -> Dict[str, Any]:
         """
         未同期リリースを同期
@@ -139,13 +139,7 @@ class CalendarSyncManager:
 
         if not releases:
             logger.info("同期すべきリリースはありません")
-            return {
-                'success': 0,
-                'failed': 0,
-                'skipped': 0,
-                'total': 0,
-                'results': []
-            }
+            return {"success": 0, "failed": 0, "skipped": 0, "total": 0, "results": []}
 
         logger.info(f"{len(releases)}件のリリースを同期します")
 
@@ -156,7 +150,7 @@ class CalendarSyncManager:
         skipped_count = 0
 
         for i in range(0, len(releases), batch_size):
-            batch = releases[i:i+batch_size]
+            batch = releases[i : i + batch_size]
             logger.info(f"バッチ {i//batch_size + 1}: {len(batch)}件処理中...")
 
             for release in batch:
@@ -164,11 +158,11 @@ class CalendarSyncManager:
                     result = self._sync_single_release(release)
                     results.append(result)
 
-                    if result['status'] == 'success':
+                    if result["status"] == "success":
                         success_count += 1
-                    elif result['status'] == 'failed':
+                    elif result["status"] == "failed":
                         failed_count += 1
-                    elif result['status'] == 'skipped':
+                    elif result["status"] == "skipped":
                         skipped_count += 1
 
                     # レート制限対策
@@ -177,11 +171,13 @@ class CalendarSyncManager:
                 except Exception as e:
                     logger.error(f"リリース{release['id']}の同期に失敗: {e}")
                     failed_count += 1
-                    results.append({
-                        'release_id': release['id'],
-                        'status': 'failed',
-                        'error': str(e)
-                    })
+                    results.append(
+                        {
+                            "release_id": release["id"],
+                            "status": "failed",
+                            "error": str(e),
+                        }
+                    )
 
             # バッチ間待機
             if i + batch_size < len(releases):
@@ -189,19 +185,21 @@ class CalendarSyncManager:
                 time.sleep(5)
 
         # 統計更新
-        self.stats['total_processed'] = len(releases)
-        self.stats['success_count'] = success_count
-        self.stats['failure_count'] = failed_count
-        self.stats['skipped_count'] = skipped_count
+        self.stats["total_processed"] = len(releases)
+        self.stats["success_count"] = success_count
+        self.stats["failure_count"] = failed_count
+        self.stats["skipped_count"] = skipped_count
 
-        logger.info(f"同期完了: 成功{success_count}件、失敗{failed_count}件、スキップ{skipped_count}件")
+        logger.info(
+            f"同期完了: 成功{success_count}件、失敗{failed_count}件、スキップ{skipped_count}件"
+        )
 
         return {
-            'success': success_count,
-            'failed': failed_count,
-            'skipped': skipped_count,
-            'total': len(releases),
-            'results': results
+            "success": success_count,
+            "failed": failed_count,
+            "skipped": skipped_count,
+            "total": len(releases),
+            "results": results,
         }
 
     def _sync_single_release(self, release: Dict[str, Any]) -> Dict[str, Any]:
@@ -214,18 +212,18 @@ class CalendarSyncManager:
         Returns:
             同期結果
         """
-        release_id = release['id']
-        title = release['title_kana'] or release['title']
-        release_type = '話' if release['release_type'] == 'episode' else '巻'
-        number = release['number'] or '不明'
+        release_id = release["id"]
+        title = release["title_kana"] or release["title"]
+        release_type = "話" if release["release_type"] == "episode" else "巻"
+        number = release["number"] or "不明"
 
         # タイトル不明の場合はスキップ
-        if title.startswith('タイトル不明'):
+        if title.startswith("タイトル不明"):
             logger.debug(f"スキップ: {title}")
             return {
-                'release_id': release_id,
-                'status': 'skipped',
-                'reason': 'title_unknown'
+                "release_id": release_id,
+                "status": "skipped",
+                "reason": "title_unknown",
             }
 
         try:
@@ -242,74 +240,65 @@ URL: {release.get('source_url', 'N/A')}
 
             event = calendar.create_event(
                 summary=event_title,
-                start_time=datetime.fromisoformat(release['release_date']),
+                start_time=datetime.fromisoformat(release["release_date"]),
                 duration_minutes=60,
-                description=description
+                description=description,
             )
 
             # データベース更新
             self._update_sync_status(
-                release_id=release_id,
-                event_id=event['id'],
-                success=True
+                release_id=release_id, event_id=event["id"], success=True
             )
 
             logger.info(f"✅ 同期成功: {event_title}")
 
             return {
-                'release_id': release_id,
-                'event_id': event['id'],
-                'status': 'success',
-                'event_title': event_title
+                "release_id": release_id,
+                "event_id": event["id"],
+                "status": "success",
+                "event_title": event_title,
             }
 
         except GoogleCalendarAPIError as e:
             logger.error(f"❌ カレンダーAPI エラー: {e}")
             self._log_sync_error(release_id, str(e))
 
-            return {
-                'release_id': release_id,
-                'status': 'failed',
-                'error': str(e)
-            }
+            return {"release_id": release_id, "status": "failed", "error": str(e)}
 
         except Exception as e:
             logger.error(f"❌ 予期しないエラー: {e}")
             self._log_sync_error(release_id, str(e))
 
-            return {
-                'release_id': release_id,
-                'status': 'failed',
-                'error': str(e)
-            }
+            return {"release_id": release_id, "status": "failed", "error": str(e)}
 
-    def _update_sync_status(
-        self,
-        release_id: int,
-        event_id: str,
-        success: bool = True
-    ):
+    def _update_sync_status(self, release_id: int, event_id: str, success: bool = True):
         """同期ステータス更新"""
         conn = self._get_connection()
         cursor = conn.cursor()
 
         if success:
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE releases
                 SET calendar_synced = 1,
                     calendar_event_id = ?,
                     calendar_synced_at = ?
                 WHERE id = ?
-            """, (event_id, datetime.now(), release_id))
+            """,
+                (event_id, datetime.now(), release_id),
+            )
 
             # calendar_events テーブルにも記録
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT OR IGNORE INTO calendar_events
                 (work_id, release_id, event_id, created_at)
                 SELECT work_id, ?, ?, ?
                 FROM releases
                 WHERE id = ?
-            """, (release_id, event_id, datetime.now(), release_id))
+            """,
+                (release_id, event_id, datetime.now(), release_id),
+            )
 
         conn.commit()
         conn.close()
@@ -329,14 +318,16 @@ URL: {release.get('source_url', 'N/A')}
         conn = self._get_connection()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 COUNT(*) as total,
                 SUM(CASE WHEN calendar_synced = 1 THEN 1 ELSE 0 END) as synced,
                 SUM(CASE WHEN calendar_synced = 0 THEN 1 ELSE 0 END) as unsynced,
                 ROUND(SUM(CASE WHEN calendar_synced = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) as sync_rate
             FROM releases
-        """)
+        """
+        )
 
         stats = dict(cursor.fetchone())
         conn.close()
@@ -355,7 +346,7 @@ URL: {release.get('source_url', 'N/A')}
         """
         # 将来的に calendar_sync_log から失敗レコードを取得してリトライ
         logger.info("失敗した同期のリトライ機能は未実装です")
-        return {'message': 'Not implemented yet'}
+        return {"message": "Not implemented yet"}
 
     def validate_sync_integrity(self) -> Dict[str, Any]:
         """
@@ -368,28 +359,27 @@ URL: {release.get('source_url', 'N/A')}
         cursor = conn.cursor()
 
         # calendar_synced = 1 だが calendar_event_id が NULL のレコード
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*) as inconsistent
             FROM releases
             WHERE calendar_synced = 1 AND calendar_event_id IS NULL
-        """)
+        """
+        )
 
-        inconsistent = cursor.fetchone()['inconsistent']
+        inconsistent = cursor.fetchone()["inconsistent"]
         conn.close()
 
-        return {
-            'inconsistent_records': inconsistent,
-            'is_valid': inconsistent == 0
-        }
+        return {"inconsistent_records": inconsistent, "is_valid": inconsistent == 0}
 
 
 # テスト実行用
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    print("="*70)
+    print("=" * 70)
     print("🧪 CalendarSyncManager テスト")
-    print("="*70)
+    print("=" * 70)
 
     manager = CalendarSyncManager()
 
@@ -406,9 +396,9 @@ if __name__ == "__main__":
     print(f"  件数: {len(unsynced)}件（最初の5件表示）")
 
     for i, release in enumerate(unsynced, 1):
-        title = release['title_kana'] or release['title']
+        title = release["title_kana"] or release["title"]
         print(f"  {i}. {title} - {release['release_date']}")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("✅ テスト完了")
-    print("="*70)
+    print("=" * 70)

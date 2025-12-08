@@ -3,13 +3,15 @@ Dashboard module for monitoring and statistics visualization
 統計・監視ダッシュボード機能
 """
 
-import sqlite3
 import json
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
-from flask import Blueprint, render_template, jsonify, request
-from .monitoring import MetricsCollector
 import logging
+import sqlite3
+from datetime import datetime, timedelta
+from typing import Any, Dict, Optional
+
+from flask import Blueprint, jsonify, render_template, request
+
+from .monitoring import MetricsCollector
 
 logger = logging.getLogger(__name__)
 

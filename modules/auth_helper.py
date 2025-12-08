@@ -6,9 +6,9 @@ Google API 認証ヘルパーモジュール
 OAuth 2.0フローを使用してアクセストークンを取得・管理します。
 """
 
-import os
 import pickle
 from pathlib import Path
+
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -20,12 +20,12 @@ class GoogleAuthHelper:
 
     # OAuth 2.0のスコープ定義
     SCOPES = {
-        'calendar': ['https://www.googleapis.com/auth/calendar'],
-        'gmail': [
-            'https://www.googleapis.com/auth/gmail.send',
-            'https://www.googleapis.com/auth/gmail.readonly',
-            'https://www.googleapis.com/auth/gmail.compose'
-        ]
+        "calendar": ["https://www.googleapis.com/auth/calendar"],
+        "gmail": [
+            "https://www.googleapis.com/auth/gmail.send",
+            "https://www.googleapis.com/auth/gmail.readonly",
+            "https://www.googleapis.com/auth/gmail.compose",
+        ],
     }
 
     def __init__(self, project_root=None):
@@ -41,11 +41,11 @@ class GoogleAuthHelper:
         else:
             self.project_root = Path(project_root)
 
-        self.credentials_path = self.project_root / 'credentials.json'
-        self.token_path = self.project_root / 'token.json'
-        self.token_pickle_path = self.project_root / 'token.pickle'
+        self.credentials_path = self.project_root / "credentials.json"
+        self.token_path = self.project_root / "token.json"
+        self.token_pickle_path = self.project_root / "token.pickle"
 
-    def get_credentials(self, scopes_type='calendar'):
+    def get_credentials(self, scopes_type="calendar"):
         """
         Google APIの認証情報を取得
 
@@ -59,8 +59,8 @@ class GoogleAuthHelper:
             FileNotFoundError: credentials.jsonが見つからない場合
         """
         # スコープの決定
-        if scopes_type == 'both':
-            scopes = self.SCOPES['calendar'] + self.SCOPES['gmail']
+        if scopes_type == "both":
+            scopes = self.SCOPES["calendar"] + self.SCOPES["gmail"]
         elif scopes_type in self.SCOPES:
             scopes = self.SCOPES[scopes_type]
         else:
@@ -72,7 +72,7 @@ class GoogleAuthHelper:
         if self.token_path.exists():
             creds = Credentials.from_authorized_user_file(str(self.token_path), scopes)
         elif self.token_pickle_path.exists():
-            with open(self.token_pickle_path, 'rb') as token:
+            with open(self.token_pickle_path, "rb") as token:
                 creds = pickle.load(token)
 
         # 認証情報が無効または存在しない場合
@@ -90,14 +90,16 @@ class GoogleAuthHelper:
                     )
 
                 print("初回認証を開始します...")
-                print("ブラウザが開きますので、Googleアカウントでログインしてください。")
+                print(
+                    "ブラウザが開きますので、Googleアカウントでログインしてください。"
+                )
                 flow = InstalledAppFlow.from_client_secrets_file(
                     str(self.credentials_path), scopes
                 )
                 creds = flow.run_local_server(port=0)
 
             # 認証情報を保存
-            with open(self.token_path, 'w') as token:
+            with open(self.token_path, "w") as token:
                 token.write(creds.to_json())
 
             print(f"認証情報を保存しました: {self.token_path}")
@@ -111,8 +113,8 @@ class GoogleAuthHelper:
         Returns:
             Resource: Google Calendar APIサービスオブジェクト
         """
-        creds = self.get_credentials(scopes_type='calendar')
-        service = build('calendar', 'v3', credentials=creds)
+        creds = self.get_credentials(scopes_type="calendar")
+        service = build("calendar", "v3", credentials=creds)
         return service
 
     def get_gmail_service(self):
@@ -122,8 +124,8 @@ class GoogleAuthHelper:
         Returns:
             Resource: Gmail APIサービスオブジェクト
         """
-        creds = self.get_credentials(scopes_type='gmail')
-        service = build('gmail', 'v1', credentials=creds)
+        creds = self.get_credentials(scopes_type="gmail")
+        service = build("gmail", "v1", credentials=creds)
         return service
 
     def revoke_credentials(self):
@@ -170,9 +172,9 @@ class GoogleAuthHelper:
 
 
 # モジュール単体でのテスト用
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Google API 認証ヘルパー - テストモード")
-    print("="*60)
+    print("=" * 60)
 
     helper = GoogleAuthHelper()
 
@@ -202,5 +204,5 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"   ❌ エラー: {e}")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("テスト完了")

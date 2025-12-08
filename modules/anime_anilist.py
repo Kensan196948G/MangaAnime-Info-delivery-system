@@ -13,16 +13,17 @@ Rate Limits: 90 requests per minute
 """
 
 import asyncio
-import aiohttp
 import logging
 import time
-from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
-from .models import AniListWork, DataSource
+import aiohttp
+
 from .db import get_db
+from .models import AniListWork, DataSource
 
 
 class AniListAPIError(Exception):

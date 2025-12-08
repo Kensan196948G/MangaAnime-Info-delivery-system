@@ -13,15 +13,15 @@ Database Schema:
 - releases: Stores episode/volume release information
 """
 
-import sqlite3
-import logging
 import hashlib
-from typing import Optional, List, Dict, Any
+import logging
+import os
+import sqlite3
+import threading
+import time
 from contextlib import contextmanager
 from datetime import datetime
-import threading
-import os
-import time
+from typing import Any, Dict, List, Optional
 
 
 class DatabaseManager:
@@ -395,7 +395,12 @@ class DatabaseManager:
     def _initialize_default_settings(self, conn):
         """Initialize default settings if they don't exist."""
         default_settings = [
-            ("notification_email", "kensan1969@gmail.com", "string", "デフォルト通知先メールアドレス"),
+            (
+                "notification_email",
+                "kensan1969@gmail.com",
+                "string",
+                "デフォルト通知先メールアドレス",
+            ),
             ("check_interval_hours", "1", "integer", "チェック間隔（時間）"),
             ("email_notifications_enabled", "true", "boolean", "メール通知を有効化"),
             ("calendar_enabled", "false", "boolean", "カレンダー登録を有効化"),
@@ -882,11 +887,14 @@ class DatabaseManager:
                 return value.lower() in ("true", "1", "yes")
             elif value_type == "json":
                 import json
+
                 return json.loads(value)
             else:
                 return value
 
-    def set_setting(self, key: str, value: Any, value_type: str = "string", description: str = ""):
+    def set_setting(
+        self, key: str, value: Any, value_type: str = "string", description: str = ""
+    ):
         """
         Set a setting value in the database.
 
@@ -899,6 +907,7 @@ class DatabaseManager:
         # Convert value to string for storage
         if value_type == "json":
             import json
+
             value_str = json.dumps(value)
         elif value_type == "boolean":
             value_str = "true" if value else "false"
@@ -940,6 +949,7 @@ class DatabaseManager:
                     settings[key] = value.lower() in ("true", "1", "yes")
                 elif value_type == "json":
                     import json
+
                     settings[key] = json.loads(value)
                 else:
                     settings[key] = value
@@ -964,6 +974,7 @@ class DatabaseManager:
                     value_str = str(value)
                 elif isinstance(value, (dict, list)):
                     import json
+
                     value_type = "json"
                     value_str = json.dumps(value)
                 else:
@@ -1061,9 +1072,7 @@ class DatabaseManager:
 
             return [dict(row) for row in cursor.fetchall()]
 
-    def get_last_notification_time(
-        self, notification_type: str
-    ) -> Optional[datetime]:
+    def get_last_notification_time(self, notification_type: str) -> Optional[datetime]:
         """
         Get the last successful notification execution time.
 

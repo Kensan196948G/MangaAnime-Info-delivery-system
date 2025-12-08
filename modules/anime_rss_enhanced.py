@@ -18,17 +18,18 @@ Features:
 - Duplicate detection
 """
 
-import logging
-import feedparser
 import asyncio
-import aiohttp
-from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
-from dataclasses import dataclass
-from urllib.parse import urljoin, urlparse
+import logging
 import re
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 
-from .models import RSSFeedItem, Work, Release, WorkType, ReleaseType, DataSource
+import aiohttp
+import feedparser
+
+from .models import (DataSource, Release, ReleaseType, RSSFeedItem, Work,
+                     WorkType)
 
 
 @dataclass

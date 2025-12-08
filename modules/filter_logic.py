@@ -12,19 +12,19 @@ Enhanced features (統合版):
 - Audit logging for filtered content
 """
 
+import difflib
+import hashlib
+import json
 import logging
 import re
-import json
-from typing import List, Dict, Any, Optional, Set, Tuple
+import time
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
-from .models import Work, AniListWork, RSSFeedItem
-import difflib
-import time
 from functools import lru_cache
-import hashlib
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
+from .models import AniListWork, RSSFeedItem, Work
 
 # === Enhanced Filter Classes (統合: filter_logic_enhanced.py より移植) ===
 
