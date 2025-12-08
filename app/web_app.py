@@ -192,14 +192,27 @@ def add_security_headers(response):
     # Referrerポリシー
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
-    # CSP（開発時は緩め、本番では厳格に）
+    # Permissions-Policy（旧Feature-Policy）- 不要な機能を無効化
+    response.headers["Permissions-Policy"] = (
+        "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+    )
+
+    # 本番環境のみの追加セキュリティ
     if os.environ.get("FLASK_ENV") == "production":
+        # HSTS（HTTP Strict Transport Security）- 1年間HTTPS強制
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains; preload"
+        )
+
+        # CSP（Content Security Policy）
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com; "
             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
             "img-src 'self' data: https:; "
-            "font-src 'self' https://cdn.jsdelivr.net;"
+            "font-src 'self' https://cdn.jsdelivr.net; "
+            "frame-ancestors 'self'; "
+            "form-action 'self';"
         )
 
     return response
@@ -1789,15 +1802,13 @@ def api_settings():
 def api_collection_processes():
     """API endpoint for collection processes status - loads from config.json and database stats"""
     try:
-        import sqlite3
         from datetime import datetime
 
         config = load_config()
         processes = []
 
-        # Connect to database to get statistics
-        conn = sqlite3.connect("db.sqlite3")
-        conn.row_factory = sqlite3.Row
+        # Connect to database to get statistics (共通関数を使用)
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         # Get all statistics
@@ -2262,12 +2273,12 @@ def api_test_configuration():
 
     # Test Database connection
     try:
-        db_path = config.get("database", {}).get("path", "./db.sqlite3")
+        db_path = config.get("database", {}).get("path", DATABASE_PATH)
         if not os.path.exists(db_path):
             results["database"]["status"] = "error"
             results["database"]["message"] = "データベースファイルが見つかりません"
         else:
-            conn = sqlite3.connect(db_path)
+            conn = get_db_connection()
             cursor = conn.cursor()
 
             # Check table existence
@@ -2751,9 +2762,8 @@ def api_sources():
             },
         }
 
-        # Connect to database to get statistics
-        conn = sqlite3.connect("db.sqlite3")
-        conn.row_factory = sqlite3.Row
+        # Connect to database to get statistics (共通関数を使用)
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         # Get all statistics

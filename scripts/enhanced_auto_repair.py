@@ -1067,8 +1067,6 @@ def main():
 
     # ログ設定
     setup_logging(args.log_level)
-    logger = logging.getLogger(__name__)
-
     logger.info("="*60)
     logger.info("改善版自動エラー修復システム起動")
     logger.info("="*60)

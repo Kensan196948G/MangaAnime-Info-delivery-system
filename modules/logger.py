@@ -169,7 +169,6 @@ def setup_logging(config_manager, force_reload: bool = False) -> logging.Logger:
     _configure_module_loggers()
 
     # 初期ログメッセージ
-    logger = logging.getLogger(__name__)
     logger.info(f"ログシステムが初期化されました (レベル: {config_manager.get_log_level()})")
     logger.info(f"ログファイル: {log_file_path}")
 

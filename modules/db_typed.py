@@ -8,8 +8,6 @@ import sqlite3
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union
 
-logger = logging.getLogger(__name__)
-
 
 def get_connection(db_path: str = "data/db.sqlite3") -> sqlite3.Connection:
     """

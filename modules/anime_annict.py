@@ -24,8 +24,6 @@ import aiohttp
 
 from .models import DataSource, WorkType
 
-logger = logging.getLogger(__name__)
-
 
 class AnnictAPIError(Exception):
     """Custom exception for Annict API errors."""

@@ -285,6 +285,5 @@ def measure_time():
 @pytest.fixture(autouse=True)
 def configure_test_logging(caplog):
     """Configure logging for tests"""
-    import logging
     caplog.set_level(logging.DEBUG)
     yield caplog

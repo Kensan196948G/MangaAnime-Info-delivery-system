@@ -16,8 +16,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-logger = logging.getLogger(__name__)
-
 
 class SMTPGmailSender:
     """SMTP経由でGmailを送信するクラス"""

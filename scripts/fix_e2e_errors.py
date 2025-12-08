@@ -141,11 +141,11 @@ api_keys_total {stats['api_keys_total']}
 
         # /api/collection-status エンドポイント追加
         if '@app.route("/api/collection-status")' not in content:
-            collection_status_endpoint = '''
+            collection_status_endpoint = """
 
 @app.route('/api/collection-status')
 def api_collection_status():
-    """コレクション状態API"""
+    \"\"\"コレクション状態API\"\"\"
     db = get_db()
 
     # ステータス別集計
@@ -164,7 +164,7 @@ def api_collection_status():
         'by_status': status_counts,
         'timestamp': datetime.now().isoformat()
     })
-'''
+"""
             content += collection_status_endpoint
             self.fixes_applied.append("✓ /api/collection-status エンドポイント追加")
 

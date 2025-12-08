@@ -13,8 +13,15 @@ project_root = os.path.dirname(os.path.dirname(__file__))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# テスト環境用SECRET_KEYを設定
+# ============================================================
+# テスト環境用の環境変数を設定（モジュールインポート前に設定必須）
+# ============================================================
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-testing-only")
+os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "test-admin-password-12345")
+os.environ.setdefault("GMAIL_CREDENTIALS_PATH", "test_credentials.json")
+os.environ.setdefault("CALENDAR_CREDENTIALS_PATH", "test_calendar_credentials.json")
+os.environ.setdefault("FLASK_ENV", "testing")
+os.environ.setdefault("DATABASE_PATH", ":memory:")
 
 
 @pytest.fixture

@@ -157,13 +157,7 @@ def create_fixed_config(old_config: Dict[str, Any]) -> Dict[str, Any]:
 
 def main():
     """メイン処理"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     logger.info("=" * 60)
-
-logger = logging.getLogger(__name__)
 
     logger.info("Config.json 整合性チェック")
     logger.info("=" * 60)

@@ -6,10 +6,6 @@ Flask-Limiterを使用したAPIエンドポイントのレート制限実装
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask import jsonify, redirect, url_for, request, flash
-import logging
-
-logger = logging.getLogger(__name__)
-
 
 def get_user_identifier():
     """

@@ -456,13 +456,7 @@ def verify_api_key_endpoint():
             "message": "API key is valid and active"
         }
     """
-import logging
-
-logger = logging.getLogger(__name__)
-
     return jsonify({
-
-logger = logging.getLogger(__name__)
 
         'success': True,
         'user_id': g.api_user_id,

@@ -166,14 +166,7 @@ class TitleTranslator:
 
 def get_japanese_title(title):
     """便利関数：英語タイトルから日本語タイトルを取得"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     translator = TitleTranslator()
-
-logger = logging.getLogger(__name__)
-
     return translator.translate(title)
 
 

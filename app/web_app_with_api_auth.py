@@ -443,14 +443,7 @@ def not_found(error):
 @app.errorhandler(500)
 def internal_error(error):
     """500エラーハンドラー"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     if request.path.startswith('/api/'):
-
-logger = logging.getLogger(__name__)
-
         return jsonify({
             'success': False,
             'error': 'Internal server error',

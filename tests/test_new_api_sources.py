@@ -34,8 +34,6 @@ logging.basicConfig(
     ],
 )
 
-logger = logging.getLogger(__name__)
-
 
 class APITestRunner:
     """API動作確認テストランナー"""

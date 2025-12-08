@@ -170,13 +170,7 @@ async def test_full_collection():
 
 def main():
     """Main test function"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     logger.info("\n")
-
-logger = logging.getLogger(__name__)
 
     logger.info("╔" + "=" * 78 + "╗")
     logger.info("║" + " " * 20 + "Annict API 統合テストスイート" + " " * 27 + "║")

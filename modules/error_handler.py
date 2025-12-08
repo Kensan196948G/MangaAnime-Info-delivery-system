@@ -257,15 +257,14 @@ if __name__ == "__main__":
     )
 
     # リトライのテスト
-    attempt_count = 0
+    test_attempt_count = [0]  # Use list to allow modification in nested function
 
     @with_retry(RetryConfig(max_retries=3, backoff_factor=1.5))
     def test_retry_function():
-        nonlocal attempt_count
-        attempt_count += 1
-        logger.info(f"Attempt {attempt_count}")
+        test_attempt_count[0] += 1
+        logger.info(f"Attempt {test_attempt_count[0]}")
 
-        if attempt_count < 3:
+        if test_attempt_count[0] < 3:
             raise Exception("Simulated error")
 
         return "Success!"
@@ -275,7 +274,7 @@ if __name__ == "__main__":
         result = test_retry_function()
         logger.info(f"Result: {result}")
     except Exception as e:
-        logger.error(f"Failed")
+        logger.error(f"Failed: {e}")
 
     # サーキットブレーカーのテスト
     logger.info("\n" + "=" * 50)

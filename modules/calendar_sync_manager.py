@@ -29,8 +29,6 @@ from typing import Any, Dict, List, Optional
 
 from modules.calendar_api import GoogleCalendarAPI, GoogleCalendarAPIError
 
-logger = logging.getLogger(__name__)
-
 
 class CalendarSyncManager:
     """

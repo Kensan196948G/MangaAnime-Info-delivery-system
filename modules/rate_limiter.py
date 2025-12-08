@@ -25,8 +25,6 @@ from functools import wraps
 from threading import Lock
 from typing import Callable, Optional
 
-logger = logging.getLogger(__name__)
-
 
 class RateLimiter:
     """

@@ -613,13 +613,7 @@ class RepairDashboard:
 
     def interactive_mode(self):
         """Run dashboard in interactive mode"""
-import logging
-
-logger = logging.getLogger(__name__)
-
         logger.info(f"{Colors.GREEN}Starting interactive dashboard...{Colors.END}")
-
-logger = logging.getLogger(__name__)
 
         logger.info(
             f"{Colors.CYAN}Commands: 'q' to quit, 'r' to refresh, 'e' to export, 'g' to generate graph{Colors.END}"

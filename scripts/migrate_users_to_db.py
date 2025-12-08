@@ -247,13 +247,7 @@ class UserMigration:
 
 def main():
     """メイン実行関数"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     if len(sys.argv) < 2:
-
-logger = logging.getLogger(__name__)
 
         logger.info("Usage: python migrate_users_to_db.py [migrate|verify|rollback]")
         logger.info("\nCommands:")

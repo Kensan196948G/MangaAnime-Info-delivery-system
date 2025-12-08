@@ -35,8 +35,6 @@ logging.basicConfig(
     ]
 )
 
-logger = logging.getLogger(__name__)
-
 
 def main():
     """メイン処理"""

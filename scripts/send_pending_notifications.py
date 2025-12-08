@@ -80,13 +80,7 @@ def mark_as_notified(release_ids):
 
 def send_notification_email(releases, config):
     """通知メールを送信"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     email_config = config.get("email", {})
-
-logger = logging.getLogger(__name__)
 
 
     smtp_server = email_config.get("smtp_server", "smtp.gmail.com")

@@ -8,8 +8,6 @@ import time
 from functools import wraps
 from typing import Any, Callable
 
-logger = logging.getLogger(__name__)
-
 
 class RetryException(Exception):
     """リトライ失敗時の例外"""

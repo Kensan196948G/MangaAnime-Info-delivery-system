@@ -134,13 +134,7 @@ def check_pending_notifications():
         # 未通知のリリースを確認
         cursor.execute(
             """
-import logging
-
-logger = logging.getLogger(__name__)
-
             SELECT COUNT(*) FROM releases
-
-logger = logging.getLogger(__name__)
 
             WHERE notified = 0
         """

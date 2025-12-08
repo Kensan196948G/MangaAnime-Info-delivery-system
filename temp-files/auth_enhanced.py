@@ -306,14 +306,8 @@ def forgot_password():
 @auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     """パスワード再設定"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     # トークン検証
     user_id = verify_reset_token(token)
-
-logger = logging.getLogger(__name__)
 
 
     if not user_id:

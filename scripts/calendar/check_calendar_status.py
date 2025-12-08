@@ -11,8 +11,6 @@ from pathlib import Path
 
 def main():
 
-logger = logging.getLogger(__name__)
-
     logger.info("=" * 70)
     logger.info("Google Calendar連携機能 - 状態確認")
     logger.info("=" * 70)

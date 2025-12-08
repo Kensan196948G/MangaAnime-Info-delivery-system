@@ -12,8 +12,6 @@ from typing import Any, Dict, Optional
 
 from .monitoring import MetricsCollector
 
-logger = logging.getLogger(__name__)
-
 
 # Note: dashboard_service循環参照を避けるため、遅延インポート
 def get_dashboard_service():

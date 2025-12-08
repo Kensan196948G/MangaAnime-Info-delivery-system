@@ -25,8 +25,6 @@ def main():
     # 設定と初期化
     config = get_config()
     setup_logging(config)
-    logger = logging.getLogger(__name__)
-
     # データベース接続
     db = DatabaseManager(config.get_db_path())
 

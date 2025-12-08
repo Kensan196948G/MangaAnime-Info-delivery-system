@@ -347,7 +347,6 @@ class TestSecurityCompliance(unittest.TestCase):
 
     def test_sensitive_data_logging_prevention(self):
         """Test that sensitive data is not logged."""
-        import logging
         from io import StringIO
 
         # Capture log output

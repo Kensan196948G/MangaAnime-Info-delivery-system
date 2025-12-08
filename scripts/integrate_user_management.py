@@ -154,13 +154,7 @@ def integrate_base_html():
 
 def verify_integration():
     """統合結果の検証"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     logger.info("\n" + "=" * 60)
-
-logger = logging.getLogger(__name__)
 
     logger.info("統合結果の検証")
     logger.info("=" * 60)

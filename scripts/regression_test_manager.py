@@ -701,11 +701,8 @@ class RegressionTestManager:
 def main():
     """Main entry point"""
     import argparse
-import logging
 
     parser = argparse.ArgumentParser(description="Regression Test Manager")
-
-logger = logging.getLogger(__name__)
 
     parser.add_argument("--project-root", default=".", help="Project root directory")
     parser.add_argument(

@@ -28,8 +28,6 @@ logging.basicConfig(
         logging.StreamHandler(),
     ],
 )
-logger = logging.getLogger(__name__)
-
 
 class OperationalMonitor:
     """運用監視クラス - 24時間365日システム監視"""

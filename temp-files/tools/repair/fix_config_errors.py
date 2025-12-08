@@ -17,8 +17,6 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
-logger = logging.getLogger(__name__)
-
 
 class ConfigAutoRepair:
     """設定ファイル自動修復クラス"""

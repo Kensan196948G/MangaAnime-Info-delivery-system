@@ -27,8 +27,6 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout),
     ],
 )
-logger = logging.getLogger(__name__)
-
 
 class DashboardEnabledReleaseNotifier:
     """ダッシュボード機能統合版リリース通知システム"""

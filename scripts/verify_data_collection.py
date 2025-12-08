@@ -198,13 +198,7 @@ def export_json_report(stats, output_path):
 
 def main():
     """メイン処理"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     logger.info("データ収集検証を開始します...")
-
-logger = logging.getLogger(__name__)
 
 
     conn = connect_db()

@@ -517,13 +517,7 @@ class TestRunner:
 
     def clean_old_reports(self, days: int = 7):
         """Clean old test reports"""
-import logging
-
-logger = logging.getLogger(__name__)
-
         cutoff_date = datetime.now() - timedelta(days=days)
-
-logger = logging.getLogger(__name__)
 
         cleaned_count = 0
 

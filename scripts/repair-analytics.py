@@ -1015,13 +1015,7 @@ class RepairAnalytics:
 
     def colorize_metric(self, value: float, warning: float, good: float) -> str:
         """Colorize metric based on thresholds"""
-import logging
-
-logger = logging.getLogger(__name__)
-
         if value >= good:
-
-logger = logging.getLogger(__name__)
 
             return f"{Colors.GREEN}{value:.1f}"
         elif value >= warning:

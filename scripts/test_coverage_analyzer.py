@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional
 #!/usr/bin/env python3
 """
 Test Coverage Analyzer and Quality Assessment Tool
@@ -13,6 +12,10 @@ import subprocess
 from datetime import datetime
 import re
 from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -988,15 +991,12 @@ Action Items:
 
         with open(output_path, "w") as f:
 
-logger = logging.getLogger(__name__)
-
             f.write(md_content)
 
 
 def main():
     """Main entry point"""
     import argparse
-import logging
 
     parser = argparse.ArgumentParser(description="Test Coverage Analyzer")
     parser.add_argument("--project-root", default=".", help="Project root directory")

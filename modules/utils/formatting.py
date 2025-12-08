@@ -8,8 +8,6 @@ import logging
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger(__name__)
-
 
 def format_date(
     date_obj: Optional[datetime | date | str], format: str = "%Y-%m-%d", default: str = ""

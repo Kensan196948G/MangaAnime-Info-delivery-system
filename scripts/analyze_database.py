@@ -354,13 +354,7 @@ class DatabaseAnalyzer:
 
     def print_summary(self):
         """サマリーをコンソールに出力"""
-import logging
-
-logger = logging.getLogger(__name__)
-
         logger.info("\n" + "=" * 80)
-
-logger = logging.getLogger(__name__)
 
         logger.info("データベース分析サマリー")
         logger.info("=" * 80)

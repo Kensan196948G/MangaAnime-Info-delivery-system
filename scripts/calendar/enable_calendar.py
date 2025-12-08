@@ -11,8 +11,6 @@ from pathlib import Path
 
 def enable_calendar_in_config():
 
-logger = logging.getLogger(__name__)
-
     """config.jsonのcalendar.enabledをtrueに設定"""
 
     project_root = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")

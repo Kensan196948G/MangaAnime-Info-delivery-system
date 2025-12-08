@@ -32,8 +32,6 @@ logging.basicConfig(
         logging.StreamHandler(),
     ],
 )
-logger = logging.getLogger(__name__)
-
 
 class PerformanceValidator:
     """システムパフォーマンス・運用性検証クラス"""

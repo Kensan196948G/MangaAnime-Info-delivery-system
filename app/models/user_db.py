@@ -5,6 +5,8 @@
 import logging
 import sqlite3
 
+logger = logging.getLogger(__name__)
+
 # User dataclass をインポート
 import sys
 from contextlib import contextmanager
@@ -17,9 +19,8 @@ from werkzeug.security import generate_password_hash
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from app.routes.auth import User
-
-logger = logging.getLogger(__name__)
+# Userクラスは遅延インポートで循環インポートを回避
+# from app.routes.auth import User は使用時にインポート
 
 
 class UserDBStore:
@@ -27,7 +28,23 @@ class UserDBStore:
 
     def __init__(self, db_path: str = "db.sqlite3"):
         self.db_path = db_path
+        self._init_db()
         logger.info(f"UserDBStore初期化: {db_path}")
+
+    def _init_db(self):
+        """データベーステーブルを初期化"""
+        with self.get_connection() as conn:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id TEXT PRIMARY KEY,
+                    username TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    is_admin INTEGER DEFAULT 0,
+                    is_active INTEGER DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    last_login DATETIME
+                )
+            ''')
 
     @contextmanager
     def get_connection(self):
@@ -44,8 +61,10 @@ class UserDBStore:
         finally:
             conn.close()
 
-    def _row_to_user(self, row: sqlite3.Row) -> User:
+    def _row_to_user(self, row: sqlite3.Row):
         """SQLiteのRowをUserオブジェクトに変換"""
+        # 遅延インポートで循環インポートを回避
+        from app.routes.auth import User
         return User(
             id=row["id"],
             username=row["username"],
@@ -58,7 +77,7 @@ class UserDBStore:
             last_login=(datetime.fromisoformat(row["last_login"]) if row["last_login"] else None),
         )
 
-    def get_user_by_id(self, user_id: str) -> Optional[User]:
+    def get_user_by_id(self, user_id: str):
         """IDでユーザーを取得"""
         with self.get_connection() as conn:
             cursor = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,))
@@ -68,7 +87,7 @@ class UserDBStore:
                 return self._row_to_user(row)
             return None
 
-    def get_user_by_username(self, username: str) -> Optional[User]:
+    def get_user_by_username(self, username: str):
         """ユーザー名でユーザーを取得"""
         with self.get_connection() as conn:
             cursor = conn.execute("SELECT * FROM users WHERE username = ?", (username,))
@@ -78,9 +97,11 @@ class UserDBStore:
                 return self._row_to_user(row)
             return None
 
-    def add_user(self, username: str, password: str, is_admin: bool = False) -> User:
+    def add_user(self, username: str, password: str, is_admin: bool = False):
         """新規ユーザーを追加"""
         import secrets
+        # 遅延インポートで循環インポートを回避
+        from app.routes.auth import User
 
         user_id = f"user-{secrets.token_urlsafe(12)}"
         password_hash = generate_password_hash(password)
@@ -112,7 +133,7 @@ class UserDBStore:
             created_at=datetime.now(),
         )
 
-    def get_all_users(self) -> List[User]:
+    def get_all_users(self):
         """全ユーザーを取得"""
         with self.get_connection() as conn:
             cursor = conn.execute(

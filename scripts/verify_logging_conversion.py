@@ -66,8 +66,6 @@ class LoggingConversionVerifier:
         """loggingインポートの確認"""
         return bool(re.search(r'import logging', content))
 
-logger = logging.getLogger(__name__)
-
     def has_logger_instance(self, content: str) -> bool:
         """loggerインスタンスの確認"""
         return bool(re.search(r'logger\s*=\s*logging\.getLogger', content))
@@ -196,7 +194,7 @@ logger = logging.getLogger(__name__)
         logger.info(f"Total Files Scanned:        {summary['total_files']}")
         logger.info(f"Files Clean:                {summary['files_clean']}")
         logger.info(f"Files with Issues:          {summary['files_with_issues']}")
-        logger.info(f"Success'success_rate']}")
+        logger.info(f"Success Rate:               {summary['success_rate']}")
         logger.info()
         logger.info(f"Remaining Print Statements: {summary['total_print_statements']}")
         logger.info(f"Files with Prints:          {summary['files_with_prints']}")

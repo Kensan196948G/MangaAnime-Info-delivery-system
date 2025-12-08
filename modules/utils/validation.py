@@ -9,8 +9,6 @@ import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger(__name__)
-
 
 def is_valid_email(email: str) -> bool:
     """

@@ -23,8 +23,6 @@ import aiohttp
 
 from .models import DataSource, WorkType
 
-logger = logging.getLogger(__name__)
-
 
 class MangaUpdatesAPIError(Exception):
     """Custom exception for MangaUpdates API errors."""

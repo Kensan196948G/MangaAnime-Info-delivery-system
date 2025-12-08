@@ -12,8 +12,6 @@ from pathlib import Path
 
 def validate_fixes():
 
-logger = logging.getLogger(__name__)
-
     """修正内容を検証"""
     errors = []
     warnings = []

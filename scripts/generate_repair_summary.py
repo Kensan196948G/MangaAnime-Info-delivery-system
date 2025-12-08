@@ -57,15 +57,9 @@ def generate_summary_report(summary_file: str) -> str:
 | **最終ステータス** | {status_icon} {final_status.upper()} |
 
 """
-import logging
-
-logger = logging.getLogger(__name__)
-
 
     # 検出されたエラー
     detected_errors = data.get('detected_errors', [])
-
-logger = logging.getLogger(__name__)
 
     if detected_errors:
         report += "### 🔍 検出されたエラー\n\n"

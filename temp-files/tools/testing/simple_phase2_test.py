@@ -81,6 +81,7 @@ def test_models():
     print("\nTesting Enhanced Models...")
 
     try:
+        from modules.models import (
             Work,
             Release,
             WorkType,

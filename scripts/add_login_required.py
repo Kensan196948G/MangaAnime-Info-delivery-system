@@ -13,8 +13,6 @@ def add_login_decorators(file_path):
     """
     logger.info(f"📝 読み込み: {file_path}")
 
-logger = logging.getLogger(__name__)
-
 
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -27,7 +25,6 @@ logger = logging.getLogger(__name__)
     # flask_login のインポートを追加
     if 'from flask_login import' not in content:
         import_pattern = r'(from flask_cors import CORS\n)'
-import logging
         import_replacement = r'\1from flask_login import login_required, current_user\n'
         content = re.sub(import_pattern, import_replacement, content)
         logger.info("  - flask_login インポート追加")

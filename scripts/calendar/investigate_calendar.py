@@ -9,8 +9,6 @@ from pathlib import Path
 
 PROJECT_ROOT = Path("/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system")
 
-logger = logging.getLogger(__name__)
-
 
 def find_files(pattern, root_dir):
     """ファイルを再帰的に検索"""

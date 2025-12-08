@@ -579,12 +579,7 @@ def fetch_and_store() -> dict:
     Returns:
         dict: 収集結果のサマリー
     """
-    import logging
-
     from .db import get_db
-
-    logger = logging.getLogger(__name__)
-
     try:
         # データ収集（同期版を使用）
         works, releases = fetch_syoboi_works_and_releases_sync(days_ahead=14)

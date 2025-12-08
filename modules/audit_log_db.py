@@ -12,8 +12,6 @@ from typing import Any, Dict, List, Optional
 
 from modules.audit_log import AuditEventType, AuditLog
 
-logger = logging.getLogger(__name__)
-
 
 class AuditLoggerDB:
     """SQLiteベースの監査ログ管理クラス"""

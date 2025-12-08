@@ -212,8 +212,6 @@ def generate_markdown_report(results: Dict[str, List[Dict]], output_path: Path) 
     """Markdown形式のレポートを生成"""
     with open(output_path, 'w', encoding='utf-8') as f:
 
-logger = logging.getLogger(__name__)
-
         f.write("# SQLインジェクション脆弱性スキャン結果\n\n")
         f.write(f"**スキャン日時**: {Path.cwd()}\n\n")
 
@@ -258,7 +256,6 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     import argparse
-import logging
 
     parser = argparse.ArgumentParser(description='SQLインジェクション脆弱性スキャナー')
     parser.add_argument(

@@ -10,8 +10,6 @@ from pathlib import Path
 
 def validate_ci_fixes():
 
-logger = logging.getLogger(__name__)
-
     """CI.ymlの修正内容を検証"""
     errors = []
     warnings = []

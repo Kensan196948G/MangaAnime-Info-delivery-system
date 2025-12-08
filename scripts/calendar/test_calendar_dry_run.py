@@ -192,13 +192,7 @@ def generate_test_report():
 
 def main():
     """メイン実行"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     logger.info("\n")
-
-logger = logging.getLogger(__name__)
 
     logger.info("*" * 80)
     logger.info("*" + " " * 78 + "*")

@@ -10,8 +10,6 @@ import os
 
 def integrate_auth_to_web_app():
 
-logger = logging.getLogger(__name__)
-
     """web_app.py に認証機構を統合"""
 
     web_app_path = '/mnt/Linux-ExHDD/MangaAnime-Info-delivery-system/app/web_app.py'

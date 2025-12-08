@@ -30,13 +30,7 @@ def login_required(f):
 @login_required
 def manage_api_keys():
     """
-import logging
-
-logger = logging.getLogger(__name__)
-
     APIキー管理ページ
-
-logger = logging.getLogger(__name__)
 
 
     ログインユーザーのみアクセス可能

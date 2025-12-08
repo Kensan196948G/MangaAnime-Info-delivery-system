@@ -34,13 +34,7 @@ def fix_workflow_file(filepath):
 
 def main():
     """メイン処理"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     workflows_dir = Path(".github/workflows")
-
-logger = logging.getLogger(__name__)
 
 
     if not workflows_dir.exists():

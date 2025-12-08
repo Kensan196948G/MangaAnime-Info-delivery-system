@@ -9,8 +9,6 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger(__name__)
-
 
 class AuditEventType(Enum):
     """監査イベントタイプ"""

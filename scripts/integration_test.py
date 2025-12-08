@@ -31,8 +31,6 @@ logging.basicConfig(
         logging.StreamHandler(),
     ],
 )
-logger = logging.getLogger(__name__)
-
 
 class IntegrationTestSuite:
     """統合テストスイート"""

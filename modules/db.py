@@ -1153,8 +1153,65 @@ class DatabaseManager:
                 "notification_type": notification_type or "all",
             }
 
+    def execute_wal_checkpoint(self) -> dict:
+        """
+        Execute WAL checkpoint to consolidate WAL file into main database.
+
+        This should be called periodically to prevent WAL file from growing too large
+        and to ensure data durability.
+
+        Returns:
+            dict: Checkpoint result with busy, log, and checkpointed page counts
+        """
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
+                result = cursor.fetchone()
+                checkpoint_info = {
+                    "busy": result[0],
+                    "log_pages": result[1],
+                    "checkpointed_pages": result[2],
+                    "success": result[0] == 0,
+                    "timestamp": datetime.now().isoformat()
+                }
+                self.logger.info(
+                    f"WAL checkpoint executed: busy={result[0]}, "
+                    f"log={result[1]}, checkpointed={result[2]}"
+                )
+                return checkpoint_info
+        except Exception as e:
+            self.logger.error(f"WAL checkpoint failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    def check_integrity(self) -> dict:
+        """
+        Check database integrity.
+
+        Returns:
+            dict: Integrity check result
+        """
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.execute("PRAGMA integrity_check;")
+                result = cursor.fetchone()[0]
+                is_valid = result == "ok"
+                return {
+                    "valid": is_valid,
+                    "result": result,
+                    "timestamp": datetime.now().isoformat()
+                }
+        except Exception as e:
+            self.logger.error(f"Integrity check failed: {e}")
+            return {"valid": False, "error": str(e)}
+
     def close_connections(self):
         """Close all database connections and clean up resources."""
+        # Execute WAL checkpoint before closing
+        try:
+            self.execute_wal_checkpoint()
+        except Exception as e:
+            self.logger.warning(f"WAL checkpoint before close failed: {e}")
+
         with self._pool_lock:
             # Close pooled connections
             for conn in self._connection_pool:

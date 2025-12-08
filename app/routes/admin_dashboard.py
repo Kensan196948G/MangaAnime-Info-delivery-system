@@ -344,14 +344,7 @@ def api_unlock_account(user_id):
             INSERT INTO audit_logs (action, username, ip_address, details)
             VALUES (?, ?, ?, ?)
         ''', (
-import logging
-
-logger = logging.getLogger(__name__)
-
             'account_unlocked',
-
-logger = logging.getLogger(__name__)
-
             current_user.username,
             request.remote_addr,
             f'Unlocked user_id: {user_id}'

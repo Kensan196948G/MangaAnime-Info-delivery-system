@@ -20,8 +20,6 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
-logger = logging.getLogger(__name__)
-
 
 class SecretProvider(ABC):
     """シークレットプロバイダー基底クラス"""

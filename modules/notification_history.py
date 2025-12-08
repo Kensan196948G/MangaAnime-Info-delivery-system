@@ -10,8 +10,6 @@ import sqlite3
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger(__name__)
-
 
 class NotificationHistoryManager:
     """通知履歴管理クラス"""

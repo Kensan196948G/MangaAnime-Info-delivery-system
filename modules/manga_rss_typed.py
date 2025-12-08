@@ -10,8 +10,6 @@ from urllib.parse import urlparse
 
 import feedparser
 
-logger = logging.getLogger(__name__)
-
 
 class RSSFeedParser:
     """RSSフィードパーサー"""

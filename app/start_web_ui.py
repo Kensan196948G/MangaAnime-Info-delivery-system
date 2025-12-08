@@ -12,10 +12,8 @@ import sys
 from web_app import app
 
 
+
 def main():
-
-logger = logging.getLogger(__name__)
-
     parser = argparse.ArgumentParser(
         description="Start the Anime/Manga Information Delivery System Web UI"
     )

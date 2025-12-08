@@ -52,13 +52,7 @@ def check_external_apis():
 
 def main():
     """メインのヘルスチェック処理"""
-import logging
-
-logger = logging.getLogger(__name__)
-
     logger.info("🏥 MangaAnime System Health Check")
-
-logger = logging.getLogger(__name__)
 
     logger.info("=" * 40)
 

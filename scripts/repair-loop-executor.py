@@ -490,13 +490,7 @@ def test_import():
 
     def execute(self) -> int:
         """修復を実行"""
-import logging
-
-logger = logging.getLogger(__name__)
-
         self.log(f"Starting repair for Issue #{self.issue_number}")
-
-logger = logging.getLogger(__name__)
 
         self.log(f"Cycle {self.cycle}, Attempt {self.attempt}/7, Total {self.total} (Infinite Loop Mode)")
 

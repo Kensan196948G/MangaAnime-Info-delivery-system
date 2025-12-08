@@ -348,11 +348,8 @@ class SecureQueryBuilder:
 def main():
     """メイン関数"""
     import argparse
-import logging
 
     parser = argparse.ArgumentParser(description='SQLite データベース分析ツール（セキュア版）')
-
-logger = logging.getLogger(__name__)
 
     parser.add_argument(
         '--db',

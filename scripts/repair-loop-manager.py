@@ -156,8 +156,6 @@ class RepairLoopManager:
         """状態をリセット"""
         initial_state = self.get_initial_state()
 
-logger = logging.getLogger(__name__)
-
         self.save_state(initial_state)
         logger.info("🔄 Repair loop state reset")
         return initial_state
@@ -166,7 +164,6 @@ logger = logging.getLogger(__name__)
 def main():
     """CLIエントリーポイント"""
     import argparse
-import logging
 
     parser = argparse.ArgumentParser(description="Repair Loop Manager")
     parser.add_argument(

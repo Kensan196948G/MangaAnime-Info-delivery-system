@@ -200,8 +200,6 @@ def print_next_steps():
     """次のステップを表示"""
     logger.info("=" * 60)
 
-logger = logging.getLogger(__name__)
-
     logger.info("管理者ダッシュボードセットアップ完了!")
     logger.info("=" * 60)
     logger.info()
@@ -209,10 +207,9 @@ logger = logging.getLogger(__name__)
     logger.info()
     logger.info("1. ブループリントを登録:")
     logger.info("   app/__init__.py または app/web_app.py に以下を追加")
-    logger.info()
+    logger.info("")
     logger.info("   from app.routes.admin_dashboard import admin_dash_bp")
-import logging
-    logger.info("   app.register_bluelogger.info(admin_dash_bp)")
+    logger.info("   app.register_blueprint(admin_dash_bp)")
     logger.info()
     logger.info("2. ナビゲーションメニューを追加:")
     logger.info("   templates/base.html の管理者メニューに")

@@ -31,8 +31,6 @@ except ImportError:
     REDIS_AVAILABLE = False
     logging.warning("redis package not installed. Using memory cache fallback.")
 
-logger = logging.getLogger(__name__)
-
 
 class MemoryCache:
     """

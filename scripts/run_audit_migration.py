@@ -171,8 +171,6 @@ import logging
 # イベント記録
 audit_logger.log_event(
 
-logger = logging.getLogger(__name__)
-
     event_type=AuditEventType.AUTH_LOGIN_SUCCESS,
     user_id="user123",
     username="testuser",

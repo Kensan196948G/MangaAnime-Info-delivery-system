@@ -8,8 +8,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
-logger = logging.getLogger(__name__)
-
 
 class LoginAttemptTracker:
     """ログイン試行追跡クラス"""

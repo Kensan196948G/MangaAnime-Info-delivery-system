@@ -22,16 +22,16 @@ def run_migration(db_path: str = "db.sqlite3"):
     Args:
         db_path: データベースファイルパス
     """
-    logger.info("=" * 60)
-    logger.info("🔄 監査ログマイグレーション開始")
-    logger.info("=" * 60)
+    print("=" * 60)
+    print("🔄 監査ログマイグレーション開始")
+    print("=" * 60)
 
     # マイグレーションファイルパス
     migration_file = project_root / "migrations" / "006_audit_logs.sql"
 
     if not migration_file.exists():
-        logger.info(f"⚠️  マイグレーションファイルが見つかりません: {migration_file}")
-        logger.info("📝 基本テーブルを作成します...")
+        print(f"⚠️  マイグレーションファイルが見つかりません: {migration_file}")
+        print("📝 基本テーブルを作成します...")
 
         # 基本テーブルSQL
         create_table_sql = """
@@ -84,13 +84,13 @@ def run_migration(db_path: str = "db.sqlite3"):
             conn.executescript(create_table_sql)
             conn.commit()
             conn.close()
-            logger.info("✅ 基本テーブル作成完了")
+            print("✅ 基本テーブル作成完了")
         except Exception as e:
-            logger.info(f"❌ エラー: {e}")
+            print(f"❌ エラー: {e}")
             return False
 
     else:
-        logger.info(f"📄 マイグレーションファイル: {migration_file}")
+        print(f"📄 マイグレーションファイル: {migration_file}")
 
         try:
             # SQLファイルを読み込み
@@ -103,13 +103,13 @@ def run_migration(db_path: str = "db.sqlite3"):
             conn.commit()
             conn.close()
 
-            logger.info("✅ マイグレーション完了")
+            print("✅ マイグレーション完了")
         except Exception as e:
-            logger.info(f"❌ エラー: {e}")
+            print(f"❌ エラー: {e}")
             return False
 
     # テーブル確認
-    logger.info("\n📊 テーブル構造確認:")
+    print("\n📊 テーブル構造確認:")
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -122,14 +122,14 @@ def run_migration(db_path: str = "db.sqlite3"):
         table_exists = cursor.fetchone()
 
         if table_exists:
-            logger.info("  ✓ audit_logs テーブル: 存在")
+            print("  ✓ audit_logs テーブル: 存在")
 
             # カラム情報取得
             cursor.execute("PRAGMA table_info(audit_logs)")
             columns = cursor.fetchall()
-            logger.info(f"  ✓ カラム数: {len(columns)}")
+            print(f"  ✓ カラム数: {len(columns)}")
             for col in columns:
-                logger.info(f"    - {col[1]} ({col[2]})")
+                print(f"    - {col[1]} ({col[2]})")
 
             # インデックス確認
             cursor.execute("""
@@ -137,40 +137,40 @@ def run_migration(db_path: str = "db.sqlite3"):
                 WHERE type='index' AND tbl_name='audit_logs'
             """)
             indexes = cursor.fetchall()
-            logger.info(f"  ✓ インデックス数: {len(indexes)}")
+            print(f"  ✓ インデックス数: {len(indexes)}")
             for idx in indexes:
-                logger.info(f"    - {idx[0]}")
+                print(f"    - {idx[0]}")
 
             # レコード数確認
             cursor.execute("SELECT COUNT(*) FROM audit_logs")
             count = cursor.fetchone()[0]
-            logger.info(f"  ✓ 現在のログ件数: {count}")
+            print(f"  ✓ 現在のログ件数: {count}")
 
         else:
-            logger.info("  ❌ audit_logs テーブルが見つかりません")
+            print("  ❌ audit_logs テーブルが見つかりません")
 
         conn.close()
 
     except Exception as e:
-        logger.info(f"⚠️  確認エラー: {e}")
+        print(f"⚠️  確認エラー: {e}")
 
-    logger.info("\n" + "=" * 60)
-    logger.info("✅ マイグレーション処理完了")
-    logger.info("=" * 60)
+    print("\n" + "=" * 60)
+    print("✅ マイグレーション処理完了")
+    print("=" * 60)
 
     return True
 
 
 def migrate_memory_logs():
     """既存のメモリログをDBに移行"""
-    logger.info("\n🔄 メモリログ移行処理開始...")
+    print("\n🔄 メモリログ移行処理開始...")
 
     try:
         # 既存のaudit_log.pyからインポート
         from modules.audit_log import audit_logger
 
         if hasattr(audit_logger, '_logs') and len(audit_logger._logs) > 0:
-            logger.info(f"📝 メモリ上のログ: {len(audit_logger._logs)} 件")
+            print(f"📝 メモリ上のログ: {len(audit_logger._logs)} 件")
 
             # DB版のロガーを初期化
             from modules.audit_log_db import AuditLoggerDB
@@ -180,40 +180,36 @@ def migrate_memory_logs():
             # 移行実行
             migrated = db_logger.migrate_from_memory(audit_logger._logs)
 
-            logger.info(f"✅ {migrated} 件のログをDBに移行しました")
+            print(f"✅ {migrated} 件のログをDBに移行しました")
 
         else:
-            logger.info("ℹ️  移行対象のメモリログが見つかりません")
+            print("ℹ️  移行対象のメモリログが見つかりません")
 
     except ImportError:
-        logger.info("ℹ️  modules/audit_log.py が見つかりません（スキップ）")
+        print("ℹ️  modules/audit_log.py が見つかりません（スキップ）")
     except Exception as e:
-        logger.info(f"⚠️  移行エラー: {e}")
+        print(f"⚠️  移行エラー: {e}")
 
 
 def verify_migration():
     """マイグレーション結果を検証"""
-    logger.info("\n🔍 マイグレーション検証...")
-
-logger = logging.getLogger(__name__)
-
+    print("\n🔍 マイグレーション検証...")
 
     try:
         from modules.audit_log_db import AuditLoggerDB
-import logging
 
-        logger = AuditLoggerDB()
+        db_logger = AuditLoggerDB()
 
         # 統計情報を取得
-        stats = logger.get_statistics()
+        stats = db_logger.get_statistics()
 
-        logger.info(f"  ✓ 総ログ数: {stats['total_logs']}")
-        logger.info(f"  ✓ 過去24時間の失敗: {stats['recent_failures_24h']}")
-        logger.info(f"  ✓ アクティブユーザー: {stats['active_users_24h']}")
-        logger.info(f"  ✓ 平均レスポンス時間: {stats['avg_response_time_ms']}ms")
+        print(f"  ✓ 総ログ数: {stats['total_logs']}")
+        print(f"  ✓ 過去24時間の失敗: {stats['recent_failures_24h']}")
+        print(f"  ✓ アクティブユーザー: {stats['active_users_24h']}")
+        print(f"  ✓ 平均レスポンス時間: {stats['avg_response_time_ms']}ms")
 
         # テストログ書き込み
-        log_id = logger.log_event(
+        log_id = db_logger.log_event(
             event_type="migration_test",
             user_id="test_user",
             username="Test User",
@@ -221,19 +217,19 @@ import logging
             success=True
         )
 
-        logger.info(f"  ✓ テストログ書き込み成功 (ID: {log_id})")
+        print(f"  ✓ テストログ書き込み成功 (ID: {log_id})")
 
         # テストログ読み込み
-        logs = logger.get_logs(limit=1, event_type="migration_test")
+        logs = db_logger.get_logs(limit=1, event_type="migration_test")
         if logs:
-            logger.info(f"  ✓ テストログ読み込み成功")
+            print(f"  ✓ テストログ読み込み成功")
         else:
-            logger.info(f"  ⚠️  テストログが見つかりません")
+            print(f"  ⚠️  テストログが見つかりません")
 
-        logger.info("\n✅ 検証完了: システムは正常に動作しています")
+        print("\n✅ 検証完了: システムは正常に動作しています")
 
     except Exception as e:
-        logger.info(f"❌ 検証エラー: {e}")
+        print(f"❌ 検証エラー: {e}")
         return False
 
     return True
@@ -279,7 +275,7 @@ def main():
         if not verify_migration():
             sys.exit(1)
 
-    logger.info("\n🎉 すべての処理が完了しました！")
+    print("\n🎉 すべての処理が完了しました！")
 
 
 if __name__ == "__main__":

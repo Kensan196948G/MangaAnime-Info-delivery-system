@@ -1515,13 +1515,8 @@ def fetch_and_store() -> dict:
     Returns:
         dict: 収集結果のサマリー
     """
-    import logging
-
     from .config import get_config
     from .db import get_db
-
-    logger = logging.getLogger(__name__)
-
     try:
         # 設定取得
         config_manager = get_config()
