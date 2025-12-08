@@ -60,9 +60,7 @@ class AnnictAPIClient:
         self.access_token = config.get("access_token") or config.get("api_key", "")
         self.timeout = config.get("timeout_seconds", 30)
         self.rate_limit_config = config.get("rate_limit", {})
-        self.rate_limiter = RateLimiter(
-            self.rate_limit_config.get("requests_per_minute", 60)
-        )
+        self.rate_limiter = RateLimiter(self.rate_limit_config.get("requests_per_minute", 60))
         self.session: Optional[aiohttp.ClientSession] = None
         self.logger = logging.getLogger(__name__)
 
@@ -200,9 +198,7 @@ class AnnictAPIClient:
 
         return programs
 
-    async def get_episodes(
-        self, work_id: int, per_page: int = 50
-    ) -> List[Dict[str, Any]]:
+    async def get_episodes(self, work_id: int, per_page: int = 50) -> List[Dict[str, Any]]:
         """
         Get episodes for a specific work.
 

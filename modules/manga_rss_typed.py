@@ -1,12 +1,14 @@
 """
 マンガRSSフィード収集モジュール（型ヒント付き）
 """
-import feedparser
-import re
+
 import logging
-from typing import List, Dict, Any, Optional, Tuple
+import re
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
+
+import feedparser
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +55,7 @@ class RSSFeedParser:
         """
         feed = self.fetch_feed()
 
-        if not feed or not hasattr(feed, 'entries'):
+        if not feed or not hasattr(feed, "entries"):
             return []
 
         entries: List[Dict[str, Any]] = []
@@ -77,22 +79,22 @@ class RSSFeedParser:
             Optional[Dict[str, Any]]: 解析されたエントリー（解析失敗時はNone）
         """
         try:
-            title = entry.get('title', '不明')
-            link = entry.get('link', '')
+            title = entry.get("title", "不明")
+            link = entry.get("link", "")
             published = self._parse_date(entry)
-            description = entry.get('description', '') or entry.get('summary', '')
+            description = entry.get("description", "") or entry.get("summary", "")
 
             # タイトルから巻数を抽出
             volume_number = self._extract_volume_number(title)
 
             return {
-                'title': title,
-                'link': link,
-                'published': published,
-                'description': description,
-                'volume_number': volume_number,
-                'source': self.source_name,
-                'raw_entry': entry
+                "title": title,
+                "link": link,
+                "published": published,
+                "description": description,
+                "volume_number": volume_number,
+                "source": self.source_name,
+                "raw_entry": entry,
             }
 
         except Exception as e:
@@ -110,23 +112,23 @@ class RSSFeedParser:
             Optional[str]: 日付（YYYY-MM-DD形式、不明な場合はNone）
         """
         # published_parsedを優先
-        if hasattr(entry, 'published_parsed') and entry.published_parsed:
+        if hasattr(entry, "published_parsed") and entry.published_parsed:
             try:
                 dt = datetime(*entry.published_parsed[:6])
-                return dt.strftime('%Y-%m-%d')
+                return dt.strftime("%Y-%m-%d")
             except (ValueError, TypeError):
                 pass
 
         # updated_parsedを試行
-        if hasattr(entry, 'updated_parsed') and entry.updated_parsed:
+        if hasattr(entry, "updated_parsed") and entry.updated_parsed:
             try:
                 dt = datetime(*entry.updated_parsed[:6])
-                return dt.strftime('%Y-%m-%d')
+                return dt.strftime("%Y-%m-%d")
             except (ValueError, TypeError):
                 pass
 
         # 文字列から解析を試みる
-        date_str = entry.get('published', '') or entry.get('updated', '')
+        date_str = entry.get("published", "") or entry.get("updated", "")
         if date_str:
             return self._parse_date_string(date_str)
 
@@ -144,17 +146,17 @@ class RSSFeedParser:
         """
         # よくある日付フォーマットを試行
         formats = [
-            '%Y-%m-%d',
-            '%Y/%m/%d',
-            '%Y年%m月%d日',
-            '%a, %d %b %Y %H:%M:%S %z',
-            '%a, %d %b %Y %H:%M:%S %Z',
+            "%Y-%m-%d",
+            "%Y/%m/%d",
+            "%Y年%m月%d日",
+            "%a, %d %b %Y %H:%M:%S %z",
+            "%a, %d %b %Y %H:%M:%S %Z",
         ]
 
         for fmt in formats:
             try:
                 dt = datetime.strptime(date_str, fmt)
-                return dt.strftime('%Y-%m-%d')
+                return dt.strftime("%Y-%m-%d")
             except ValueError:
                 continue
 
@@ -172,13 +174,13 @@ class RSSFeedParser:
         """
         # パターン: "第X巻", "X巻", "(X)", "[X]", "Vol.X", "Volume X"
         patterns = [
-            r'第(\d+)巻',
-            r'(\d+)巻',
-            r'\((\d+)\)',
-            r'\[(\d+)\]',
-            r'[Vv]ol\.?\s*(\d+)',
-            r'[Vv]olume\s+(\d+)',
-            r'#(\d+)'
+            r"第(\d+)巻",
+            r"(\d+)巻",
+            r"\((\d+)\)",
+            r"\[(\d+)\]",
+            r"[Vv]ol\.?\s*(\d+)",
+            r"[Vv]olume\s+(\d+)",
+            r"#(\d+)",
         ]
 
         for pattern in patterns:
@@ -257,25 +259,24 @@ def extract_work_title(entry_title: str) -> str:
         str: 作品タイトル
     """
     # 巻数表記を削除
-    title = re.sub(r'第?\d+巻', '', entry_title)
-    title = re.sub(r'\(\d+\)', '', title)
-    title = re.sub(r'\[\d+\]', '', title)
-    title = re.sub(r'[Vv]ol\.?\s*\d+', '', title)
-    title = re.sub(r'[Vv]olume\s+\d+', '', title)
-    title = re.sub(r'#\d+', '', title)
+    title = re.sub(r"第?\d+巻", "", entry_title)
+    title = re.sub(r"\(\d+\)", "", title)
+    title = re.sub(r"\[\d+\]", "", title)
+    title = re.sub(r"[Vv]ol\.?\s*\d+", "", title)
+    title = re.sub(r"[Vv]olume\s+\d+", "", title)
+    title = re.sub(r"#\d+", "", title)
 
     # 記号を削除
-    title = re.sub(r'[【】『』「」\[\]()（）]', '', title)
+    title = re.sub(r"[【】『』「」\[\]()（）]", "", title)
 
     # 余分な空白を削除
-    title = re.sub(r'\s+', ' ', title).strip()
+    title = re.sub(r"\s+", " ", title).strip()
 
     return title
 
 
 def check_ng_keywords_in_entry(
-    entry: Dict[str, Any],
-    ng_keywords: List[str]
+    entry: Dict[str, Any], ng_keywords: List[str]
 ) -> Tuple[bool, List[str]]:
     """
     エントリー内のNGキーワードをチェック
@@ -290,13 +291,13 @@ def check_ng_keywords_in_entry(
     matched_keywords: List[str] = []
 
     # タイトルをチェック
-    title = entry.get('title', '')
+    title = entry.get("title", "")
     for keyword in ng_keywords:
         if keyword.lower() in title.lower():
             matched_keywords.append(keyword)
 
     # 説明をチェック
-    description = entry.get('description', '')
+    description = entry.get("description", "")
     if description:
         for keyword in ng_keywords:
             if keyword.lower() in description.lower():
@@ -308,9 +309,7 @@ def check_ng_keywords_in_entry(
     return len(matched_keywords) > 0, matched_keywords
 
 
-def parse_multiple_feeds(
-    feed_urls: Dict[str, str]
-) -> Dict[str, List[Dict[str, Any]]]:
+def parse_multiple_feeds(feed_urls: Dict[str, str]) -> Dict[str, List[Dict[str, Any]]]:
     """
     複数のRSSフィードを解析
 
@@ -349,7 +348,7 @@ def validate_feed_url(url: str) -> bool:
     """
     try:
         result = urlparse(url)
-        return all([result.scheme in ['http', 'https'], result.netloc])
+        return all([result.scheme in ["http", "https"], result.netloc])
     except Exception:
         return False
 
@@ -371,12 +370,12 @@ def get_feed_info(feed_url: str) -> Optional[Dict[str, Any]]:
             logger.warning(f"フィード解析警告: {feed.bozo_exception}")
 
         return {
-            'title': feed.feed.get('title', '不明'),
-            'link': feed.feed.get('link', ''),
-            'description': feed.feed.get('description', ''),
-            'language': feed.feed.get('language', ''),
-            'updated': feed.feed.get('updated', ''),
-            'entry_count': len(feed.entries)
+            "title": feed.feed.get("title", "不明"),
+            "link": feed.feed.get("link", ""),
+            "description": feed.feed.get("description", ""),
+            "language": feed.feed.get("language", ""),
+            "updated": feed.feed.get("updated", ""),
+            "entry_count": len(feed.entries),
         }
 
     except Exception as e:

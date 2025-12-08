@@ -95,12 +95,8 @@ class DatabaseManager:
 
         # Optimize SQLite settings
         conn.execute("PRAGMA foreign_keys = ON")
-        conn.execute(
-            "PRAGMA journal_mode = WAL"
-        )  # Write-Ahead Logging for better concurrency
-        conn.execute(
-            "PRAGMA synchronous = NORMAL"
-        )  # Balance between performance and safety
+        conn.execute("PRAGMA journal_mode = WAL")  # Write-Ahead Logging for better concurrency
+        conn.execute("PRAGMA synchronous = NORMAL")  # Balance between performance and safety
         conn.execute("PRAGMA cache_size = -64000")  # 64MB cache
         conn.execute("PRAGMA temp_store = MEMORY")
         conn.execute("PRAGMA mmap_size = 268435456")  # 256MB memory map
@@ -222,8 +218,7 @@ class DatabaseManager:
             conn_id = id(connection)
             if (
                 conn_id in self._connection_ages
-                and current_time - self._connection_ages[conn_id]
-                < self._max_connection_age
+                and current_time - self._connection_ages[conn_id] < self._max_connection_age
             ):
                 if self._is_connection_valid(connection):
                     valid_connections.append(connection)
@@ -357,22 +352,16 @@ class DatabaseManager:
                 )
 
                 # Create indexes for better performance
-                conn.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_works_title ON works(title)"
-                )
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_works_title ON works(title)")
                 conn.execute("CREATE INDEX IF NOT EXISTS idx_works_type ON works(type)")
-                conn.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_releases_work_id ON releases(work_id)"
-                )
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_releases_work_id ON releases(work_id)")
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_releases_date ON releases(release_date)"
                 )
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_releases_notified ON releases(notified)"
                 )
-                conn.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key)"
-                )
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key)")
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_notification_history_type ON notification_history(notification_type)"
                 )
@@ -462,9 +451,7 @@ class DatabaseManager:
             sqlite3.Error: Database operation failed
         """
         if work_type not in ("anime", "manga"):
-            raise ValueError(
-                f"Invalid work_type: {work_type}. Must be 'anime' or 'manga'"
-            )
+            raise ValueError(f"Invalid work_type: {work_type}. Must be 'anime' or 'manga'")
 
         with self.get_connection() as conn:
             cursor = conn.execute(
@@ -478,9 +465,7 @@ class DatabaseManager:
             work_id = cursor.lastrowid
             conn.commit()
 
-            self.logger.info(
-                f"Created work: {title} (ID: {work_id}, Type: {work_type})"
-            )
+            self.logger.info(f"Created work: {title} (ID: {work_id}, Type: {work_type})")
             return work_id
 
     def get_work_by_title(
@@ -563,9 +548,7 @@ class DatabaseManager:
             sqlite3.IntegrityError: Duplicate release (handled by UNIQUE constraint)
         """
         if release_type not in ("episode", "volume"):
-            raise ValueError(
-                f"Invalid release_type: {release_type}. Must be 'episode' or 'volume'"
-            )
+            raise ValueError(f"Invalid release_type: {release_type}. Must be 'episode' or 'volume'")
 
         with self.get_connection() as conn:
             try:
@@ -589,9 +572,7 @@ class DatabaseManager:
                 release_id = cursor.lastrowid
                 conn.commit()
 
-                self.logger.info(
-                    f"Created release: Work ID {work_id}, {release_type} {number}"
-                )
+                self.logger.info(f"Created release: Work ID {work_id}, {release_type} {number}")
                 return release_id
 
             except sqlite3.IntegrityError as e:
@@ -612,9 +593,7 @@ class DatabaseManager:
                 else:
                     raise
 
-    def get_unnotified_releases(
-        self, limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    def get_unnotified_releases(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """
         Get releases that haven't been notified yet.
 
@@ -663,9 +642,7 @@ class DatabaseManager:
             if success:
                 self.logger.info(f"Marked release {release_id} as notified")
             else:
-                self.logger.warning(
-                    f"Release {release_id} not found for notification update"
-                )
+                self.logger.warning(f"Release {release_id} not found for notification update")
 
             return success
 
@@ -755,9 +732,7 @@ class DatabaseManager:
         # Calculate connection pool efficiency
         total_connection_requests = self._pool_hits + self._pool_misses
         pool_hit_rate = (
-            self._pool_hits / total_connection_requests
-            if total_connection_requests > 0
-            else 0
+            self._pool_hits / total_connection_requests if total_connection_requests > 0 else 0
         )
 
         return {
@@ -769,13 +744,9 @@ class DatabaseManager:
             "total_rollbacks": self._rollback_count,
             # Performance ratios
             "queries_per_second": self._query_count / uptime if uptime > 0 else 0,
-            "error_rate": (
-                self._error_count / self._query_count if self._query_count > 0 else 0
-            ),
+            "error_rate": (self._error_count / self._query_count if self._query_count > 0 else 0),
             "rollback_rate": (
-                self._rollback_count / self._transaction_count
-                if self._transaction_count > 0
-                else 0
+                self._rollback_count / self._transaction_count if self._transaction_count > 0 else 0
             ),
             # Connection pool metrics
             "active_connections": 1 if hasattr(self._local, "connection") else 0,
@@ -803,9 +774,7 @@ class DatabaseManager:
             return 1.0  # Perfect score for new database
 
         # Base score calculation
-        error_penalty = min(
-            self._error_count / self._query_count, 0.5
-        )  # Max 50% penalty
+        error_penalty = min(self._error_count / self._query_count, 0.5)  # Max 50% penalty
         rollback_penalty = min(
             self._rollback_count / max(self._transaction_count, 1), 0.3
         )  # Max 30% penalty
@@ -870,9 +839,7 @@ class DatabaseManager:
             Setting value with proper type conversion
         """
         with self.get_connection() as conn:
-            cursor = conn.execute(
-                "SELECT value, value_type FROM settings WHERE key = ?", (key,)
-            )
+            cursor = conn.execute("SELECT value, value_type FROM settings WHERE key = ?", (key,))
             row = cursor.fetchone()
 
             if not row:
@@ -892,9 +859,7 @@ class DatabaseManager:
             else:
                 return value
 
-    def set_setting(
-        self, key: str, value: Any, value_type: str = "string", description: str = ""
-    ):
+    def set_setting(self, key: str, value: Any, value_type: str = "string", description: str = ""):
         """
         Set a setting value in the database.
 

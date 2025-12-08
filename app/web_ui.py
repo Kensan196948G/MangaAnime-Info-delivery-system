@@ -10,8 +10,7 @@ import logging
 import os
 import sqlite3
 
-from flask import (Flask, flash, jsonify, redirect, render_template, request,
-                   url_for)
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from flask_wtf.csrf import CSRFProtect
 
 from modules.dashboard import dashboard_bp, dashboard_service
@@ -29,9 +28,7 @@ if not app.secret_key:
     # 開発環境用フォールバック（本番では必ず環境変数を設定すること）
     import warnings
 
-    warnings.warn(
-        "SECRET_KEY not set! Using fallback for development only.", RuntimeWarning
-    )
+    warnings.warn("SECRET_KEY not set! Using fallback for development only.", RuntimeWarning)
     app.secret_key = "dev-fallback-key-not-for-production-use"
 
 # CSRF保護を有効化
@@ -144,9 +141,7 @@ def index():
             cursor = conn.execute("SELECT COUNT(*) as count FROM works")
             total_works = cursor.fetchone()["count"]
 
-            cursor = conn.execute(
-                "SELECT COUNT(*) as count FROM releases WHERE notified = 1"
-            )
+            cursor = conn.execute("SELECT COUNT(*) as count FROM releases WHERE notified = 1")
             notified_releases = cursor.fetchone()["count"]
 
             cursor = conn.execute(
@@ -170,9 +165,7 @@ def index():
         "upcoming_releases": upcoming_releases,
     }
 
-    return render_template(
-        "index.html", releases=releases, stats=stats, now=datetime.now()
-    )
+    return render_template("index.html", releases=releases, stats=stats, now=datetime.now())
 
 
 @app.route("/works")
@@ -193,9 +186,7 @@ def works():
             count_params = []
 
             if search_query:
-                count_query += (
-                    " AND (w.title LIKE ? OR w.title_kana LIKE ? OR w.title_en LIKE ?)"
-                )
+                count_query += " AND (w.title LIKE ? OR w.title_kana LIKE ? OR w.title_en LIKE ?)"
                 search_param = f"%{search_query}%"
                 count_params.extend([search_param, search_param, search_param])
 
@@ -219,9 +210,7 @@ def works():
 
             # 検索条件を追加
             if search_query:
-                query += (
-                    " AND (w.title LIKE ? OR w.title_kana LIKE ? OR w.title_en LIKE ?)"
-                )
+                query += " AND (w.title LIKE ? OR w.title_kana LIKE ? OR w.title_en LIKE ?)"
                 search_param = f"%{search_query}%"
                 params.extend([search_param, search_param, search_param])
 
@@ -322,9 +311,7 @@ def settings():
         config_exists = False
         config_data = {}
 
-    return render_template(
-        "settings.html", config_exists=config_exists, config=config_data
-    )
+    return render_template("settings.html", config_exists=config_exists, config=config_data)
 
 
 @app.route("/api/trigger-collection", methods=["POST"])
@@ -363,9 +350,7 @@ def api_trigger_collection():
         logger.error(f"Error triggering collection: {e}")
 
         # エラー時のダッシュボード更新
-        dashboard_service.update_system_health(
-            "manual_collection", "error", error_message=str(e)
-        )
+        dashboard_service.update_system_health("manual_collection", "error", error_message=str(e))
 
         return (
             jsonify(
@@ -390,19 +375,13 @@ def api_system_stats():
             cursor = conn.execute("SELECT COUNT(*) as count FROM works")
             total_works = cursor.fetchone()["count"]
 
-            cursor = conn.execute(
-                "SELECT COUNT(*) as count FROM works WHERE type = 'anime'"
-            )
+            cursor = conn.execute("SELECT COUNT(*) as count FROM works WHERE type = 'anime'")
             anime_count = cursor.fetchone()["count"]
 
-            cursor = conn.execute(
-                "SELECT COUNT(*) as count FROM works WHERE type = 'manga'"
-            )
+            cursor = conn.execute("SELECT COUNT(*) as count FROM works WHERE type = 'manga'")
             manga_count = cursor.fetchone()["count"]
 
-            cursor = conn.execute(
-                "SELECT COUNT(*) as count FROM releases WHERE notified = 1"
-            )
+            cursor = conn.execute("SELECT COUNT(*) as count FROM releases WHERE notified = 1")
             total_notifications = cursor.fetchone()["count"]
 
             cursor = conn.execute(
@@ -512,9 +491,7 @@ def config():
         logger.error(f"Error loading config: {e}")
         config_exists = False
         config_data = {}
-    return render_template(
-        "config.html", config_exists=config_exists, config=config_data
-    )
+    return render_template("config.html", config_exists=config_exists, config=config_data)
 
 
 @app.route("/logs")

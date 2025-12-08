@@ -1,24 +1,24 @@
 """
 Googleカレンダー連携モジュール（型ヒント付き）
 """
-import os
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
+
 import logging
+import os
+from typing import Any, Dict, List, Optional
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build, Resource
+from googleapiclient.discovery import Resource, build
 
 logger = logging.getLogger(__name__)
 
-SCOPES = ['https://www.googleapis.com/auth/calendar']
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
 def get_calendar_service(
     credentials_path: str = "config/credentials.json",
-    token_path: str = "config/calendar_token.json"
+    token_path: str = "config/calendar_token.json",
 ) -> Resource:
     """
     Google Calendar APIサービスを取得
@@ -42,10 +42,10 @@ def get_calendar_service(
             flow = InstalledAppFlow.from_client_secrets_file(credentials_path, SCOPES)
             creds = flow.run_local_server(port=0)
 
-        with open(token_path, 'w') as token:
+        with open(token_path, "w") as token:
             token.write(creds.to_json())
 
-    service: Resource = build('calendar', 'v3', credentials=creds)
+    service: Resource = build("calendar", "v3", credentials=creds)
     return service
 
 
@@ -54,7 +54,7 @@ def create_event_body(
     date: str,
     description: Optional[str] = None,
     location: Optional[str] = None,
-    color_id: Optional[str] = None
+    color_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     カレンダーイベントボディを作成
@@ -70,33 +70,31 @@ def create_event_body(
         Dict[str, Any]: イベントボディ
     """
     event: Dict[str, Any] = {
-        'summary': title,
-        'start': {
-            'date': date,
-            'timeZone': 'Asia/Tokyo',
+        "summary": title,
+        "start": {
+            "date": date,
+            "timeZone": "Asia/Tokyo",
         },
-        'end': {
-            'date': date,
-            'timeZone': 'Asia/Tokyo',
+        "end": {
+            "date": date,
+            "timeZone": "Asia/Tokyo",
         },
     }
 
     if description:
-        event['description'] = description
+        event["description"] = description
 
     if location:
-        event['location'] = location
+        event["location"] = location
 
     if color_id:
-        event['colorId'] = color_id
+        event["colorId"] = color_id
 
     return event
 
 
 def add_event(
-    service: Resource,
-    event_body: Dict[str, Any],
-    calendar_id: str = 'primary'
+    service: Resource, event_body: Dict[str, Any], calendar_id: str = "primary"
 ) -> Dict[str, Any]:
     """
     カレンダーにイベントを追加
@@ -110,10 +108,9 @@ def add_event(
         Dict[str, Any]: 作成されたイベント
     """
     try:
-        event: Dict[str, Any] = service.events().insert(
-            calendarId=calendar_id,
-            body=event_body
-        ).execute()
+        event: Dict[str, Any] = (
+            service.events().insert(calendarId=calendar_id, body=event_body).execute()
+        )
 
         logger.info(f"イベント追加成功: {event.get('summary')} (ID: {event.get('id')})")
         return event
@@ -133,12 +130,12 @@ def generate_release_event_title(release: Dict[str, Any]) -> str:
     Returns:
         str: イベントタイトル
     """
-    title = release.get('title', '不明')
-    release_type = release.get('release_type', 'episode')
-    number = release.get('number', '?')
+    title = release.get("title", "不明")
+    release_type = release.get("release_type", "episode")
+    number = release.get("number", "?")
 
-    type_emoji = "🎬" if release.get('work_type') == 'anime' else "📚"
-    type_text = "話" if release_type == 'episode' else "巻"
+    type_emoji = "🎬" if release.get("work_type") == "anime" else "📚"
+    type_text = "話" if release_type == "episode" else "巻"
 
     return f"{type_emoji} {title} 第{number}{type_text}"
 
@@ -155,19 +152,19 @@ def generate_release_description(release: Dict[str, Any]) -> str:
     """
     description_parts: List[str] = []
 
-    work_type = release.get('work_type')
+    work_type = release.get("work_type")
     if work_type:
         description_parts.append(f"種別: {'アニメ' if work_type == 'anime' else 'マンガ'}")
 
-    platform = release.get('platform')
+    platform = release.get("platform")
     if platform:
         description_parts.append(f"配信: {platform}")
 
-    source = release.get('source')
+    source = release.get("source")
     if source:
         description_parts.append(f"ソース: {source}")
 
-    source_url = release.get('source_url')
+    source_url = release.get("source_url")
     if source_url:
         description_parts.append(f"\n詳細: {source_url}")
 
@@ -187,19 +184,16 @@ def get_color_id_for_work_type(work_type: str) -> str:
     # Google Calendarのカラーパレット
     # 1: Lavender, 2: Sage, 3: Grape, 4: Flamingo, 5: Banana
     # 6: Tangerine, 7: Peacock, 8: Graphite, 9: Blueberry, 10: Basil, 11: Tomato
-    color_map = {
-        'anime': '9',  # Blueberry (青系)
-        'manga': '10'  # Basil (緑系)
-    }
+    color_map = {"anime": "9", "manga": "10"}  # Blueberry (青系)  # Basil (緑系)
 
-    return color_map.get(work_type, '1')
+    return color_map.get(work_type, "1")
 
 
 def add_release_to_calendar(
     release: Dict[str, Any],
-    calendar_id: str = 'primary',
+    calendar_id: str = "primary",
     credentials_path: str = "config/credentials.json",
-    token_path: str = "config/calendar_token.json"
+    token_path: str = "config/calendar_token.json",
 ) -> Optional[str]:
     """
     リリース情報をカレンダーに追加
@@ -218,19 +212,16 @@ def add_release_to_calendar(
 
         title = generate_release_event_title(release)
         description = generate_release_description(release)
-        date = release.get('release_date', '')
-        work_type = release.get('work_type', 'anime')
+        date = release.get("release_date", "")
+        work_type = release.get("work_type", "anime")
         color_id = get_color_id_for_work_type(work_type)
 
         event_body = create_event_body(
-            title=title,
-            date=date,
-            description=description,
-            color_id=color_id
+            title=title, date=date, description=description, color_id=color_id
         )
 
         event = add_event(service, event_body, calendar_id)
-        event_id = event.get('id')
+        event_id = event.get("id")
 
         if event_id:
             logger.info(f"カレンダー追加成功: {title}")
@@ -246,9 +237,9 @@ def add_release_to_calendar(
 
 def add_releases_to_calendar(
     releases: List[Dict[str, Any]],
-    calendar_id: str = 'primary',
+    calendar_id: str = "primary",
     credentials_path: str = "config/credentials.json",
-    token_path: str = "config/calendar_token.json"
+    token_path: str = "config/calendar_token.json",
 ) -> List[Dict[str, Any]]:
     """
     複数のリリース情報をカレンダーに追加
@@ -275,35 +266,32 @@ def add_releases_to_calendar(
             try:
                 title = generate_release_event_title(release)
                 description = generate_release_description(release)
-                date = release.get('release_date', '')
-                work_type = release.get('work_type', 'anime')
+                date = release.get("release_date", "")
+                work_type = release.get("work_type", "anime")
                 color_id = get_color_id_for_work_type(work_type)
 
                 event_body = create_event_body(
-                    title=title,
-                    date=date,
-                    description=description,
-                    color_id=color_id
+                    title=title, date=date, description=description, color_id=color_id
                 )
 
                 event = add_event(service, event_body, calendar_id)
-                event_id = event.get('id')
+                event_id = event.get("id")
 
-                results.append({
-                    'release_id': release.get('release_id'),
-                    'event_id': str(event_id) if event_id else None,
-                    'success': bool(event_id)
-                })
+                results.append(
+                    {
+                        "release_id": release.get("release_id"),
+                        "event_id": str(event_id) if event_id else None,
+                        "success": bool(event_id),
+                    }
+                )
 
             except Exception as e:
                 logger.error(f"個別イベント追加エラー: {e}")
-                results.append({
-                    'release_id': release.get('release_id'),
-                    'event_id': None,
-                    'success': False
-                })
+                results.append(
+                    {"release_id": release.get("release_id"), "event_id": None, "success": False}
+                )
 
-        success_count = sum(1 for r in results if r['success'])
+        success_count = sum(1 for r in results if r["success"])
         logger.info(f"カレンダー追加完了: {success_count}/{len(releases)}件成功")
 
         return results
@@ -313,11 +301,7 @@ def add_releases_to_calendar(
         return []
 
 
-def delete_event(
-    service: Resource,
-    event_id: str,
-    calendar_id: str = 'primary'
-) -> bool:
+def delete_event(service: Resource, event_id: str, calendar_id: str = "primary") -> bool:
     """
     カレンダーからイベントを削除
 
@@ -330,10 +314,7 @@ def delete_event(
         bool: 削除成功したかどうか
     """
     try:
-        service.events().delete(
-            calendarId=calendar_id,
-            eventId=event_id
-        ).execute()
+        service.events().delete(calendarId=calendar_id, eventId=event_id).execute()
 
         logger.info(f"イベント削除成功: {event_id}")
         return True
@@ -345,10 +326,10 @@ def delete_event(
 
 def get_events(
     service: Resource,
-    calendar_id: str = 'primary',
+    calendar_id: str = "primary",
     time_min: Optional[str] = None,
     time_max: Optional[str] = None,
-    max_results: int = 100
+    max_results: int = 100,
 ) -> List[Dict[str, Any]]:
     """
     カレンダーからイベントを取得
@@ -364,16 +345,20 @@ def get_events(
         List[Dict[str, Any]]: イベントのリスト
     """
     try:
-        events_result = service.events().list(
-            calendarId=calendar_id,
-            timeMin=time_min,
-            timeMax=time_max,
-            maxResults=max_results,
-            singleEvents=True,
-            orderBy='startTime'
-        ).execute()
+        events_result = (
+            service.events()
+            .list(
+                calendarId=calendar_id,
+                timeMin=time_min,
+                timeMax=time_max,
+                maxResults=max_results,
+                singleEvents=True,
+                orderBy="startTime",
+            )
+            .execute()
+        )
 
-        events: List[Dict[str, Any]] = events_result.get('items', [])
+        events: List[Dict[str, Any]] = events_result.get("items", [])
         logger.info(f"イベント取得成功: {len(events)}件")
 
         return events

@@ -250,9 +250,7 @@ class CalendarNotificationError(NotificationError):
 class CalendarAuthenticationError(CalendarNotificationError):
     """Google Calendar認証エラー"""
 
-    def __init__(
-        self, message: str = "Google Calendar authentication failed", **kwargs
-    ):
+    def __init__(self, message: str = "Google Calendar authentication failed", **kwargs):
         super().__init__(message, error_code="CALENDAR_AUTH_ERROR", **kwargs)
 
 
@@ -309,9 +307,7 @@ class FilteringError(DataProcessingError):
 class NormalizationError(DataProcessingError):
     """データ正規化のエラー"""
 
-    def __init__(
-        self, message: str, source_data: Optional[Dict[str, Any]] = None, **kwargs
-    ):
+    def __init__(self, message: str, source_data: Optional[Dict[str, Any]] = None, **kwargs):
         """
         Args:
             message: エラーメッセージ

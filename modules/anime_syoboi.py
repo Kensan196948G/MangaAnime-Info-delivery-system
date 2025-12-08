@@ -201,9 +201,7 @@ class SyoboiCalendarClient:
                 await asyncio.sleep(wait_time)
                 return await self._make_request(endpoint, params, retries + 1)
 
-            raise SyoboiAPIError(
-                f"Request failed after {self.max_retries} retries: {e}"
-            )
+            raise SyoboiAPIError(f"Request failed after {self.max_retries} retries: {e}")
 
     async def get_recent_programs(
         self, days_ahead: int = 7, channels: Optional[List[str]] = None
@@ -420,9 +418,7 @@ class SyoboiCalendarClient:
 
         return work
 
-    def _convert_to_release(
-        self, program: BroadcastProgram, work_id: int
-    ) -> Optional[Release]:
+    def _convert_to_release(self, program: BroadcastProgram, work_id: int) -> Optional[Release]:
         """Convert BroadcastProgram to Release model."""
         if not program.start_time:
             return None
@@ -453,9 +449,7 @@ class SyoboiCalendarClient:
 
         return release
 
-    async def fetch_and_convert(
-        self, days_ahead: int = 7
-    ) -> Tuple[List[Work], List[Release]]:
+    async def fetch_and_convert(self, days_ahead: int = 7) -> Tuple[List[Work], List[Release]]:
         """
         Fetch programs and convert to Work/Release models.
 
@@ -510,9 +504,7 @@ class SyoboiCalendarClient:
 # Async wrapper functions for easy integration
 
 
-async def fetch_syoboi_programs(
-    days_ahead: int = 7, timeout: int = 15
-) -> List[BroadcastProgram]:
+async def fetch_syoboi_programs(days_ahead: int = 7, timeout: int = 15) -> List[BroadcastProgram]:
     """
     Fetch anime programs from Syoboi Calendar.
 

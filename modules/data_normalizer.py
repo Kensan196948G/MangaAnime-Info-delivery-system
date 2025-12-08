@@ -321,9 +321,7 @@ class DataQualityAnalyzer:
         freshness = self._calculate_freshness(work)
 
         # Overall score (weighted average)
-        overall = (
-            completeness * 0.3 + accuracy * 0.3 + consistency * 0.2 + freshness * 0.2
-        )
+        overall = completeness * 0.3 + accuracy * 0.3 + consistency * 0.2 + freshness * 0.2
 
         return DataQualityScore(
             overall_score=overall,
@@ -337,9 +335,7 @@ class DataQualityAnalyzer:
                 "has_kana_title": bool(work.title_kana),
                 "has_official_url": bool(work.official_url),
                 "has_metadata": bool(getattr(work, "metadata", {})),
-                "creation_date": (
-                    work.created_at.isoformat() if work.created_at else None
-                ),
+                "creation_date": (work.created_at.isoformat() if work.created_at else None),
             },
         )
 
@@ -405,8 +401,7 @@ class DataQualityAnalyzer:
             # Basic consistency checks
             normalizer = TitleNormalizer()
             normalized_titles = [
-                normalizer.normalize_title(t, NormalizationLevel.STRICT)
-                for t in non_empty_titles
+                normalizer.normalize_title(t, NormalizationLevel.STRICT) for t in non_empty_titles
             ]
 
             # Check if normalized titles are too different
@@ -480,9 +475,7 @@ class DataIntegrator:
             SHA-256 hash string (16 characters)
         """
         # Normalize title for consistent hashing
-        normalized_title = self.title_normalizer.normalize_title(
-            title, NormalizationLevel.STRICT
-        )
+        normalized_title = self.title_normalizer.normalize_title(title, NormalizationLevel.STRICT)
 
         # Create hash input
         hash_input = f"{normalized_title.lower()}_{work_type.lower()}"

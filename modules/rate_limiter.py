@@ -92,9 +92,7 @@ class RateLimiter:
                         self.timestamps.popleft()
 
                 self.timestamps.append(now)
-                logger.debug(
-                    f"{self.name}: {len(self.timestamps)}/{self.calls} calls used"
-                )
+                logger.debug(f"{self.name}: {len(self.timestamps)}/{self.calls} calls used")
 
             return func(*args, **kwargs)
 

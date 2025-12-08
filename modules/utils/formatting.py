@@ -4,17 +4,15 @@ Data formatting utilities for MangaAnime Info Delivery System.
 Provides common formatting functions to eliminate code duplication.
 """
 
-from typing import Any, Optional, Dict, List
-from datetime import datetime, date, timedelta
 import logging
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 
 def format_date(
-    date_obj: Optional[datetime | date | str],
-    format: str = '%Y-%m-%d',
-    default: str = ''
+    date_obj: Optional[datetime | date | str], format: str = "%Y-%m-%d", default: str = ""
 ) -> str:
     """
     Format date object to string.
@@ -33,7 +31,7 @@ def format_date(
     try:
         if isinstance(date_obj, str):
             # Try to parse string to datetime
-            date_obj = datetime.fromisoformat(date_obj.replace('Z', '+00:00'))
+            date_obj = datetime.fromisoformat(date_obj.replace("Z", "+00:00"))
 
         if isinstance(date_obj, datetime):
             return date_obj.strftime(format)
@@ -47,9 +45,7 @@ def format_date(
 
 
 def format_datetime(
-    dt: Optional[datetime | str],
-    format: str = '%Y-%m-%d %H:%M:%S',
-    default: str = ''
+    dt: Optional[datetime | str], format: str = "%Y-%m-%d %H:%M:%S", default: str = ""
 ) -> str:
     """
     Format datetime object to string.
@@ -75,10 +71,10 @@ def format_japanese_date(date_obj: Optional[datetime | date | str]) -> str:
     Returns:
         Japanese formatted date (e.g., "2025年12月8日")
     """
-    formatted = format_date(date_obj, '%Y年%m月%d日')
+    formatted = format_date(date_obj, "%Y年%m月%d日")
     if formatted:
         # Remove leading zeros from month and day
-        formatted = formatted.replace('年0', '年').replace('月0', '月')
+        formatted = formatted.replace("年0", "年").replace("月0", "月")
     return formatted
 
 
@@ -95,12 +91,12 @@ def format_relative_time(dt: datetime | str, reference: Optional[datetime] = Non
     """
     if isinstance(dt, str):
         try:
-            dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
+            dt = datetime.fromisoformat(dt.replace("Z", "+00:00"))
         except ValueError:
-            return ''
+            return ""
 
     if not isinstance(dt, datetime):
-        return ''
+        return ""
 
     if reference is None:
         reference = datetime.now()
@@ -140,15 +136,15 @@ def format_file_size(size_bytes: int) -> str:
     """
     if size_bytes < 1024:
         return f"{size_bytes} B"
-    elif size_bytes < 1024 ** 2:
+    elif size_bytes < 1024**2:
         return f"{size_bytes / 1024:.1f} KB"
-    elif size_bytes < 1024 ** 3:
+    elif size_bytes < 1024**3:
         return f"{size_bytes / (1024 ** 2):.1f} MB"
     else:
         return f"{size_bytes / (1024 ** 3):.1f} GB"
 
 
-def format_number(number: int | float, locale: str = 'ja') -> str:
+def format_number(number: int | float, locale: str = "ja") -> str:
     """
     Format number with thousand separators.
 
@@ -159,7 +155,7 @@ def format_number(number: int | float, locale: str = 'ja') -> str:
     Returns:
         Formatted number string
     """
-    if locale == 'ja':
+    if locale == "ja":
         return f"{number:,}"
     else:
         return f"{number:,}"
@@ -189,7 +185,7 @@ def format_work_title(
     title: str,
     title_kana: Optional[str] = None,
     title_en: Optional[str] = None,
-    include_all: bool = False
+    include_all: bool = False,
 ) -> str:
     """
     Format work title with optional readings.
@@ -214,14 +210,11 @@ def format_work_title(
     if title_en:
         parts.append(f"[{title_en}]")
 
-    return ' '.join(parts)
+    return " ".join(parts)
 
 
 def format_release_title(
-    work_title: str,
-    release_type: str,
-    number: Optional[str] = None,
-    platform: Optional[str] = None
+    work_title: str, release_type: str, number: Optional[str] = None, platform: Optional[str] = None
 ) -> str:
     """
     Format release title for notifications.
@@ -238,9 +231,9 @@ def format_release_title(
     parts = [work_title]
 
     type_labels = {
-        'episode': '第{number}話',
-        'volume': '第{number}巻',
-        'chapter': '第{number}話',
+        "episode": "第{number}話",
+        "volume": "第{number}巻",
+        "chapter": "第{number}話",
     }
 
     if number and release_type in type_labels:
@@ -250,14 +243,14 @@ def format_release_title(
     if platform:
         parts.append(f"({platform})")
 
-    return ' '.join(parts)
+    return " ".join(parts)
 
 
 def format_email_subject(
     work_title: str,
     release_type: str,
     number: Optional[str] = None,
-    prefix: str = "[アニメ・マンガ情報]"
+    prefix: str = "[アニメ・マンガ情報]",
 ) -> str:
     """
     Format email subject line.
@@ -275,11 +268,7 @@ def format_email_subject(
     return f"{prefix} {release_info}"
 
 
-def format_calendar_title(
-    work_title: str,
-    release_type: str,
-    number: Optional[str] = None
-) -> str:
+def format_calendar_title(work_title: str, release_type: str, number: Optional[str] = None) -> str:
     """
     Format calendar event title.
 
@@ -305,12 +294,12 @@ def format_platform_list(platforms: List[str]) -> str:
         Formatted platform string
     """
     if not platforms:
-        return ''
+        return ""
 
     if len(platforms) == 1:
         return platforms[0]
 
-    return '、'.join(platforms)
+    return "、".join(platforms)
 
 
 def format_json_pretty(data: Dict[str, Any], indent: int = 2) -> str:
@@ -333,11 +322,7 @@ def format_json_pretty(data: Dict[str, Any], indent: int = 2) -> str:
         return str(data)
 
 
-def format_log_message(
-    level: str,
-    message: str,
-    context: Optional[Dict[str, Any]] = None
-) -> str:
+def format_log_message(level: str, message: str, context: Optional[Dict[str, Any]] = None) -> str:
     """
     Format log message with context.
 
@@ -352,10 +337,10 @@ def format_log_message(
     parts = [f"[{level}]", message]
 
     if context:
-        context_str = ' | '.join(f"{k}={v}" for k, v in context.items())
+        context_str = " | ".join(f"{k}={v}" for k, v in context.items())
         parts.append(f"({context_str})")
 
-    return ' '.join(parts)
+    return " ".join(parts)
 
 
 def format_error_message(error: Exception, include_type: bool = True) -> str:
@@ -399,7 +384,9 @@ def format_duration(seconds: float) -> str:
         return f"{hours}時間{minutes}分"
 
 
-def format_table_row(data: Dict[str, Any], columns: List[str], widths: Optional[Dict[str, int]] = None) -> str:
+def format_table_row(
+    data: Dict[str, Any], columns: List[str], widths: Optional[Dict[str, int]] = None
+) -> str:
     """
     Format data as table row.
 
@@ -416,14 +403,14 @@ def format_table_row(data: Dict[str, Any], columns: List[str], widths: Optional[
 
     cells = []
     for col in columns:
-        value = str(data.get(col, ''))
+        value = str(data.get(col, ""))
         width = widths.get(col, len(value))
         cells.append(value.ljust(width))
 
-    return ' | '.join(cells)
+    return " | ".join(cells)
 
 
-def format_success_message(message: str, icon: str = '✓') -> str:
+def format_success_message(message: str, icon: str = "✓") -> str:
     """
     Format success message.
 

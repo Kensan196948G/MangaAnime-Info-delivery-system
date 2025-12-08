@@ -1,9 +1,10 @@
 """
 フィルタリングロジックモジュール（型ヒント付き）
 """
-import re
+
 import logging
-from typing import List, Dict, Any, Tuple, Optional, Callable
+import re
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -77,35 +78,37 @@ class ContentFilter:
         texts_to_check: List[str] = []
 
         # タイトルをチェック
-        title_obj = media.get('title', {})
+        title_obj = media.get("title", {})
         if isinstance(title_obj, dict):
-            texts_to_check.extend([
-                str(title_obj.get('romaji', '')),
-                str(title_obj.get('english', '')),
-                str(title_obj.get('native', ''))
-            ])
+            texts_to_check.extend(
+                [
+                    str(title_obj.get("romaji", "")),
+                    str(title_obj.get("english", "")),
+                    str(title_obj.get("native", "")),
+                ]
+            )
         elif isinstance(title_obj, str):
             texts_to_check.append(title_obj)
 
         # ジャンルをチェック
-        genres = media.get('genres', [])
+        genres = media.get("genres", [])
         if isinstance(genres, list):
             texts_to_check.extend([str(g) for g in genres])
 
         # タグをチェック
-        tags = media.get('tags', [])
+        tags = media.get("tags", [])
         if isinstance(tags, list):
             for tag in tags:
                 if isinstance(tag, dict):
-                    tag_name = tag.get('name', '')
+                    tag_name = tag.get("name", "")
                     if tag_name:
                         texts_to_check.append(str(tag_name))
 
         # 説明をチェック
-        description = media.get('description', '')
+        description = media.get("description", "")
         if description:
             # HTMLタグを除去
-            description_text = re.sub(r'<[^>]+>', '', str(description))
+            description_text = re.sub(r"<[^>]+>", "", str(description))
             texts_to_check.append(description_text)
 
         return self.check_multiple_texts(texts_to_check)
@@ -123,15 +126,15 @@ class ContentFilter:
         texts_to_check: List[str] = []
 
         # タイトルをチェック
-        title = entry.get('title', '')
+        title = entry.get("title", "")
         if title:
             texts_to_check.append(str(title))
 
         # 説明をチェック
-        description = entry.get('description', '')
+        description = entry.get("description", "")
         if description:
             # HTMLタグを除去
-            description_text = re.sub(r'<[^>]+>', '', str(description))
+            description_text = re.sub(r"<[^>]+>", "", str(description))
             texts_to_check.append(description_text)
 
         return self.check_multiple_texts(texts_to_check)
@@ -176,8 +179,7 @@ class ContentFilter:
 
 
 def filter_anime_list(
-    media_list: List[Dict[str, Any]],
-    ng_keywords: List[str]
+    media_list: List[Dict[str, Any]], ng_keywords: List[str]
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     アニメリストをフィルタリング
@@ -197,7 +199,7 @@ def filter_anime_list(
         should_filter, matched_keywords = content_filter.filter_anime_media(media)
 
         if should_filter:
-            media['_filtered_keywords'] = matched_keywords
+            media["_filtered_keywords"] = matched_keywords
             filtered.append(media)
             logger.debug(f"フィルタリング: {media.get('title')} - {matched_keywords}")
         else:
@@ -209,8 +211,7 @@ def filter_anime_list(
 
 
 def filter_manga_list(
-    entry_list: List[Dict[str, Any]],
-    ng_keywords: List[str]
+    entry_list: List[Dict[str, Any]], ng_keywords: List[str]
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     マンガリストをフィルタリング
@@ -230,7 +231,7 @@ def filter_manga_list(
         should_filter, matched_keywords = content_filter.filter_manga_entry(entry)
 
         if should_filter:
-            entry['_filtered_keywords'] = matched_keywords
+            entry["_filtered_keywords"] = matched_keywords
             filtered.append(entry)
             logger.debug(f"フィルタリング: {entry.get('title')} - {matched_keywords}")
         else:
@@ -242,7 +243,7 @@ def filter_manga_list(
 
 
 def create_custom_filter(
-    filter_func: Callable[[Dict[str, Any]], bool]
+    filter_func: Callable[[Dict[str, Any]], bool],
 ) -> Callable[[List[Dict[str, Any]]], Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]]:
     """
     カスタムフィルターを作成
@@ -253,8 +254,9 @@ def create_custom_filter(
     Returns:
         Callable: リストをフィルタリングする関数
     """
+
     def filter_list(
-        items: List[Dict[str, Any]]
+        items: List[Dict[str, Any]],
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         allowed: List[Dict[str, Any]] = []
         filtered: List[Dict[str, Any]] = []
@@ -271,9 +273,7 @@ def create_custom_filter(
 
 
 def filter_by_rating(
-    media_list: List[Dict[str, Any]],
-    min_rating: float = 0.0,
-    max_rating: float = 100.0
+    media_list: List[Dict[str, Any]], min_rating: float = 0.0, max_rating: float = 100.0
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     評価スコアでフィルタリング
@@ -290,7 +290,7 @@ def filter_by_rating(
     filtered: List[Dict[str, Any]] = []
 
     for media in media_list:
-        rating = media.get('averageScore', 0)
+        rating = media.get("averageScore", 0)
 
         if isinstance(rating, (int, float)) and min_rating <= rating <= max_rating:
             allowed.append(media)
@@ -306,7 +306,7 @@ def filter_by_date_range(
     items: List[Dict[str, Any]],
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
-    date_field: str = 'release_date'
+    date_field: str = "release_date",
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     日付範囲でフィルタリング
@@ -349,7 +349,9 @@ def filter_by_date_range(
 
 def combine_filters(
     items: List[Dict[str, Any]],
-    filters: List[Callable[[List[Dict[str, Any]]], Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]]]
+    filters: List[
+        Callable[[List[Dict[str, Any]]], Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]]
+    ],
 ) -> Tuple[List[Dict[str, Any]], Dict[str, List[Dict[str, Any]]]]:
     """
     複数のフィルターを組み合わせる
@@ -366,7 +368,7 @@ def combine_filters(
 
     for i, filter_func in enumerate(filters):
         allowed, filtered = filter_func(current_items)
-        all_filtered[f'filter_{i}'] = filtered
+        all_filtered[f"filter_{i}"] = filtered
         current_items = allowed
 
     logger.info(f"複合フィルタリング結果: 最終許可={len(current_items)}件")

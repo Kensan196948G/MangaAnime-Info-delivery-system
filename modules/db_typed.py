@@ -1,11 +1,12 @@
 """
 データベース操作モジュール（型ヒント付き）
 """
-import sqlite3
+
 import hashlib
 import logging
-from typing import Optional, List, Dict, Any, Union
-from datetime import datetime, date
+import sqlite3
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,8 @@ def init_db(db_path: str = "data/db.sqlite3") -> None:
     cursor = conn.cursor()
 
     # worksテーブル
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS works (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
@@ -46,10 +48,12 @@ def init_db(db_path: str = "data/db.sqlite3") -> None:
             official_url TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
     # releasesテーブル
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS releases (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             work_id INTEGER NOT NULL,
@@ -65,10 +69,12 @@ def init_db(db_path: str = "data/db.sqlite3") -> None:
             UNIQUE(work_id, release_type, number, platform, release_date),
             FOREIGN KEY(work_id) REFERENCES works(id)
         )
-    """)
+    """
+    )
 
     # calendar_eventsテーブル
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS calendar_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             release_id INTEGER NOT NULL,
@@ -77,7 +83,8 @@ def init_db(db_path: str = "data/db.sqlite3") -> None:
             synced_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(release_id) REFERENCES releases(id)
         )
-    """)
+    """
+    )
 
     conn.commit()
     conn.close()
@@ -104,7 +111,7 @@ def insert_work(
     title_kana: Optional[str] = None,
     title_en: Optional[str] = None,
     official_url: Optional[str] = None,
-    db_path: str = "data/db.sqlite3"
+    db_path: str = "data/db.sqlite3",
 ) -> int:
     """
     作品を登録（既存の場合はIDを返す）
@@ -124,10 +131,7 @@ def insert_work(
     cursor = conn.cursor()
 
     # 既存チェック
-    cursor.execute(
-        "SELECT id FROM works WHERE title = ? AND type = ?",
-        (title, work_type)
-    )
+    cursor.execute("SELECT id FROM works WHERE title = ? AND type = ?", (title, work_type))
     row = cursor.fetchone()
 
     if row:
@@ -136,7 +140,7 @@ def insert_work(
         cursor.execute(
             """INSERT INTO works (title, title_kana, title_en, type, official_url)
                VALUES (?, ?, ?, ?, ?)""",
-            (title, title_kana, title_en, work_type, official_url)
+            (title, title_kana, title_en, work_type, official_url),
         )
         conn.commit()
         work_id = cursor.lastrowid
@@ -154,7 +158,7 @@ def insert_release(
     platform: Optional[str] = None,
     source: Optional[str] = None,
     source_url: Optional[str] = None,
-    db_path: str = "data/db.sqlite3"
+    db_path: str = "data/db.sqlite3",
 ) -> Optional[int]:
     """
     リリース情報を登録
@@ -177,7 +181,7 @@ def insert_release(
 
     # 日付を文字列に変換
     if isinstance(release_date, (date, datetime)):
-        release_date_str = release_date.strftime('%Y-%m-%d')
+        release_date_str = release_date.strftime("%Y-%m-%d")
     else:
         release_date_str = release_date
 
@@ -186,7 +190,7 @@ def insert_release(
             """INSERT INTO releases
                (work_id, release_type, number, platform, release_date, source, source_url)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (work_id, release_type, number, platform, release_date_str, source, source_url)
+            (work_id, release_type, number, platform, release_date_str, source, source_url),
         )
         conn.commit()
         release_id = cursor.lastrowid
@@ -212,7 +216,8 @@ def get_unnotified_releases(db_path: str = "data/db.sqlite3") -> List[Dict[str, 
     conn = get_connection(db_path)
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT
             r.id as release_id,
             r.work_id,
@@ -228,7 +233,8 @@ def get_unnotified_releases(db_path: str = "data/db.sqlite3") -> List[Dict[str, 
         JOIN works w ON r.work_id = w.id
         WHERE r.notified = 0
         ORDER BY r.release_date ASC
-    """)
+    """
+    )
 
     releases: List[Dict[str, Any]] = [dict(row) for row in cursor.fetchall()]
     conn.close()
@@ -247,10 +253,7 @@ def mark_as_notified(release_id: int, db_path: str = "data/db.sqlite3") -> None:
     conn = get_connection(db_path)
     cursor = conn.cursor()
 
-    cursor.execute(
-        "UPDATE releases SET notified = 1 WHERE id = ?",
-        (release_id,)
-    )
+    cursor.execute("UPDATE releases SET notified = 1 WHERE id = ?", (release_id,))
     conn.commit()
     conn.close()
     logger.info(f"通知済みマーク: release_id={release_id}")
@@ -269,7 +272,8 @@ def get_unsynced_calendar_releases(db_path: str = "data/db.sqlite3") -> List[Dic
     conn = get_connection(db_path)
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT
             r.id as release_id,
             r.work_id,
@@ -284,7 +288,8 @@ def get_unsynced_calendar_releases(db_path: str = "data/db.sqlite3") -> List[Dic
         JOIN works w ON r.work_id = w.id
         WHERE r.calendar_synced = 0
         ORDER BY r.release_date ASC
-    """)
+    """
+    )
 
     releases: List[Dict[str, Any]] = [dict(row) for row in cursor.fetchall()]
     conn.close()
@@ -293,10 +298,7 @@ def get_unsynced_calendar_releases(db_path: str = "data/db.sqlite3") -> List[Dic
 
 
 def mark_calendar_synced(
-    release_id: int,
-    event_id: str,
-    calendar_id: str = "primary",
-    db_path: str = "data/db.sqlite3"
+    release_id: int, event_id: str, calendar_id: str = "primary", db_path: str = "data/db.sqlite3"
 ) -> None:
     """
     カレンダー同期済みとしてマーク
@@ -311,17 +313,14 @@ def mark_calendar_synced(
     cursor = conn.cursor()
 
     # releasesテーブルを更新
-    cursor.execute(
-        "UPDATE releases SET calendar_synced = 1 WHERE id = ?",
-        (release_id,)
-    )
+    cursor.execute("UPDATE releases SET calendar_synced = 1 WHERE id = ?", (release_id,))
 
     # calendar_eventsテーブルに記録
     try:
         cursor.execute(
             """INSERT INTO calendar_events (release_id, event_id, calendar_id)
                VALUES (?, ?, ?)""",
-            (release_id, event_id, calendar_id)
+            (release_id, event_id, calendar_id),
         )
     except sqlite3.IntegrityError:
         logger.warning(f"カレンダーイベント重複: event_id={event_id}")
@@ -387,8 +386,7 @@ def get_releases_by_work(work_id: int, db_path: str = "data/db.sqlite3") -> List
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT * FROM releases WHERE work_id = ? ORDER BY release_date DESC",
-        (work_id,)
+        "SELECT * FROM releases WHERE work_id = ? ORDER BY release_date DESC", (work_id,)
     )
     releases: List[Dict[str, Any]] = [dict(row) for row in cursor.fetchall()]
     conn.close()
@@ -413,27 +411,27 @@ def get_statistics(db_path: str = "data/db.sqlite3") -> Dict[str, Any]:
 
     # 作品数
     cursor.execute("SELECT COUNT(*) as count FROM works")
-    stats['total_works'] = cursor.fetchone()['count']
+    stats["total_works"] = cursor.fetchone()["count"]
 
     # アニメ作品数
     cursor.execute("SELECT COUNT(*) as count FROM works WHERE type = 'anime'")
-    stats['anime_works'] = cursor.fetchone()['count']
+    stats["anime_works"] = cursor.fetchone()["count"]
 
     # マンガ作品数
     cursor.execute("SELECT COUNT(*) as count FROM works WHERE type = 'manga'")
-    stats['manga_works'] = cursor.fetchone()['count']
+    stats["manga_works"] = cursor.fetchone()["count"]
 
     # リリース総数
     cursor.execute("SELECT COUNT(*) as count FROM releases")
-    stats['total_releases'] = cursor.fetchone()['count']
+    stats["total_releases"] = cursor.fetchone()["count"]
 
     # 未通知リリース数
     cursor.execute("SELECT COUNT(*) as count FROM releases WHERE notified = 0")
-    stats['unnotified_releases'] = cursor.fetchone()['count']
+    stats["unnotified_releases"] = cursor.fetchone()["count"]
 
     # カレンダー未同期リリース数
     cursor.execute("SELECT COUNT(*) as count FROM releases WHERE calendar_synced = 0")
-    stats['unsynced_calendar_releases'] = cursor.fetchone()['count']
+    stats["unsynced_calendar_releases"] = cursor.fetchone()["count"]
 
     conn.close()
 

@@ -78,9 +78,7 @@ class CalendarSyncManager:
         conn.row_factory = sqlite3.Row
         return conn
 
-    def get_unsynced_releases(
-        self, limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    def get_unsynced_releases(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """
         未同期リリース取得
 
@@ -246,9 +244,7 @@ URL: {release.get('source_url', 'N/A')}
             )
 
             # データベース更新
-            self._update_sync_status(
-                release_id=release_id, event_id=event["id"], success=True
-            )
+            self._update_sync_status(release_id=release_id, event_id=event["id"], success=True)
 
             logger.info(f"✅ 同期成功: {event_title}")
 

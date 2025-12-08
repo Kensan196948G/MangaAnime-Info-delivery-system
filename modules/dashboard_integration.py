@@ -111,13 +111,9 @@ class DashboardIntegration:
         # アイテム数も記録
         if success and items_count > 0:
             service = get_dashboard_service()
-            service.record_metric(
-                "rss_items_collected", items_count, "counter", source=source
-            )
+            service.record_metric("rss_items_collected", items_count, "counter", source=source)
 
-    def track_database_operation(
-        self, operation: str, duration_ms: float, rows_affected: int = 0
-    ):
+    def track_database_operation(self, operation: str, duration_ms: float, rows_affected: int = 0):
         """データベース操作を追跡"""
         service = get_dashboard_service()
         service.record_metric(

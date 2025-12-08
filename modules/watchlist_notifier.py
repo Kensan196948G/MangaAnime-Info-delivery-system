@@ -27,9 +27,7 @@ class WatchlistNotifier:
         conn.row_factory = sqlite3.Row
         return conn
 
-    def get_new_releases_for_watchlist(
-        self, days_back: int = 7
-    ) -> Dict[str, List[Dict]]:
+    def get_new_releases_for_watchlist(self, days_back: int = 7) -> Dict[str, List[Dict]]:
         """
         ウォッチリスト登録作品の新規リリースを取得
 
@@ -177,9 +175,7 @@ class WatchlistNotifier:
             }
         return None
 
-    def format_notification_email(
-        self, user_info: Dict, releases: List[Dict]
-    ) -> Tuple[str, str]:
+    def format_notification_email(self, user_info: Dict, releases: List[Dict]) -> Tuple[str, str]:
         """
         通知メールのHTMLを生成
 

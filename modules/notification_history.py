@@ -45,15 +45,11 @@ class NotificationHistoryManager:
 
                 # 必要なカラムを追加（存在しない場合）
                 if "details" not in columns:
-                    cursor.execute(
-                        "ALTER TABLE notification_history ADD COLUMN details TEXT"
-                    )
+                    cursor.execute("ALTER TABLE notification_history ADD COLUMN details TEXT")
                     logger.info("details カラムを追加しました")
 
                 if "metadata" not in columns:
-                    cursor.execute(
-                        "ALTER TABLE notification_history ADD COLUMN metadata TEXT"
-                    )
+                    cursor.execute("ALTER TABLE notification_history ADD COLUMN metadata TEXT")
                     logger.info("metadata カラムを追加しました")
 
                 logger.info("notification_history テーブルを確認しました（既存）")
@@ -151,8 +147,7 @@ class NotificationHistoryManager:
             conn.close()
 
             logger.info(
-                f"通知履歴記録: type={notification_type}, "
-                f"status={status}, count={count}"
+                f"通知履歴記録: type={notification_type}, " f"status={status}, count={count}"
             )
 
             return record_id
@@ -206,13 +201,9 @@ class NotificationHistoryManager:
             for row in rows:
                 record = dict(row)
                 # success整数値をstatus文字列に変換
-                record["status"] = (
-                    "success" if record.get("success", 0) == 1 else "failed"
-                )
+                record["status"] = "success" if record.get("success", 0) == 1 else "failed"
                 record["count"] = record.get("releases_count", 0)
-                record["timestamp"] = record.get("executed_at") or record.get(
-                    "created_at"
-                )
+                record["timestamp"] = record.get("executed_at") or record.get("created_at")
 
                 # メタデータをJSONから復元
                 if record.get("metadata"):
@@ -243,9 +234,7 @@ class NotificationHistoryManager:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            cutoff_date = (datetime.now() - timedelta(days=days)).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
+            cutoff_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
 
             # 総通知数（releases_count）
             cursor.execute(
@@ -320,9 +309,7 @@ class NotificationHistoryManager:
                 "period_days": days,
             }
 
-    def calculate_next_execution(
-        self, schedule_hour: int = 8, schedule_minute: int = 0
-    ) -> str:
+    def calculate_next_execution(self, schedule_hour: int = 8, schedule_minute: int = 0) -> str:
         """
         次回実行時刻を計算
 
@@ -334,9 +321,7 @@ class NotificationHistoryManager:
             次回実行時刻（ISO形式）
         """
         now = datetime.now()
-        next_run = now.replace(
-            hour=schedule_hour, minute=schedule_minute, second=0, microsecond=0
-        )
+        next_run = now.replace(hour=schedule_hour, minute=schedule_minute, second=0, microsecond=0)
 
         # 今日の実行時刻を過ぎていたら翌日に設定
         if next_run <= now:
@@ -370,9 +355,7 @@ class NotificationHistoryManager:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
-            cutoff_date = (datetime.now() - timedelta(days=days)).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
+            cutoff_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
 
             cursor.execute(
                 """
@@ -412,15 +395,11 @@ class NotificationHistoryManager:
             for record in history:
                 # executed_atまたはcreated_atを使用
                 timestamp_str = (
-                    record.get("timestamp")
-                    or record.get("executed_at")
-                    or record.get("created_at")
+                    record.get("timestamp") or record.get("executed_at") or record.get("created_at")
                 )
                 if timestamp_str:
                     try:
-                        record_date = datetime.strptime(
-                            timestamp_str, "%Y-%m-%d %H:%M:%S"
-                        )
+                        record_date = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
                         if record_date >= cutoff_date:
                             filtered_history.append(record)
                     except:

@@ -4,10 +4,10 @@ Data validation utilities for MangaAnime Info Delivery System.
 Provides common validation functions to eliminate code duplication.
 """
 
-import re
-from typing import Any, Optional, List, Dict
-from datetime import datetime, date
 import logging
+import re
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ def is_valid_email(email: str) -> bool:
     if not email:
         return False
 
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return re.match(pattern, email) is not None
 
 
@@ -42,11 +42,11 @@ def is_valid_url(url: str) -> bool:
     if not url:
         return False
 
-    pattern = r'^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$'
+    pattern = r"^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$"
     return re.match(pattern, url) is not None
 
 
-def is_valid_date(date_str: str, format: str = '%Y-%m-%d') -> bool:
+def is_valid_date(date_str: str, format: str = "%Y-%m-%d") -> bool:
     """
     Validate date string.
 
@@ -79,10 +79,10 @@ def sanitize_string(text: str, max_length: Optional[int] = None) -> str:
         Sanitized string
     """
     if not text:
-        return ''
+        return ""
 
     # Remove control characters
-    sanitized = ''.join(char for char in text if ord(char) >= 32 or char in '\n\t')
+    sanitized = "".join(char for char in text if ord(char) >= 32 or char in "\n\t")
 
     # Strip whitespace
     sanitized = sanitized.strip()
@@ -104,7 +104,7 @@ def validate_work_type(work_type: str) -> bool:
     Returns:
         True if valid, False otherwise
     """
-    valid_types = ['anime', 'manga']
+    valid_types = ["anime", "manga"]
     return work_type.lower() in valid_types
 
 
@@ -118,7 +118,7 @@ def validate_release_type(release_type: str) -> bool:
     Returns:
         True if valid, False otherwise
     """
-    valid_types = ['episode', 'volume', 'chapter']
+    valid_types = ["episode", "volume", "chapter"]
     return release_type.lower() in valid_types
 
 
@@ -153,17 +153,17 @@ def validate_work_data(data: Dict[str, Any]) -> List[str]:
     errors = []
 
     # Required fields
-    if not data.get('title'):
-        errors.append('Title is required')
+    if not data.get("title"):
+        errors.append("Title is required")
 
-    if not data.get('type'):
-        errors.append('Type is required')
-    elif not validate_work_type(data['type']):
-        errors.append('Invalid work type')
+    if not data.get("type"):
+        errors.append("Type is required")
+    elif not validate_work_type(data["type"]):
+        errors.append("Invalid work type")
 
     # Optional URL validation
-    if data.get('official_url') and not is_valid_url(data['official_url']):
-        errors.append('Invalid official URL format')
+    if data.get("official_url") and not is_valid_url(data["official_url"]):
+        errors.append("Invalid official URL format")
 
     return errors
 
@@ -181,21 +181,21 @@ def validate_release_data(data: Dict[str, Any]) -> List[str]:
     errors = []
 
     # Required fields
-    if not data.get('work_id'):
-        errors.append('Work ID is required')
+    if not data.get("work_id"):
+        errors.append("Work ID is required")
 
-    if not data.get('release_type'):
-        errors.append('Release type is required')
-    elif not validate_release_type(data['release_type']):
-        errors.append('Invalid release type')
+    if not data.get("release_type"):
+        errors.append("Release type is required")
+    elif not validate_release_type(data["release_type"]):
+        errors.append("Invalid release type")
 
     # Date validation
-    if data.get('release_date') and not is_valid_date(data['release_date']):
-        errors.append('Invalid release date format')
+    if data.get("release_date") and not is_valid_date(data["release_date"]):
+        errors.append("Invalid release date format")
 
     # URL validation
-    if data.get('source_url') and not is_valid_url(data['source_url']):
-        errors.append('Invalid source URL format')
+    if data.get("source_url") and not is_valid_url(data["source_url"]):
+        errors.append("Invalid source URL format")
 
     return errors
 
@@ -211,23 +211,23 @@ def is_valid_platform(platform: str) -> bool:
         True if valid, False otherwise
     """
     valid_platforms = [
-        'netflix',
-        'amazon',
-        'prime',
-        'crunchyroll',
-        'funimation',
-        'hulu',
-        'danime',
-        'abema',
-        'niconico',
-        'bandai',
-        'bookwalker',
-        'kindle',
-        'kobo',
-        'jump',
-        'magazine',
-        'sunday',
-        'weekly',
+        "netflix",
+        "amazon",
+        "prime",
+        "crunchyroll",
+        "funimation",
+        "hulu",
+        "danime",
+        "abema",
+        "niconico",
+        "bandai",
+        "bookwalker",
+        "kindle",
+        "kobo",
+        "jump",
+        "magazine",
+        "sunday",
+        "weekly",
     ]
 
     if not platform:
@@ -250,24 +250,24 @@ def validate_config_data(config: Dict[str, Any]) -> List[str]:
     errors = []
 
     # Database path
-    if not config.get('database', {}).get('path'):
-        errors.append('Database path is required')
+    if not config.get("database", {}).get("path"):
+        errors.append("Database path is required")
 
     # Email configuration
-    email_config = config.get('email', {})
-    if email_config.get('sender') and not is_valid_email(email_config['sender']):
-        errors.append('Invalid sender email address')
+    email_config = config.get("email", {})
+    if email_config.get("sender") and not is_valid_email(email_config["sender"]):
+        errors.append("Invalid sender email address")
 
-    if email_config.get('recipient') and not is_valid_email(email_config['recipient']):
-        errors.append('Invalid recipient email address')
+    if email_config.get("recipient") and not is_valid_email(email_config["recipient"]):
+        errors.append("Invalid recipient email address")
 
     # API URLs
-    apis = config.get('apis', {})
-    if apis.get('anilist_url') and not is_valid_url(apis['anilist_url']):
-        errors.append('Invalid AniList API URL')
+    apis = config.get("apis", {})
+    if apis.get("anilist_url") and not is_valid_url(apis["anilist_url"]):
+        errors.append("Invalid AniList API URL")
 
-    if apis.get('syoboi_url') and not is_valid_url(apis['syoboi_url']):
-        errors.append('Invalid Syoboi API URL')
+    if apis.get("syoboi_url") and not is_valid_url(apis["syoboi_url"]):
+        errors.append("Invalid Syoboi API URL")
 
     return errors
 
@@ -321,7 +321,7 @@ def safe_bool(value: Any, default: bool = False) -> bool:
         return value
 
     if isinstance(value, str):
-        return value.lower() in ('true', '1', 'yes', 'on')
+        return value.lower() in ("true", "1", "yes", "on")
 
     if isinstance(value, (int, float)):
         return bool(value)
@@ -329,7 +329,7 @@ def safe_bool(value: Any, default: bool = False) -> bool:
     return default
 
 
-def truncate_text(text: str, max_length: int, suffix: str = '...') -> str:
+def truncate_text(text: str, max_length: int, suffix: str = "...") -> str:
     """
     Truncate text to maximum length.
 
@@ -358,24 +358,24 @@ def normalize_platform_name(platform: str) -> str:
         Normalized platform name
     """
     if not platform:
-        return ''
+        return ""
 
     # Common normalizations
     normalizations = {
-        'amazon prime': 'Amazon Prime',
-        'prime video': 'Amazon Prime',
-        'crunchyroll': 'Crunchyroll',
-        'funimation': 'Funimation',
-        'hulu': 'Hulu',
-        'netflix': 'Netflix',
-        'd anime': 'dアニメストア',
-        'danime': 'dアニメストア',
-        'abematv': 'ABEMA',
-        'abema': 'ABEMA',
-        'niconico': 'ニコニコ動画',
-        'bookwalker': 'BookWalker',
-        'kindle': 'Kindle',
-        'kobo': 'Kobo',
+        "amazon prime": "Amazon Prime",
+        "prime video": "Amazon Prime",
+        "crunchyroll": "Crunchyroll",
+        "funimation": "Funimation",
+        "hulu": "Hulu",
+        "netflix": "Netflix",
+        "d anime": "dアニメストア",
+        "danime": "dアニメストア",
+        "abematv": "ABEMA",
+        "abema": "ABEMA",
+        "niconico": "ニコニコ動画",
+        "bookwalker": "BookWalker",
+        "kindle": "Kindle",
+        "kobo": "Kobo",
     }
 
     platform_lower = platform.lower().strip()

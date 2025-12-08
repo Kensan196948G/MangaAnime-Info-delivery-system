@@ -5,14 +5,13 @@ Provides unified database connection helpers that eliminate code duplication
 across the application.
 """
 
-import sqlite3
 import os
+import sqlite3
 from contextlib import contextmanager
 from typing import Optional
-from pathlib import Path
 
 # Default database path
-DEFAULT_DB_PATH = os.getenv('DATABASE_PATH', './data/db.sqlite3')
+DEFAULT_DB_PATH = os.getenv("DATABASE_PATH", "./data/db.sqlite3")
 
 
 def get_db_path(custom_path: Optional[str] = None) -> str:
@@ -33,7 +32,7 @@ def get_db_path(custom_path: Optional[str] = None) -> str:
     if custom_path:
         return custom_path
 
-    return os.getenv('DATABASE_PATH', './data/db.sqlite3')
+    return os.getenv("DATABASE_PATH", "./data/db.sqlite3")
 
 
 def ensure_db_directory(db_path: str) -> None:
@@ -129,7 +128,7 @@ def get_db_manager(db_path: Optional[str] = None):
     path = get_db_path(db_path)
 
     # Singleton pattern - reuse existing instance if available
-    if not hasattr(get_db_manager, '_instances'):
+    if not hasattr(get_db_manager, "_instances"):
         get_db_manager._instances = {}
 
     if path not in get_db_manager._instances:
@@ -143,7 +142,7 @@ def execute_query(
     params: Optional[tuple] = None,
     db_path: Optional[str] = None,
     fetch_one: bool = False,
-    fetch_all: bool = True
+    fetch_all: bool = True,
 ):
     """
     Execute a database query with automatic connection management.
@@ -220,23 +219,19 @@ def get_database_stats(db_path: Optional[str] = None) -> dict:
     path = get_db_path(db_path)
 
     stats = {
-        'path': path,
-        'exists': os.path.exists(path),
-        'size_bytes': os.path.getsize(path) if os.path.exists(path) else 0,
+        "path": path,
+        "exists": os.path.exists(path),
+        "size_bytes": os.path.getsize(path) if os.path.exists(path) else 0,
     }
 
-    if stats['exists']:
+    if stats["exists"]:
         with get_db_connection(db_path) as conn:
             # Get table count
-            cursor = conn.execute(
-                "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table'"
-            )
-            stats['table_count'] = cursor.fetchone()['count']
+            cursor = conn.execute("SELECT COUNT(*) as count FROM sqlite_master WHERE type='table'")
+            stats["table_count"] = cursor.fetchone()["count"]
 
             # Get table names
-            cursor = conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
-            )
-            stats['tables'] = [row['name'] for row in cursor.fetchall()]
+            cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+            stats["tables"] = [row["name"] for row in cursor.fetchall()]
 
     return stats

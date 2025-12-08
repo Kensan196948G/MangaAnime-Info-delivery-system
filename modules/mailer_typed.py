@@ -1,26 +1,26 @@
 """
 Gmail送信モジュール（型ヒント付き）
 """
-import os
+
 import base64
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from typing import List, Dict, Any, Optional
 import logging
+import os
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from typing import Any, Dict, List, Optional
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build, Resource
+from googleapiclient.discovery import Resource, build
 
 logger = logging.getLogger(__name__)
 
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 
 def get_gmail_service(
-    credentials_path: str = "config/credentials.json",
-    token_path: str = "config/token.json"
+    credentials_path: str = "config/credentials.json", token_path: str = "config/token.json"
 ) -> Resource:
     """
     Gmail APIサービスを取得
@@ -44,19 +44,14 @@ def get_gmail_service(
             flow = InstalledAppFlow.from_client_secrets_file(credentials_path, SCOPES)
             creds = flow.run_local_server(port=0)
 
-        with open(token_path, 'w') as token:
+        with open(token_path, "w") as token:
             token.write(creds.to_json())
 
-    service: Resource = build('gmail', 'v1', credentials=creds)
+    service: Resource = build("gmail", "v1", credentials=creds)
     return service
 
 
-def create_html_message(
-    sender: str,
-    to: str,
-    subject: str,
-    html_body: str
-) -> Dict[str, Any]:
+def create_html_message(sender: str, to: str, subject: str, html_body: str) -> Dict[str, Any]:
     """
     HTMLメールメッセージを作成
 
@@ -69,23 +64,20 @@ def create_html_message(
     Returns:
         Dict[str, Any]: 送信用メッセージ
     """
-    message = MIMEMultipart('alternative')
-    message['to'] = to
-    message['from'] = sender
-    message['subject'] = subject
+    message = MIMEMultipart("alternative")
+    message["to"] = to
+    message["from"] = sender
+    message["subject"] = subject
 
-    html_part = MIMEText(html_body, 'html', 'utf-8')
+    html_part = MIMEText(html_body, "html", "utf-8")
     message.attach(html_part)
 
     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
-    return {'raw': raw_message}
+    return {"raw": raw_message}
 
 
-def send_email(
-    service: Resource,
-    message: Dict[str, Any]
-) -> Dict[str, Any]:
+def send_email(service: Resource, message: Dict[str, Any]) -> Dict[str, Any]:
     """
     メールを送信
 
@@ -97,10 +89,9 @@ def send_email(
         Dict[str, Any]: 送信結果
     """
     try:
-        sent_message: Dict[str, Any] = service.users().messages().send(
-            userId='me',
-            body=message
-        ).execute()
+        sent_message: Dict[str, Any] = (
+            service.users().messages().send(userId="me", body=message).execute()
+        )
         logger.info(f"メール送信成功: Message ID {sent_message['id']}")
         return sent_message
     except Exception as e:
@@ -195,8 +186,8 @@ def generate_release_html(releases: List[Dict[str, Any]]) -> str:
     """
 
     for release in releases:
-        work_type_emoji = "🎬" if release.get('work_type') == 'anime' else "📚"
-        release_type_text = "話" if release.get('release_type') == 'episode' else "巻"
+        work_type_emoji = "🎬" if release.get("work_type") == "anime" else "📚"
+        release_type_text = "話" if release.get("release_type") == "episode" else "巻"
 
         html += f"""
                 <div class="release-item">
@@ -211,21 +202,21 @@ def generate_release_html(releases: List[Dict[str, Any]]) -> str:
                     </div>
         """
 
-        if release.get('platform'):
+        if release.get("platform"):
             html += f"""
                     <div class="release-info">
                         <strong>配信:</strong> {release['platform']}
                     </div>
             """
 
-        if release.get('release_date'):
+        if release.get("release_date"):
             html += f"""
                     <div class="release-info">
                         <strong>公開日:</strong> {release['release_date']}
                     </div>
             """
 
-        if release.get('source_url'):
+        if release.get("source_url"):
             html += f"""
                     <a href="{release['source_url']}" class="release-link">詳細を見る</a>
             """
@@ -251,7 +242,7 @@ def send_release_notification(
     releases: List[Dict[str, Any]],
     recipient: str,
     credentials_path: str = "config/credentials.json",
-    token_path: str = "config/token.json"
+    token_path: str = "config/token.json",
 ) -> Optional[Dict[str, Any]]:
     """
     リリース通知メールを送信
@@ -277,10 +268,7 @@ def send_release_notification(
         subject = f"【新着{count}件】アニメ・マンガ最新情報"
 
         message = create_html_message(
-            sender='me',
-            to=recipient,
-            subject=subject,
-            html_body=html_body
+            sender="me", to=recipient, subject=subject, html_body=html_body
         )
 
         result = send_email(service, message)

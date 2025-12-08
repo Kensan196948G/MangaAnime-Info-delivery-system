@@ -212,9 +212,7 @@ class Release:
             "release_type": self.release_type.value,
             "number": self.number,
             "platform": self.platform,
-            "release_date": (
-                self.release_date.isoformat() if self.release_date else None
-            ),
+            "release_date": (self.release_date.isoformat() if self.release_date else None),
             "source": self.source,
             "source_url": self.source_url,
             "notified": 1 if self.notified else 0,

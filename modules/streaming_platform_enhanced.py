@@ -185,9 +185,7 @@ class EnhancedStreamingCollector:
         Returns:
             List of anime with streaming information
         """
-        self.logger.info(
-            f"Fetching streaming data: season={season}, year={year}, page={page}"
-        )
+        self.logger.info(f"Fetching streaming data: season={season}, year={year}, page={page}")
 
         variables = {"page": page, "perPage": per_page, "type": "ANIME"}
 
@@ -210,9 +208,7 @@ class EnhancedStreamingCollector:
 
                         if "data" in data and "Page" in data["data"]:
                             media_list = data["data"]["Page"]["media"]
-                            self.logger.info(
-                                f"Retrieved {len(media_list)} anime entries"
-                            )
+                            self.logger.info(f"Retrieved {len(media_list)} anime entries")
                             return media_list
                         else:
                             self.logger.warning("No data found in response")
@@ -221,15 +217,11 @@ class EnhancedStreamingCollector:
                     elif response.status == 429:
                         self.logger.warning("Rate limit exceeded, waiting...")
                         await asyncio.sleep(60)
-                        return await self.fetch_streaming_data(
-                            season, year, page, per_page
-                        )
+                        return await self.fetch_streaming_data(season, year, page, per_page)
 
                     else:
                         error_text = await response.text()
-                        self.logger.error(
-                            f"API request failed: {response.status} - {error_text}"
-                        )
+                        self.logger.error(f"API request failed: {response.status} - {error_text}")
                         return []
 
         except Exception as e:
@@ -360,9 +352,7 @@ class EnhancedStreamingCollector:
 
         return filtered_anime
 
-    def convert_to_releases(
-        self, anime_data: Dict[str, Any], work_id: int
-    ) -> List[Release]:
+    def convert_to_releases(self, anime_data: Dict[str, Any], work_id: int) -> List[Release]:
         """
         Convert anime streaming data to Release models.
 
@@ -472,9 +462,7 @@ class EnhancedStreamingCollector:
             work_releases = self.convert_to_releases(anime, 0)
             releases.extend(work_releases)
 
-        self.logger.info(
-            f"Converted to {len(works)} works and {len(releases)} releases"
-        )
+        self.logger.info(f"Converted to {len(works)} works and {len(releases)} releases")
 
         return works, releases
 
@@ -524,6 +512,4 @@ def fetch_streaming_works_and_releases_sync(
     netflix_prime_only: bool = False,
 ) -> Tuple[List[Work], List[Release]]:
     """Synchronous wrapper for fetch_streaming_works_and_releases."""
-    return asyncio.run(
-        fetch_streaming_works_and_releases(season, year, netflix_prime_only)
-    )
+    return asyncio.run(fetch_streaming_works_and_releases(season, year, netflix_prime_only))

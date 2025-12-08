@@ -95,9 +95,7 @@ class EnhancedErrorRecovery:
 
         # Error event storage
         self.error_events: List[ErrorEvent] = []
-        self.max_error_events = config.get("error_recovery", {}).get(
-            "max_error_events", 1000
-        )
+        self.max_error_events = config.get("error_recovery", {}).get("max_error_events", 1000)
         self.events_lock = threading.Lock()
 
         # Recovery strategies mapping
@@ -144,12 +142,8 @@ class EnhancedErrorRecovery:
         }
 
         # Monitoring settings
-        self.monitoring_interval = config.get("error_recovery", {}).get(
-            "monitoring_interval", 60
-        )
-        self.health_threshold = config.get("error_recovery", {}).get(
-            "health_threshold", 0.8
-        )
+        self.monitoring_interval = config.get("error_recovery", {}).get("monitoring_interval", 60)
+        self.health_threshold = config.get("error_recovery", {}).get("health_threshold", 0.8)
         self.max_consecutive_errors = config.get("error_recovery", {}).get(
             "max_consecutive_errors", 5
         )
@@ -165,9 +159,7 @@ class EnhancedErrorRecovery:
 
         # Start monitoring thread
         self.monitoring_active = True
-        self.monitoring_thread = threading.Thread(
-            target=self._monitoring_loop, daemon=True
-        )
+        self.monitoring_thread = threading.Thread(target=self._monitoring_loop, daemon=True)
         self.monitoring_thread.start()
 
         self.logger.info("Enhanced error recovery system initialized")
@@ -187,9 +179,7 @@ class EnhancedErrorRecovery:
 
         with self.health_lock:
             for component in components:
-                self.component_health[component] = ComponentHealth(
-                    component_name=component
-                )
+                self.component_health[component] = ComponentHealth(component_name=component)
 
     def record_error(
         self,
@@ -262,9 +252,7 @@ class EnhancedErrorRecovery:
         """
         with self.health_lock:
             if component not in self.component_health:
-                self.component_health[component] = ComponentHealth(
-                    component_name=component
-                )
+                self.component_health[component] = ComponentHealth(component_name=component)
 
             health = self.component_health[component]
             health.last_success = datetime.now()
@@ -280,9 +268,7 @@ class EnhancedErrorRecovery:
         """Update component health based on error event."""
         with self.health_lock:
             if component not in self.component_health:
-                self.component_health[component] = ComponentHealth(
-                    component_name=component
-                )
+                self.component_health[component] = ComponentHealth(component_name=component)
 
             health = self.component_health[component]
             health.last_error = error_event
@@ -347,13 +333,9 @@ class EnhancedErrorRecovery:
 
         except Exception as e:
             self.failed_recoveries += 1
-            self.logger.error(
-                f"Recovery handler failed for {component}:{error_type}: {e}"
-            )
+            self.logger.error(f"Recovery handler failed for {component}:{error_type}: {e}")
 
-    def _get_recovery_strategy(
-        self, component: str, error_type: str
-    ) -> Optional[RecoveryStrategy]:
+    def _get_recovery_strategy(self, component: str, error_type: str) -> Optional[RecoveryStrategy]:
         """Get recovery strategy for component and error type."""
         component_strategies = self.recovery_strategies.get(component, {})
         return component_strategies.get(error_type)
@@ -420,9 +402,7 @@ class EnhancedErrorRecovery:
 
     def _ignore_recovery(self, error_event: ErrorEvent) -> bool:
         """Implement ignore recovery strategy."""
-        self.logger.debug(
-            f"Ignoring error for {error_event.component}:{error_event.error_type}"
-        )
+        self.logger.debug(f"Ignoring error for {error_event.component}:{error_event.error_type}")
         return True
 
     def _fallback_anilist(self) -> bool:
@@ -532,9 +512,7 @@ class EnhancedErrorRecovery:
                         health.health_score = max(0.0, health.health_score - 0.1)
 
         if unhealthy_components:
-            self.logger.warning(
-                f"Unhealthy components detected: {unhealthy_components}"
-            )
+            self.logger.warning(f"Unhealthy components detected: {unhealthy_components}")
 
         # Log health summary
         self.logger.debug(
@@ -569,9 +547,7 @@ class EnhancedErrorRecovery:
 
         return {
             "overall_health_score": (
-                total_health_score / len(self.component_health)
-                if self.component_health
-                else 1.0
+                total_health_score / len(self.component_health) if self.component_health else 1.0
             ),
             "healthy_components": healthy_count,
             "total_components": len(self.component_health),
@@ -612,9 +588,7 @@ class EnhancedErrorRecovery:
                     "recovery_attempted": event.recovery_attempted,
                     "recovery_successful": event.recovery_successful,
                     "recovery_strategy": (
-                        event.recovery_strategy.value
-                        if event.recovery_strategy
-                        else None
+                        event.recovery_strategy.value if event.recovery_strategy else None
                     ),
                 }
                 for event in recent_events
@@ -656,9 +630,7 @@ def record_error(
     """Record an error using the global error recovery instance."""
     recovery = get_error_recovery()
     if recovery:
-        return recovery.record_error(
-            component, error_type, message, severity, details, exception
-        )
+        return recovery.record_error(component, error_type, message, severity, details, exception)
     return None
 
 

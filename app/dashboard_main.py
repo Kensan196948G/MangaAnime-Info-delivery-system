@@ -12,8 +12,7 @@ from datetime import datetime
 
 from modules.anime_anilist import AniListCollector
 from modules.calendar_integration import GoogleCalendarManager
-from modules.dashboard_integration import (dashboard_integration,
-                                           track_performance)
+from modules.dashboard_integration import dashboard_integration, track_performance
 from modules.db import DatabaseManager
 from modules.filter_logic import ContentFilter
 from modules.mailer import GmailNotifier
@@ -96,16 +95,12 @@ class DashboardEnabledReleaseNotifier:
 
                     # データベース操作時間を記録
                     db_duration = (time.time() - start_db_time) * 1000
-                    dashboard_integration.track_database_operation(
-                        "anime_insert", db_duration, 1
-                    )
+                    dashboard_integration.track_database_operation("anime_insert", db_duration, 1)
 
                     collected_count += 1
 
                 except Exception as e:
-                    logger.error(
-                        f"Error processing anime {anime.get('title', 'Unknown')}: {e}"
-                    )
+                    logger.error(f"Error processing anime {anime.get('title', 'Unknown')}: {e}")
                     dashboard_integration.track_api_request("anilist", 0, False)
 
             logger.info(f"Collected {collected_count} anime entries")
@@ -150,9 +145,7 @@ class DashboardEnabledReleaseNotifier:
                 items_count = len(manga_data)
 
                 # RSS収集結果を追跡
-                dashboard_integration.track_rss_collection(
-                    source_name, success, items_count
-                )
+                dashboard_integration.track_rss_collection(source_name, success, items_count)
 
                 # データを処理
                 source_collected = 0
@@ -183,17 +176,11 @@ class DashboardEnabledReleaseNotifier:
                         logger.error(f"Error processing manga from {source_name}: {e}")
 
                 total_collected += source_collected
-                logger.info(
-                    f"Collected {source_collected} manga entries from {source_name}"
-                )
+                logger.info(f"Collected {source_collected} manga entries from {source_name}")
 
             except Exception as e:
-                logger.error(
-                    f"Error processing RSS source {source.get('name', 'unknown')}: {e}"
-                )
-                dashboard_integration.track_rss_collection(
-                    source.get("name", "unknown"), False, 0
-                )
+                logger.error(f"Error processing RSS source {source.get('name', 'unknown')}: {e}")
+                dashboard_integration.track_rss_collection(source.get("name", "unknown"), False, 0)
 
         logger.info(f"Total manga collected: {total_collected}")
 
@@ -228,15 +215,11 @@ class DashboardEnabledReleaseNotifier:
                     email_success = self.mail_sender.send_release_notification(release)
 
                     # 通知送信結果を追跡
-                    dashboard_integration.track_notification_sent(
-                        "email", email_success
-                    )
+                    dashboard_integration.track_notification_sent("email", email_success)
 
                     # カレンダー登録
                     calendar_success = self.calendar_manager.add_release_event(release)
-                    dashboard_integration.track_notification_sent(
-                        "calendar", calendar_success
-                    )
+                    dashboard_integration.track_notification_sent("calendar", calendar_success)
 
                     if email_success:
                         # 通知済みフラグを更新
@@ -248,9 +231,7 @@ class DashboardEnabledReleaseNotifier:
                     time.sleep(1)
 
                 except Exception as e:
-                    logger.error(
-                        f"Error sending notification for release {release['id']}: {e}"
-                    )
+                    logger.error(f"Error sending notification for release {release['id']}: {e}")
                     dashboard_integration.track_notification_sent("email", False)
 
             logger.info(f"Sent {sent_count} notifications")

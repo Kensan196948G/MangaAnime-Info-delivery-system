@@ -16,8 +16,7 @@ import os
 import sys
 from datetime import datetime, timedelta
 
-from flask import (Flask, flash, g, jsonify, redirect, render_template,
-                   request, session, url_for)
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 
 # プロジェクトルートをパスに追加
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

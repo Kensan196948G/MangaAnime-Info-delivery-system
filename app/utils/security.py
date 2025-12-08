@@ -43,9 +43,7 @@ class SecurityConfig:
 
         return {
             "SESSION_TYPE": "redis",
-            "SESSION_REDIS": redis.from_url(
-                os.environ.get("REDIS_URL", "redis://localhost:6379")
-            ),
+            "SESSION_REDIS": redis.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379")),
             "SESSION_COOKIE_SECURE": True,
             "SESSION_COOKIE_HTTPONLY": True,
             "SESSION_COOKIE_SAMESITE": "Strict",  # 本番はStrictを推奨
@@ -111,9 +109,7 @@ class SecurityConfig:
         app.config["SESSION_COOKIE_SECURE"] = SecurityConfig.SESSION_COOKIE_SECURE
         app.config["SESSION_COOKIE_HTTPONLY"] = SecurityConfig.SESSION_COOKIE_HTTPONLY
         app.config["SESSION_COOKIE_SAMESITE"] = SecurityConfig.SESSION_COOKIE_SAMESITE
-        app.config["PERMANENT_SESSION_LIFETIME"] = (
-            SecurityConfig.PERMANENT_SESSION_LIFETIME
-        )
+        app.config["PERMANENT_SESSION_LIFETIME"] = SecurityConfig.PERMANENT_SESSION_LIFETIME
 
         # Flask-Session設定
         app.config["SESSION_TYPE"] = SecurityConfig.SESSION_TYPE
@@ -139,9 +135,7 @@ class SecurityConfig:
 
             Session(app)
         except ImportError:
-            app.logger.warning(
-                "Flask-Session not installed. Using default session management."
-            )
+            app.logger.warning("Flask-Session not installed. Using default session management.")
 
         return app
 

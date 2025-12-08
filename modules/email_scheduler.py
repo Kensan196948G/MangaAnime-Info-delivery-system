@@ -169,9 +169,7 @@ class EmailScheduler:
 
         return batches
 
-    def should_send_now(
-        self, schedule: DeliverySchedule, tolerance_minutes: int = 5
-    ) -> bool:
+    def should_send_now(self, schedule: DeliverySchedule, tolerance_minutes: int = 5) -> bool:
         """
         現在時刻が配信時刻かチェック
 
@@ -383,9 +381,7 @@ class EmailScheduler:
             "total_batches": total_batches,
             "sent_batches": sent_batches,
             "pending_batches": pending_batches,
-            "completion_rate": (
-                (sent_batches / total_batches * 100) if total_batches > 0 else 0
-            ),
+            "completion_rate": ((sent_batches / total_batches * 100) if total_batches > 0 else 0),
             "last_update": state.get("timestamp", "N/A"),
         }
 

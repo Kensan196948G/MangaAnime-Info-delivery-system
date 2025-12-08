@@ -20,10 +20,20 @@ Usage:
 """
 
 from .config import ConfigManager, get_config, load_config_file
+
 # Import main components for easy access
 from .db import DatabaseManager, get_db
-from .models import (AniListWork, DataNormalizer, DataSource, DataValidator,
-                     Release, ReleaseType, RSSFeedItem, Work, WorkType)
+from .models import (
+    AniListWork,
+    DataNormalizer,
+    DataSource,
+    DataValidator,
+    Release,
+    ReleaseType,
+    RSSFeedItem,
+    Work,
+    WorkType,
+)
 
 # Version information
 __version__ = "1.0.0"

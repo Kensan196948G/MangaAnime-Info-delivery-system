@@ -126,10 +126,7 @@ class InputSanitizer:
             allowed_domains = InputSanitizer.ALLOWED_DOMAINS
 
         if allowed_domains:
-            return any(
-                parsed.netloc.lower().endswith(domain.lower())
-                for domain in allowed_domains
-            )
+            return any(parsed.netloc.lower().endswith(domain.lower()) for domain in allowed_domains)
 
         return True
 
@@ -140,9 +137,7 @@ class InputSanitizer:
             raise ValueError("Title cannot be empty")
 
         if len(title) > InputSanitizer.MAX_TITLE_LENGTH:
-            raise ValueError(
-                f"Title too long (max {InputSanitizer.MAX_TITLE_LENGTH} chars)"
-            )
+            raise ValueError(f"Title too long (max {InputSanitizer.MAX_TITLE_LENGTH} chars)")
 
         # Remove control characters and normalize unicode
         title = unicodedata.normalize("NFKC", title)
@@ -209,9 +204,7 @@ class RateLimiter:
             # Clean old requests (older than 1 minute)
             cutoff_time = current_time - 60
             self.requests[identifier] = [
-                req_time
-                for req_time in self.requests[identifier]
-                if req_time > cutoff_time
+                req_time for req_time in self.requests[identifier] if req_time > cutoff_time
             ]
 
             # Check if under limit
@@ -487,9 +480,7 @@ class DatabaseSecurity:
             self.conn.rollback()
             raise SecurityError(f"Database operation failed: {e}")
 
-    def validate_work_data(
-        self, title: str, work_type: str, official_url: str = None
-    ) -> bool:
+    def validate_work_data(self, title: str, work_type: str, official_url: str = None) -> bool:
         """Validate work data before database operations"""
         try:
             # Validate title
@@ -539,9 +530,7 @@ class SecurityMonitor:
         if len(self.security_events) > 1000:
             self.security_events = self.security_events[-1000:]
 
-    def check_rate_limit_violation(
-        self, api_name: str, client_id: str = "default"
-    ) -> None:
+    def check_rate_limit_violation(self, api_name: str, client_id: str = "default") -> None:
         """Monitor for rate limit violations"""
         key = f"rate_limit_{api_name}_{client_id}"
         current_time = time.time()

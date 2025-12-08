@@ -5,8 +5,8 @@ Provides unified configuration access that eliminates scattered os.getenv() call
 """
 
 import os
-from typing import Optional, Any, Dict, List
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 class ConfigHelper:
@@ -19,51 +19,41 @@ class ConfigHelper:
     # Environment variable mappings
     ENV_VARS = {
         # Database
-        'DATABASE_PATH': './data/db.sqlite3',
-        'DB_BACKUP_ENABLED': 'true',
-        'DB_BACKUP_RETENTION_DAYS': '30',
-
+        "DATABASE_PATH": "./data/db.sqlite3",
+        "DB_BACKUP_ENABLED": "true",
+        "DB_BACKUP_RETENTION_DAYS": "30",
         # Email
-        'GMAIL_SENDER_EMAIL': '',
-        'GMAIL_RECIPIENT_EMAIL': '',
-        'GMAIL_ADDRESS': '',
-        'GMAIL_APP_PASSWORD': '',
-        'NOTIFICATION_EMAIL': '',
-
+        "GMAIL_SENDER_EMAIL": "",
+        "GMAIL_RECIPIENT_EMAIL": "",
+        "GMAIL_ADDRESS": "",
+        "GMAIL_APP_PASSWORD": "",
+        "NOTIFICATION_EMAIL": "",
         # Google API
-        'GOOGLE_CREDENTIALS_FILE': './credentials.json',
-        'GOOGLE_TOKEN_FILE': './token.json',
-
+        "GOOGLE_CREDENTIALS_FILE": "./credentials.json",
+        "GOOGLE_TOKEN_FILE": "./token.json",
         # Logging
-        'LOG_LEVEL': 'INFO',
-        'LOG_DIR': './logs',
-
+        "LOG_LEVEL": "INFO",
+        "LOG_DIR": "./logs",
         # API URLs
-        'ANILIST_API_URL': 'https://graphql.anilist.co',
-        'SYOBOI_API_URL': 'https://cal.syoboi.jp',
-
+        "ANILIST_API_URL": "https://graphql.anilist.co",
+        "SYOBOI_API_URL": "https://cal.syoboi.jp",
         # Filtering
-        'NG_KEYWORDS': '',
-
+        "NG_KEYWORDS": "",
         # System
-        'TIMEZONE': 'Asia/Tokyo',
-        'TEST_MODE': 'false',
-
+        "TIMEZONE": "Asia/Tokyo",
+        "TEST_MODE": "false",
         # Security
-        'SECRET_KEY': '',
-        'FLASK_SECRET_KEY': '',
-        'SESSION_TYPE': 'filesystem',
-
+        "SECRET_KEY": "",
+        "FLASK_SECRET_KEY": "",
+        "SESSION_TYPE": "filesystem",
         # Redis
-        'REDIS_URL': 'redis://localhost:6379',
-
+        "REDIS_URL": "redis://localhost:6379",
         # Rate Limiting
-        'RATE_LIMIT_ENABLED': 'true',
-        'RATE_LIMIT_REQUESTS': '90',
-
+        "RATE_LIMIT_ENABLED": "true",
+        "RATE_LIMIT_REQUESTS": "90",
         # Monitoring
-        'USE_DB_AUDIT_LOG': 'true',
-        'MONITORING_ENABLED': 'true',
+        "USE_DB_AUDIT_LOG": "true",
+        "MONITORING_ENABLED": "true",
     }
 
     @staticmethod
@@ -79,7 +69,7 @@ class ConfigHelper:
             Configuration value
         """
         if default is None:
-            default = ConfigHelper.ENV_VARS.get(key, '')
+            default = ConfigHelper.ENV_VARS.get(key, "")
 
         return os.getenv(key, default)
 
@@ -97,7 +87,7 @@ class ConfigHelper:
         """
         default_str = ConfigHelper.ENV_VARS.get(key, str(default).lower())
         value = os.getenv(key, default_str)
-        return value.lower() in ('true', '1', 'yes', 'on')
+        return value.lower() in ("true", "1", "yes", "on")
 
     @staticmethod
     def get_int(key: str, default: int = 0) -> int:
@@ -119,7 +109,7 @@ class ConfigHelper:
             return default
 
     @staticmethod
-    def get_list(key: str, delimiter: str = ',', default: Optional[List[str]] = None) -> List[str]:
+    def get_list(key: str, delimiter: str = ",", default: Optional[List[str]] = None) -> List[str]:
         """
         Get list configuration value.
 
@@ -131,7 +121,7 @@ class ConfigHelper:
         Returns:
             List of configuration values
         """
-        value = ConfigHelper.get(key, '')
+        value = ConfigHelper.get(key, "")
         if not value:
             return default or []
 
@@ -154,7 +144,7 @@ class ConfigHelper:
         path = Path(path_str)
 
         if ensure_exists and not path.exists():
-            if '.' in path.name:  # It's a file
+            if "." in path.name:  # It's a file
                 path.parent.mkdir(parents=True, exist_ok=True)
             else:  # It's a directory
                 path.mkdir(parents=True, exist_ok=True)
@@ -190,37 +180,37 @@ def get_db_path(custom_path: Optional[str] = None) -> str:
     """
     if custom_path:
         return custom_path
-    return ConfigHelper.get('DATABASE_PATH', './data/db.sqlite3')
+    return ConfigHelper.get("DATABASE_PATH", "./data/db.sqlite3")
 
 
 def get_log_level() -> str:
     """Get log level."""
-    return ConfigHelper.get('LOG_LEVEL', 'INFO')
+    return ConfigHelper.get("LOG_LEVEL", "INFO")
 
 
 def get_timezone() -> str:
     """Get timezone."""
-    return ConfigHelper.get('TIMEZONE', 'Asia/Tokyo')
+    return ConfigHelper.get("TIMEZONE", "Asia/Tokyo")
 
 
 def is_test_mode() -> bool:
     """Check if test mode is enabled."""
-    return ConfigHelper.get_bool('TEST_MODE', False)
+    return ConfigHelper.get_bool("TEST_MODE", False)
 
 
 def is_debug_mode() -> bool:
     """Check if debug mode is enabled."""
-    return ConfigHelper.get_bool('DEBUG', False)
+    return ConfigHelper.get_bool("DEBUG", False)
 
 
 def get_ng_keywords() -> List[str]:
     """Get NG keywords list."""
-    return ConfigHelper.get_list('NG_KEYWORDS', default=[])
+    return ConfigHelper.get_list("NG_KEYWORDS", default=[])
 
 
 def get_notification_emails() -> List[str]:
     """Get notification email addresses."""
-    return ConfigHelper.get_list('NOTIFICATION_EMAIL', default=[])
+    return ConfigHelper.get_list("NOTIFICATION_EMAIL", default=[])
 
 
 def get_env_config() -> Dict[str, Any]:
@@ -231,43 +221,43 @@ def get_env_config() -> Dict[str, Any]:
         Dictionary with all configuration sections
     """
     return {
-        'database': {
-            'path': get_db_path(),
-            'backup_enabled': ConfigHelper.get_bool('DB_BACKUP_ENABLED', True),
-            'backup_retention_days': ConfigHelper.get_int('DB_BACKUP_RETENTION_DAYS', 30),
+        "database": {
+            "path": get_db_path(),
+            "backup_enabled": ConfigHelper.get_bool("DB_BACKUP_ENABLED", True),
+            "backup_retention_days": ConfigHelper.get_int("DB_BACKUP_RETENTION_DAYS", 30),
         },
-        'email': {
-            'sender': ConfigHelper.get('GMAIL_SENDER_EMAIL'),
-            'recipient': ConfigHelper.get('GMAIL_RECIPIENT_EMAIL'),
-            'app_password': ConfigHelper.get('GMAIL_APP_PASSWORD'),
+        "email": {
+            "sender": ConfigHelper.get("GMAIL_SENDER_EMAIL"),
+            "recipient": ConfigHelper.get("GMAIL_RECIPIENT_EMAIL"),
+            "app_password": ConfigHelper.get("GMAIL_APP_PASSWORD"),
         },
-        'google': {
-            'credentials_file': ConfigHelper.get('GOOGLE_CREDENTIALS_FILE', './credentials.json'),
-            'token_file': ConfigHelper.get('GOOGLE_TOKEN_FILE', './token.json'),
+        "google": {
+            "credentials_file": ConfigHelper.get("GOOGLE_CREDENTIALS_FILE", "./credentials.json"),
+            "token_file": ConfigHelper.get("GOOGLE_TOKEN_FILE", "./token.json"),
         },
-        'logging': {
-            'level': get_log_level(),
-            'dir': ConfigHelper.get('LOG_DIR', './logs'),
+        "logging": {
+            "level": get_log_level(),
+            "dir": ConfigHelper.get("LOG_DIR", "./logs"),
         },
-        'apis': {
-            'anilist_url': ConfigHelper.get('ANILIST_API_URL', 'https://graphql.anilist.co'),
-            'syoboi_url': ConfigHelper.get('SYOBOI_API_URL', 'https://cal.syoboi.jp'),
+        "apis": {
+            "anilist_url": ConfigHelper.get("ANILIST_API_URL", "https://graphql.anilist.co"),
+            "syoboi_url": ConfigHelper.get("SYOBOI_API_URL", "https://cal.syoboi.jp"),
         },
-        'filtering': {
-            'ng_keywords': get_ng_keywords(),
+        "filtering": {
+            "ng_keywords": get_ng_keywords(),
         },
-        'system': {
-            'timezone': get_timezone(),
-            'test_mode': is_test_mode(),
-            'debug_mode': is_debug_mode(),
+        "system": {
+            "timezone": get_timezone(),
+            "test_mode": is_test_mode(),
+            "debug_mode": is_debug_mode(),
         },
-        'security': {
-            'secret_key': ConfigHelper.get('SECRET_KEY'),
-            'flask_secret_key': ConfigHelper.get('FLASK_SECRET_KEY'),
+        "security": {
+            "secret_key": ConfigHelper.get("SECRET_KEY"),
+            "flask_secret_key": ConfigHelper.get("FLASK_SECRET_KEY"),
         },
-        'monitoring': {
-            'enabled': ConfigHelper.get_bool('MONITORING_ENABLED', True),
-            'use_db_audit_log': ConfigHelper.get_bool('USE_DB_AUDIT_LOG', True),
+        "monitoring": {
+            "enabled": ConfigHelper.get_bool("MONITORING_ENABLED", True),
+            "use_db_audit_log": ConfigHelper.get_bool("USE_DB_AUDIT_LOG", True),
         },
     }
 
@@ -280,7 +270,7 @@ def validate_required_config() -> List[str]:
         List of missing required configuration keys
     """
     required = [
-        'DATABASE_PATH',
+        "DATABASE_PATH",
     ]
 
     missing = []
@@ -303,10 +293,10 @@ def print_config_summary() -> None:
         print(f"\n[{section.upper()}]")
         for key, value in values.items():
             # Mask sensitive values
-            if any(s in key.lower() for s in ['password', 'secret', 'key']):
-                display_value = '***MASKED***' if value else '(not set)'
+            if any(s in key.lower() for s in ["password", "secret", "key"]):
+                display_value = "***MASKED***" if value else "(not set)"
             else:
-                display_value = value or '(not set)'
+                display_value = value or "(not set)"
 
             print(f"  {key}: {display_value}")
 

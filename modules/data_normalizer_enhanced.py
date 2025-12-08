@@ -19,8 +19,7 @@ from typing import Any, Dict, List, Optional, Set
 
 import jellyfish  # For phonetic matching (install: pip install jellyfish)
 
-from .data_normalizer import (DataQualityAnalyzer, NormalizationLevel,
-                              TitleNormalizer)
+from .data_normalizer import DataQualityAnalyzer, NormalizationLevel, TitleNormalizer
 from .models import DataSource, Work
 
 
@@ -122,12 +121,8 @@ class EnhancedDuplicateDetector:
             return 1.0 if title1 == title2 else 0.0
 
         elif algorithm == MatchAlgorithm.NORMALIZED:
-            norm1 = self.title_normalizer.normalize_title(
-                title1, NormalizationLevel.STRICT
-            )
-            norm2 = self.title_normalizer.normalize_title(
-                title2, NormalizationLevel.STRICT
-            )
+            norm1 = self.title_normalizer.normalize_title(title1, NormalizationLevel.STRICT)
+            norm2 = self.title_normalizer.normalize_title(title2, NormalizationLevel.STRICT)
             return 1.0 if norm1 == norm2 else 0.0
 
         elif algorithm == MatchAlgorithm.FUZZY:
@@ -152,19 +147,13 @@ class EnhancedDuplicateDetector:
                 return 1.0
 
             # Normalized match
-            norm1 = self.title_normalizer.normalize_title(
-                title1, NormalizationLevel.STRICT
-            )
-            norm2 = self.title_normalizer.normalize_title(
-                title2, NormalizationLevel.STRICT
-            )
+            norm1 = self.title_normalizer.normalize_title(title1, NormalizationLevel.STRICT)
+            norm2 = self.title_normalizer.normalize_title(title2, NormalizationLevel.STRICT)
             if norm1 == norm2:
                 scores.append(1.0)
             else:
                 # Fuzzy on normalized
-                scores.append(
-                    SequenceMatcher(None, norm1.lower(), norm2.lower()).ratio()
-                )
+                scores.append(SequenceMatcher(None, norm1.lower(), norm2.lower()).ratio())
 
             # Fuzzy on original
             scores.append(SequenceMatcher(None, title1.lower(), title2.lower()).ratio())
@@ -223,9 +212,7 @@ class EnhancedDuplicateDetector:
         max_title_sim = title_sim
 
         if work1.title_en and work2.title_en:
-            en_sim = self.calculate_title_similarity(
-                work1.title_en, work2.title_en, algorithm
-            )
+            en_sim = self.calculate_title_similarity(work1.title_en, work2.title_en, algorithm)
             max_title_sim = max(max_title_sim, en_sim)
 
         if work1.title_kana and work2.title_kana:
@@ -322,9 +309,7 @@ class EnhancedDuplicateDetector:
                 if match:
                     duplicates.append(match)
 
-        self.logger.info(
-            f"Found {len(duplicates)} duplicate pairs in {len(works)} works"
-        )
+        self.logger.info(f"Found {len(duplicates)} duplicate pairs in {len(works)} works")
         return duplicates
 
 
@@ -372,8 +357,7 @@ class EnhancedDataMerger:
         elif self.strategy.prefer_newer:
             primary = (
                 work1
-                if (work1.created_at or datetime.min)
-                >= (work2.created_at or datetime.min)
+                if (work1.created_at or datetime.min) >= (work2.created_at or datetime.min)
                 else work2
             )
             secondary = work2 if primary == work1 else work1
@@ -400,9 +384,7 @@ class EnhancedDataMerger:
         self.logger.debug(f"Merged works: '{primary.title}' + '{secondary.title}'")
         return merged
 
-    def _merge_metadata(
-        self, meta1: Dict[str, Any], meta2: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _merge_metadata(self, meta1: Dict[str, Any], meta2: Dict[str, Any]) -> Dict[str, Any]:
         """
         Merge metadata dictionaries with conflict resolution.
 
@@ -491,9 +473,7 @@ class EnhancedDataMerger:
 
             processed.update(group)
 
-        self.logger.info(
-            f"Deduplicated {len(works)} works to {len(deduplicated)} unique works"
-        )
+        self.logger.info(f"Deduplicated {len(works)} works to {len(deduplicated)} unique works")
 
         return deduplicated
 
@@ -501,9 +481,7 @@ class EnhancedDataMerger:
 # Convenience functions
 
 
-def detect_duplicates(
-    works: List[Work], threshold: float = 0.85
-) -> List[DuplicateMatch]:
+def detect_duplicates(works: List[Work], threshold: float = 0.85) -> List[DuplicateMatch]:
     """
     Detect duplicates in a list of works.
 

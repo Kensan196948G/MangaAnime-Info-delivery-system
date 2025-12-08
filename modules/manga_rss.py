@@ -47,9 +47,7 @@ class FeedHealth:
         if self.average_response_time == 0:
             self.average_response_time = response_time
         else:
-            self.average_response_time = (
-                self.average_response_time + response_time
-            ) / 2
+            self.average_response_time = (self.average_response_time + response_time) / 2
 
         self.is_healthy = True
 
@@ -76,9 +74,7 @@ class FeedHealth:
             return 0.0
 
         success_rate = self.get_success_rate()
-        response_penalty = min(
-            self.average_response_time / 10.0, 0.5
-        )  # 10秒で50%ペナルティ
+        response_penalty = min(self.average_response_time / 10.0, 0.5)  # 10秒で50%ペナルティ
         consecutive_failure_penalty = min(self.consecutive_failures * 0.1, 0.3)
 
         score = success_rate - response_penalty - consecutive_failure_penalty
@@ -341,9 +337,7 @@ class MangaRSSCollector:
 
         return unique_items
 
-    async def _collect_async(
-        self, manga_feeds: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    async def _collect_async(self, manga_feeds: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """非同期並列収集"""
         connector = aiohttp.TCPConnector(
             limit=20,  # 全体での同時接続数制限
@@ -395,8 +389,7 @@ class MangaRSSCollector:
         # 並列処理でRSS収集を実行
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             future_to_feed = {
-                executor.submit(self._collect_from_feed_safe, feed): feed
-                for feed in manga_feeds
+                executor.submit(self._collect_from_feed_safe, feed): feed for feed in manga_feeds
             }
 
             for future in as_completed(future_to_feed):
@@ -470,9 +463,7 @@ class MangaRSSCollector:
                         return items
 
                 except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-                    self.logger.warning(
-                        f"{feed_name} 非同期収集試行 {attempt + 1} 失敗: {e}"
-                    )
+                    self.logger.warning(f"{feed_name} 非同期収集試行 {attempt + 1} 失敗: {e}")
                     if attempt < retry_count - 1:
                         await asyncio.sleep(retry_delay)
                         continue
@@ -488,9 +479,7 @@ class MangaRSSCollector:
                 self.feed_health[feed_url].record_failure()
             return []
 
-    def _collect_from_feed_safe(
-        self, feed_info: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+    def _collect_from_feed_safe(self, feed_info: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         並列処理対応のフィード収集（エラーハンドリング強化版）
 
@@ -541,9 +530,7 @@ class MangaRSSCollector:
 
         return unique_items
 
-    def _collect_from_feed_enhanced(
-        self, feed_url: str, feed_name: str
-    ) -> List[Dict[str, Any]]:
+    def _collect_from_feed_enhanced(self, feed_url: str, feed_name: str) -> List[Dict[str, Any]]:
         """
         強化版フィード収集（健全性チェック、日時正規化機能付き）
 
@@ -564,9 +551,7 @@ class MangaRSSCollector:
 
         for attempt in range(retry_count):
             try:
-                self.logger.info(
-                    f"{feed_name}から情報収集中... (試行 {attempt + 1}/{retry_count})"
-                )
+                self.logger.info(f"{feed_name}から情報収集中... (試行 {attempt + 1}/{retry_count})")
 
                 # HTTPリクエスト設定（強化版）
                 headers = {
@@ -638,9 +623,7 @@ class MangaRSSCollector:
                     continue
 
             except requests.exceptions.HTTPError as e:
-                self.logger.error(
-                    f"{feed_name} HTTPエラー: {e} (試行 {attempt + 1}/{retry_count})"
-                )
+                self.logger.error(f"{feed_name} HTTPエラー: {e} (試行 {attempt + 1}/{retry_count})")
                 if attempt < retry_count - 1:
                     time.sleep(retry_delay)
                     continue
@@ -654,9 +637,7 @@ class MangaRSSCollector:
                     continue
 
         # 全ての試行が失敗した場合
-        self.logger.error(
-            f"{feed_name}から情報を取得できませんでした（{retry_count}回試行後）"
-        )
+        self.logger.error(f"{feed_name}から情報を取得できませんでした（{retry_count}回試行後）")
 
         # フィードヘルス更新（失敗）
         if feed_url in self.feed_health:
@@ -705,9 +686,7 @@ class MangaRSSCollector:
             # コンテンツタイプをチェック
             content_type = response.headers.get("content-type", "").lower()
             if not any(ct in content_type for ct in ["xml", "rss", "atom"]):
-                self.logger.warning(
-                    f"予期しないコンテンツタイプ ({feed_name}): {content_type}"
-                )
+                self.logger.warning(f"予期しないコンテンツタイプ ({feed_name}): {content_type}")
 
             # レスポンスサイズをチェック（空でないか）
             if len(response.content) < 100:
@@ -743,24 +722,16 @@ class MangaRSSCollector:
         # レスポンスサイズチェック
         content_length = len(response.content)
         if content_length < 100:  # 極端に小さいレスポンス
-            self.logger.warning(
-                f"レスポンスが小さすぎます ({feed_name}): {content_length} bytes"
-            )
+            self.logger.warning(f"レスポンスが小さすぎます ({feed_name}): {content_length} bytes")
             return False
 
         if content_length > 10 * 1024 * 1024:  # 10MB以上
-            self.logger.warning(
-                f"レスポンスが大きすぎます ({feed_name}): {content_length} bytes"
-            )
+            self.logger.warning(f"レスポンスが大きすぎます ({feed_name}): {content_length} bytes")
             return False
 
         # 基本的なXML構造チェック
         content_str = response.content[:1000].decode("utf-8", errors="ignore")
-        if (
-            "<rss" not in content_str
-            and "<feed" not in content_str
-            and "<?xml" not in content_str
-        ):
+        if "<rss" not in content_str and "<feed" not in content_str and "<?xml" not in content_str:
             self.logger.warning(f"XMLフォーマットではありません ({feed_name})")
             return False
 
@@ -779,9 +750,7 @@ class MangaRSSCollector:
         """
         return self._collect_from_feed_enhanced(feed_url, feed_name)
 
-    def _parse_feed_entry_enhanced(
-        self, entry, feed_name: str
-    ) -> Optional[RSSFeedItem]:
+    def _parse_feed_entry_enhanced(self, entry, feed_name: str) -> Optional[RSSFeedItem]:
         """
         強化版フィードエントリー解析
 
@@ -804,11 +773,7 @@ class MangaRSSCollector:
                     pass
 
             # updated_parsedも試行
-            if (
-                not published
-                and hasattr(entry, "updated_parsed")
-                and entry.updated_parsed
-            ):
+            if not published and hasattr(entry, "updated_parsed") and entry.updated_parsed:
                 try:
                     published = datetime(*entry.updated_parsed[:6])
                 except (ValueError, TypeError):
@@ -816,17 +781,13 @@ class MangaRSSCollector:
 
             # 文字列からの日時解析
             if not published:
-                date_str = getattr(entry, "published", None) or getattr(
-                    entry, "updated", None
-                )
+                date_str = getattr(entry, "published", None) or getattr(entry, "updated", None)
                 if date_str:
                     published = self.parser.extract_date(date_str)
 
             # タイトルとdescriptionのクリーンアップ
             title = self.parser.extract_title(getattr(entry, "title", ""))
-            description = getattr(entry, "description", None) or getattr(
-                entry, "summary", None
-            )
+            description = getattr(entry, "description", None) or getattr(entry, "summary", None)
 
             # HTMLタグ除去
             if description:
@@ -1082,10 +1043,7 @@ class DuplicateDetector:
         normalized_title = self._normalize_title(title)
 
         for existing_normalized in self.title_variations:
-            if (
-                self._calculate_title_similarity(normalized_title, existing_normalized)
-                > 0.85
-            ):
+            if self._calculate_title_similarity(normalized_title, existing_normalized) > 0.85:
                 return True
 
         return False
@@ -1244,9 +1202,7 @@ class BookWalkerRSSCollector(MangaRSSCollector):
 
         return all_items
 
-    def _collect_bookwalker_feed(
-        self, feed_url: str, feed_name: str
-    ) -> List[Dict[str, Any]]:
+    def _collect_bookwalker_feed(self, feed_url: str, feed_name: str) -> List[Dict[str, Any]]:
         """BookWalker専用の収集処理"""
         # 基本のRSS収集を使用
         items = self._collect_from_feed_enhanced(feed_url, feed_name)
@@ -1315,9 +1271,7 @@ class BookWalkerRSSCollector(MangaRSSCollector):
     ) -> Optional[Dict[str, Any]]:
         """BookWalker特有の正規化処理"""
         # 基本の正規化を実行
-        normalized = super()._normalize_manga_item_enhanced(
-            work_info, rss_item, source_name
-        )
+        normalized = super()._normalize_manga_item_enhanced(work_info, rss_item, source_name)
 
         if normalized:
             # BookWalker特有の処理
@@ -1385,8 +1339,7 @@ class DAnimeRSSCollector(MangaRSSCollector):
         danime_feeds = [
             feed
             for feed in self.enabled_feeds
-            if "danime" in feed.get("name", "").lower()
-            or "dアニメ" in feed.get("name", "")
+            if "danime" in feed.get("name", "").lower() or "dアニメ" in feed.get("name", "")
         ]
 
         if not danime_feeds:
@@ -1416,9 +1369,7 @@ class DAnimeRSSCollector(MangaRSSCollector):
 
         return all_items
 
-    def _collect_danime_feed_enhanced(
-        self, feed_url: str, feed_name: str
-    ) -> List[Dict[str, Any]]:
+    def _collect_danime_feed_enhanced(self, feed_url: str, feed_name: str) -> List[Dict[str, Any]]:
         """dアニメストア専用の強化収集処理"""
         # 基本のRSS収集を使用
         items = self._collect_from_feed_enhanced(feed_url, feed_name)
@@ -1456,15 +1407,11 @@ class DAnimeRSSCollector(MangaRSSCollector):
 
         return processed_items
 
-    def _collect_danime_feed(
-        self, feed_url: str, feed_name: str
-    ) -> List[Dict[str, Any]]:
+    def _collect_danime_feed(self, feed_url: str, feed_name: str) -> List[Dict[str, Any]]:
         """dアニメストア専用の収集処理（後方互換性のため維持）"""
         return self._collect_danime_feed_enhanced(feed_url, feed_name)
 
-    def _extract_episode_info(
-        self, title: str, description: str
-    ) -> Optional[Dict[str, Any]]:
+    def _extract_episode_info(self, title: str, description: str) -> Optional[Dict[str, Any]]:
         """エピソード情報を抽出"""
         if not title:
             return None
@@ -1514,17 +1461,11 @@ class DAnimeRSSCollector(MangaRSSCollector):
 
     def get_health_report(self) -> Dict[str, Any]:
         """Get comprehensive health monitoring report."""
-        healthy_feeds = sum(
-            1 for health in self.feed_health.values() if health.is_healthy
-        )
+        healthy_feeds = sum(1 for health in self.feed_health.values() if health.is_healthy)
         unhealthy_feeds = len(self.feed_health) - healthy_feeds
 
-        total_requests = sum(
-            health.total_requests for health in self.feed_health.values()
-        )
-        total_failures = sum(
-            health.total_failures for health in self.feed_health.values()
-        )
+        total_requests = sum(health.total_requests for health in self.feed_health.values())
+        total_failures = sum(health.total_failures for health in self.feed_health.values())
 
         avg_response_time = 0
         if self.feed_health:
@@ -1544,9 +1485,7 @@ class DAnimeRSSCollector(MangaRSSCollector):
             "total_requests": total_requests,
             "total_failures": total_failures,
             "success_rate": (
-                (total_requests - total_failures) / total_requests
-                if total_requests > 0
-                else 0
+                (total_requests - total_failures) / total_requests if total_requests > 0 else 0
             ),
             "average_response_time": avg_response_time,
             "feed_details": {
@@ -1633,9 +1572,7 @@ def fetch_and_store() -> dict:
                 stored_count += 1
 
             except Exception as e:
-                logger.warning(
-                    f"アイテム保存エラー: {item.get('title', 'Unknown')} - {e}"
-                )
+                logger.warning(f"アイテム保存エラー: {item.get('title', 'Unknown')} - {e}")
                 continue
 
         logger.info(f"マンガRSS収集完了: {len(items)}件収集, {stored_count}件保存")

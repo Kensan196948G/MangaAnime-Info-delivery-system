@@ -16,6 +16,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from .anime_anilist import AniListClient, CircuitBreakerOpen
+
 # Import all modules to test
 from .db import get_db
 from .filter_logic import ContentFilter
@@ -49,11 +50,7 @@ class ValidationReport:
     @property
     def success_rate(self) -> float:
         """Calculate test success rate."""
-        return (
-            (self.passed_tests / self.total_tests) * 100
-            if self.total_tests > 0
-            else 0.0
-        )
+        return (self.passed_tests / self.total_tests) * 100 if self.total_tests > 0 else 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
@@ -176,9 +173,7 @@ class BackendValidator:
                 "memory_total": psutil.virtual_memory().total,
                 "memory_available": psutil.virtual_memory().available,
                 "disk_usage": (
-                    psutil.disk_usage("/").percent
-                    if hasattr(psutil, "disk_usage")
-                    else None
+                    psutil.disk_usage("/").percent if hasattr(psutil, "disk_usage") else None
                 ),
             }
         except ImportError:
@@ -192,24 +187,16 @@ class BackendValidator:
         results = []
 
         # Test 1: Database connection
-        results.append(
-            await self._run_test("Database Connection", self._test_db_connection)
-        )
+        results.append(await self._run_test("Database Connection", self._test_db_connection))
 
         # Test 2: CRUD operations
-        results.append(
-            await self._run_test("Database CRUD Operations", self._test_db_crud)
-        )
+        results.append(await self._run_test("Database CRUD Operations", self._test_db_crud))
 
         # Test 3: Performance test
-        results.append(
-            await self._run_test("Database Performance", self._test_db_performance)
-        )
+        results.append(await self._run_test("Database Performance", self._test_db_performance))
 
         # Test 4: Integrity check
-        results.append(
-            await self._run_test("Database Integrity", self._test_db_integrity)
-        )
+        results.append(await self._run_test("Database Integrity", self._test_db_integrity))
 
         return results
 
@@ -245,9 +232,7 @@ class BackendValidator:
             raise Exception("Failed to read created work")
 
         # Create test release
-        release_id = db.create_release(
-            work_id, "episode", number="1", release_date="2024-01-01"
-        )
+        release_id = db.create_release(work_id, "episode", number="1", release_date="2024-01-01")
 
         if not release_id:
             raise Exception("Failed to create test release")
@@ -337,12 +322,8 @@ class BackendValidator:
         work_id = db.get_or_create_work("Integrity Test Work", "anime")
         try:
             # Try to create duplicate release
-            release_id_1 = db.create_release(
-                work_id, "episode", "1", release_date="2024-01-01"
-            )
-            release_id_2 = db.create_release(
-                work_id, "episode", "1", release_date="2024-01-01"
-            )
+            release_id_1 = db.create_release(work_id, "episode", "1", release_date="2024-01-01")
+            release_id_2 = db.create_release(work_id, "episode", "1", release_date="2024-01-01")
             unique_constraint_enforced = (
                 release_id_1 == release_id_2
             )  # Should return same ID due to UNIQUE constraint
@@ -365,30 +346,22 @@ class BackendValidator:
         results = []
 
         # Test 1: Client initialization
-        results.append(
-            await self._run_test("AniList Client Init", self._test_anilist_init)
-        )
+        results.append(await self._run_test("AniList Client Init", self._test_anilist_init))
 
         # Test 2: API connectivity
         results.append(
-            await self._run_test(
-                "AniList API Connectivity", self._test_anilist_connectivity
-            )
+            await self._run_test("AniList API Connectivity", self._test_anilist_connectivity)
         )
 
         # Test 3: Rate limiting
         if self.test_config["anilist"]["enable_rate_limit_test"]:
             results.append(
-                await self._run_test(
-                    "AniList Rate Limiting", self._test_anilist_rate_limiting
-                )
+                await self._run_test("AniList Rate Limiting", self._test_anilist_rate_limiting)
             )
 
         # Test 4: Circuit breaker
         results.append(
-            await self._run_test(
-                "AniList Circuit Breaker", self._test_anilist_circuit_breaker
-            )
+            await self._run_test("AniList Circuit Breaker", self._test_anilist_circuit_breaker)
         )
 
         return results
@@ -592,22 +565,16 @@ class BackendValidator:
         results.append(await self._run_test("Filter Init", self._test_filter_init))
 
         # Test 2: Basic filtering
-        results.append(
-            await self._run_test("Basic Filtering", self._test_basic_filtering)
-        )
+        results.append(await self._run_test("Basic Filtering", self._test_basic_filtering))
 
         # Test 3: Performance test
         if self.test_config["filter"]["enable_performance_test"]:
             results.append(
-                await self._run_test(
-                    "Filter Performance", self._test_filter_performance
-                )
+                await self._run_test("Filter Performance", self._test_filter_performance)
             )
 
         # Test 4: Fuzzy matching
-        results.append(
-            await self._run_test("Fuzzy Matching", self._test_fuzzy_matching)
-        )
+        results.append(await self._run_test("Fuzzy Matching", self._test_fuzzy_matching))
 
         return results
 
@@ -783,15 +750,11 @@ class BackendValidator:
 
         # Test 1: Database + Filter integration
         results.append(
-            await self._run_test(
-                "DB-Filter Integration", self._test_db_filter_integration
-            )
+            await self._run_test("DB-Filter Integration", self._test_db_filter_integration)
         )
 
         # Test 2: End-to-end workflow
-        results.append(
-            await self._run_test("End-to-End Workflow", self._test_e2e_workflow)
-        )
+        results.append(await self._run_test("End-to-End Workflow", self._test_e2e_workflow))
 
         return results
 
@@ -901,9 +864,7 @@ class BackendValidator:
                 created_work_ids.append(work_id)
 
                 # Create sample release
-                release_id = db.create_release(
-                    work_id, "episode", "1", release_date="2024-01-01"
-                )
+                release_id = db.create_release(work_id, "episode", "1", release_date="2024-01-01")
 
                 processed_items.append(
                     {
@@ -924,9 +885,7 @@ class BackendValidator:
 
         # Check unnotified releases
         unnotified = db.get_unnotified_releases()
-        test_releases_in_unnotified = [
-            r for r in unnotified if r["work_id"] in created_work_ids
-        ]
+        test_releases_in_unnotified = [r for r in unnotified if r["work_id"] in created_work_ids]
 
         # Cleanup
         for work_id in created_work_ids:
@@ -964,20 +923,14 @@ class BackendValidator:
 
             self.logger.info(f"✓ {test_name} passed in {duration:.3f}s")
 
-            return TestResult(
-                test_name=test_name, passed=True, duration=duration, details=details
-            )
+            return TestResult(test_name=test_name, passed=True, duration=duration, details=details)
 
         except Exception as e:
             duration = time.time() - start_time
             error_message = str(e)
 
-            self.logger.error(
-                f"✗ {test_name} failed in {duration:.3f}s: {error_message}"
-            )
-            self.logger.debug(
-                f"Full traceback for {test_name}:\n{traceback.format_exc()}"
-            )
+            self.logger.error(f"✗ {test_name} failed in {duration:.3f}s: {error_message}")
+            self.logger.debug(f"Full traceback for {test_name}:\n{traceback.format_exc()}")
 
             return TestResult(
                 test_name=test_name,

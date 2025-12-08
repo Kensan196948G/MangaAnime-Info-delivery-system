@@ -90,12 +90,8 @@ class GoogleAuthHelper:
                     )
 
                 print("初回認証を開始します...")
-                print(
-                    "ブラウザが開きますので、Googleアカウントでログインしてください。"
-                )
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    str(self.credentials_path), scopes
-                )
+                print("ブラウザが開きますので、Googleアカウントでログインしてください。")
+                flow = InstalledAppFlow.from_client_secrets_file(str(self.credentials_path), scopes)
                 creds = flow.run_local_server(port=0)
 
             # 認証情報を保存

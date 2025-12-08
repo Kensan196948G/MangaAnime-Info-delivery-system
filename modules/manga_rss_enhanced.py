@@ -23,8 +23,7 @@ import aiohttp
 import feedparser
 from bs4 import BeautifulSoup
 
-from .models import (DataSource, Release, ReleaseType, RSSFeedItem, Work,
-                     WorkType)
+from .models import DataSource, Release, ReleaseType, RSSFeedItem, Work, WorkType
 
 
 @dataclass
@@ -215,8 +214,7 @@ class EnhancedMangaRSSCollector:
         }
 
         self.logger.info(
-            "Enhanced Manga RSS Collector initialized with "
-            f"{len(self.MANGA_SOURCES)} sources"
+            "Enhanced Manga RSS Collector initialized with " f"{len(self.MANGA_SOURCES)} sources"
         )
 
     def get_all_sources(self) -> List[MangaRSSFeedConfig]:
@@ -227,9 +225,7 @@ class EnhancedMangaRSSCollector:
         """Get manga RSS source by name."""
         return self.MANGA_SOURCES.get(name)
 
-    async def fetch_feed_async(
-        self, feed_config: MangaRSSFeedConfig
-    ) -> List[RSSFeedItem]:
+    async def fetch_feed_async(self, feed_config: MangaRSSFeedConfig) -> List[RSSFeedItem]:
         """
         Asynchronously fetch and parse RSS feed.
 
@@ -303,9 +299,7 @@ class EnhancedMangaRSSCollector:
                 title = entry.get("title", "")
                 link = entry.get("link", "")
                 description = entry.get("summary", entry.get("description", ""))
-                pub_date = self._parse_date(
-                    entry.get("published", entry.get("updated", ""))
-                )
+                pub_date = self._parse_date(entry.get("published", entry.get("updated", "")))
 
                 # Extract metadata
                 metadata = {
@@ -339,9 +333,7 @@ class EnhancedMangaRSSCollector:
 
         return items
 
-    def _parse_json_feed(
-        self, content: str, feed_config: MangaRSSFeedConfig
-    ) -> List[RSSFeedItem]:
+    def _parse_json_feed(self, content: str, feed_config: MangaRSSFeedConfig) -> List[RSSFeedItem]:
         """Parse JSON feed format."""
         items = []
 
@@ -355,9 +347,7 @@ class EnhancedMangaRSSCollector:
                 title = entry.get("title", "")
                 link = entry.get("url", entry.get("link", ""))
                 description = entry.get("content_text", entry.get("summary", ""))
-                pub_date = self._parse_date(
-                    entry.get("date_published", entry.get("published", ""))
-                )
+                pub_date = self._parse_date(entry.get("date_published", entry.get("published", "")))
 
                 metadata = {
                     "source": feed_config.name,
@@ -393,9 +383,7 @@ class EnhancedMangaRSSCollector:
 
         return items
 
-    def _parse_html_feed(
-        self, content: str, feed_config: MangaRSSFeedConfig
-    ) -> List[RSSFeedItem]:
+    def _parse_html_feed(self, content: str, feed_config: MangaRSSFeedConfig) -> List[RSSFeedItem]:
         """Parse HTML page as feed using custom selectors."""
         items = []
 
@@ -406,14 +394,10 @@ class EnhancedMangaRSSCollector:
             if feed_config.custom_selectors:
                 title_selector = feed_config.custom_selectors.get("title", ".title")
                 link_selector = feed_config.custom_selectors.get("link", "a")
-                desc_selector = feed_config.custom_selectors.get(
-                    "description", ".description"
-                )
+                desc_selector = feed_config.custom_selectors.get("description", ".description")
 
                 # Find all items (assume they're in a common container)
-                containers = soup.find_all(
-                    class_=re.compile(r"(item|entry|article|series)")
-                )
+                containers = soup.find_all(class_=re.compile(r"(item|entry|article|series)"))
 
                 for container in containers:
                     title_elem = container.select_one(title_selector)
@@ -512,9 +496,7 @@ class EnhancedMangaRSSCollector:
             elif isinstance(result, Exception):
                 self.logger.error(f"Task failed with exception: {result}")
 
-        self.logger.info(
-            f"Fetched total of {len(all_items)} items from {len(sources)} sources"
-        )
+        self.logger.info(f"Fetched total of {len(all_items)} items from {len(sources)} sources")
 
         return all_items
 
@@ -564,9 +546,7 @@ class EnhancedMangaRSSCollector:
                 release_type=release_type or ReleaseType.VOLUME,
                 number=number,
                 platform=item.source,
-                release_date=(
-                    item.pub_date.date() if item.pub_date else datetime.now().date()
-                ),
+                release_date=(item.pub_date.date() if item.pub_date else datetime.now().date()),
                 source=DataSource.RSS_GENERAL,
                 source_url=item.link,
                 metadata={"source": item.source, "description": item.description},
@@ -580,9 +560,7 @@ class EnhancedMangaRSSCollector:
 
         return works, releases
 
-    def _extract_number_and_type(
-        self, title: str
-    ) -> Tuple[Optional[str], Optional[ReleaseType]]:
+    def _extract_number_and_type(self, title: str) -> Tuple[Optional[str], Optional[ReleaseType]]:
         """Extract volume/episode number and release type from title."""
         # Volume patterns
         volume_patterns = [
@@ -638,9 +616,7 @@ class EnhancedMangaRSSCollector:
         """Get collector statistics."""
         success_rate = 0.0
         if self.stats["total_requests"] > 0:
-            success_rate = (
-                self.stats["successful_requests"] / self.stats["total_requests"]
-            )
+            success_rate = self.stats["successful_requests"] / self.stats["total_requests"]
 
         return {
             "total_requests": self.stats["total_requests"],

@@ -5,8 +5,7 @@
 
 from functools import wraps
 
-from flask import (Blueprint, flash, jsonify, redirect, render_template,
-                   request, url_for)
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.routes.auth import user_store
@@ -78,9 +77,7 @@ def create_user():
             return redirect(url_for("users.user_list"))
 
         # ユーザー作成
-        user = user_store.add_user(
-            username=username, password=password, is_admin=is_admin
-        )
+        user = user_store.add_user(username=username, password=password, is_admin=is_admin)
 
         if user:
             flash(f'ユーザー "{username}" を作成しました。', "success")
@@ -133,9 +130,7 @@ def toggle_admin(user_id):
         # 自分自身の権限は変更できない
         if user_id == current_user.id:
             return (
-                jsonify(
-                    {"success": False, "message": "自分自身の権限は変更できません。"}
-                ),
+                jsonify({"success": False, "message": "自分自身の権限は変更できません。"}),
                 400,
             )
 

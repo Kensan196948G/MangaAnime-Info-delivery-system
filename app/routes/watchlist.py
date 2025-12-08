@@ -60,9 +60,7 @@ def watchlist_page():
 
         conn.close()
 
-        return render_template(
-            "watchlist.html", watchlist=watchlist_items, user=current_user
-        )
+        return render_template("watchlist.html", watchlist=watchlist_items, user=current_user)
 
     except Exception as e:
         logger.error(f"ウォッチリスト取得エラー: {str(e)}")
@@ -124,9 +122,7 @@ def get_watchlist_api():
 
         conn.close()
 
-        return jsonify(
-            {"success": True, "watchlist": watchlist, "count": len(watchlist)}
-        )
+        return jsonify({"success": True, "watchlist": watchlist, "count": len(watchlist)})
 
     except Exception as e:
         logger.error(f"ウォッチリスト取得エラー（API）: {str(e)}")
@@ -228,9 +224,7 @@ def remove_from_watchlist(work_id):
         if not item:
             conn.close()
             return (
-                jsonify(
-                    {"success": False, "error": "ウォッチリストに登録されていません"}
-                ),
+                jsonify({"success": False, "error": "ウォッチリストに登録されていません"}),
                 404,
             )
 
@@ -287,9 +281,7 @@ def update_watchlist_settings(work_id):
         if cursor.rowcount == 0:
             conn.close()
             return (
-                jsonify(
-                    {"success": False, "error": "ウォッチリストに登録されていません"}
-                ),
+                jsonify({"success": False, "error": "ウォッチリストに登録されていません"}),
                 404,
             )
 

@@ -12,11 +12,12 @@ Features:
 """
 
 import asyncio
-import time
-from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
-import aiohttp
 import logging
+import time
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+import aiohttp
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,8 @@ class AniListBatchClient:
         # エイリアスを使って複数作品を1クエリで取得
         queries = []
         for idx, anime_id in enumerate(anime_ids):
-            queries.append(f"""
+            queries.append(
+                f"""
             anime{idx}: Media(id: {anime_id}, type: ANIME) {{
                 id
                 title {{
@@ -123,7 +125,8 @@ class AniListBatchClient:
                     episode
                 }}
             }}
-            """)
+            """
+            )
 
         query = "query {" + "\n".join(queries) + "}"
         return query
@@ -181,7 +184,7 @@ class AniListBatchClient:
                     self.BASE_URL,
                     json=payload,
                     headers=headers,
-                    timeout=aiohttp.ClientTimeout(total=30)
+                    timeout=aiohttp.ClientTimeout(total=30),
                 ) as response:
                     self.request_count += 1
 
@@ -203,7 +206,7 @@ class AniListBatchClient:
             except (aiohttp.ClientError, asyncio.TimeoutError) as e:
                 logger.warning(f"Request failed (attempt {attempt + 1}/{self.max_retries}): {e}")
                 if attempt < self.max_retries - 1:
-                    await asyncio.sleep(self.retry_delay * (2 ** attempt))  # Exponential backoff
+                    await asyncio.sleep(self.retry_delay * (2**attempt))  # Exponential backoff
                 else:
                     raise
 
@@ -226,7 +229,7 @@ class AniListBatchClient:
 
         # MAX_BATCH_SIZEごとに分割してバッチ処理
         for i in range(0, len(anime_ids), self.MAX_BATCH_SIZE):
-            batch = anime_ids[i:i + self.MAX_BATCH_SIZE]
+            batch = anime_ids[i : i + self.MAX_BATCH_SIZE]
             logger.info(f"Fetching batch {i//self.MAX_BATCH_SIZE + 1}: {len(batch)} anime")
 
             query = self._build_batch_query(batch)
@@ -252,11 +255,7 @@ class AniListBatchClient:
         return results
 
     async def search_anime_by_season(
-        self,
-        season: str,
-        year: int,
-        page: int = 1,
-        per_page: int = 50
+        self, season: str, year: int, page: int = 1, per_page: int = 50
     ) -> List[Dict[str, Any]]:
         """
         シーズン別アニメ検索
@@ -307,12 +306,7 @@ class AniListBatchClient:
         }
         """
 
-        variables = {
-            "season": season.upper(),
-            "year": year,
-            "page": page,
-            "perPage": per_page
-        }
+        variables = {"season": season.upper(), "year": year, "page": page, "perPage": per_page}
 
         try:
             response = await self._execute_query(query, variables)
@@ -369,11 +363,7 @@ class AniListBatchClient:
         page = 1
 
         while True:
-            variables = {
-                "airingAt_greater": now,
-                "airingAt_lesser": future,
-                "page": page
-            }
+            variables = {"airingAt_greater": now, "airingAt_lesser": future, "page": page}
 
             try:
                 response = await self._execute_query(query, variables)

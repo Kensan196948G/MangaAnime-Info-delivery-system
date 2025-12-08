@@ -1,10 +1,10 @@
 """
 設定管理モジュール（型ヒント付き）
 """
+
 import json
 import os
-from typing import Dict, Any, List, Optional
-from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 class Config:
@@ -31,7 +31,7 @@ class Config:
             return self._get_default_config()
 
         try:
-            with open(self.config_path, 'r', encoding='utf-8') as f:
+            with open(self.config_path, "r", encoding="utf-8") as f:
                 config: Dict[str, Any] = json.load(f)
                 return config
         except (json.JSONDecodeError, IOError) as e:
@@ -46,40 +46,30 @@ class Config:
             Dict[str, Any]: デフォルト設定
         """
         return {
-            "database": {
-                "path": "data/db.sqlite3"
-            },
+            "database": {"path": "data/db.sqlite3"},
             "gmail": {
                 "credentials_path": "config/credentials.json",
                 "token_path": "config/token.json",
-                "recipient": "your-email@example.com"
+                "recipient": "your-email@example.com",
             },
             "calendar": {
                 "credentials_path": "config/credentials.json",
                 "token_path": "config/calendar_token.json",
-                "calendar_id": "primary"
+                "calendar_id": "primary",
             },
-            "anilist": {
-                "api_url": "https://graphql.anilist.co",
-                "rate_limit": 90
-            },
-            "ng_keywords": [
-                "エロ", "R18", "成人向け", "BL", "百合", "ボーイズラブ"
-            ],
+            "anilist": {"api_url": "https://graphql.anilist.co", "rate_limit": 90},
+            "ng_keywords": ["エロ", "R18", "成人向け", "BL", "百合", "ボーイズラブ"],
             "rss_feeds": {
                 "bookwalker": "https://bookwalker.jp/series/rss/",
                 "magapoke": "https://pocket.shonenmagazine.com/rss",
-                "danime": "https://anime.dmkt-sp.jp/animestore/CF/rss/"
+                "danime": "https://anime.dmkt-sp.jp/animestore/CF/rss/",
             },
-            "schedule": {
-                "daily_run_time": "08:00",
-                "timezone": "Asia/Tokyo"
-            },
+            "schedule": {"daily_run_time": "08:00", "timezone": "Asia/Tokyo"},
             "logging": {
                 "level": "INFO",
                 "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                "file": "logs/app.log"
-            }
+                "file": "logs/app.log",
+            },
         }
 
     def get(self, key: str, default: Any = None) -> Any:
@@ -93,7 +83,7 @@ class Config:
         Returns:
             Any: 設定値
         """
-        keys = key.split('.')
+        keys = key.split(".")
         value: Any = self.config
 
         for k in keys:
@@ -112,7 +102,7 @@ class Config:
             key: 設定キー（ドット区切りで階層指定可能）
             value: 設定値
         """
-        keys = key.split('.')
+        keys = key.split(".")
         config: Dict[str, Any] = self.config
 
         for k in keys[:-1]:
@@ -126,7 +116,7 @@ class Config:
         """設定ファイルを保存"""
         os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
 
-        with open(self.config_path, 'w', encoding='utf-8') as f:
+        with open(self.config_path, "w", encoding="utf-8") as f:
             json.dump(self.config, f, ensure_ascii=False, indent=2)
 
     def get_ng_keywords(self) -> List[str]:
@@ -136,7 +126,7 @@ class Config:
         Returns:
             List[str]: NGキーワードのリスト
         """
-        keywords = self.get('ng_keywords', [])
+        keywords = self.get("ng_keywords", [])
         if isinstance(keywords, list):
             return keywords
         return []
@@ -148,8 +138,8 @@ class Config:
         Returns:
             str: データベースパス
         """
-        path = self.get('database.path', 'data/db.sqlite3')
-        return str(path) if path else 'data/db.sqlite3'
+        path = self.get("database.path", "data/db.sqlite3")
+        return str(path) if path else "data/db.sqlite3"
 
     def get_gmail_config(self) -> Dict[str, str]:
         """
@@ -158,14 +148,16 @@ class Config:
         Returns:
             Dict[str, str]: Gmail設定
         """
-        gmail_config = self.get('gmail', {})
+        gmail_config = self.get("gmail", {})
         if not isinstance(gmail_config, dict):
             gmail_config = {}
 
         return {
-            'credentials_path': str(gmail_config.get('credentials_path', 'config/credentials.json')),
-            'token_path': str(gmail_config.get('token_path', 'config/token.json')),
-            'recipient': str(gmail_config.get('recipient', 'your-email@example.com'))
+            "credentials_path": str(
+                gmail_config.get("credentials_path", "config/credentials.json")
+            ),
+            "token_path": str(gmail_config.get("token_path", "config/token.json")),
+            "recipient": str(gmail_config.get("recipient", "your-email@example.com")),
         }
 
     def get_calendar_config(self) -> Dict[str, str]:
@@ -175,14 +167,16 @@ class Config:
         Returns:
             Dict[str, str]: カレンダー設定
         """
-        calendar_config = self.get('calendar', {})
+        calendar_config = self.get("calendar", {})
         if not isinstance(calendar_config, dict):
             calendar_config = {}
 
         return {
-            'credentials_path': str(calendar_config.get('credentials_path', 'config/credentials.json')),
-            'token_path': str(calendar_config.get('token_path', 'config/calendar_token.json')),
-            'calendar_id': str(calendar_config.get('calendar_id', 'primary'))
+            "credentials_path": str(
+                calendar_config.get("credentials_path", "config/credentials.json")
+            ),
+            "token_path": str(calendar_config.get("token_path", "config/calendar_token.json")),
+            "calendar_id": str(calendar_config.get("calendar_id", "primary")),
         }
 
     def get_rss_feeds(self) -> Dict[str, str]:
@@ -192,7 +186,7 @@ class Config:
         Returns:
             Dict[str, str]: RSSフィードのURL辞書
         """
-        feeds = self.get('rss_feeds', {})
+        feeds = self.get("rss_feeds", {})
         if isinstance(feeds, dict):
             return {k: str(v) for k, v in feeds.items()}
         return {}

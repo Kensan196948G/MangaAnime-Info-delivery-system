@@ -14,10 +14,24 @@ from datetime import datetime
 from functools import wraps
 from typing import Dict, List, Optional
 
-from flask import (Blueprint, current_app, flash, jsonify, redirect,
-                   render_template, request, url_for)
-from flask_login import (LoginManager, UserMixin, current_user, login_required,
-                         login_user, logout_user)
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -272,9 +286,7 @@ def login():
             is_locked, unlock_time = attempt_tracker.is_locked(username)
 
             if is_locked:
-                remaining_minutes = int(
-                    (unlock_time - datetime.now()).total_seconds() / 60
-                )
+                remaining_minutes = int((unlock_time - datetime.now()).total_seconds() / 60)
                 flash(
                     f"アカウントがロックされています。{remaining_minutes}分後に再試行してください。",
                     "danger",
@@ -412,9 +424,7 @@ def status():
                 "username": current_user.username,
                 "is_admin": current_user.is_admin,
                 "last_login": (
-                    current_user.last_login.isoformat()
-                    if current_user.last_login
-                    else None
+                    current_user.last_login.isoformat() if current_user.last_login else None
                 ),
             }
         )
@@ -430,9 +440,7 @@ def refresh():
         if current_user.check_password(password):
             # セッションを更新
             login_user(current_user, fresh=True)
-            logger.info(
-                f"ユーザー '{current_user.username}' のセッションを更新しました"
-            )
+            logger.info(f"ユーザー '{current_user.username}' のセッションを更新しました")
 
             # 監査ログ記録
             try:

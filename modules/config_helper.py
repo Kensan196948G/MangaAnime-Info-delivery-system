@@ -73,9 +73,7 @@ class ConfigHelper:
     @property
     def email_enabled(self) -> bool:
         """メール通知が有効か"""
-        return (
-            self._config.get("notifications", {}).get("email", {}).get("enabled", False)
-        )
+        return self._config.get("notifications", {}).get("email", {}).get("enabled", False)
 
     @email_enabled.setter
     def email_enabled(self, value: bool):
@@ -112,18 +110,12 @@ class ConfigHelper:
     @property
     def email_send_time(self) -> str:
         """メール送信時刻"""
-        return (
-            self._config.get("notifications", {})
-            .get("email", {})
-            .get("send_time", "08:00")
-        )
+        return self._config.get("notifications", {}).get("email", {}).get("send_time", "08:00")
 
     @property
     def email_html_template(self) -> Optional[str]:
         """HTMLメールテンプレートファイル"""
-        return (
-            self._config.get("notifications", {}).get("email", {}).get("html_template")
-        )
+        return self._config.get("notifications", {}).get("email", {}).get("html_template")
 
     # ========================================
     # Calendar設定
@@ -132,11 +124,7 @@ class ConfigHelper:
     @property
     def calendar_enabled(self) -> bool:
         """カレンダー連携が有効か"""
-        return (
-            self._config.get("notifications", {})
-            .get("calendar", {})
-            .get("enabled", False)
-        )
+        return self._config.get("notifications", {}).get("calendar", {}).get("enabled", False)
 
     @calendar_enabled.setter
     def calendar_enabled(self, value: bool):
@@ -151,9 +139,7 @@ class ConfigHelper:
     def calendar_id(self) -> str:
         """GoogleカレンダーID"""
         return (
-            self._config.get("notifications", {})
-            .get("calendar", {})
-            .get("calendar_id", "primary")
+            self._config.get("notifications", {}).get("calendar", {}).get("calendar_id", "primary")
         )
 
     @property
@@ -168,11 +154,7 @@ class ConfigHelper:
     @property
     def calendar_color_by_genre(self) -> bool:
         """ジャンル別の色分けが有効か"""
-        return (
-            self._config.get("notifications", {})
-            .get("calendar", {})
-            .get("color_by_genre", True)
-        )
+        return self._config.get("notifications", {}).get("calendar", {}).get("color_by_genre", True)
 
     @property
     def calendar_reminders(self) -> List[int]:
@@ -366,9 +348,7 @@ class ConfigHelper:
     def api_rss_rate_limit(self) -> int:
         """RSS取得のレート制限（回/分）"""
         return (
-            self._config.get("api", {})
-            .get("rate_limiting", {})
-            .get("rss_requests_per_minute", 30)
+            self._config.get("api", {}).get("rate_limiting", {}).get("rss_requests_per_minute", 30)
         )
 
     @property

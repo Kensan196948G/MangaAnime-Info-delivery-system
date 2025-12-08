@@ -15,8 +15,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import requests
-from flask import (Flask, flash, jsonify, make_response, redirect,
-                   render_template, request, url_for)
+from flask import Flask, flash, jsonify, make_response, redirect, render_template, request, url_for
 
 # プロジェクトルートをPythonパスに追加
 project_root = Path(__file__).parent.parent
@@ -477,9 +476,7 @@ def test_api_connections():
         future_to_name = {
             executor.submit(test_single_api, "anilist", test_anilist): "anilist",
             executor.submit(test_single_api, "shobo", test_shobo): "shobo",
-            executor.submit(
-                test_single_api, "bookwalker", test_yahoo_rss
-            ): "bookwalker",
+            executor.submit(test_single_api, "bookwalker", test_yahoo_rss): "bookwalker",
             executor.submit(test_single_api, "other_rss", test_nhk_rss): "other_rss",
         }
 
@@ -547,12 +544,12 @@ def dashboard():
         "pending_notifications": conn.execute(
             "SELECT COUNT(*) FROM releases WHERE notified = 0"
         ).fetchone()[0],
-        "anime_count": conn.execute(
-            'SELECT COUNT(*) FROM works WHERE type = "anime"'
-        ).fetchone()[0],
-        "manga_count": conn.execute(
-            'SELECT COUNT(*) FROM works WHERE type = "manga"'
-        ).fetchone()[0],
+        "anime_count": conn.execute('SELECT COUNT(*) FROM works WHERE type = "anime"').fetchone()[
+            0
+        ],
+        "manga_count": conn.execute('SELECT COUNT(*) FROM works WHERE type = "manga"').fetchone()[
+            0
+        ],
     }
 
     conn.close()
@@ -742,9 +739,7 @@ def config():
 
         # Update other settings
         config_data["notification_email"] = request.form.get("notification_email", "")
-        config_data["check_interval_hours"] = int(
-            request.form.get("check_interval_hours", 24)
-        )
+        config_data["check_interval_hours"] = int(request.form.get("check_interval_hours", 24))
 
         # Update enabled sources
         config_data["enabled_sources"] = {
@@ -855,8 +850,7 @@ def api_realtime_logs():
                             # Parse log entry
                             log_entry = parse_log_entry(line)
                             if log_entry and (
-                                level_filter == "all"
-                                or log_entry["level"].lower() == level_filter
+                                level_filter == "all" or log_entry["level"].lower() == level_filter
                             ):
                                 all_logs.append(log_entry)
             except Exception as e:
@@ -1116,9 +1110,7 @@ def api_rss_feeds():
         logger.info(f"Loading {len(rss_feeds_list)} RSS feeds from config.json")
 
         for feed in rss_feeds_list:
-            feed_id = (
-                feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
-            )
+            feed_id = feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
             feed_stats = stats_dict.get(feed_id, {})
             logger.debug(
                 f"Feed: {feed.get('name')} → ID: {feed_id}, Stats found: {feed_id in stats_dict}"
@@ -1128,18 +1120,14 @@ def api_rss_feeds():
             last_run_formatted = "未実行"
             if feed_stats.get("last_run"):
                 try:
-                    last_run_dt = datetime.strptime(
-                        feed_stats["last_run"], "%Y-%m-%d %H:%M:%S"
-                    )
+                    last_run_dt = datetime.strptime(feed_stats["last_run"], "%Y-%m-%d %H:%M:%S")
                     delta = datetime.now() - last_run_dt
                     if delta.total_seconds() < 60:
                         last_run_formatted = f"{int(delta.total_seconds())}秒前"
                     elif delta.total_seconds() < 3600:
                         last_run_formatted = f"{int(delta.total_seconds() / 60)}分前"
                     elif delta.total_seconds() < 86400:
-                        last_run_formatted = (
-                            f"{int(delta.total_seconds() / 3600)}時間前"
-                        )
+                        last_run_formatted = f"{int(delta.total_seconds() / 3600)}時間前"
                     else:
                         last_run_formatted = f"{int(delta.total_seconds() / 86400)}日前"
                 except:
@@ -1229,9 +1217,7 @@ def api_rss_feeds_test():
         feed_config = None
         for feed in rss_feeds_list:
             # Generate ID from name (same logic as in /api/rss-feeds)
-            generated_id = (
-                feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
-            )
+            generated_id = feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
             if generated_id == feed_id:
                 feed_config = feed
                 break
@@ -1271,9 +1257,7 @@ def api_rss_feeds_test():
 
             if feed.bozo:
                 # Feed has parsing errors
-                logger.warning(
-                    f"Feed parsing error for {feed_name}: {feed.bozo_exception}"
-                )
+                logger.warning(f"Feed parsing error for {feed_name}: {feed.bozo_exception}")
                 return jsonify(
                     {
                         "success": False,
@@ -1311,9 +1295,7 @@ def api_rss_feeds_test():
                     }
                 )
             else:
-                return jsonify(
-                    {"success": False, "error": f"HTTPエラー: {e.response.status_code}"}
-                )
+                return jsonify({"success": False, "error": f"HTTPエラー: {e.response.status_code}"})
         except Exception as e:
             logger.error(f"Error testing {feed_name}: {str(e)}")
             return jsonify({"success": False, "error": str(e)[:200]})
@@ -1429,12 +1411,8 @@ def api_rss_feeds_diagnose():
                 )
 
         # Determine overall status
-        error_count = sum(
-            1 for check in diagnosis["checks"] if check["status"] == "error"
-        )
-        warning_count = sum(
-            1 for check in diagnosis["checks"] if check["status"] == "warning"
-        )
+        error_count = sum(1 for check in diagnosis["checks"] if check["status"] == "error")
+        warning_count = sum(1 for check in diagnosis["checks"] if check["status"] == "warning")
 
         if error_count > 0:
             diagnosis["overallStatus"] = "error"
@@ -1443,9 +1421,7 @@ def api_rss_feeds_diagnose():
             )
         elif warning_count > 0:
             diagnosis["overallStatus"] = "warning"
-            diagnosis["recommendation"] = (
-                "接続に問題がある可能性があります。監視を続けてください。"
-            )
+            diagnosis["recommendation"] = "接続に問題がある可能性があります。監視を続けてください。"
         else:
             diagnosis["overallStatus"] = "success"
             diagnosis["recommendation"] = "すべてのチェックが成功しました。"
@@ -1463,10 +1439,7 @@ def api_collection_status():
     current_time = time.time()
 
     # Check cache first
-    if (
-        api_status_cache["data"]
-        and current_time - api_status_cache["timestamp"] < CACHE_DURATION
-    ):
+    if api_status_cache["data"] and current_time - api_status_cache["timestamp"] < CACHE_DURATION:
         return jsonify(api_status_cache["data"])
 
     conn = get_db_connection()
@@ -1494,9 +1467,9 @@ def api_collection_status():
 
     metrics = {
         "todayCollected": today_collected,
-        "pendingCount": conn.execute(
-            "SELECT COUNT(*) FROM releases WHERE notified = 0"
-        ).fetchone()[0],
+        "pendingCount": conn.execute("SELECT COUNT(*) FROM releases WHERE notified = 0").fetchone()[
+            0
+        ],
         "errorCount": conn.execute(
             "SELECT COUNT(*) FROM collection_stats WHERE success_rate < 80 AND total_attempts > 0"
         ).fetchone()[0],
@@ -1599,9 +1572,7 @@ def api_works():
 
     # Apply same filters as main query
     if search:
-        count_query += (
-            " AND (w.title LIKE ? OR w.title_kana LIKE ? OR w.title_en LIKE ?)"
-        )
+        count_query += " AND (w.title LIKE ? OR w.title_kana LIKE ? OR w.title_en LIKE ?)"
         count_params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
 
     if work_type:
@@ -1628,9 +1599,7 @@ def api_works():
     works_data = []
     for work in works:
         work_dict = dict(work)
-        work_dict["platforms"] = (
-            work_dict["platforms"].split(",") if work_dict["platforms"] else []
-        )
+        work_dict["platforms"] = work_dict["platforms"].split(",") if work_dict["platforms"] else []
         work_dict["quality_score"] = 85  # Mock quality score
         work_dict["genres"] = ["Action", "Adventure"]  # Mock genres
         work_dict["description"] = "サンプル説明文です。"  # Mock description
@@ -1679,9 +1648,7 @@ def api_work_detail(work_id):
     conn.close()
 
     work_dict = dict(work)
-    work_dict["platforms"] = (
-        work_dict["platforms"].split(",") if work_dict["platforms"] else []
-    )
+    work_dict["platforms"] = work_dict["platforms"].split(",") if work_dict["platforms"] else []
     work_dict["releases"] = [dict(release) for release in releases]
     work_dict["quality_score"] = 85  # Mock quality score
     work_dict["genres"] = ["Action", "Adventure"]  # Mock genres
@@ -1857,9 +1824,7 @@ def api_collection_processes():
             last_update = "未実行"
             if stats.get("last_run"):
                 try:
-                    last_run_dt = datetime.fromisoformat(
-                        stats["last_run"].replace("Z", "+00:00")
-                    )
+                    last_run_dt = datetime.fromisoformat(stats["last_run"].replace("Z", "+00:00"))
                     delta = datetime.now() - last_run_dt
                     if delta.total_seconds() < 60:
                         last_update = f"{int(delta.total_seconds())}秒前"
@@ -1881,19 +1846,11 @@ def api_collection_processes():
                         else ("warning" if enabled else "disconnected")
                     ),
                     "last_update": last_update if enabled else "無効",
-                    "success_rate": (
-                        round(stats.get("success_rate", 0), 1) if enabled else 0
-                    ),
+                    "success_rate": (round(stats.get("success_rate", 0), 1) if enabled else 0),
                     "response_time": (
-                        f"{stats.get('avg_response_time', 0):.1f}s"
-                        if enabled
-                        else "N/A"
+                        f"{stats.get('avg_response_time', 0):.1f}s" if enabled else "N/A"
                     ),
-                    "note": (
-                        f"取得: {stats.get('items_collected', 0)}件"
-                        if enabled
-                        else "無効"
-                    ),
+                    "note": (f"取得: {stats.get('items_collected', 0)}件" if enabled else "無効"),
                     "items_collected": stats.get("items_collected", 0),
                     "total_attempts": stats.get("total_attempts", 0),
                 }
@@ -1904,9 +1861,7 @@ def api_collection_processes():
         rss_feeds_list = rss_config.get("feeds", [])
 
         for feed in rss_feeds_list:
-            feed_id = (
-                feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
-            )
+            feed_id = feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
             stats = stats_dict.get(feed_id, {})
             enabled = feed.get("enabled", False)
 
@@ -1914,9 +1869,7 @@ def api_collection_processes():
             last_update = "未実行"
             if stats.get("last_run"):
                 try:
-                    last_run_dt = datetime.fromisoformat(
-                        stats["last_run"].replace("Z", "+00:00")
-                    )
+                    last_run_dt = datetime.fromisoformat(stats["last_run"].replace("Z", "+00:00"))
                     delta = datetime.now() - last_run_dt
                     if delta.total_seconds() < 60:
                         last_update = f"{int(delta.total_seconds())}秒前"
@@ -1938,19 +1891,11 @@ def api_collection_processes():
                         else ("warning" if enabled else "disconnected")
                     ),
                     "last_update": last_update if enabled else "無効",
-                    "success_rate": (
-                        round(stats.get("success_rate", 0), 1) if enabled else 0
-                    ),
+                    "success_rate": (round(stats.get("success_rate", 0), 1) if enabled else 0),
                     "response_time": (
-                        f"{stats.get('avg_response_time', 0):.1f}s"
-                        if enabled
-                        else "N/A"
+                        f"{stats.get('avg_response_time', 0):.1f}s" if enabled else "N/A"
                     ),
-                    "note": (
-                        f"取得: {stats.get('items_collected', 0)}件"
-                        if enabled
-                        else "無効"
-                    ),
+                    "note": (f"取得: {stats.get('items_collected', 0)}件" if enabled else "無効"),
                     "items_collected": stats.get("items_collected", 0),
                     "total_attempts": stats.get("total_attempts", 0),
                 }
@@ -2110,9 +2055,7 @@ def websocket_collection_status():
     """Fallback endpoint for collection status (replaces WebSocket for now)"""
     # Return regular JSON response instead of WebSocket error
     return (
-        jsonify(
-            {"status": "ok", "message": "Real-time updates available via API polling"}
-        ),
+        jsonify({"status": "ok", "message": "Real-time updates available via API polling"}),
         200,
     )
 
@@ -2133,9 +2076,7 @@ def api_test_notification():
         load_dotenv()
 
         data = request.get_json() or {}
-        message = data.get(
-            "message", "テスト通知です。システムが正常に動作しています。"
-        )
+        message = data.get("message", "テスト通知です。システムが正常に動作しています。")
 
         logger.info(f"Test notification requested: {message}")
 
@@ -2276,9 +2217,7 @@ def api_test_configuration():
             config = json.load(f)
     except Exception as e:
         return (
-            jsonify(
-                {"success": False, "error": f"設定ファイルの読み込みに失敗: {str(e)}"}
-            ),
+            jsonify({"success": False, "error": f"設定ファイルの読み込みに失敗: {str(e)}"}),
             500,
         )
 
@@ -2303,15 +2242,11 @@ def api_test_configuration():
 
         if not sender_email or not sender_password:
             results["gmail"]["status"] = "error"
-            results["gmail"][
-                "message"
-            ] = "メール設定が不完全です（.envファイルを確認してください）"
+            results["gmail"]["message"] = "メール設定が不完全です（.envファイルを確認してください）"
         else:
             # SSL接続（465ポート）
             context = ssl.create_default_context()
-            with smtplib.SMTP_SSL(
-                smtp_server, smtp_port, context=context, timeout=10
-            ) as server:
+            with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context, timeout=10) as server:
                 server.login(sender_email, sender_password)
 
             results["gmail"]["status"] = "success"
@@ -2402,9 +2337,7 @@ def api_test_configuration():
                 results["anilist"]["message"] = "AniList APIレスポンスエラー"
         else:
             results["anilist"]["status"] = "error"
-            results["anilist"][
-                "message"
-            ] = f"AniList API HTTPエラー: {response.status_code}"
+            results["anilist"]["message"] = f"AniList API HTTPエラー: {response.status_code}"
 
     except Exception as e:
         results["anilist"]["status"] = "error"
@@ -2483,9 +2416,7 @@ def api_test_configuration():
         results["rss_feeds"]["message"] = f"RSSフィードテストエラー: {str(e)}"
 
     # Calculate overall success
-    success_count = sum(
-        1 for result in results.values() if result["status"] == "success"
-    )
+    success_count = sum(1 for result in results.values() if result["status"] == "success")
     total_tests = len(results)
     overall_success = success_count == total_tests
 
@@ -2544,9 +2475,7 @@ def generate_ics():
             # 詳細情報
             description = f"作品: {release.get('title', '')}\\n"
             description += f"タイプ: {type_label}\\n"
-            description += (
-                f"{release_text}: 第{release.get('number', '')}{release_text}\\n"
-            )
+            description += f"{release_text}: 第{release.get('number', '')}{release_text}\\n"
             description += f"配信プラットフォーム: {release.get('platform', '')}\\n"
             if release.get("source_url"):
                 description += f"ソースURL: {release.get('source_url')}\\n"
@@ -2701,16 +2630,12 @@ def api_notification_status():
                 "checkIntervalHours": interval_hours,
                 "todayStats": {
                     "totalExecutions": (
-                        email_stats_today["total_executions"]
-                        if email_stats_today
-                        else 0
+                        email_stats_today["total_executions"] if email_stats_today else 0
                     ),
                     "successCount": (
                         email_stats_today["success_count"] if email_stats_today else 0
                     ),
-                    "errorCount": (
-                        email_stats_today["error_count"] if email_stats_today else 0
-                    ),
+                    "errorCount": (email_stats_today["error_count"] if email_stats_today else 0),
                     "totalReleases": (
                         email_stats_today["total_releases"] if email_stats_today else 0
                     ),
@@ -2737,31 +2662,21 @@ def api_notification_status():
                     if calendar_last and not calendar_last["success"]
                     else None
                 ),
-                "lastEventsCount": (
-                    calendar_last["releases_count"] if calendar_last else 0
-                ),
+                "lastEventsCount": (calendar_last["releases_count"] if calendar_last else 0),
                 "nextScheduled": next_run.isoformat(),
                 "checkIntervalHours": interval_hours,
                 "todayStats": {
                     "totalExecutions": (
-                        calendar_stats_today["total_executions"]
-                        if calendar_stats_today
-                        else 0
+                        calendar_stats_today["total_executions"] if calendar_stats_today else 0
                     ),
                     "successCount": (
-                        calendar_stats_today["success_count"]
-                        if calendar_stats_today
-                        else 0
+                        calendar_stats_today["success_count"] if calendar_stats_today else 0
                     ),
                     "errorCount": (
-                        calendar_stats_today["error_count"]
-                        if calendar_stats_today
-                        else 0
+                        calendar_stats_today["error_count"] if calendar_stats_today else 0
                     ),
                     "totalEvents": (
-                        calendar_stats_today["total_events"]
-                        if calendar_stats_today
-                        else 0
+                        calendar_stats_today["total_events"] if calendar_stats_today else 0
                     ),
                 },
                 "recentErrors": [
@@ -2857,9 +2772,7 @@ def api_sources():
             if not last_run_str:
                 return None
             try:
-                last_run_dt = datetime.fromisoformat(
-                    last_run_str.replace("Z", "+00:00")
-                )
+                last_run_dt = datetime.fromisoformat(last_run_str.replace("Z", "+00:00"))
                 delta = datetime.now() - last_run_dt
                 if delta.total_seconds() < 60:
                     return f"{int(delta.total_seconds())}秒前"
@@ -2879,9 +2792,7 @@ def api_sources():
             "type": "api",
             "enabled": anilist_config.get("enabled", True),
             "url": anilist_config.get("graphql_url", "https://graphql.anilist.co"),
-            "rate_limit": anilist_config.get("rate_limit", {}).get(
-                "requests_per_minute", 90
-            ),
+            "rate_limit": anilist_config.get("rate_limit", {}).get("requests_per_minute", 90),
             "timeout": anilist_config.get("timeout_seconds", 30),
             "description": "アニメ情報取得用GraphQL API",
             "data_type": "anime",
@@ -2911,9 +2822,7 @@ def api_sources():
                 "type": "api",
                 "enabled": kitsu_config.get("enabled", True),
                 "url": kitsu_config.get("base_url", "https://kitsu.io/api/edge"),
-                "rate_limit": kitsu_config.get("rate_limit", {}).get(
-                    "requests_per_minute", 90
-                ),
+                "rate_limit": kitsu_config.get("rate_limit", {}).get("requests_per_minute", 90),
                 "timeout": kitsu_config.get("timeout_seconds", 30),
                 "description": "アニメ・マンガ情報取得用REST API",
                 "data_type": "anime_manga",
@@ -2943,9 +2852,7 @@ def api_sources():
                 "type": "api",
                 "enabled": mangadex_config.get("enabled", True),
                 "url": mangadex_config.get("base_url", "https://api.mangadex.org"),
-                "rate_limit": mangadex_config.get("rate_limit", {}).get(
-                    "requests_per_minute", 40
-                ),
+                "rate_limit": mangadex_config.get("rate_limit", {}).get("requests_per_minute", 40),
                 "timeout": mangadex_config.get("timeout_seconds", 30),
                 "description": "マンガ情報取得用REST API",
                 "data_type": "manga",
@@ -2974,9 +2881,7 @@ def api_sources():
                 "name": "MangaUpdates API",
                 "type": "api",
                 "enabled": mangaupdates_config.get("enabled", True),
-                "url": mangaupdates_config.get(
-                    "base_url", "https://api.mangaupdates.com/v1"
-                ),
+                "url": mangaupdates_config.get("base_url", "https://api.mangaupdates.com/v1"),
                 "rate_limit": mangaupdates_config.get("rate_limit", {}).get(
                     "requests_per_minute", 30
                 ),
@@ -3009,9 +2914,7 @@ def api_sources():
                 "type": "api",
                 "enabled": annict_config.get("enabled", True),
                 "url": annict_config.get("base_url", "https://api.annict.com/v1"),
-                "rate_limit": annict_config.get("rate_limit", {}).get(
-                    "requests_per_minute", 60
-                ),
+                "rate_limit": annict_config.get("rate_limit", {}).get("requests_per_minute", 60),
                 "timeout": annict_config.get("timeout_seconds", 30),
                 "description": "Annict REST API v1 - 日本アニメ放送情報・作品データベース",
                 "data_type": "anime",
@@ -3040,9 +2943,7 @@ def api_sources():
             "type": "api",
             "enabled": syoboi_config.get("enabled", False),
             "url": syoboi_config.get("base_url", "https://cal.syoboi.jp"),
-            "rate_limit": syoboi_config.get("rate_limit", {}).get(
-                "requests_per_minute", 60
-            ),
+            "rate_limit": syoboi_config.get("rate_limit", {}).get("requests_per_minute", 60),
             "description": "日本のアニメ放送スケジュール",
             "data_type": "anime",
             "last_test": None,
@@ -3066,9 +2967,7 @@ def api_sources():
         rss_feeds = rss_config.get("feeds", [])
 
         for feed in rss_feeds:
-            feed_id = (
-                feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
-            )
+            feed_id = feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
             feed_stats = stats_dict.get(feed_id, {})
             feed_source = {
                 "id": feed_id,
@@ -3108,9 +3007,7 @@ def api_sources():
             sources["summary"]["total_sources"] - sources["summary"]["enabled_sources"]
         )
 
-        logger.info(
-            f"Returning {sources['summary']['total_sources']} sources with statistics"
-        )
+        logger.info(f"Returning {sources['summary']['total_sources']} sources with statistics")
         return jsonify(sources)
 
     except Exception as e:
@@ -3170,9 +3067,7 @@ def api_test_anilist():
                 data = response.json()
                 if "errors" in data:
                     test_results["tests"][-1]["status"] = "warning"
-                    test_results["tests"][-1][
-                        "details"
-                    ] = f"GraphQL errors: {data['errors']}"
+                    test_results["tests"][-1]["details"] = f"GraphQL errors: {data['errors']}"
 
         except requests.exceptions.Timeout:
             test_results["tests"].append(
@@ -3661,9 +3556,7 @@ def api_test_rss():
                             "status": "success" if entries_count > 0 else "warning",
                             "response_time_ms": round(parse_time * 1000, 2),
                             "entries_count": entries_count,
-                            "feed_title": parsed_feed.get("feed", {}).get(
-                                "title", "N/A"
-                            ),
+                            "feed_title": parsed_feed.get("feed", {}).get("title", "N/A"),
                             "has_valid_structure": has_title and entries_count > 0,
                             "details": (
                                 f"{entries_count}件のエントリー検出"
@@ -3681,8 +3574,7 @@ def api_test_rss():
                             "link": sample_entry.get("link", "N/A"),
                             "published": sample_entry.get("published", "N/A"),
                             "has_description": bool(
-                                sample_entry.get("description")
-                                or sample_entry.get("summary")
+                                sample_entry.get("description") or sample_entry.get("summary")
                             ),
                         }
 
@@ -3798,9 +3690,7 @@ def api_toggle_source():
             rss_feeds = config.get("apis", {}).get("rss_feeds", {}).get("feeds", [])
 
             for feed in rss_feeds:
-                feed_key = (
-                    feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
-                )
+                feed_key = feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
                 if feed_key == source_id.lower():
                     feed["enabled"] = bool(enabled)
                     updated = True
@@ -3877,9 +3767,7 @@ def api_test_all_sources():
                         return json.loads(test_result[0].get_data(as_text=True))
 
                 elif source_type == "rss":
-                    with app.test_request_context(
-                        method="POST", json={"feed_id": source_id}
-                    ):
+                    with app.test_request_context(method="POST", json={"feed_id": source_id}):
                         test_result = api_test_rss()
                         return json.loads(test_result[0].get_data(as_text=True))
 
@@ -3900,16 +3788,13 @@ def api_test_all_sources():
         rss_feeds = config.get("apis", {}).get("rss_feeds", {}).get("feeds", [])
         for feed in rss_feeds:
             if feed.get("enabled", False):
-                feed_id = (
-                    feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
-                )
+                feed_id = feed.get("name", "").lower().replace(" ", "_").replace("＋", "plus")
                 sources_to_test.append({"type": "rss", "id": feed_id})
 
         # Test sources in parallel
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             future_to_source = {
-                executor.submit(test_source, source): source
-                for source in sources_to_test
+                executor.submit(test_source, source): source for source in sources_to_test
             }
 
             for future in concurrent.futures.as_completed(future_to_source, timeout=30):
@@ -3960,9 +3845,7 @@ def api_calendar_sync():
 
         if months_ahead < 1 or months_ahead > 12:
             return (
-                jsonify(
-                    {"success": False, "error": "months_ahead must be between 1 and 12"}
-                ),
+                jsonify({"success": False, "error": "months_ahead must be between 1 and 12"}),
                 400,
             )
 
@@ -4006,20 +3889,12 @@ def api_calendar_sync():
                     ).fetchone()
 
                     # Build event title
-                    release_type_label = (
-                        "話" if release["release_type"] == "episode" else "巻"
-                    )
+                    release_type_label = "話" if release["release_type"] == "episode" else "巻"
                     number_label = (
-                        f"第{release['number']}{release_type_label}"
-                        if release["number"]
-                        else ""
+                        f"第{release['number']}{release_type_label}" if release["number"] else ""
                     )
-                    platform_label = (
-                        f"[{release['platform']}]" if release["platform"] else ""
-                    )
-                    event_title = (
-                        f"{release['title']} {number_label} {platform_label}".strip()
-                    )
+                    platform_label = f"[{release['platform']}]" if release["platform"] else ""
+                    event_title = f"{release['title']} {number_label} {platform_label}".strip()
 
                     # Build description
                     description = f"""
@@ -4170,9 +4045,7 @@ def api_calendar_events():
                     }
                 )
 
-            return jsonify(
-                {"success": True, "total": len(events_list), "events": events_list}
-            )
+            return jsonify({"success": True, "total": len(events_list), "events": events_list})
 
         finally:
             conn.close()

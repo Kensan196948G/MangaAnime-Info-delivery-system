@@ -237,15 +237,11 @@ def prometheus_metrics():
 
     # Works count
     if db_status["status"] == "healthy":
-        metrics.append(
-            "# HELP mangaanime_works_total Total number of works in database"
-        )
+        metrics.append("# HELP mangaanime_works_total Total number of works in database")
         metrics.append("# TYPE mangaanime_works_total gauge")
         metrics.append(f'mangaanime_works_total {db_status["works_count"]}')
 
-        metrics.append(
-            "# HELP mangaanime_releases_total Total number of releases in database"
-        )
+        metrics.append("# HELP mangaanime_releases_total Total number of releases in database")
         metrics.append("# TYPE mangaanime_releases_total gauge")
         metrics.append(f'mangaanime_releases_total {db_status["releases_count"]}')
 

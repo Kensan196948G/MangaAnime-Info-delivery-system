@@ -144,9 +144,7 @@ class SecurityCompliance:
             audit_results.update(self._compile_audit_results())
 
             audit_duration = time.time() - audit_start
-            self.logger.info(
-                f"Security audit completed in {audit_duration:.2f} seconds"
-            )
+            self.logger.info(f"Security audit completed in {audit_duration:.2f} seconds")
 
         except Exception as e:
             self.logger.error(f"Security audit failed: {e}")
@@ -173,9 +171,7 @@ class SecurityCompliance:
 
             for category, patterns in self.security_patterns.items():
                 for pattern in patterns:
-                    matches = re.finditer(
-                        pattern, content, re.MULTILINE | re.IGNORECASE
-                    )
+                    matches = re.finditer(pattern, content, re.MULTILINE | re.IGNORECASE)
 
                     for match in matches:
                         # Find line number
@@ -185,9 +181,7 @@ class SecurityCompliance:
                         finding = SecurityFinding(
                             severity=self._get_pattern_severity(category),
                             category=category,
-                            description=self._get_pattern_description(
-                                category, match.group(0)
-                            ),
+                            description=self._get_pattern_description(category, match.group(0)),
                             file_path=str(file_path.relative_to(self.project_root)),
                             line_number=line_num,
                             remediation=self._get_pattern_remediation(category),
@@ -220,9 +214,7 @@ class SecurityCompliance:
             "unsafe_deserialization": f"Unsafe deserialization detected: {match_text[:50]}...",
             "weak_crypto": f"Weak cryptographic function: {match_text[:50]}...",
         }
-        return descriptions.get(
-            category, f"Security issue detected: {match_text[:50]}..."
-        )
+        return descriptions.get(category, f"Security issue detected: {match_text[:50]}...")
 
     def _get_pattern_remediation(self, category: str) -> str:
         """Get remediation advice for security pattern"""
@@ -640,9 +632,7 @@ class SecurityCompliance:
 
         # Calculate overall score
         total_score = sum(result.score for result in self.compliance_results)
-        overall_score = (
-            total_score / len(self.compliance_results) if self.compliance_results else 0
-        )
+        overall_score = total_score / len(self.compliance_results) if self.compliance_results else 0
 
         # Generate recommendations
         recommendations = self._generate_security_recommendations()
@@ -667,36 +657,26 @@ class SecurityCompliance:
         # Critical findings recommendations
         critical_count = sum(1 for f in self.findings if f.severity == "CRITICAL")
         if critical_count > 0:
-            recommendations.append(
-                f"Address {critical_count} critical security issues immediately"
-            )
+            recommendations.append(f"Address {critical_count} critical security issues immediately")
 
         # High findings recommendations
         high_count = sum(1 for f in self.findings if f.severity == "HIGH")
         if high_count > 0:
-            recommendations.append(
-                f"Fix {high_count} high-priority security vulnerabilities"
-            )
+            recommendations.append(f"Fix {high_count} high-priority security vulnerabilities")
 
         # Configuration recommendations
         config_findings = [f for f in self.findings if f.category == "configuration"]
         if config_findings:
-            recommendations.append(
-                "Review and secure configuration files and permissions"
-            )
+            recommendations.append("Review and secure configuration files and permissions")
 
         # Authentication recommendations
         auth_findings = [f for f in self.findings if f.category == "authentication"]
         if auth_findings:
-            recommendations.append(
-                "Strengthen authentication and credential management"
-            )
+            recommendations.append("Strengthen authentication and credential management")
 
         # General recommendations
         if len(self.findings) == 0:
-            recommendations.append(
-                "Security posture is good. Maintain regular security audits."
-            )
+            recommendations.append("Security posture is good. Maintain regular security audits.")
         elif len(self.findings) > 10:
             recommendations.append(
                 "High number of findings. Consider security training for development team."
@@ -719,14 +699,12 @@ class SecurityCompliance:
             "files_scanned": total_files_scanned,
             "findings_per_file": len(self.findings) / max(total_files_scanned, 1),
             "compliance_score": (
-                sum(r.score for r in self.compliance_results)
-                / len(self.compliance_results)
+                sum(r.score for r in self.compliance_results) / len(self.compliance_results)
                 if self.compliance_results
                 else 0
             ),
             "security_coverage": (
-                len([r for r in self.compliance_results if r.passed])
-                / len(self.compliance_results)
+                len([r for r in self.compliance_results if r.passed]) / len(self.compliance_results)
                 if self.compliance_results
                 else 0
             ),
@@ -819,12 +797,8 @@ class SecurityTestRunner:
 
         # Count results
         test_results["tests_run"] = len(test_results["test_details"])
-        test_results["tests_passed"] = len(
-            [t for t in test_results["test_details"] if t["passed"]]
-        )
-        test_results["tests_failed"] = (
-            test_results["tests_run"] - test_results["tests_passed"]
-        )
+        test_results["tests_passed"] = len([t for t in test_results["test_details"] if t["passed"]])
+        test_results["tests_failed"] = test_results["tests_run"] - test_results["tests_passed"]
 
         return test_results
 

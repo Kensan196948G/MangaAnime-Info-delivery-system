@@ -74,9 +74,7 @@ def calendar_retry_on_failure(
                             )
                             raise
 
-                    logger.warning(
-                        f"Attempt {attempt + 1} of {func.__name__} failed: {e}"
-                    )
+                    logger.warning(f"Attempt {attempt + 1} of {func.__name__} failed: {e}")
                     logger.info(f"Retrying in {current_delay:.1f} seconds...")
 
                     time.sleep(current_delay)
@@ -137,9 +135,7 @@ class GoogleCalendarManager:
         """
         self.config = config
         self.calendar_config = config.get("google", {}).get("calendar", {})
-        self.credentials_file = config.get("google", {}).get(
-            "credentials_file", "credentials.json"
-        )
+        self.credentials_file = config.get("google", {}).get("credentials_file", "credentials.json")
         self.token_file = config.get("google", {}).get("token_file", "token.json")
         self.scopes = config.get("google", {}).get(
             "scopes", ["https://www.googleapis.com/auth/calendar.events"]
@@ -214,9 +210,7 @@ class GoogleCalendarManager:
                     logger.warning("Calendar token file not found for refresh")
                     return False
 
-                creds = Credentials.from_authorized_user_file(
-                    self.token_file, self.scopes
-                )
+                creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
 
                 if not creds.refresh_token:
                     logger.warning("No refresh token available for Calendar")
@@ -234,9 +228,7 @@ class GoogleCalendarManager:
                     os.umask(old_umask)
 
                 # Update service with new credentials
-                self.service = build(
-                    "calendar", "v3", credentials=creds, cache_discovery=False
-                )
+                self.service = build("calendar", "v3", credentials=creds, cache_discovery=False)
 
                 # Update auth state
                 self.auth_state.token_expires_at = creds.expiry or (
@@ -272,9 +264,7 @@ class GoogleCalendarManager:
 
             # Load existing token
             if os.path.exists(self.token_file):
-                creds = Credentials.from_authorized_user_file(
-                    self.token_file, self.scopes
-                )
+                creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
 
             # If no valid credentials, authorize user
             if not creds or not creds.valid:
@@ -283,9 +273,7 @@ class GoogleCalendarManager:
                     creds.refresh(Request())
                 else:
                     if not os.path.exists(self.credentials_file):
-                        logger.error(
-                            f"Credentials file not found: {self.credentials_file}"
-                        )
+                        logger.error(f"Credentials file not found: {self.credentials_file}")
                         return False
 
                     logger.info("Initiating Google Calendar OAuth2 flow")
@@ -309,9 +297,7 @@ class GoogleCalendarManager:
             logger.error(f"Calendar authentication failed: {str(e)}")
             return False
 
-    def create_event(
-        self, event: CalendarEvent, releases_count: int = 1
-    ) -> Optional[str]:
+    def create_event(self, event: CalendarEvent, releases_count: int = 1) -> Optional[str]:
         """
         Create a calendar event with history recording.
 
@@ -340,9 +326,7 @@ class GoogleCalendarManager:
                         releases_count=releases_count,
                     )
                 except Exception as db_error:
-                    logger.warning(
-                        f"Failed to record calendar notification history: {db_error}"
-                    )
+                    logger.warning(f"Failed to record calendar notification history: {db_error}")
 
             return None
 
@@ -362,8 +346,7 @@ class GoogleCalendarManager:
                 "reminders": {
                     "useDefault": False,
                     "overrides": [
-                        {"method": "popup", "minutes": reminder}
-                        for reminder in event.reminders
+                        {"method": "popup", "minutes": reminder} for reminder in event.reminders
                     ],
                 },
             }
@@ -378,9 +361,7 @@ class GoogleCalendarManager:
 
             # Create the event
             created_event = (
-                self.service.events()
-                .insert(calendarId=self.calendar_id, body=event_body)
-                .execute()
+                self.service.events().insert(calendarId=self.calendar_id, body=event_body).execute()
             )
 
             event_id = created_event.get("id")
@@ -404,9 +385,7 @@ class GoogleCalendarManager:
                         releases_count=releases_count,
                     )
                 except Exception as db_error:
-                    logger.warning(
-                        f"Failed to record calendar notification history: {db_error}"
-                    )
+                    logger.warning(f"Failed to record calendar notification history: {db_error}")
 
         return event_id
 
@@ -441,8 +420,7 @@ class GoogleCalendarManager:
                 "reminders": {
                     "useDefault": False,
                     "overrides": [
-                        {"method": "popup", "minutes": reminder}
-                        for reminder in event.reminders
+                        {"method": "popup", "minutes": reminder} for reminder in event.reminders
                     ],
                 },
             }
@@ -485,9 +463,7 @@ class GoogleCalendarManager:
             return False
 
         try:
-            self.service.events().delete(
-                calendarId=self.calendar_id, eventId=event_id
-            ).execute()
+            self.service.events().delete(calendarId=self.calendar_id, eventId=event_id).execute()
 
             logger.info(f"Calendar event deleted successfully. Event ID: {event_id}")
             return True
@@ -575,9 +551,7 @@ class GoogleCalendarManager:
             # Parse release date
             if isinstance(release_date, str):
                 try:
-                    release_datetime = datetime.fromisoformat(
-                        release_date.replace("Z", "+00:00")
-                    )
+                    release_datetime = datetime.fromisoformat(release_date.replace("Z", "+00:00"))
                 except ValueError:
                     # Try parsing different date formats
                     for fmt in ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S"]:
@@ -633,9 +607,7 @@ class GoogleCalendarManager:
                 start_datetime=release_datetime,
                 end_datetime=end_datetime,
                 location=platform if platform else "",
-                color_id=self.color_mapping.get(
-                    release_type, self.color_mapping["default"]
-                ),
+                color_id=self.color_mapping.get(release_type, self.color_mapping["default"]),
                 reminders=reminder_minutes,
             )
 
@@ -651,9 +623,7 @@ class GoogleCalendarManager:
             logger.error(f"Failed to create release event: {str(e)}")
             return None
 
-    def bulk_create_release_events(
-        self, releases: List[Dict[str, Any]]
-    ) -> Dict[str, str]:
+    def bulk_create_release_events(self, releases: List[Dict[str, Any]]) -> Dict[str, str]:
         """
         Create calendar events for multiple releases.
 
@@ -676,9 +646,7 @@ class GoogleCalendarManager:
             except Exception as e:
                 logger.error(f"Error creating event for {title}: {str(e)}")
 
-        logger.info(
-            f"Created {len(results)} calendar events out of {len(releases)} releases"
-        )
+        logger.info(f"Created {len(results)} calendar events out of {len(releases)} releases")
         return results
 
     def search_events(self, query: str, max_results: int = 50) -> List[Dict[str, Any]]:
@@ -732,9 +700,7 @@ class GoogleCalendarManager:
             return None
 
         try:
-            calendar_info = (
-                self.service.calendars().get(calendarId=self.calendar_id).execute()
-            )
+            calendar_info = self.service.calendars().get(calendarId=self.calendar_id).execute()
 
             return {
                 "id": calendar_info.get("id"),
@@ -756,9 +722,7 @@ class CalendarEventFormatter:
     """Utility class for formatting calendar event information."""
 
     @staticmethod
-    def format_anime_event_title(
-        title: str, episode: str = None, platform: str = None
-    ) -> str:
+    def format_anime_event_title(title: str, episode: str = None, platform: str = None) -> str:
         """Format anime event title."""
         formatted_title = title
         if episode:
@@ -768,9 +732,7 @@ class CalendarEventFormatter:
         return formatted_title
 
     @staticmethod
-    def format_manga_event_title(
-        title: str, volume: str = None, platform: str = None
-    ) -> str:
+    def format_manga_event_title(title: str, volume: str = None, platform: str = None) -> str:
         """Format manga event title."""
         formatted_title = title
         if volume:

@@ -328,9 +328,7 @@ class ConfigLoader:
 
     def __repr__(self) -> str:
         """設定の文字列表現"""
-        return (
-            f"ConfigLoader(config_path={self.config_path}, loaded={bool(self._config)})"
-        )
+        return f"ConfigLoader(config_path={self.config_path}, loaded={bool(self._config)})"
 
 
 # グローバルインスタンス（シングルトンパターン）

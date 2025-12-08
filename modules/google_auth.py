@@ -138,9 +138,7 @@ class GoogleAuthenticator:
 
             return None
 
-    def _refresh_or_reauthorize(
-        self, creds: Optional[Credentials]
-    ) -> Optional[Credentials]:
+    def _refresh_or_reauthorize(self, creds: Optional[Credentials]) -> Optional[Credentials]:
         """
         トークンをリフレッシュまたは再認証
 
@@ -185,9 +183,7 @@ class GoogleAuthenticator:
             self.logger.info(f"{self.service_name} OAuth2フローを開始...")
             self.logger.info("ブラウザが開きます。Googleアカウントで認証してください。")
 
-            flow = InstalledAppFlow.from_client_secrets_file(
-                self.credentials_file, self.scopes
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(self.credentials_file, self.scopes)
 
             # ローカルサーバーを起動して認証
             creds = flow.run_local_server(
@@ -307,9 +303,7 @@ class GoogleAuthenticator:
             "service_name": self.service_name,
             "token_file": self.token_file,
             "token_exists": os.path.exists(self.token_file),
-            "last_auth_time": (
-                self._last_auth_time.isoformat() if self._last_auth_time else None
-            ),
+            "last_auth_time": (self._last_auth_time.isoformat() if self._last_auth_time else None),
             "auth_failure_count": self._auth_failure_count,
         }
 

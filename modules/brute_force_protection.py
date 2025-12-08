@@ -34,9 +34,7 @@ class LoginAttemptTracker:
         ]
 
         recent_attempts = len(self._attempts[username])
-        logger.warning(
-            f"ログイン失敗記録: '{username}' ({recent_attempts}/{self.MAX_ATTEMPTS})"
-        )
+        logger.warning(f"ログイン失敗記録: '{username}' ({recent_attempts}/{self.MAX_ATTEMPTS})")
 
     def is_locked(self, username: str) -> Tuple[bool, Optional[datetime]]:
         """アカウントがロックされているか確認"""
@@ -45,9 +43,7 @@ class LoginAttemptTracker:
             unlock_time = self._locked_accounts[username]
             if datetime.now() < unlock_time:
                 remaining = (unlock_time - datetime.now()).total_seconds() / 60
-                logger.info(
-                    f"ロック中のアカウント: '{username}' (残り {remaining:.1f}分)"
-                )
+                logger.info(f"ロック中のアカウント: '{username}' (残り {remaining:.1f}分)")
                 return True, unlock_time
             else:
                 # ロック期限切れ - クリア
@@ -58,9 +54,7 @@ class LoginAttemptTracker:
         # 失敗回数チェック
         cutoff_time = datetime.now() - self.ATTEMPT_WINDOW
         recent_attempts = [
-            attempt
-            for attempt in self._attempts.get(username, [])
-            if attempt > cutoff_time
+            attempt for attempt in self._attempts.get(username, []) if attempt > cutoff_time
         ]
 
         if len(recent_attempts) >= self.MAX_ATTEMPTS:
@@ -85,9 +79,7 @@ class LoginAttemptTracker:
         """残り試行回数を取得"""
         cutoff_time = datetime.now() - self.ATTEMPT_WINDOW
         recent_attempts = [
-            attempt
-            for attempt in self._attempts.get(username, [])
-            if attempt > cutoff_time
+            attempt for attempt in self._attempts.get(username, []) if attempt > cutoff_time
         ]
         return max(0, self.MAX_ATTEMPTS - len(recent_attempts))
 
@@ -109,10 +101,7 @@ class LoginAttemptTracker:
                     {
                         "username": username,
                         "unlock_time": unlock_time,
-                        "remaining_minutes": (
-                            unlock_time - datetime.now()
-                        ).total_seconds()
-                        / 60,
+                        "remaining_minutes": (unlock_time - datetime.now()).total_seconds() / 60,
                     }
                 )
         return locked

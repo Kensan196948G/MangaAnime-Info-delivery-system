@@ -93,9 +93,7 @@ def with_retry(config: Optional[RetryConfig] = None):
 
                     # 成功した場合、リトライがあったことをログに記録
                     if attempt > 0:
-                        logger.info(
-                            f"{func.__name__} succeeded after {attempt + 1} attempts"
-                        )
+                        logger.info(f"{func.__name__} succeeded after {attempt + 1} attempts")
 
                     return result
 
@@ -107,10 +105,7 @@ def with_retry(config: Optional[RetryConfig] = None):
                         status_code = e.response.status_code
 
                         # リトライ対象外のステータスコードの場合は即座に失敗
-                        if (
-                            status_code not in config.retry_on_status
-                            and status_code >= 400
-                        ):
+                        if status_code not in config.retry_on_status and status_code >= 400:
                             logger.error(
                                 f"{func.__name__} failed with non-retryable status "
                                 f"{status_code}: {e}"
@@ -186,8 +181,7 @@ class CircuitBreaker:
         self.last_failure_time = None
 
         logger.info(
-            f"{self.name} initialized: threshold={failure_threshold}, "
-            f"timeout={timeout}s"
+            f"{self.name} initialized: threshold={failure_threshold}, " f"timeout={timeout}s"
         )
 
     def __call__(self, func: Callable) -> Callable:
@@ -252,9 +246,7 @@ anilist_breaker = CircuitBreaker(failure_threshold=5, timeout=60, name="AniListB
 
 gmail_breaker = CircuitBreaker(failure_threshold=3, timeout=120, name="GmailBreaker")
 
-calendar_breaker = CircuitBreaker(
-    failure_threshold=3, timeout=120, name="CalendarBreaker"
-)
+calendar_breaker = CircuitBreaker(failure_threshold=3, timeout=120, name="CalendarBreaker")
 
 
 if __name__ == "__main__":

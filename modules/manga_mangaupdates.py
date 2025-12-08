@@ -57,9 +57,7 @@ class MangaUpdatesAPIClient:
         self.base_url = config.get("base_url", "https://api.mangaupdates.com/v1")
         self.timeout = config.get("timeout_seconds", 30)
         self.rate_limit_config = config.get("rate_limit", {})
-        self.rate_limiter = RateLimiter(
-            self.rate_limit_config.get("requests_per_minute", 30)
-        )
+        self.rate_limiter = RateLimiter(self.rate_limit_config.get("requests_per_minute", 30))
         self.session: Optional[aiohttp.ClientSession] = None
         self.logger = logging.getLogger(__name__)
 
@@ -79,9 +77,7 @@ class MangaUpdatesAPIClient:
         if self.session:
             await self.session.close()
 
-    async def get_latest_releases(
-        self, page: int = 1, per_page: int = 50
-    ) -> List[Dict[str, Any]]:
+    async def get_latest_releases(self, page: int = 1, per_page: int = 50) -> List[Dict[str, Any]]:
         """
         Get latest manga releases from MangaUpdates.
 
@@ -97,9 +93,7 @@ class MangaUpdatesAPIClient:
         params = {"page": page, "perpage": min(per_page, 100)}
 
         try:
-            async with self.session.get(
-                f"{self.base_url}/releases", params=params
-            ) as response:
+            async with self.session.get(f"{self.base_url}/releases", params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     return self._normalize_releases(data.get("results", []))
@@ -111,9 +105,7 @@ class MangaUpdatesAPIClient:
                     self.logger.error(
                         f"MangaUpdates API error: {response.status} - {await response.text()}"
                     )
-                    raise MangaUpdatesAPIError(
-                        f"API request failed with status {response.status}"
-                    )
+                    raise MangaUpdatesAPIError(f"API request failed with status {response.status}")
 
         except asyncio.TimeoutError:
             self.logger.error("MangaUpdates API request timeout")
@@ -146,9 +138,7 @@ class MangaUpdatesAPIClient:
                     return self._normalize_series(data.get("results", []))
                 else:
                     self.logger.error(f"MangaUpdates API error: {response.status}")
-                    raise MangaUpdatesAPIError(
-                        f"API request failed with status {response.status}"
-                    )
+                    raise MangaUpdatesAPIError(f"API request failed with status {response.status}")
 
         except Exception as e:
             self.logger.error(f"MangaUpdates API request error: {str(e)}")
@@ -167,9 +157,7 @@ class MangaUpdatesAPIClient:
         await self.rate_limiter.wait()
 
         try:
-            async with self.session.get(
-                f"{self.base_url}/series/{series_id}"
-            ) as response:
+            async with self.session.get(f"{self.base_url}/series/{series_id}") as response:
                 if response.status == 200:
                     data = await response.json()
                     return self._normalize_series_detail(data)
@@ -197,9 +185,7 @@ class MangaUpdatesAPIClient:
                     "chapter": record.get("chapter", ""),
                     "volume": record.get("volume", ""),
                     "release_date": record.get("release_date", ""),
-                    "groups": [
-                        group.get("name", "") for group in record.get("groups", [])
-                    ],
+                    "groups": [group.get("name", "") for group in record.get("groups", [])],
                     "type": WorkType.MANGA.value,
                     "source": DataSource.MANGAUPDATES.value,
                     "source_url": f"https://www.mangaupdates.com/series/{series.get('id', '')}",
@@ -226,12 +212,8 @@ class MangaUpdatesAPIClient:
                     "type": record.get("type", ""),
                     "year": record.get("year", ""),
                     "description": record.get("description", ""),
-                    "genres": [
-                        genre.get("genre", "") for genre in record.get("genres", [])
-                    ],
-                    "categories": [
-                        cat.get("category", "") for cat in record.get("categories", [])
-                    ],
+                    "genres": [genre.get("genre", "") for genre in record.get("genres", [])],
+                    "categories": [cat.get("category", "") for cat in record.get("categories", [])],
                     "latest_chapter": record.get("latest_chapter", ""),
                     "cover_image": image.get("url", {}).get("original", ""),
                     "work_type": WorkType.MANGA.value,
@@ -260,12 +242,8 @@ class MangaUpdatesAPIClient:
                 "year": series.get("year", ""),
                 "status": series.get("status", ""),
                 "licensed": series.get("licensed", False),
-                "genres": [
-                    genre.get("genre", "") for genre in series.get("genres", [])
-                ],
-                "categories": [
-                    cat.get("category", "") for cat in series.get("categories", [])
-                ],
+                "genres": [genre.get("genre", "") for genre in series.get("genres", [])],
+                "categories": [cat.get("category", "") for cat in series.get("categories", [])],
                 "latest_chapter": series.get("latest_chapter", ""),
                 "cover_image": image.get("url", {}).get("original", ""),
                 "rating": series.get("bayesian_rating", 0),
@@ -309,19 +287,13 @@ async def collect_mangaupdates_releases(
         except MangaUpdatesAPIError as e:
             logger.error(f"MangaUpdates API error: {str(e)}")
         except Exception as e:
-            logger.error(
-                f"Unexpected error in MangaUpdates releases collection: {str(e)}"
-            )
+            logger.error(f"Unexpected error in MangaUpdates releases collection: {str(e)}")
 
-    logger.info(
-        f"MangaUpdates releases collection complete: {len(all_releases)} total items"
-    )
+    logger.info(f"MangaUpdates releases collection complete: {len(all_releases)} total items")
     return all_releases
 
 
-async def search_mangaupdates_series(
-    config: Dict[str, Any], query: str
-) -> List[Dict[str, Any]]:
+async def search_mangaupdates_series(config: Dict[str, Any], query: str) -> List[Dict[str, Any]]:
     """
     Search manga series on MangaUpdates.
 

@@ -88,9 +88,7 @@ class RSSConfig:
 
     enabled: bool = True
     timeout_seconds: int = 20
-    user_agent: str = (
-        "MangaAnimeNotifier/1.0 (https://github.com/user/manga-anime-notifier)"
-    )
+    user_agent: str = "MangaAnimeNotifier/1.0 (https://github.com/user/manga-anime-notifier)"
     feeds: List[FeedConfig] = field(default_factory=list)
     max_parallel_workers: int = 5
     stats: dict = field(default_factory=dict)
@@ -193,9 +191,7 @@ class NotificationConfig:
     """Notification configuration."""
 
     email: EmailNotificationConfig = field(default_factory=EmailNotificationConfig)
-    calendar: CalendarNotificationConfig = field(
-        default_factory=CalendarNotificationConfig
-    )
+    calendar: CalendarNotificationConfig = field(default_factory=CalendarNotificationConfig)
 
 
 @dataclass
@@ -303,9 +299,7 @@ class ConfigManager:
         os.path.expanduser("~/.manga-anime-notifier/config.json"),
     ]
 
-    def __init__(
-        self, config_path: Optional[str] = None, enable_encryption: bool = False
-    ):
+    def __init__(self, config_path: Optional[str] = None, enable_encryption: bool = False):
         """
         Initialize configuration manager.
 
@@ -327,18 +321,14 @@ class ConfigManager:
                 self._secure_manager = SecureConfigManager(password)
                 self.logger.info("Encryption enabled for sensitive configuration data")
             else:
-                self.logger.warning(
-                    "Encryption requested but MANGA_ANIME_MASTER_PASSWORD not set"
-                )
+                self.logger.warning("Encryption requested but MANGA_ANIME_MASTER_PASSWORD not set")
 
         # Load configuration
         self.load_config()
 
     def load_config(self) -> None:
         """Load configuration from file and environment variables."""
-        config_paths = (
-            [self.config_path] if self.config_path else self.DEFAULT_CONFIG_PATHS
-        )
+        config_paths = [self.config_path] if self.config_path else self.DEFAULT_CONFIG_PATHS
 
         for path in config_paths:
             if path and os.path.exists(path):
@@ -365,9 +355,7 @@ class ConfigManager:
 
     def get_system_name(self) -> str:
         """Get system name."""
-        return self._config_data.get("system", {}).get(
-            "name", "MangaAnime情報配信システム"
-        )
+        return self._config_data.get("system", {}).get("name", "MangaAnime情報配信システム")
 
     def get_system_version(self) -> str:
         """Get system version."""
@@ -422,9 +410,7 @@ class ConfigManager:
 
     def get_log_date_format(self) -> str:
         """Get log date format."""
-        return self._config_data.get("logging", {}).get(
-            "date_format", "%Y-%m-%d %H:%M:%S"
-        )
+        return self._config_data.get("logging", {}).get("date_format", "%Y-%m-%d %H:%M:%S")
 
     def get_rss_config(self) -> Dict[str, Any]:
         """Get RSS configuration."""
@@ -580,9 +566,7 @@ class ConfigManager:
                     try:
                         value = int(value)
                     except ValueError:
-                        self.logger.warning(
-                            f"Invalid numeric value for {env_var}: {value}"
-                        )
+                        self.logger.warning(f"Invalid numeric value for {env_var}: {value}")
                         continue
 
                 self._set_nested_value(self._config_data, config_path, value)
@@ -609,9 +593,7 @@ class ConfigManager:
                 try:
                     os.makedirs(db_dir, exist_ok=True)
                 except OSError as e:
-                    self.logger.warning(
-                        f"Cannot create database directory {db_dir}: {e}"
-                    )
+                    self.logger.warning(f"Cannot create database directory {db_dir}: {e}")
 
         self.logger.debug("Configuration validation completed")
 
@@ -759,9 +741,7 @@ class ConfigManager:
         notification_config = self.get_section("notification")
 
         email_config = EmailNotificationConfig(**notification_config.get("email", {}))
-        calendar_config = CalendarNotificationConfig(
-            **notification_config.get("calendar", {})
-        )
+        calendar_config = CalendarNotificationConfig(**notification_config.get("calendar", {}))
 
         return NotificationConfig(email=email_config, calendar=calendar_config)
 

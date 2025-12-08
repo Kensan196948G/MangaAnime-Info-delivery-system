@@ -104,9 +104,7 @@ class CircuitBreaker:
                 and self.failure_count >= self.config.failure_threshold
             ):
                 self.state = CircuitState.OPEN
-                self.logger.warning(
-                    f"Circuit breaker OPENED after {self.failure_count} failures"
-                )
+                self.logger.warning(f"Circuit breaker OPENED after {self.failure_count} failures")
             elif self.state == CircuitState.HALF_OPEN:
                 self.state = CircuitState.OPEN
                 self.success_count = 0
@@ -143,9 +141,7 @@ class AniListClient:
     MIN_RATE_LIMIT = 30  # Minimum requests per minute during throttling
     MAX_BURST_SIZE = 10  # Maximum burst requests allowed
 
-    def __init__(
-        self, timeout: int = 30, retry_attempts: int = 3, retry_delay: int = 5
-    ):
+    def __init__(self, timeout: int = 30, retry_attempts: int = 3, retry_delay: int = 5):
         """
         Initialize AniList client with enhanced reliability features.
 
@@ -213,9 +209,9 @@ class AniListClient:
 
             # Adaptive throttling: slow down as we approach the limit
             if current_requests >= effective_limit * self.BURST_THRESHOLD:
-                throttle_factor = (
-                    current_requests - effective_limit * self.BURST_THRESHOLD
-                ) / (effective_limit * (1 - self.BURST_THRESHOLD))
+                throttle_factor = (current_requests - effective_limit * self.BURST_THRESHOLD) / (
+                    effective_limit * (1 - self.BURST_THRESHOLD)
+                )
                 adaptive_delay = min(throttle_factor * 3, 5)  # Max 5 second delay
                 if adaptive_delay > 0:
                     self.logger.debug(
@@ -227,9 +223,7 @@ class AniListClient:
             # Hard limit enforcement
             if current_requests >= effective_limit:
                 if self.request_timestamps:
-                    sleep_time = (
-                        self.RATE_WINDOW - (now - self.request_timestamps[0]) + 1
-                    )
+                    sleep_time = self.RATE_WINDOW - (now - self.request_timestamps[0]) + 1
                     self.logger.info(
                         f"Rate limit reached ({effective_limit}/min), sleeping for {sleep_time:.1f} seconds"
                     )
@@ -238,9 +232,7 @@ class AniListClient:
                     # Clean up old timestamps again
                     now = time.time()
                     self.request_timestamps = [
-                        ts
-                        for ts in self.request_timestamps
-                        if now - ts < self.RATE_WINDOW
+                        ts for ts in self.request_timestamps if now - ts < self.RATE_WINDOW
                     ]
 
             # Record this request
@@ -283,9 +275,7 @@ class AniListClient:
                 self.last_rate_adjustment = now
                 self.consecutive_successes = 0
 
-    async def _make_request(
-        self, query: str, variables: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def _make_request(self, query: str, variables: Optional[Dict] = None) -> Dict[str, Any]:
         """
         Make GraphQL request to AniList API with circuit breaker and enhanced error handling.
 
@@ -345,16 +335,12 @@ class AniListClient:
                             raise rate_limit_error
 
                         if response.status != 200:
-                            api_error = AniListAPIError(
-                                f"HTTP {response.status}: {data}"
-                            )
+                            api_error = AniListAPIError(f"HTTP {response.status}: {data}")
                             self.circuit_breaker.record_failure(api_error)
                             raise api_error
 
                         if "errors" in data:
-                            api_error = AniListAPIError(
-                                f"GraphQL errors: {data['errors']}"
-                            )
+                            api_error = AniListAPIError(f"GraphQL errors: {data['errors']}")
                             self.circuit_breaker.record_failure(api_error)
                             raise api_error
 
@@ -364,9 +350,7 @@ class AniListClient:
                         self.consecutive_successes += 1
 
                         if response_time > 5.0:
-                            self.logger.warning(
-                                f"Slow AniList API response: {response_time:.2f}s"
-                            )
+                            self.logger.warning(f"Slow AniList API response: {response_time:.2f}s")
 
                         return data.get("data", {})
 
@@ -380,9 +364,7 @@ class AniListClient:
                 if attempt < self.retry_attempts - 1:
                     # Exponential backoff with jitter
                     backoff_delay = min(self.retry_delay * (2**attempt), 30)
-                    jitter = (
-                        backoff_delay * 0.1 * (0.5 - time.time() % 1)
-                    )  # ±10% jitter
+                    jitter = backoff_delay * 0.1 * (0.5 - time.time() % 1)  # ±10% jitter
                     await asyncio.sleep(backoff_delay + jitter)
                 else:
                     api_error = AniListAPIError(
@@ -392,9 +374,7 @@ class AniListClient:
                     raise api_error
 
         # Should never reach here, but just in case
-        api_error = AniListAPIError(
-            f"Unexpected error in request handling: {last_exception}"
-        )
+        api_error = AniListAPIError(f"Unexpected error in request handling: {last_exception}")
         self.circuit_breaker.record_failure(api_error)
         raise api_error
 
@@ -406,26 +386,20 @@ class AniListClient:
             Dictionary with comprehensive performance metrics
         """
         avg_response_time = (
-            self.total_response_time / self.request_count
-            if self.request_count > 0
-            else 0
+            self.total_response_time / self.request_count if self.request_count > 0 else 0
         )
 
         # Calculate recent performance metrics
         now = time.time()
         recent_timestamps = [
-            ts
-            for ts in self.request_timestamps
-            if now - ts <= self.PERFORMANCE_OPTIMIZATION_WINDOW
+            ts for ts in self.request_timestamps if now - ts <= self.PERFORMANCE_OPTIMIZATION_WINDOW
         ]
 
         return {
             # Core metrics
             "request_count": self.request_count,
             "error_count": self.error_count,
-            "error_rate": (
-                self.error_count / self.request_count if self.request_count > 0 else 0
-            ),
+            "error_rate": (self.error_count / self.request_count if self.request_count > 0 else 0),
             "average_response_time": avg_response_time,
             # Circuit breaker metrics
             "circuit_breaker_state": self.circuit_breaker.state.value,
@@ -435,11 +409,7 @@ class AniListClient:
             "rate_limit_queue_size": len(self.request_timestamps),
             "recent_request_count": len(recent_timestamps),
             "rate_limit_utilization": len(recent_timestamps)
-            / (
-                self.RATE_LIMIT
-                * self.PERFORMANCE_OPTIMIZATION_WINDOW
-                / self.RATE_WINDOW
-            ),
+            / (self.RATE_LIMIT * self.PERFORMANCE_OPTIMIZATION_WINDOW / self.RATE_WINDOW),
             "current_rate_limit": self.current_rate_limit,
             "consecutive_errors": self.consecutive_errors,
             "consecutive_successes": self.consecutive_successes,
@@ -455,9 +425,7 @@ class AniListClient:
             "uptime_seconds": now - (self.last_request_time or now),
         }
 
-    def _calculate_performance_grade(
-        self, avg_response_time: float, error_count: int
-    ) -> str:
+    def _calculate_performance_grade(self, avg_response_time: float, error_count: int) -> str:
         """
         Calculate performance grade based on response time and errors.
 
@@ -486,12 +454,8 @@ class AniListClient:
             return 1.0  # Perfect score for new client
 
         # Base score calculation
-        error_penalty = min(
-            self.error_count / self.request_count, 0.5
-        )  # Max 50% penalty
-        circuit_penalty = (
-            0.2 if self.circuit_breaker.state != CircuitState.CLOSED else 0.0
-        )
+        error_penalty = min(self.error_count / self.request_count, 0.5)  # Max 50% penalty
+        circuit_penalty = 0.2 if self.circuit_breaker.state != CircuitState.CLOSED else 0.0
 
         # Performance bonus for fast responses
         avg_response_time = self.total_response_time / self.request_count
@@ -696,9 +660,7 @@ class AniListClient:
 
         return await self.search_anime(season=season, year=year, limit=50)
 
-    async def get_studio_anime(
-        self, studio_name: str, limit: int = 20
-    ) -> List[AniListWork]:
+    async def get_studio_anime(self, studio_name: str, limit: int = 20) -> List[AniListWork]:
         """
         Get anime by studio name.
 
@@ -777,9 +739,7 @@ class AniListClient:
                         self.logger.warning(f"Failed to parse studio media data: {e}")
                         continue
 
-            self.logger.info(
-                f"Retrieved {len(results)} anime from studio {studio_name}"
-            )
+            self.logger.info(f"Retrieved {len(results)} anime from studio {studio_name}")
             return results
 
         except Exception as e:
@@ -861,13 +821,10 @@ class AniListClient:
                     # Add additional metadata
                     anilist_work.metadata = getattr(anilist_work, "metadata", {})
                     anilist_work.metadata["studios"] = [
-                        s.get("name")
-                        for s in media_data.get("studios", {}).get("nodes", [])
+                        s.get("name") for s in media_data.get("studios", {}).get("nodes", [])
                     ]
                     anilist_work.metadata["popularity"] = media_data.get("popularity")
-                    anilist_work.metadata["average_score"] = media_data.get(
-                        "averageScore"
-                    )
+                    anilist_work.metadata["average_score"] = media_data.get("averageScore")
                     results.append(anilist_work)
                 except Exception as e:
                     self.logger.warning(f"Failed to parse genre media data: {e}")
@@ -880,9 +837,7 @@ class AniListClient:
             self.logger.error(f"Failed to search anime by genre {genre}: {e}")
             return []
 
-    async def get_streaming_anime(
-        self, platform: str, limit: int = 20
-    ) -> List[Dict[str, Any]]:
+    async def get_streaming_anime(self, platform: str, limit: int = 20) -> List[Dict[str, Any]]:
         """
         Get anime available on specific streaming platform.
 
@@ -1014,9 +969,7 @@ class AniListClient:
 
         while page <= max_pages:
             try:
-                data = await self._make_request(
-                    graphql_query, {"page": page, "perPage": 50}
-                )
+                data = await self._make_request(graphql_query, {"page": page, "perPage": 50})
                 media_list = data.get("Page", {}).get("media", [])
 
                 if not media_list:
@@ -1108,9 +1061,7 @@ class AniListClient:
 
         if "studios" in media_data:
             studios = media_data["studios"].get("nodes", [])
-            anilist_work.metadata["studios"] = [
-                studio.get("name") for studio in studios
-            ]
+            anilist_work.metadata["studios"] = [studio.get("name") for studio in studios]
 
         if "popularity" in media_data:
             anilist_work.metadata["popularity"] = media_data["popularity"]
@@ -1190,17 +1141,13 @@ class AniListCollector:
         # Check genres
         for genre in anilist_work.genres:
             if genre in self.ng_genres:
-                self.logger.debug(
-                    f"Filtered by genre '{genre}': {anilist_work.title_romaji}"
-                )
+                self.logger.debug(f"Filtered by genre '{genre}': {anilist_work.title_romaji}")
                 return True
 
         # Check tags
         for tag in anilist_work.tags:
             if tag in self.exclude_tags:
-                self.logger.debug(
-                    f"Filtered by tag '{tag}': {anilist_work.title_romaji}"
-                )
+                self.logger.debug(f"Filtered by tag '{tag}': {anilist_work.title_romaji}")
                 return True
 
         return False
@@ -1236,9 +1183,7 @@ class AniListCollector:
                 collected_count += 1
                 self.logger.debug(f"Collected anime: {work.title} (ID: {work_id})")
 
-            self.logger.info(
-                f"Collected {collected_count} anime, filtered {filtered_count}"
-            )
+            self.logger.info(f"Collected {collected_count} anime, filtered {filtered_count}")
             return collected_count, filtered_count
 
         except Exception as e:
@@ -1259,9 +1204,7 @@ class AniListCollector:
 
             for release_info in upcoming:
                 # Get or create work
-                work_id = self.db.get_or_create_work(
-                    title=release_info["title"], work_type="anime"
-                )
+                work_id = self.db.get_or_create_work(title=release_info["title"], work_type="anime")
 
                 # Create release entry
                 release_id = self.db.create_release(
@@ -1333,9 +1276,7 @@ class AniListCollector:
 
         return asyncio.run(_run())
 
-    async def fetch_seasonal_anime(
-        self, year: int, season: str
-    ) -> List[Dict[str, Any]]:
+    async def fetch_seasonal_anime(self, year: int, season: str) -> List[Dict[str, Any]]:
         """Fetch seasonal anime from AniList."""
         if season not in ["WINTER", "SPRING", "SUMMER", "FALL"]:
             return []
@@ -1356,9 +1297,7 @@ class AniListCollector:
                     "description": work.description,
                     "startDate": work.start_date,
                     "episodes": (
-                        work.metadata.get("total_episodes")
-                        if hasattr(work, "metadata")
-                        else None
+                        work.metadata.get("total_episodes") if hasattr(work, "metadata") else None
                     ),
                     "streamingEpisodes": work.streaming_episodes,
                     "siteUrl": work.site_url,
@@ -1369,9 +1308,7 @@ class AniListCollector:
             self.logger.error(f"Failed to fetch seasonal anime: {e}")
             return []
 
-    def _filter_ng_content(
-        self, anime_list: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def _filter_ng_content(self, anime_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Filter out NG content from anime list."""
         ng_genres = ["Hentai", "Ecchi"]
         ng_tags = ["Adult Cast", "Explicit Sex"]
@@ -1413,9 +1350,7 @@ class AniListCollector:
         streaming_platforms = []
         for ep in streaming_episodes:
             if isinstance(ep, dict) and "url" in ep:
-                streaming_platforms.append(
-                    {"title": ep.get("title", ""), "url": ep.get("url", "")}
-                )
+                streaming_platforms.append({"title": ep.get("title", ""), "url": ep.get("url", "")})
 
         return {
             "work_id": work_id,

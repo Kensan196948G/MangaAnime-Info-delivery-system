@@ -79,9 +79,7 @@ class APIKeyDBStore:
             """
             )
 
-    def generate_key(
-        self, user_id: str, name: str, permissions: List[str] = None
-    ) -> APIKey:
+    def generate_key(self, user_id: str, name: str, permissions: List[str] = None) -> APIKey:
         """APIキーを生成"""
         key = f"sk_{secrets.token_urlsafe(32)}"
         permissions_str = ",".join(permissions) if permissions else "read"
@@ -95,9 +93,7 @@ class APIKeyDBStore:
                 (key, user_id, name, permissions_str, datetime.now().isoformat()),
             )
 
-        logger.info(
-            f"APIキー生成: user_id={user_id}, name={name}, permissions={permissions_str}"
-        )
+        logger.info(f"APIキー生成: user_id={user_id}, name={name}, permissions={permissions_str}")
 
         return APIKey(
             key=key,
@@ -110,9 +106,7 @@ class APIKeyDBStore:
     def verify_key(self, key: str) -> Optional[APIKey]:
         """APIキーを検証"""
         with self.get_connection() as conn:
-            cursor = conn.execute(
-                "SELECT * FROM api_keys WHERE key = ? AND is_active = 1", (key,)
-            )
+            cursor = conn.execute("SELECT * FROM api_keys WHERE key = ? AND is_active = 1", (key,))
             row = cursor.fetchone()
 
             if row:
@@ -128,9 +122,7 @@ class APIKeyDBStore:
                     name=row["name"],
                     created_at=datetime.fromisoformat(row["created_at"]),
                     last_used=(
-                        datetime.fromisoformat(row["last_used"])
-                        if row["last_used"]
-                        else None
+                        datetime.fromisoformat(row["last_used"]) if row["last_used"] else None
                     ),
                     is_active=bool(row["is_active"]),
                     permissions=row["permissions"],
@@ -155,9 +147,7 @@ class APIKeyDBStore:
                         name=row["name"],
                         created_at=datetime.fromisoformat(row["created_at"]),
                         last_used=(
-                            datetime.fromisoformat(row["last_used"])
-                            if row["last_used"]
-                            else None
+                            datetime.fromisoformat(row["last_used"]) if row["last_used"] else None
                         ),
                         is_active=bool(row["is_active"]),
                         permissions=row["permissions"],
@@ -169,9 +159,7 @@ class APIKeyDBStore:
     def revoke_key(self, key: str) -> bool:
         """APIキーを無効化"""
         with self.get_connection() as conn:
-            cursor = conn.execute(
-                "UPDATE api_keys SET is_active = 0 WHERE key = ?", (key,)
-            )
+            cursor = conn.execute("UPDATE api_keys SET is_active = 0 WHERE key = ?", (key,))
 
             if cursor.rowcount > 0:
                 logger.info(f"APIキー無効化: key={key[:15]}...")

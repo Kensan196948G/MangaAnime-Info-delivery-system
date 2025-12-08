@@ -35,9 +35,7 @@ except ImportError:
     GOOGLE_AVAILABLE = False
 
 
-def retry_on_failure(
-    max_retries: int = 3, delay: float = 1.0, exponential_backoff: bool = True
-):
+def retry_on_failure(max_retries: int = 3, delay: float = 1.0, exponential_backoff: bool = True):
     """
     Gmail API エラー時のリトライデコレータ
 
@@ -78,9 +76,7 @@ def retry_on_failure(
                             )
                             raise
 
-                    logger.warning(
-                        f"Attempt {attempt + 1} of {func.__name__} failed: {e}"
-                    )
+                    logger.warning(f"Attempt {attempt + 1} of {func.__name__} failed: {e}")
                     logger.info(f"Retrying in {current_delay:.1f} seconds...")
 
                     time.sleep(current_delay)
@@ -141,9 +137,7 @@ class GmailNotifier:
         """
         self.config = config
         self.gmail_config = config.get("google", {}).get("gmail", {})
-        self.credentials_file = config.get("google", {}).get(
-            "credentials_file", "credentials.json"
-        )
+        self.credentials_file = config.get("google", {}).get("credentials_file", "credentials.json")
         self.token_file = config.get("google", {}).get("token_file", "token.json")
         self.scopes = config.get("google", {}).get(
             "scopes", ["https://www.googleapis.com/auth/gmail.send"]
@@ -197,9 +191,7 @@ class GmailNotifier:
                     logger.warning("Token file not found for refresh")
                     return False
 
-                creds = Credentials.from_authorized_user_file(
-                    self.token_file, self.scopes
-                )
+                creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
 
                 if not creds.refresh_token:
                     logger.warning("No refresh token available")
@@ -213,9 +205,7 @@ class GmailNotifier:
                     token.write(creds.to_json())
 
                 # Update service with new credentials
-                self.service = build(
-                    "gmail", "v1", credentials=creds, cache_discovery=False
-                )
+                self.service = build("gmail", "v1", credentials=creds, cache_discovery=False)
 
                 # Update auth state
                 self.auth_state.token_expires_at = creds.expiry or (
@@ -254,10 +244,7 @@ class GmailNotifier:
 
             try:
                 # Check if already authenticated and valid (with proactive refresh)
-                if (
-                    self.auth_state.is_authenticated
-                    and self.auth_state.token_expires_at
-                ):
+                if self.auth_state.is_authenticated and self.auth_state.token_expires_at:
                     if self._is_token_near_expiry():
                         logger.info("Token near expiry, attempting refresh")
                         if self._refresh_token():
@@ -272,9 +259,7 @@ class GmailNotifier:
                 # Load existing token with validation
                 if os.path.exists(self.token_file):
                     try:
-                        creds = Credentials.from_authorized_user_file(
-                            self.token_file, self.scopes
-                        )
+                        creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
                         logger.debug("Loaded existing credentials from token file")
                     except Exception as e:
                         logger.warning(f"Failed to load existing token: {e}")
@@ -303,9 +288,7 @@ class GmailNotifier:
 
                     if not creds or not creds.valid:
                         if not os.path.exists(self.credentials_file):
-                            error_msg = (
-                                f"Credentials file not found: {self.credentials_file}"
-                            )
+                            error_msg = f"Credentials file not found: {self.credentials_file}"
                             logger.error(error_msg)
                             self.auth_state.last_auth_error = error_msg
                             self.auth_state.consecutive_auth_failures += 1
@@ -346,9 +329,7 @@ class GmailNotifier:
 
                 # Build Gmail service with timeout
                 try:
-                    self.service = build(
-                        "gmail", "v1", credentials=creds, cache_discovery=False
-                    )
+                    self.service = build("gmail", "v1", credentials=creds, cache_discovery=False)
                     logger.info("Gmail service built successfully")
                 except Exception as service_error:
                     error_msg = f"Failed to build Gmail service: {service_error}"
@@ -360,9 +341,7 @@ class GmailNotifier:
                 try:
                     profile = self.service.users().getProfile(userId="me").execute()
                     email_address = profile.get("emailAddress", "unknown")
-                    logger.info(
-                        f"Gmail API authentication successful for: {email_address}"
-                    )
+                    logger.info(f"Gmail API authentication successful for: {email_address}")
                 except Exception as test_error:
                     error_msg = f"Gmail service test failed: {test_error}"
                     logger.error(error_msg)
@@ -380,9 +359,7 @@ class GmailNotifier:
                     self.auth_state.token_expires_at = creds.expiry
                 else:
                     # Default to 1 hour if no expiry info
-                    self.auth_state.token_expires_at = datetime.now() + timedelta(
-                        hours=1
-                    )
+                    self.auth_state.token_expires_at = datetime.now() + timedelta(hours=1)
 
                 return True
 
@@ -411,12 +388,8 @@ class GmailNotifier:
 
         # レート制限チェック
         if len(self.rate_limit_requests) >= self.max_requests_per_minute:
-            sleep_time = (
-                self.rate_limit_window - (now - self.rate_limit_requests[0]) + 1
-            )
-            logger.info(
-                f"Gmail API rate limit reached, sleeping for {sleep_time:.1f} seconds"
-            )
+            sleep_time = self.rate_limit_window - (now - self.rate_limit_requests[0]) + 1
+            logger.info(f"Gmail API rate limit reached, sleeping for {sleep_time:.1f} seconds")
             time.sleep(sleep_time)
 
             # タイムスタンプを再度クリーンアップ
@@ -439,8 +412,7 @@ class GmailNotifier:
             "total_send_failures": self.total_send_failures,
             "total_auth_attempts": self.total_auth_attempts,
             "success_rate": (
-                self.total_emails_sent
-                / (self.total_emails_sent + self.total_send_failures)
+                self.total_emails_sent / (self.total_emails_sent + self.total_send_failures)
                 if (self.total_emails_sent + self.total_send_failures) > 0
                 else 1.0
             ),
@@ -449,8 +421,7 @@ class GmailNotifier:
             "consecutive_auth_failures": self.auth_state.consecutive_auth_failures,
             "last_auth_error": self.auth_state.last_auth_error,
             "rate_limit_requests_count": len(self.rate_limit_requests),
-            "rate_limit_utilization": len(self.rate_limit_requests)
-            / self.max_requests_per_minute,
+            "rate_limit_utilization": len(self.rate_limit_requests) / self.max_requests_per_minute,
         }
 
     def create_message(
@@ -512,9 +483,7 @@ class GmailNotifier:
 
             if attachment_type == "image":
                 img = MIMEImage(data)
-                img.add_header(
-                    "Content-Disposition", f"attachment; filename={filename}"
-                )
+                img.add_header("Content-Disposition", f"attachment; filename={filename}")
                 message.attach(img)
 
         except Exception as e:
@@ -539,13 +508,9 @@ class GmailNotifier:
                 self.total_send_failures += 1
                 return False
         elif self._is_token_near_expiry():
-            logger.info(
-                "Token near expiry, attempting proactive refresh before sending"
-            )
+            logger.info("Token near expiry, attempting proactive refresh before sending")
             if not self._refresh_token_proactively():
-                logger.warning(
-                    "Proactive token refresh failed, will try to send anyway"
-                )
+                logger.warning("Proactive token refresh failed, will try to send anyway")
 
         # Double-check authentication after potential refresh
         if not self.auth_state.is_authenticated:
@@ -564,12 +529,7 @@ class GmailNotifier:
                 raise ValueError("Invalid message format: missing 'raw' field")
 
             # Send message
-            result = (
-                self.service.users()
-                .messages()
-                .send(userId="me", body=message)
-                .execute()
-            )
+            result = self.service.users().messages().send(userId="me", body=message).execute()
 
             send_time = time.time() - start_time
             message_id = result.get("id")
@@ -577,9 +537,7 @@ class GmailNotifier:
             # Success metrics
             self.total_emails_sent += 1
 
-            logger.info(
-                f"Email sent successfully in {send_time:.2f}s. Message ID: {message_id}"
-            )
+            logger.info(f"Email sent successfully in {send_time:.2f}s. Message ID: {message_id}")
 
             # Log slow sends
             if send_time > 5.0:
@@ -592,14 +550,10 @@ class GmailNotifier:
 
             # Handle specific Gmail API errors
             status_code = error.resp.status if hasattr(error, "resp") else "unknown"
-            error_details = (
-                error.error_details if hasattr(error, "error_details") else []
-            )
+            error_details = error.error_details if hasattr(error, "error_details") else []
 
             if status_code == 401:  # Unauthorized
-                logger.warning(
-                    "Gmail API unauthorized error, attempting re-authentication"
-                )
+                logger.warning("Gmail API unauthorized error, attempting re-authentication")
                 self.auth_state.is_authenticated = False
                 self.service = None
                 # Re-authenticate will be attempted on retry
@@ -628,9 +582,7 @@ class GmailNotifier:
 
             # Check for network-related errors that should trigger retry
             error_str = str(e).lower()
-            if any(
-                keyword in error_str for keyword in ["timeout", "connection", "network"]
-            ):
+            if any(keyword in error_str for keyword in ["timeout", "connection", "network"]):
                 logger.warning(f"Network-related error, retrying: {e}")
                 raise  # Trigger retry
             else:
@@ -698,9 +650,7 @@ class GmailNotifier:
                         releases_count=releases_count,
                     )
                 except Exception as db_error:
-                    logger.warning(
-                        f"Failed to record email notification history: {db_error}"
-                    )
+                    logger.warning(f"Failed to record email notification history: {db_error}")
 
 
 class EmailTemplateGenerator:
@@ -740,9 +690,7 @@ class EmailTemplateGenerator:
 
             # Generate subject
             if subject_prefix is None:
-                subject_prefix = self.gmail_config.get(
-                    "subject_prefix", "[アニメ・マンガ情報]"
-                )
+                subject_prefix = self.gmail_config.get("subject_prefix", "[アニメ・マンガ情報]")
             anime_count = len([r for r in releases if r.get("type") == "anime"])
             manga_count = len([r for r in releases if r.get("type") == "manga"])
 
@@ -770,9 +718,7 @@ class EmailTemplateGenerator:
             logger.error(f"Failed to generate release notification: {str(e)}")
             raise
 
-    def _generate_html_template(
-        self, releases: List[Dict[str, Any]], date_str: str
-    ) -> str:
+    def _generate_html_template(self, releases: List[Dict[str, Any]], date_str: str) -> str:
         """Generate HTML email template."""
 
         # Group releases by type
@@ -932,7 +878,9 @@ class EmailTemplateGenerator:
             if release_date:
                 html += f"配信日: {release_date}"
             if source_url:
-                html += f' <a href="{source_url}" class="release-link" target="_blank">詳細を見る</a>'
+                html += (
+                    f' <a href="{source_url}" class="release-link" target="_blank">詳細を見る</a>'
+                )
             html += "</div>\n"
             html += "</div>\n"
 
@@ -968,9 +916,7 @@ class EmailTemplateGenerator:
         html += "</div>\n"
         return html
 
-    def _generate_text_template(
-        self, releases: List[Dict[str, Any]], date_str: str
-    ) -> str:
+    def _generate_text_template(self, releases: List[Dict[str, Any]], date_str: str) -> str:
         """Generate plain text email template."""
         text = f"アニメ・マンガ最新情報 - {date_str}\n"
         text += "=" * 40 + "\n\n"

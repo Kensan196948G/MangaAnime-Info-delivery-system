@@ -28,8 +28,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import aiohttp
 import feedparser
 
-from .models import (DataSource, Release, ReleaseType, RSSFeedItem, Work,
-                     WorkType)
+from .models import DataSource, Release, ReleaseType, RSSFeedItem, Work, WorkType
 
 
 @dataclass
@@ -152,8 +151,7 @@ class EnhancedAnimeRSSCollector:
         self.seen_items = set()
 
         self.logger.info(
-            "Enhanced Anime RSS Collector initialized with "
-            f"{len(self.ANIME_SOURCES)} sources"
+            "Enhanced Anime RSS Collector initialized with " f"{len(self.ANIME_SOURCES)} sources"
         )
 
     def get_all_sources(self) -> List[AnimeRSSFeedConfig]:
@@ -172,9 +170,7 @@ class EnhancedAnimeRSSCollector:
         """Get anime RSS source by name."""
         return self.ANIME_SOURCES.get(name)
 
-    async def fetch_feed_async(
-        self, feed_config: AnimeRSSFeedConfig
-    ) -> List[RSSFeedItem]:
+    async def fetch_feed_async(self, feed_config: AnimeRSSFeedConfig) -> List[RSSFeedItem]:
         """
         Asynchronously fetch and parse RSS feed.
 
@@ -229,9 +225,7 @@ class EnhancedAnimeRSSCollector:
                             return unique_items
 
                         elif response.status == 404:
-                            self.logger.warning(
-                                f"Feed not found (404): {feed_config.name}"
-                            )
+                            self.logger.warning(f"Feed not found (404): {feed_config.name}")
                             self.stats["failed_requests"] += 1
                             return []
 
@@ -295,9 +289,7 @@ class EnhancedAnimeRSSCollector:
                 title = entry.get("title", "")
                 link = entry.get("link", "")
                 description = entry.get("summary", entry.get("description", ""))
-                pub_date = self._parse_date(
-                    entry.get("published", entry.get("updated", ""))
-                )
+                pub_date = self._parse_date(entry.get("published", entry.get("updated", "")))
 
                 # Skip if no title or link
                 if not title or not link:
@@ -397,9 +389,7 @@ class EnhancedAnimeRSSCollector:
             elif isinstance(result, Exception):
                 self.logger.error(f"Task failed with exception: {result}")
 
-        self.logger.info(
-            f"Fetched total of {len(all_items)} items from {len(sources)} sources"
-        )
+        self.logger.info(f"Fetched total of {len(all_items)} items from {len(sources)} sources")
 
         return all_items
 
@@ -449,9 +439,7 @@ class EnhancedAnimeRSSCollector:
                 release_type=release_type or ReleaseType.EPISODE,
                 number=number,
                 platform="News",
-                release_date=(
-                    item.pub_date.date() if item.pub_date else datetime.now().date()
-                ),
+                release_date=(item.pub_date.date() if item.pub_date else datetime.now().date()),
                 source=DataSource.RSS_GENERAL,
                 source_url=item.link,
                 metadata={"source": item.source, "description": item.description},
@@ -465,9 +453,7 @@ class EnhancedAnimeRSSCollector:
 
         return works, releases
 
-    def _extract_episode_number(
-        self, title: str
-    ) -> Tuple[Optional[str], Optional[ReleaseType]]:
+    def _extract_episode_number(self, title: str) -> Tuple[Optional[str], Optional[ReleaseType]]:
         """Extract episode number from title."""
         # Episode patterns
         episode_patterns = [
@@ -510,9 +496,7 @@ class EnhancedAnimeRSSCollector:
         """Get collector statistics."""
         success_rate = 0.0
         if self.stats["total_requests"] > 0:
-            success_rate = (
-                self.stats["successful_requests"] / self.stats["total_requests"]
-            )
+            success_rate = self.stats["successful_requests"] / self.stats["total_requests"]
 
         return {
             "total_requests": self.stats["total_requests"],

@@ -186,9 +186,7 @@ class ContentFilter:
                 pattern = re.compile(f"\\b{escaped}\\b", re.IGNORECASE | re.UNICODE)
                 compiled_patterns[keyword] = pattern
             except re.error as e:
-                self.logger.warning(
-                    f"Failed to compile keyword pattern '{keyword}': {e}"
-                )
+                self.logger.warning(f"Failed to compile keyword pattern '{keyword}': {e}")
 
         return compiled_patterns
 
@@ -209,17 +207,13 @@ class ContentFilter:
 
         # 英語タイトルチェック
         if work.title_en:
-            en_result = self._check_text_content_optimized(
-                work.title_en, "英語タイトル"
-            )
+            en_result = self._check_text_content_optimized(work.title_en, "英語タイトル")
             if en_result.is_filtered:
                 return en_result
 
         # カナタイトルチェック
         if work.title_kana:
-            kana_result = self._check_text_content_optimized(
-                work.title_kana, "カナタイトル"
-            )
+            kana_result = self._check_text_content_optimized(work.title_kana, "カナタイトル")
             if kana_result.is_filtered:
                 return kana_result
 
@@ -290,9 +284,7 @@ class ContentFilter:
         """
         # タイトルチェック (using optimized method)
         if rss_item.title:
-            title_result = self._check_text_content_optimized(
-                rss_item.title, "RSSタイトル"
-            )
+            title_result = self._check_text_content_optimized(rss_item.title, "RSSタイトル")
             if title_result.is_filtered:
                 return title_result
 
@@ -382,15 +374,15 @@ class ContentFilter:
         if matched_keywords:
             reason = f"{context}でNGキーワードに一致: {', '.join(matched_keywords)}"
             self.logger.debug(f"フィルタリング: {reason} - '{text[:50]}...'")
-            return FilterResult(
-                is_filtered=True, reason=reason, matched_keywords=matched_keywords
-            )
+            return FilterResult(is_filtered=True, reason=reason, matched_keywords=matched_keywords)
 
         # カスタムパターンチェック (optimized)
         for pattern in self.custom_patterns:
             match = pattern.search(text)
             if match:
-                reason = f"{context}で危険パターンに一致: {pattern.pattern} (matched: '{match.group()}')"
+                reason = (
+                    f"{context}で危険パターンに一致: {pattern.pattern} (matched: '{match.group()}')"
+                )
                 self.logger.debug(f"フィルタリング: {reason} - '{text[:50]}...'")
                 return FilterResult(is_filtered=True, reason=reason)
 
@@ -415,9 +407,7 @@ class ContentFilter:
             # Check each word in the text for fuzzy similarity
             for word in text_words:
                 if len(word) >= 3:  # Only check words of reasonable length
-                    similarity = difflib.SequenceMatcher(
-                        None, word, keyword_lower
-                    ).ratio()
+                    similarity = difflib.SequenceMatcher(None, word, keyword_lower).ratio()
                     if similarity >= self.similarity_threshold:
                         fuzzy_matches.append(f"{keyword} (fuzzy: {similarity:.2f})")
                         self.logger.debug(
@@ -447,9 +437,7 @@ class ContentFilter:
         if matched_genres:
             reason = f"NGジャンルに一致: {', '.join(matched_genres)}"
             self.logger.debug(f"フィルタリング: {reason}")
-            return FilterResult(
-                is_filtered=True, reason=reason, matched_genres=matched_genres
-            )
+            return FilterResult(is_filtered=True, reason=reason, matched_genres=matched_genres)
 
         return FilterResult(is_filtered=False)
 
@@ -477,9 +465,7 @@ class ContentFilter:
         if matched_tags:
             reason = f"除外タグに一致: {', '.join(matched_tags)}"
             self.logger.debug(f"フィルタリング: {reason}")
-            return FilterResult(
-                is_filtered=True, reason=reason, matched_tags=matched_tags
-            )
+            return FilterResult(is_filtered=True, reason=reason, matched_tags=matched_tags)
 
         return FilterResult(is_filtered=False)
 
@@ -499,9 +485,7 @@ class ContentFilter:
         """
         # 説明文チェック
         if "description" in metadata and metadata["description"]:
-            desc_result = self._check_text_content(
-                metadata["description"], "メタデータ説明文"
-            )
+            desc_result = self._check_text_content(metadata["description"], "メタデータ説明文")
             if desc_result.is_filtered:
                 return desc_result
 
@@ -527,15 +511,11 @@ class ContentFilter:
             Dict[str, Any]: 統計情報 including performance metrics
         """
         avg_filter_time = (
-            self.total_filter_time / self.filter_call_count
-            if self.filter_call_count > 0
-            else 0
+            self.total_filter_time / self.filter_call_count if self.filter_call_count > 0 else 0
         )
 
         cache_hit_rate = (
-            self.cache_hits / self.filter_call_count
-            if self.filter_call_count > 0
-            else 0
+            self.cache_hits / self.filter_call_count if self.filter_call_count > 0 else 0
         )
 
         return {
@@ -670,9 +650,7 @@ class ContentFilter:
             # Check description
             description = anime_data.get("description")
             if description:
-                result = self._check_text_content_optimized(
-                    description, "anime_description"
-                )
+                result = self._check_text_content_optimized(description, "anime_description")
                 if result.is_filtered:
                     return True
 
@@ -739,9 +717,7 @@ class ContentFilter:
             # Check description
             description = manga_data.get("description")
             if description:
-                result = self._check_text_content_optimized(
-                    description, "manga_description"
-                )
+                result = self._check_text_content_optimized(description, "manga_description")
                 if result.is_filtered:
                     return True
 
@@ -984,9 +960,7 @@ class ConfigBasedFilterManager:
             # Update config
             filtering_config = self.config.get("filtering", {})
             keywords_list = filtering_config.get("ng_keywords", [])
-            filtering_config["ng_keywords"] = [
-                k for k in keywords_list if k.lower() != keyword
-            ]
+            filtering_config["ng_keywords"] = [k for k in keywords_list if k.lower() != keyword]
             self._save_config()
 
             self.logger.info(f"Removed NG keyword: {keyword}")
@@ -1170,9 +1144,7 @@ class EnhancedContentFilter:
             tags = metadata["tags"]
             if isinstance(tags, list):
                 for tag in tags:
-                    tag_name = (
-                        tag.get("name", tag) if isinstance(tag, dict) else str(tag)
-                    )
+                    tag_name = tag.get("name", tag) if isinstance(tag, dict) else str(tag)
                     if tag_name.lower() in self.config_manager.exclude_tags:
                         matched_tags.append(tag_name)
                         self.filter_stats["tags"] += 1
@@ -1184,9 +1156,7 @@ class EnhancedContentFilter:
                 self.filter_stats["custom_rules"] += 1
 
         # Determine filter action
-        is_filtered = bool(
-            matched_keywords or matched_genres or matched_tags or matched_rules
-        )
+        is_filtered = bool(matched_keywords or matched_genres or matched_tags or matched_rules)
 
         if is_filtered:
             self.total_filtered += 1
@@ -1231,9 +1201,7 @@ class EnhancedContentFilter:
     def _check_custom_rule(self, work: Work, rule: FilterRule) -> bool:
         """Check if work matches custom rule."""
         try:
-            pattern = re.compile(
-                rule.pattern, re.IGNORECASE if not rule.case_sensitive else 0
-            )
+            pattern = re.compile(rule.pattern, re.IGNORECASE if not rule.case_sensitive else 0)
 
             for target in rule.targets:
                 text = ""

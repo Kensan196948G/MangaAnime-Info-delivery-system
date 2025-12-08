@@ -4,6 +4,7 @@
 
 import logging
 import sqlite3
+
 # User dataclass をインポート
 import sys
 from contextlib import contextmanager
@@ -52,13 +53,9 @@ class UserDBStore:
             is_admin=bool(row["is_admin"]),
             is_active=bool(row["is_active"]),
             created_at=(
-                datetime.fromisoformat(row["created_at"])
-                if row["created_at"]
-                else datetime.now()
+                datetime.fromisoformat(row["created_at"]) if row["created_at"] else datetime.now()
             ),
-            last_login=(
-                datetime.fromisoformat(row["last_login"]) if row["last_login"] else None
-            ),
+            last_login=(datetime.fromisoformat(row["last_login"]) if row["last_login"] else None),
         )
 
     def get_user_by_id(self, user_id: str) -> Optional[User]:
@@ -104,9 +101,7 @@ class UserDBStore:
                 ),
             )
 
-        logger.info(
-            f"新規ユーザー作成: '{username}' (ID: {user_id}, 管理者: {is_admin})"
-        )
+        logger.info(f"新規ユーザー作成: '{username}' (ID: {user_id}, 管理者: {is_admin})")
 
         return User(
             id=user_id,
@@ -131,9 +126,7 @@ class UserDBStore:
         """ユーザーを削除（論理削除）"""
         with self.get_connection() as conn:
             # 物理削除ではなく論理削除
-            cursor = conn.execute(
-                "UPDATE users SET is_active = 0 WHERE id = ?", (user_id,)
-            )
+            cursor = conn.execute("UPDATE users SET is_active = 0 WHERE id = ?", (user_id,))
 
             if cursor.rowcount > 0:
                 logger.info(f"ユーザー削除（論理削除）: ID={user_id}")
@@ -168,9 +161,7 @@ class UserDBStore:
     def get_user_count(self) -> int:
         """ユーザー数を取得"""
         with self.get_connection() as conn:
-            cursor = conn.execute(
-                "SELECT COUNT(*) as count FROM users WHERE is_active = 1"
-            )
+            cursor = conn.execute("SELECT COUNT(*) as count FROM users WHERE is_active = 1")
             row = cursor.fetchone()
             return row["count"] if row else 0
 

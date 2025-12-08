@@ -75,9 +75,7 @@ class GoogleCalendarAPI:
     DEFAULT_BATCH_SIZE = 50
     BATCH_DELAY = 1.0  # 秒
 
-    def __init__(
-        self, token_file: str = "auth/calendar_token.json", calendar_id: str = "primary"
-    ):
+    def __init__(self, token_file: str = "auth/calendar_token.json", calendar_id: str = "primary"):
         """
         初期化
 
@@ -151,9 +149,7 @@ class GoogleCalendarAPI:
         except Exception as e:
             raise AuthenticationError(f"Failed to load credentials: {e}")
 
-    def _refresh_token_if_needed(
-        self, credentials: Optional[Credentials] = None
-    ) -> bool:
+    def _refresh_token_if_needed(self, credentials: Optional[Credentials] = None) -> bool:
         """
         必要に応じてトークンをリフレッシュ
 
@@ -281,16 +277,12 @@ class GoogleCalendarAPI:
         # API呼び出し
         def _create():
             return (
-                self.service.events()
-                .insert(calendarId=self.calendar_id, body=event_data)
-                .execute()
+                self.service.events().insert(calendarId=self.calendar_id, body=event_data).execute()
             )
 
         try:
             event = self._retry_with_backoff(_create)
-            logger.info(
-                f"Event created: {summary} at {start_time} " f"(ID: {event.get('id')})"
-            )
+            logger.info(f"Event created: {summary} at {start_time} " f"(ID: {event.get('id')})")
             return event
 
         except Exception as e:
@@ -313,9 +305,7 @@ class GoogleCalendarAPI:
 
         def _get():
             return (
-                self.service.events()
-                .get(calendarId=self.calendar_id, eventId=event_id)
-                .execute()
+                self.service.events().get(calendarId=self.calendar_id, eventId=event_id).execute()
             )
 
         try:
@@ -442,8 +432,7 @@ class GoogleCalendarAPI:
             events = result.get("items", [])
 
             logger.info(
-                f"Retrieved {len(events)} events "
-                f"(time_min={time_min}, time_max={time_max})"
+                f"Retrieved {len(events)} events " f"(time_min={time_min}, time_max={time_max})"
             )
             return events
 
@@ -539,10 +528,7 @@ class GoogleCalendarAPI:
         failed_count = 0
         errors = []
 
-        logger.info(
-            f"Starting batch event creation: {total} events, "
-            f"batch_size={batch_size}"
-        )
+        logger.info(f"Starting batch event creation: {total} events, " f"batch_size={batch_size}")
 
         # バッチ処理
         for i in range(0, total, batch_size):
@@ -566,10 +552,7 @@ class GoogleCalendarAPI:
             if i + batch_size < total:
                 time.sleep(self.BATCH_DELAY)
 
-        logger.info(
-            f"Batch creation completed: "
-            f"success={success_count}, failed={failed_count}"
-        )
+        logger.info(f"Batch creation completed: " f"success={success_count}, failed={failed_count}")
 
         return success_count, failed_count, errors
 
@@ -599,10 +582,7 @@ class GoogleCalendarAPI:
                 failed_count += 1
                 logger.warning(f"Failed to update {event_id}: {e}")
 
-        logger.info(
-            f"Batch update completed: "
-            f"success={success_count}, failed={failed_count}"
-        )
+        logger.info(f"Batch update completed: " f"success={success_count}, failed={failed_count}")
 
         return success_count, failed_count
 
@@ -630,10 +610,7 @@ class GoogleCalendarAPI:
                 failed_count += 1
                 logger.warning(f"Failed to delete {event_id}: {e}")
 
-        logger.info(
-            f"Batch deletion completed: "
-            f"success={success_count}, failed={failed_count}"
-        )
+        logger.info(f"Batch deletion completed: " f"success={success_count}, failed={failed_count}")
 
         return success_count, failed_count
 
@@ -765,8 +742,7 @@ class GoogleCalendarAPI:
         try:
             calendar_info = self._retry_with_backoff(_get_calendar)
             logger.info(
-                f"Calendar info: {calendar_info.get('summary')} "
-                f"(ID: {self.calendar_id})"
+                f"Calendar info: {calendar_info.get('summary')} " f"(ID: {self.calendar_id})"
             )
             return calendar_info
 

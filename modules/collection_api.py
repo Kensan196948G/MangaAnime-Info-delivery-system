@@ -27,11 +27,9 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from .anime_anilist import AniListCollector
-from .data_normalizer import (DataIntegrator, DataQualityAnalyzer,
-                              analyze_data_quality)
+from .data_normalizer import DataIntegrator, DataQualityAnalyzer, analyze_data_quality
 from .db import get_db
-from .manga_rss import (BookWalkerRSSCollector, DAnimeRSSCollector,
-                        MangaRSSCollector)
+from .manga_rss import BookWalkerRSSCollector, DAnimeRSSCollector, MangaRSSCollector
 from .models import Work
 
 
@@ -248,31 +246,23 @@ class CollectionManager:
         with self.job_lock:
             all_jobs = list(self.active_jobs.values()) + self.job_history
 
-        successful_jobs = [
-            j for j in all_jobs if j.status == CollectionStatus.COMPLETED
-        ]
+        successful_jobs = [j for j in all_jobs if j.status == CollectionStatus.COMPLETED]
         failed_jobs = [j for j in all_jobs if j.status == CollectionStatus.FAILED]
 
         # Calculate average duration
         completed_jobs = [j for j in all_jobs if j.completed_at]
         average_duration = 0.0
         if completed_jobs:
-            durations = [
-                (j.completed_at - j.started_at).total_seconds() for j in completed_jobs
-            ]
+            durations = [(j.completed_at - j.started_at).total_seconds() for j in completed_jobs]
             average_duration = sum(durations) / len(durations)
 
         # Calculate collection rate (items per hour)
         uptime_hours = (datetime.now() - self.start_time).total_seconds() / 3600
-        collection_rate = (
-            self.total_items_collected / uptime_hours if uptime_hours > 0 else 0
-        )
+        collection_rate = self.total_items_collected / uptime_hours if uptime_hours > 0 else 0
 
         # Calculate error rate
         total_collections = len(all_jobs)
-        error_rate = (
-            len(failed_jobs) / total_collections if total_collections > 0 else 0
-        )
+        error_rate = len(failed_jobs) / total_collections if total_collections > 0 else 0
 
         # Last collection
         last_collection = None
@@ -329,9 +319,7 @@ class CollectionManager:
                 grade_counts[grade] = grade_counts.get(grade, 0) + 1
 
             except Exception as e:
-                self.logger.warning(
-                    f"Failed to analyze work {work_dict.get('id')}: {e}"
-                )
+                self.logger.warning(f"Failed to analyze work {work_dict.get('id')}: {e}")
 
         # Calculate average scores
         if quality_analyses:
@@ -340,12 +328,10 @@ class CollectionManager:
                 / len(quality_analyses),
                 "completeness": sum(q["completeness"] for q in quality_analyses)
                 / len(quality_analyses),
-                "accuracy": sum(q["accuracy"] for q in quality_analyses)
-                / len(quality_analyses),
+                "accuracy": sum(q["accuracy"] for q in quality_analyses) / len(quality_analyses),
                 "consistency": sum(q["consistency"] for q in quality_analyses)
                 / len(quality_analyses),
-                "freshness": sum(q["freshness"] for q in quality_analyses)
-                / len(quality_analyses),
+                "freshness": sum(q["freshness"] for q in quality_analyses) / len(quality_analyses),
             }
         else:
             avg_scores = {
@@ -360,9 +346,7 @@ class CollectionManager:
         issues = self._identify_quality_issues(quality_analyses)
 
         # Generate recommendations
-        recommendations = self._generate_quality_recommendations(
-            avg_scores, grade_counts, issues
-        )
+        recommendations = self._generate_quality_recommendations(avg_scores, grade_counts, issues)
 
         return DataQualityReport(
             timestamp=datetime.now(),
@@ -452,10 +436,7 @@ class CollectionManager:
             results = {}
 
             # Run collectors based on job type and sources
-            if (
-                job.collection_type == CollectionType.ANILIST_ONLY
-                or "anilist" in job.sources
-            ):
+            if job.collection_type == CollectionType.ANILIST_ONLY or "anilist" in job.sources:
                 if job.status != CollectionStatus.CANCELLED:
                     anilist_result = self._run_anilist_collection(job)
                     results["anilist"] = anilist_result
@@ -666,9 +647,7 @@ class CollectionManager:
             )
 
         # Missing titles
-        missing_titles = [
-            q for q in quality_analyses if not q["details"].get("has_title")
-        ]
+        missing_titles = [q for q in quality_analyses if not q["details"].get("has_title")]
         if missing_titles:
             issues.append(
                 {
@@ -749,9 +728,7 @@ class CollectionManager:
                 )
 
         if not recommendations:
-            recommendations.append(
-                "Data quality is acceptable. Continue with regular monitoring."
-            )
+            recommendations.append("Data quality is acceptable. Continue with regular monitoring.")
 
         return recommendations
 
@@ -774,8 +751,6 @@ def start_incremental_collection(manager: CollectionManager) -> str:
     return manager.start_collection(CollectionType.INCREMENTAL)
 
 
-def get_collection_status(
-    manager: CollectionManager, job_id: str
-) -> Optional[Dict[str, Any]]:
+def get_collection_status(manager: CollectionManager, job_id: str) -> Optional[Dict[str, Any]]:
     """Get status of a collection job."""
     return manager.get_job_status(job_id)

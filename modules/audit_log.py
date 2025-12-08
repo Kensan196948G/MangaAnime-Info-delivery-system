@@ -125,9 +125,7 @@ class AuditLogger:
 
         # フィルタ適用
         if event_type:
-            filtered_logs = [
-                log for log in filtered_logs if log.event_type == event_type
-            ]
+            filtered_logs = [log for log in filtered_logs if log.event_type == event_type]
 
         if user_id:
             filtered_logs = [log for log in filtered_logs if log.user_id == user_id]

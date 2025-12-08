@@ -126,9 +126,7 @@ class ErrorNotifier:
 
         try:
             # メール作成
-            msg = self._create_error_email(
-                error_type, error_message, error_details, log_file_path
-            )
+            msg = self._create_error_email(error_type, error_message, error_details, log_file_path)
             if not msg:
                 return False
 
@@ -162,9 +160,7 @@ class ErrorNotifier:
             msg = MIMEMultipart()
 
             # ヘッダー設定
-            subject_prefix = self.error_config.get(
-                "subject_prefix", "🚨 システムエラー"
-            )
+            subject_prefix = self.error_config.get("subject_prefix", "🚨 システムエラー")
             msg["Subject"] = f"{subject_prefix} - {error_type}"
             msg["From"] = (
                 f"{self.error_config.get('sender_name', 'MangaAnime監視システム')} <{self.error_config.get('sender_email')}>"
@@ -280,9 +276,7 @@ class ErrorNotifier:
 
                 server.login(sender_email, sender_password)
                 text = msg.as_string()
-                server.sendmail(
-                    sender_email, self.error_config.get("recipient_email"), text
-                )
+                server.sendmail(sender_email, self.error_config.get("recipient_email"), text)
 
             return True
 

@@ -1,11 +1,13 @@
 """
 AniList GraphQL API連携モジュール（型ヒント付き）
 """
-import requests
-import time
+
 import logging
-from typing import List, Dict, Any, Optional, Tuple
-from datetime import datetime, timedelta
+import time
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
+
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -48,9 +50,7 @@ class AniListAPI:
                 self.last_reset_time = time.time()
 
     def _execute_query(
-        self,
-        query: str,
-        variables: Optional[Dict[str, Any]] = None
+        self, query: str, variables: Optional[Dict[str, Any]] = None
     ) -> Optional[Dict[str, Any]]:
         """
         GraphQLクエリを実行
@@ -66,9 +66,7 @@ class AniListAPI:
 
         try:
             response = requests.post(
-                self.api_url,
-                json={'query': query, 'variables': variables or {}},
-                timeout=30
+                self.api_url, json={"query": query, "variables": variables or {}}, timeout=30
             )
             response.raise_for_status()
 
@@ -76,11 +74,11 @@ class AniListAPI:
 
             data: Dict[str, Any] = response.json()
 
-            if 'errors' in data:
+            if "errors" in data:
                 logger.error(f"GraphQLエラー: {data['errors']}")
                 return None
 
-            return data.get('data')
+            return data.get("data")
 
         except requests.exceptions.RequestException as e:
             logger.error(f"APIリクエストエラー: {e}")
@@ -91,7 +89,7 @@ class AniListAPI:
         page: int = 1,
         per_page: int = 50,
         season: Optional[str] = None,
-        year: Optional[int] = None
+        year: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """
         放送予定のアニメを取得
@@ -152,23 +150,20 @@ class AniListAPI:
         }
         """
 
-        variables: Dict[str, Any] = {
-            'page': page,
-            'perPage': per_page
-        }
+        variables: Dict[str, Any] = {"page": page, "perPage": per_page}
 
         if season:
-            variables['season'] = season
+            variables["season"] = season
 
         if year:
-            variables['seasonYear'] = year
+            variables["seasonYear"] = year
 
         data = self._execute_query(query, variables)
 
-        if not data or 'Page' not in data:
+        if not data or "Page" not in data:
             return []
 
-        media_list: List[Dict[str, Any]] = data['Page'].get('media', [])
+        media_list: List[Dict[str, Any]] = data["Page"].get("media", [])
         logger.info(f"取得件数: {len(media_list)}件")
 
         return media_list
@@ -216,19 +211,16 @@ class AniListAPI:
         }
         """
 
-        variables = {'id': anime_id}
+        variables = {"id": anime_id}
         data = self._execute_query(query, variables)
 
         if not data:
             return None
 
-        return data.get('Media')
+        return data.get("Media")
 
     def search_anime(
-        self,
-        search_term: str,
-        page: int = 1,
-        per_page: int = 10
+        self, search_term: str, page: int = 1, per_page: int = 10
     ) -> List[Dict[str, Any]]:
         """
         アニメを検索
@@ -266,18 +258,14 @@ class AniListAPI:
         }
         """
 
-        variables = {
-            'search': search_term,
-            'page': page,
-            'perPage': per_page
-        }
+        variables = {"search": search_term, "page": page, "perPage": per_page}
 
         data = self._execute_query(query, variables)
 
-        if not data or 'Page' not in data:
+        if not data or "Page" not in data:
             return []
 
-        media_list: List[Dict[str, Any]] = data['Page'].get('media', [])
+        media_list: List[Dict[str, Any]] = data["Page"].get("media", [])
         logger.info(f"検索結果: {len(media_list)}件")
 
         return media_list
@@ -293,14 +281,9 @@ def extract_title(media: Dict[str, Any]) -> str:
     Returns:
         str: タイトル（優先順: native -> romaji -> english）
     """
-    title_obj = media.get('title', {})
+    title_obj = media.get("title", {})
 
-    return (
-        title_obj.get('native') or
-        title_obj.get('romaji') or
-        title_obj.get('english') or
-        '不明'
-    )
+    return title_obj.get("native") or title_obj.get("romaji") or title_obj.get("english") or "不明"
 
 
 def extract_start_date(media: Dict[str, Any]) -> Optional[str]:
@@ -313,11 +296,11 @@ def extract_start_date(media: Dict[str, Any]) -> Optional[str]:
     Returns:
         Optional[str]: 開始日（YYYY-MM-DD形式、不明な場合はNone）
     """
-    start_date = media.get('startDate', {})
+    start_date = media.get("startDate", {})
 
-    year = start_date.get('year')
-    month = start_date.get('month')
-    day = start_date.get('day')
+    year = start_date.get("year")
+    month = start_date.get("month")
+    day = start_date.get("day")
 
     if not year:
         return None
@@ -329,7 +312,7 @@ def extract_start_date(media: Dict[str, Any]) -> Optional[str]:
     try:
         date_str = f"{year:04d}-{month:02d}-{day:02d}"
         # 日付の妥当性チェック
-        datetime.strptime(date_str, '%Y-%m-%d')
+        datetime.strptime(date_str, "%Y-%m-%d")
         return date_str
     except ValueError:
         return None
@@ -345,21 +328,18 @@ def extract_streaming_platforms(media: Dict[str, Any]) -> List[str]:
     Returns:
         List[str]: 配信プラットフォームのリスト
     """
-    streaming_episodes = media.get('streamingEpisodes', [])
+    streaming_episodes = media.get("streamingEpisodes", [])
     platforms: List[str] = []
 
     for episode in streaming_episodes:
-        site = episode.get('site')
+        site = episode.get("site")
         if site and site not in platforms:
             platforms.append(site)
 
     return platforms
 
 
-def check_ng_keywords(
-    media: Dict[str, Any],
-    ng_keywords: List[str]
-) -> Tuple[bool, List[str]]:
+def check_ng_keywords(media: Dict[str, Any], ng_keywords: List[str]) -> Tuple[bool, List[str]]:
     """
     NGキーワードをチェック
 
@@ -379,22 +359,22 @@ def check_ng_keywords(
             matched_keywords.append(keyword)
 
     # ジャンルをチェック
-    genres = media.get('genres', [])
+    genres = media.get("genres", [])
     for genre in genres:
         for keyword in ng_keywords:
             if keyword.lower() in str(genre).lower():
                 matched_keywords.append(keyword)
 
     # タグをチェック
-    tags = media.get('tags', [])
+    tags = media.get("tags", [])
     for tag in tags:
-        tag_name = tag.get('name', '')
+        tag_name = tag.get("name", "")
         for keyword in ng_keywords:
             if keyword.lower() in tag_name.lower():
                 matched_keywords.append(keyword)
 
     # 説明をチェック
-    description = media.get('description', '')
+    description = media.get("description", "")
     if description:
         for keyword in ng_keywords:
             if keyword.lower() in description.lower():
@@ -418,13 +398,13 @@ def get_current_season() -> Tuple[str, int]:
     year = now.year
 
     if month in [1, 2, 3]:
-        season = 'WINTER'
+        season = "WINTER"
     elif month in [4, 5, 6]:
-        season = 'SPRING'
+        season = "SPRING"
     elif month in [7, 8, 9]:
-        season = 'SUMMER'
+        season = "SUMMER"
     else:  # month in [10, 11, 12]
-        season = 'FALL'
+        season = "FALL"
 
     return season, year
 
@@ -441,13 +421,13 @@ def get_next_season() -> Tuple[str, int]:
     year = now.year
 
     if month in [1, 2, 3]:
-        season = 'SPRING'
+        season = "SPRING"
     elif month in [4, 5, 6]:
-        season = 'SUMMER'
+        season = "SUMMER"
     elif month in [7, 8, 9]:
-        season = 'FALL'
+        season = "FALL"
     else:  # month in [10, 11, 12]
-        season = 'WINTER'
+        season = "WINTER"
         year += 1
 
     return season, year

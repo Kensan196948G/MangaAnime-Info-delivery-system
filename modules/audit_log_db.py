@@ -157,9 +157,7 @@ class AuditLoggerDB:
                 ORDER BY count DESC
                 """
             )
-            event_counts = {
-                row["event_type"]: row["count"] for row in cursor.fetchall()
-            }
+            event_counts = {row["event_type"]: row["count"] for row in cursor.fetchall()}
 
             return {
                 "total_logs": total_logs,
@@ -200,9 +198,7 @@ class AuditLoggerDB:
                             ip_address=row["ip_address"],
                             user_agent=row["user_agent"],
                             timestamp=datetime.fromisoformat(row["timestamp"]),
-                            details=(
-                                json.loads(row["details"]) if row["details"] else {}
-                            ),
+                            details=(json.loads(row["details"]) if row["details"] else {}),
                             success=False,
                         )
                     )

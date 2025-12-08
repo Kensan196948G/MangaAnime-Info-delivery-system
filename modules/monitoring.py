@@ -314,9 +314,7 @@ class MetricsCollector:
 
         with self.lock:
             # Filter recent metrics
-            recent_system = [
-                m for m in self.system_metrics if m.timestamp > cutoff_time
-            ]
+            recent_system = [m for m in self.system_metrics if m.timestamp > cutoff_time]
             recent_app = [m for m in self.app_metrics if m.timestamp > cutoff_time]
 
             summary = {
@@ -458,9 +456,7 @@ class AlertManager:
 
             try:
                 # Get metric value
-                metric_value = self._get_metric_value(
-                    metrics_data, condition.metric_path
-                )
+                metric_value = self._get_metric_value(metrics_data, condition.metric_path)
 
                 if metric_value is None:
                     continue
@@ -475,9 +471,7 @@ class AlertManager:
 
         return triggered_alerts
 
-    def _get_metric_value(
-        self, metrics_data: Dict[str, Any], metric_path: str
-    ) -> Optional[float]:
+    def _get_metric_value(self, metrics_data: Dict[str, Any], metric_path: str) -> Optional[float]:
         """Extract metric value using dot notation path"""
         keys = metric_path.split(".")
         value = metrics_data
@@ -500,9 +494,7 @@ class AlertManager:
         except (KeyError, TypeError):
             return None
 
-    def _evaluate_condition(
-        self, condition: AlertCondition, metric_value: float
-    ) -> bool:
+    def _evaluate_condition(self, condition: AlertCondition, metric_value: float) -> bool:
         """Evaluate single condition"""
         if condition.operator == ">":
             return metric_value > condition.threshold
@@ -615,9 +607,7 @@ class SystemMonitor:
 
         # Phase 2: Real-time monitoring enhancements
         self.real_time_alerts = []
-        self.performance_history = deque(
-            maxlen=1440
-        )  # 24-hour history (1-minute intervals)
+        self.performance_history = deque(maxlen=1440)  # 24-hour history (1-minute intervals)
         self.collection_performance_tracker = {
             "anilist_api": {"requests": 0, "errors": 0, "avg_response_time": 0.0},
             "rss_feeds": {
@@ -635,9 +625,7 @@ class SystemMonitor:
             return
 
         self._running = True
-        self._monitor_thread = threading.Thread(
-            target=self._monitoring_loop, daemon=True
-        )
+        self._monitor_thread = threading.Thread(target=self._monitoring_loop, daemon=True)
         self._monitor_thread.start()
 
         self.logger.info("System monitoring started")
@@ -701,9 +689,7 @@ class SystemMonitor:
             "system_metrics": asdict(system_metrics) if system_metrics else {},
             "application_metrics": asdict(app_metrics) if app_metrics else {},
             "collection_performance": self.collection_performance_tracker.copy(),
-            "overall_score": self._calculate_overall_performance_score(
-                system_metrics, app_metrics
-            ),
+            "overall_score": self._calculate_overall_performance_score(system_metrics, app_metrics),
         }
 
         self.performance_history.append(performance_snapshot)
@@ -717,9 +703,7 @@ class SystemMonitor:
             # Add to real-time alerts for dashboard
             self.add_real_time_alert(alert.message, alert.severity)
 
-    def _calculate_overall_performance_score(
-        self, system_metrics, app_metrics
-    ) -> float:
+    def _calculate_overall_performance_score(self, system_metrics, app_metrics) -> float:
         """
         Calculate overall system performance score (0.0 to 1.0).
 
@@ -832,9 +816,7 @@ class SystemMonitor:
             Health grade: 'A', 'B', 'C', 'D', or 'F'
         """
         active_alerts = self.alert_manager.get_active_alerts()
-        critical_alerts = [
-            alert for alert in active_alerts if alert.severity == "CRITICAL"
-        ]
+        critical_alerts = [alert for alert in active_alerts if alert.severity == "CRITICAL"]
         high_alerts = [alert for alert in active_alerts if alert.severity == "HIGH"]
 
         if len(critical_alerts) > 0:
@@ -876,9 +858,7 @@ class SystemMonitor:
                     1,
                 )
                 if error_rate > 0.2:  # More than 20% error rate
-                    critical_issues.append(
-                        f"{service} high error rate: {error_rate:.1%}"
-                    )
+                    critical_issues.append(f"{service} high error rate: {error_rate:.1%}")
 
         return critical_issues
 
@@ -893,9 +873,7 @@ class SystemMonitor:
             return "unknown"
 
         recent_performance = list(self.performance_history)[-10:]  # Last 10 data points
-        older_performance = list(self.performance_history)[
-            -20:-10
-        ]  # Previous 10 data points
+        older_performance = list(self.performance_history)[-20:-10]  # Previous 10 data points
 
         if len(older_performance) < 5:
             return "unknown"
@@ -970,9 +948,7 @@ class SystemMonitor:
                 or tracker.get("avg_processing_time", 0.0)
                 or tracker.get("avg_query_time", 0.0)
             )
-            new_avg = (
-                (current_avg * (total_operations - 1)) + response_time
-            ) / total_operations
+            new_avg = ((current_avg * (total_operations - 1)) + response_time) / total_operations
 
             if service == "anilist_api":
                 tracker["avg_response_time"] = new_avg
@@ -1033,17 +1009,13 @@ def record_api_performance(service: str, response_time: float, success: bool = T
     monitor = get_system_monitor()
     if monitor:
         if service == "anilist":
-            monitor.record_collection_performance(
-                "anilist_api", "request", response_time, success
-            )
+            monitor.record_collection_performance("anilist_api", "request", response_time, success)
         elif service == "rss":
             monitor.record_collection_performance(
                 "rss_feeds", "feed_process", response_time, success
             )
         elif service == "database":
-            monitor.record_collection_performance(
-                "database", "query", response_time, success
-            )
+            monitor.record_collection_performance("database", "query", response_time, success)
 
 
 def add_monitoring_alert(message: str, severity: str = "INFO"):

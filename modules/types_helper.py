@@ -1,19 +1,19 @@
 """
 型ヒント用のヘルパー定義
 """
-from typing import TypedDict, Optional, Literal
-from datetime import date
 
+from typing import Literal, Optional, TypedDict
 
 # 作品タイプ
-WorkType = Literal['anime', 'manga']
+WorkType = Literal["anime", "manga"]
 
 # リリースタイプ
-ReleaseType = Literal['episode', 'volume']
+ReleaseType = Literal["episode", "volume"]
 
 
 class WorkDict(TypedDict, total=False):
     """作品情報の型定義"""
+
     id: int
     title: str
     title_kana: Optional[str]
@@ -25,6 +25,7 @@ class WorkDict(TypedDict, total=False):
 
 class ReleaseDict(TypedDict, total=False):
     """リリース情報の型定義"""
+
     id: int
     release_id: int
     work_id: int
@@ -43,6 +44,7 @@ class ReleaseDict(TypedDict, total=False):
 
 class CalendarEventDict(TypedDict):
     """カレンダーイベント情報の型定義"""
+
     id: int
     release_id: int
     event_id: str
@@ -52,6 +54,7 @@ class CalendarEventDict(TypedDict):
 
 class StatisticsDict(TypedDict):
     """統計情報の型定義"""
+
     total_works: int
     anime_works: int
     manga_works: int
@@ -62,6 +65,7 @@ class StatisticsDict(TypedDict):
 
 class AniListMedia(TypedDict, total=False):
     """AniList APIのメディア情報"""
+
     id: int
     title: dict
     startDate: dict
@@ -73,6 +77,7 @@ class AniListMedia(TypedDict, total=False):
 
 class RSSItem(TypedDict, total=False):
     """RSSアイテムの型定義"""
+
     title: str
     link: str
     published: str

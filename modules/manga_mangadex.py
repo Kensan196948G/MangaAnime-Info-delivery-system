@@ -58,17 +58,13 @@ class MangaDexAPIClient:
         self.base_url = config.get("base_url", "https://api.mangadex.org")
         self.timeout = config.get("timeout_seconds", 30)
         self.rate_limit_config = config.get("rate_limit", {})
-        self.rate_limiter = RateLimiter(
-            self.rate_limit_config.get("requests_per_minute", 40)
-        )
+        self.rate_limiter = RateLimiter(self.rate_limit_config.get("requests_per_minute", 40))
         self.session: Optional[aiohttp.ClientSession] = None
         self.logger = logging.getLogger(__name__)
 
     async def __aenter__(self):
         """Async context manager entry."""
-        self.session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=self.timeout)
-        )
+        self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=self.timeout))
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -99,9 +95,7 @@ class MangaDexAPIClient:
         }
 
         try:
-            async with self.session.get(
-                f"{self.base_url}/manga", params=params
-            ) as response:
+            async with self.session.get(f"{self.base_url}/manga", params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     return self._normalize_manga_list(data.get("data", []))
@@ -113,9 +107,7 @@ class MangaDexAPIClient:
                     self.logger.error(
                         f"MangaDex API error: {response.status} - {await response.text()}"
                     )
-                    raise MangaDexAPIError(
-                        f"API request failed with status {response.status}"
-                    )
+                    raise MangaDexAPIError(f"API request failed with status {response.status}")
 
         except asyncio.TimeoutError:
             self.logger.error("MangaDex API request timeout")
@@ -124,9 +116,7 @@ class MangaDexAPIClient:
             self.logger.error(f"MangaDex API request error: {str(e)}")
             raise MangaDexAPIError(f"Request failed: {str(e)}")
 
-    async def get_latest_chapters(
-        self, limit: int = 100, hours: int = 24
-    ) -> List[Dict[str, Any]]:
+    async def get_latest_chapters(self, limit: int = 100, hours: int = 24) -> List[Dict[str, Any]]:
         """
         Get latest chapter updates from MangaDex.
 
@@ -154,17 +144,13 @@ class MangaDexAPIClient:
         }
 
         try:
-            async with self.session.get(
-                f"{self.base_url}/chapter", params=params
-            ) as response:
+            async with self.session.get(f"{self.base_url}/chapter", params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     return self._normalize_chapter_list(data.get("data", []))
                 else:
                     self.logger.error(f"MangaDex API error: {response.status}")
-                    raise MangaDexAPIError(
-                        f"API request failed with status {response.status}"
-                    )
+                    raise MangaDexAPIError(f"API request failed with status {response.status}")
 
         except Exception as e:
             self.logger.error(f"MangaDex API request error: {str(e)}")
@@ -191,17 +177,13 @@ class MangaDexAPIClient:
         }
 
         try:
-            async with self.session.get(
-                f"{self.base_url}/manga", params=params
-            ) as response:
+            async with self.session.get(f"{self.base_url}/manga", params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     return self._normalize_manga_list(data.get("data", []))
                 else:
                     self.logger.error(f"MangaDex API error: {response.status}")
-                    raise MangaDexAPIError(
-                        f"API request failed with status {response.status}"
-                    )
+                    raise MangaDexAPIError(f"API request failed with status {response.status}")
 
         except Exception as e:
             self.logger.error(f"MangaDex API request error: {str(e)}")
@@ -224,9 +206,7 @@ class MangaDexAPIClient:
                 title_en = titles.get("en", "")
 
                 # Use first available title as canonical
-                canonical_title = (
-                    title_en or title_ja or list(titles.values())[0] if titles else ""
-                )
+                canonical_title = title_en or title_ja or list(titles.values())[0] if titles else ""
 
                 # Get cover image
                 cover_url = ""
@@ -235,7 +215,9 @@ class MangaDexAPIClient:
                     if rel.get("type") == "cover_art":
                         cover_filename = rel.get("attributes", {}).get("fileName", "")
                         if cover_filename:
-                            cover_url = f"https://uploads.mangadex.org/covers/{manga_id}/{cover_filename}"
+                            cover_url = (
+                                f"https://uploads.mangadex.org/covers/{manga_id}/{cover_filename}"
+                            )
                         break
 
                 normalized_item = {
@@ -282,9 +264,7 @@ class MangaDexAPIClient:
                     if rel.get("type") == "manga":
                         manga_id = rel.get("id", "")
                         manga_title = (
-                            rel.get("attributes", {})
-                            .get("title", {})
-                            .get("en", "Unknown")
+                            rel.get("attributes", {}).get("title", {}).get("en", "Unknown")
                         )
                         break
 
@@ -371,9 +351,7 @@ async def collect_mangadex_chapters(
         except Exception as e:
             logger.error(f"Unexpected error in MangaDex chapter collection: {str(e)}")
 
-    logger.info(
-        f"MangaDex chapter collection complete: {len(all_chapters)} total items"
-    )
+    logger.info(f"MangaDex chapter collection complete: {len(all_chapters)} total items")
     return all_chapters
 
 
@@ -392,9 +370,7 @@ if __name__ == "__main__":
     async def test():
         manga_data = await collect_mangadex_manga(config)
         chapter_data = await collect_mangadex_chapters(config, hours=24)
-        logger.info(
-            f"Collected {len(manga_data)} manga and {len(chapter_data)} chapter updates"
-        )
+        logger.info(f"Collected {len(manga_data)} manga and {len(chapter_data)} chapter updates")
         if manga_data:
             logger.info("\nSample manga:")
             logger.info(json.dumps(manga_data[0], indent=2, ensure_ascii=False))

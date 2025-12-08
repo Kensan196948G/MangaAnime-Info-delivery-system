@@ -330,9 +330,7 @@ class CodeQualityValidator:
         # Calculate quality score
         total_issues = len(self.issues)
         severity_weights = {"CRITICAL": 10, "HIGH": 5, "MEDIUM": 2, "LOW": 1}
-        weighted_issues = sum(
-            severity_weights.get(issue.severity, 1) for issue in self.issues
-        )
+        weighted_issues = sum(severity_weights.get(issue.severity, 1) for issue in self.issues)
 
         # Score based on weighted issues (lower is better)
         quality_score = max(0, 100 - weighted_issues)
@@ -367,9 +365,7 @@ class CodeQualityValidator:
         # Severity-based recommendations
         critical_count = sum(1 for issue in self.issues if issue.severity == "CRITICAL")
         if critical_count > 0:
-            recommendations.append(
-                f"Fix {critical_count} critical quality issues immediately"
-            )
+            recommendations.append(f"Fix {critical_count} critical quality issues immediately")
 
         high_count = sum(1 for issue in self.issues if issue.severity == "HIGH")
         if high_count > 0:
@@ -384,22 +380,16 @@ class CodeQualityValidator:
             recommendations.append("Improve code documentation and docstring coverage")
 
         if category_counts["code_quality"] > 10:
-            recommendations.append(
-                "Refactor code to improve maintainability and readability"
-            )
+            recommendations.append("Refactor code to improve maintainability and readability")
 
         if category_counts["error_handling"] > 0:
             recommendations.append("Improve error handling and exception management")
 
         # General recommendations
         if len(self.issues) == 0:
-            recommendations.append(
-                "Code quality is excellent. Maintain current standards."
-            )
+            recommendations.append("Code quality is excellent. Maintain current standards.")
         elif len(self.issues) > 50:
-            recommendations.append(
-                "High number of quality issues. Consider code review process."
-            )
+            recommendations.append("High number of quality issues. Consider code review process.")
 
         return recommendations
 
@@ -656,9 +646,7 @@ class DataIntegrityValidator:
         # Calculate consistency score
         total_issues = len(self.issues)
         severity_weights = {"HIGH": 5, "MEDIUM": 3, "LOW": 1}
-        weighted_issues = sum(
-            severity_weights.get(issue.severity, 1) for issue in self.issues
-        )
+        weighted_issues = sum(severity_weights.get(issue.severity, 1) for issue in self.issues)
 
         consistency_score = max(0, 100 - weighted_issues * 2)
 
@@ -692,22 +680,16 @@ class DataIntegrityValidator:
         if integrity_issues:
             recommendations.append("Fix referential integrity issues in database")
 
-        consistency_issues = [
-            i for i in self.issues if i.category == "data_consistency"
-        ]
+        consistency_issues = [i for i in self.issues if i.category == "data_consistency"]
         if consistency_issues:
             recommendations.append("Address data consistency issues")
 
-        completeness_issues = [
-            i for i in self.issues if i.category == "data_completeness"
-        ]
+        completeness_issues = [i for i in self.issues if i.category == "data_completeness"]
         if completeness_issues:
             recommendations.append("Complete missing required data fields")
 
         if len(self.issues) == 0:
-            recommendations.append(
-                "Data integrity is excellent. Maintain current quality."
-            )
+            recommendations.append("Data integrity is excellent. Maintain current quality.")
 
         return recommendations
 
@@ -801,8 +783,7 @@ class PerformanceValidator:
 
             passed = (
                 query_time < self.performance_thresholds["database_query_time_ms"]
-                and join_time
-                < self.performance_thresholds["database_query_time_ms"] * 2
+                and join_time < self.performance_thresholds["database_query_time_ms"] * 2
             )
 
             return {
@@ -811,9 +792,7 @@ class PerformanceValidator:
                 "details": {
                     "simple_query_time_ms": query_time,
                     "join_query_time_ms": join_time,
-                    "threshold_ms": self.performance_thresholds[
-                        "database_query_time_ms"
-                    ],
+                    "threshold_ms": self.performance_thresholds["database_query_time_ms"],
                 },
                 "execution_time": time.time() - start_time,
             }
@@ -920,9 +899,7 @@ class PerformanceValidator:
                     "processed_items": len(test_anime_data),
                     "filtered_items": len(filtered_data),
                     "processing_time_seconds": process_time,
-                    "threshold_seconds": self.performance_thresholds[
-                        "response_time_seconds"
-                    ],
+                    "threshold_seconds": self.performance_thresholds["response_time_seconds"],
                 },
                 "execution_time": time.time() - start_time,
             }
@@ -937,16 +914,12 @@ class PerformanceValidator:
 
     def _compile_performance_results(self) -> Dict[str, Any]:
         """Compile performance test results"""
-        total_tests = (
-            len(self.performance_tests) if hasattr(self, "performance_tests") else 0
-        )
+        total_tests = len(self.performance_tests) if hasattr(self, "performance_tests") else 0
         passed_tests = 0
         bottlenecks = []
 
         if hasattr(self, "performance_tests"):
-            passed_tests = sum(
-                1 for test in self.performance_tests if test.get("passed", False)
-            )
+            passed_tests = sum(1 for test in self.performance_tests if test.get("passed", False))
 
             for test in self.performance_tests:
                 if not test.get("passed", False):
@@ -967,31 +940,21 @@ class PerformanceValidator:
             },
         }
 
-    def _generate_performance_recommendations(
-        self, bottlenecks: List[str]
-    ) -> List[str]:
+    def _generate_performance_recommendations(self, bottlenecks: List[str]) -> List[str]:
         """Generate performance improvement recommendations"""
         recommendations = []
 
         if "database_performance" in bottlenecks:
-            recommendations.append(
-                "Optimize database queries and consider adding indexes"
-            )
+            recommendations.append("Optimize database queries and consider adding indexes")
 
         if "memory_performance" in bottlenecks:
-            recommendations.append(
-                "Optimize memory usage and implement better data structures"
-            )
+            recommendations.append("Optimize memory usage and implement better data structures")
 
         if "api_performance_simulation" in bottlenecks:
-            recommendations.append(
-                "Optimize data processing algorithms and consider caching"
-            )
+            recommendations.append("Optimize data processing algorithms and consider caching")
 
         if not bottlenecks:
-            recommendations.append(
-                "Performance is good. Monitor regularly for regression."
-            )
+            recommendations.append("Performance is good. Monitor regularly for regression.")
 
         return recommendations
 
@@ -1043,15 +1006,11 @@ class QAFramework:
 
             # Calculate overall score and generate summary
             audit_results.update(
-                self._compile_overall_results(
-                    code_results, data_results, performance_results
-                )
+                self._compile_overall_results(code_results, data_results, performance_results)
             )
 
             audit_results["audit_duration"] = time.time() - audit_start
-            self.logger.info(
-                f"QA audit completed in {audit_results['audit_duration']:.2f} seconds"
-            )
+            self.logger.info(f"QA audit completed in {audit_results['audit_duration']:.2f} seconds")
 
         except Exception as e:
             self.logger.error(f"QA audit failed: {e}")
@@ -1136,12 +1095,8 @@ class QAFramework:
             },
             "quality_metrics": {
                 "overall_score": audit_results.get("overall_score", 0),
-                "quality_level": audit_results.get("summary", {}).get(
-                    "quality_level", "UNKNOWN"
-                ),
-                "total_issues": audit_results.get("summary", {}).get(
-                    "total_issues_found", 0
-                ),
+                "quality_level": audit_results.get("summary", {}).get("quality_level", "UNKNOWN"),
+                "total_issues": audit_results.get("summary", {}).get("total_issues_found", 0),
             },
         }
 

@@ -40,9 +40,7 @@ class SMTPGmailSender:
             or os.getenv("GMAIL_ADDRESS")
         )
         self.recipient_email = (
-            os.getenv("GMAIL_RECIPIENT_EMAIL")
-            or gmail_config.get("to_email")
-            or self.sender_email
+            os.getenv("GMAIL_RECIPIENT_EMAIL") or gmail_config.get("to_email") or self.sender_email
         )
         self.app_password = os.getenv("GMAIL_APP_PASSWORD")
 

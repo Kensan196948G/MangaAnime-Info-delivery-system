@@ -5,8 +5,7 @@ APIキー管理ルート
 import logging
 from functools import wraps
 
-from flask import (Blueprint, flash, g, jsonify, redirect, render_template,
-                   request, url_for)
+from flask import Blueprint, flash, g, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.models.api_key_db import api_key_store
@@ -129,9 +128,7 @@ def revoke(key):
         success = api_key_store.revoke_key(key)
         if success:
             flash("APIキーを無効化しました", "success")
-            logger.info(
-                f"APIキー無効化: user={current_user.username}, key={key[:15]}..."
-            )
+            logger.info(f"APIキー無効化: user={current_user.username}, key={key[:15]}...")
         else:
             flash("APIキーの無効化に失敗しました", "danger")
 

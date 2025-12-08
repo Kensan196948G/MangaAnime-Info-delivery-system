@@ -57,17 +57,13 @@ class KitsuAPIClient:
         self.base_url = config.get("base_url", "https://kitsu.io/api/edge")
         self.timeout = config.get("timeout_seconds", 30)
         self.rate_limit_config = config.get("rate_limit", {})
-        self.rate_limiter = RateLimiter(
-            self.rate_limit_config.get("requests_per_minute", 90)
-        )
+        self.rate_limiter = RateLimiter(self.rate_limit_config.get("requests_per_minute", 90))
         self.session: Optional[aiohttp.ClientSession] = None
         self.logger = logging.getLogger(__name__)
 
     async def __aenter__(self):
         """Async context manager entry."""
-        self.session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=self.timeout)
-        )
+        self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=self.timeout))
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -102,9 +98,7 @@ class KitsuAPIClient:
         }
 
         try:
-            async with self.session.get(
-                f"{self.base_url}/anime", params=params
-            ) as response:
+            async with self.session.get(f"{self.base_url}/anime", params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     return self._normalize_anime_list(data.get("data", []))
@@ -116,9 +110,7 @@ class KitsuAPIClient:
                     self.logger.error(
                         f"Kitsu API error: {response.status} - {await response.text()}"
                     )
-                    raise KitsuAPIError(
-                        f"API request failed with status {response.status}"
-                    )
+                    raise KitsuAPIError(f"API request failed with status {response.status}")
 
         except asyncio.TimeoutError:
             self.logger.error("Kitsu API request timeout")
@@ -150,9 +142,7 @@ class KitsuAPIClient:
                     return self._normalize_anime_list(data.get("data", []))
                 else:
                     self.logger.error(f"Kitsu API error: {response.status}")
-                    raise KitsuAPIError(
-                        f"API request failed with status {response.status}"
-                    )
+                    raise KitsuAPIError(f"API request failed with status {response.status}")
 
         except Exception as e:
             self.logger.error(f"Kitsu API request error: {str(e)}")
@@ -173,17 +163,13 @@ class KitsuAPIClient:
         params = {"page[limit]": limit, "sort": "-updatedAt"}
 
         try:
-            async with self.session.get(
-                f"{self.base_url}/manga", params=params
-            ) as response:
+            async with self.session.get(f"{self.base_url}/manga", params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     return self._normalize_manga_list(data.get("data", []))
                 else:
                     self.logger.error(f"Kitsu API error: {response.status}")
-                    raise KitsuAPIError(
-                        f"API request failed with status {response.status}"
-                    )
+                    raise KitsuAPIError(f"API request failed with status {response.status}")
 
         except Exception as e:
             self.logger.error(f"Kitsu API request error: {str(e)}")
@@ -274,9 +260,7 @@ class KitsuAPIClient:
             "fall": ("10-01", "12-31"),
         }
 
-        start_month_day, end_month_day = season_map.get(
-            season.lower(), ("01-01", "12-31")
-        )
+        start_month_day, end_month_day = season_map.get(season.lower(), ("01-01", "12-31"))
         start_date = f"{year}-{start_month_day}"
         end_date = f"{year}-{end_month_day}"
 
@@ -313,9 +297,7 @@ async def collect_kitsu_anime(config: Dict[str, Any]) -> List[Dict[str, Any]]:
     async with KitsuAPIClient(config) as client:
         try:
             # Get current season anime
-            seasonal_anime = await client.get_seasonal_anime(
-                current_season, current_year, limit=20
-            )
+            seasonal_anime = await client.get_seasonal_anime(current_season, current_year, limit=20)
             all_anime.extend(seasonal_anime)
             logger.info(f"Collected {len(seasonal_anime)} seasonal anime")
 

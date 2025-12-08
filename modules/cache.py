@@ -20,12 +20,12 @@ import json
 import logging
 import pickle
 import time
-from typing import Any, Callable, Dict, Optional, Union
-from datetime import timedelta
 from collections import OrderedDict
+from typing import Any, Callable, Dict, Optional
 
 try:
     import redis.asyncio as aioredis
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -105,7 +105,7 @@ class MemoryCache:
             "max_size": self.max_size,
             "hits": self.hits,
             "misses": self.misses,
-            "hit_rate": f"{hit_rate:.2f}%"
+            "hit_rate": f"{hit_rate:.2f}%",
         }
 
 
@@ -124,7 +124,7 @@ class CacheManager:
         self,
         redis_url: str = "redis://localhost:6379/0",
         memory_fallback: bool = True,
-        memory_max_size: int = 1000
+        memory_max_size: int = 1000,
     ):
         """
         初期化
@@ -152,7 +152,7 @@ class CacheManager:
                 self.redis_url,
                 encoding="utf-8",
                 decode_responses=False,  # バイナリデータ対応
-                socket_connect_timeout=5
+                socket_connect_timeout=5,
             )
 
             # 接続テスト
@@ -333,11 +333,7 @@ def get_cache_manager() -> CacheManager:
     return _cache_manager
 
 
-def cached(
-    prefix: str,
-    ttl: int = CacheManager.TTL_1_HOUR,
-    key_builder: Optional[Callable] = None
-):
+def cached(prefix: str, ttl: int = CacheManager.TTL_1_HOUR, key_builder: Optional[Callable] = None):
     """
     キャッシュデコレータ
 
@@ -351,6 +347,7 @@ def cached(
         async def get_anime_info(anime_id: int):
             return await fetch_from_api(anime_id)
     """
+
     def decorator(func: Callable):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
@@ -379,6 +376,7 @@ def cached(
             return result
 
         return wrapper
+
     return decorator
 
 

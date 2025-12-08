@@ -16,17 +16,18 @@ import asyncio
 import functools
 import logging
 import time
-from typing import Any, Callable, Coroutine, List, Optional, TypeVar, Union
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Callable, Coroutine, List, Optional, TypeVar, Union
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class RetryStrategy(Enum):
     """リトライ戦略"""
+
     EXPONENTIAL = "exponential"  # 指数バックオフ
     LINEAR = "linear"  # 線形バックオフ
     CONSTANT = "constant"  # 固定間隔
@@ -35,6 +36,7 @@ class RetryStrategy(Enum):
 @dataclass
 class RetryConfig:
     """リトライ設定"""
+
     max_attempts: int = 3
     base_delay: float = 1.0
     max_delay: float = 60.0
@@ -46,6 +48,7 @@ class RetryConfig:
 @dataclass
 class TaskResult:
     """タスク実行結果"""
+
     success: bool
     result: Any = None
     error: Optional[Exception] = None
@@ -54,10 +57,7 @@ class TaskResult:
 
 
 async def retry_async(
-    config: RetryConfig,
-    func: Callable[..., Coroutine[Any, Any, T]],
-    *args,
-    **kwargs
+    config: RetryConfig, func: Callable[..., Coroutine[Any, Any, T]], *args, **kwargs
 ) -> T:
     """
     非同期関数のリトライ実行
@@ -129,7 +129,7 @@ def with_retry(
     max_attempts: int = 3,
     base_delay: float = 1.0,
     strategy: RetryStrategy = RetryStrategy.EXPONENTIAL,
-    exceptions: tuple = (Exception,)
+    exceptions: tuple = (Exception,),
 ):
     """
     リトライデコレータ
@@ -139,6 +139,7 @@ def with_retry(
         async def fetch_data():
             return await api_call()
     """
+
     def decorator(func: Callable[..., Coroutine[Any, Any, T]]):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
@@ -146,17 +147,17 @@ def with_retry(
                 max_attempts=max_attempts,
                 base_delay=base_delay,
                 strategy=strategy,
-                exceptions=exceptions
+                exceptions=exceptions,
             )
             return await retry_async(config, func, *args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 async def with_timeout(
-    coro: Coroutine[Any, Any, T],
-    timeout: float,
-    default: Optional[T] = None
+    coro: Coroutine[Any, Any, T], timeout: float, default: Optional[T] = None
 ) -> T:
     """
     タイムアウト付き実行
@@ -185,7 +186,7 @@ async def run_parallel(
     tasks: List[Coroutine[Any, Any, T]],
     max_concurrent: Optional[int] = None,
     timeout: Optional[float] = None,
-    return_exceptions: bool = True
+    return_exceptions: bool = True,
 ) -> List[Union[T, Exception]]:
     """
     並列タスク実行（同時実行数制限付き）
@@ -217,8 +218,7 @@ async def run_parallel(
     if timeout:
         try:
             results = await asyncio.wait_for(
-                asyncio.gather(*bounded_tasks, return_exceptions=return_exceptions),
-                timeout=timeout
+                asyncio.gather(*bounded_tasks, return_exceptions=return_exceptions), timeout=timeout
             )
         except asyncio.TimeoutError:
             logger.error(f"Parallel execution timed out after {timeout}s")
@@ -232,7 +232,7 @@ async def run_parallel(
 async def run_parallel_with_progress(
     tasks: List[Coroutine[Any, Any, T]],
     max_concurrent: int = 10,
-    progress_callback: Optional[Callable[[int, int], None]] = None
+    progress_callback: Optional[Callable[[int, int], None]] = None,
 ) -> List[TaskResult]:
     """
     並列タスク実行（プログレス付き）
@@ -268,12 +268,7 @@ async def run_parallel_with_progress(
                 if progress_callback:
                     progress_callback(completed, total)
 
-                return TaskResult(
-                    success=True,
-                    result=result,
-                    duration=duration,
-                    attempts=attempts
-                )
+                return TaskResult(success=True, result=result, duration=duration, attempts=attempts)
 
             except Exception as e:
                 duration = time.time() - start_time
@@ -282,12 +277,7 @@ async def run_parallel_with_progress(
                 if progress_callback:
                     progress_callback(completed, total)
 
-                return TaskResult(
-                    success=False,
-                    error=e,
-                    duration=duration,
-                    attempts=attempts
-                )
+                return TaskResult(success=False, error=e, duration=duration, attempts=attempts)
 
     # 全タスクを追跡付きで実行
     tracked_tasks = [execute_with_tracking(task) for task in tasks]
@@ -301,7 +291,7 @@ async def batch_process(
     process_func: Callable[[Any], Coroutine[Any, Any, T]],
     batch_size: int = 10,
     max_concurrent: int = 5,
-    delay_between_batches: float = 0.0
+    delay_between_batches: float = 0.0,
 ) -> List[T]:
     """
     バッチ処理（大量データの段階的処理）
@@ -319,7 +309,7 @@ async def batch_process(
     all_results = []
 
     for i in range(0, len(items), batch_size):
-        batch = items[i:i + batch_size]
+        batch = items[i : i + batch_size]
         batch_num = i // batch_size + 1
         total_batches = (len(items) + batch_size - 1) // batch_size
 
@@ -385,17 +375,18 @@ class AsyncRateLimiter:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """終了処理"""
-        pass
 
 
 # 使用例
 async def example_usage():
     """使用例"""
+
     # 1. リトライ付き関数
     @with_retry(max_attempts=5, base_delay=2.0, strategy=RetryStrategy.EXPONENTIAL)
     async def flaky_api_call():
         """失敗する可能性のあるAPI呼び出し"""
         import random
+
         if random.random() < 0.7:  # 70%の確率で失敗
             raise ConnectionError("API unreachable")
         return {"status": "success"}
@@ -426,11 +417,7 @@ async def example_usage():
         return item * 2
 
     batch_results = await batch_process(
-        items,
-        process_item,
-        batch_size=20,
-        max_concurrent=5,
-        delay_between_batches=1.0
+        items, process_item, batch_size=20, max_concurrent=5, delay_between_batches=1.0
     )
     print(f"Processed {len(batch_results)} items")
 
@@ -456,7 +443,6 @@ async def example_usage():
 if __name__ == "__main__":
     # テスト実行
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     asyncio.run(example_usage())
