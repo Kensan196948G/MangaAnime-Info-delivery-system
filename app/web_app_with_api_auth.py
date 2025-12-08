@@ -22,13 +22,16 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from modules.db import get_db_connection
 from modules.config import load_config
+import logging
+
+logger = logging.getLogger(__name__)
 
 # APIキー認証モジュールのインポート
 try:
     from app.routes.api_auth import api_key_required, api_auth_bp, user_store
     API_AUTH_ENABLED = True
 except ImportError:
-    logger.warning("Warning")
+    logger.warning("API authentication module not available")
     API_AUTH_ENABLED = False
 
     # フォールバック用のダミーデコレータ
@@ -45,7 +48,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 # API認証Blueprintの登録
 if API_AUTH_ENABLED:
-    app.register_bluelogger.info(api_auth_bp)
+    app.register_blueprint(api_auth_bp)
 
 # =====================================
 # 基本ページ（非API）
@@ -459,11 +462,16 @@ logger = logging.getLogger(__name__)
 # =====================================
 
 if __name__ == '__main__':
-    # 開発環境用のデフォルトユーザーを作成
+    # 開発環境用のデフォルトユーザーを作成（環境変数から取得）
     if API_AUTH_ENABLED:
+        default_admin_password = os.environ.get('DEFAULT_ADMIN_PASSWORD')
+        if not default_admin_password:
+            logger.error("ERROR: DEFAULT_ADMIN_PASSWORD environment variable is required")
+            logger.info("Set it in .env file or as environment variable")
+            sys.exit(1)
         try:
-            user_store.create_user('admin', 'admin123')
-            logger.info("Default user created: admin / admin123")
+            user_store.create_user('admin', default_admin_password)
+            logger.info("Default admin user created")
         except ValueError:
             logger.info("Default user already exists")
 

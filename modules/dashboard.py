@@ -13,7 +13,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-dashboard_bp = Bluelogger.info("dashboard", __name__, url_prefix="/dashboard")
+dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 
 class DashboardService:
