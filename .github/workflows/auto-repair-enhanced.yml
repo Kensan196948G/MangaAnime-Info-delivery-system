@@ -225,20 +225,16 @@ jobs:
 
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "[自動修復] ${{ needs.detect-errors.outputs.error_summary }}
-
-修復ステータス: ${{ steps.repair.outputs.repair_status }}
-残存エラー: ${{ steps.repair.outputs.remaining_errors }}件
-
-🤖 Auto Repair System (Enhanced)
-Closes #56
-"
+            git commit -m "[Auto Repair] Fix errors - ${{ needs.detect-errors.outputs.error_summary }}" \
+              -m "Repair status: ${{ steps.repair.outputs.repair_status }}" \
+              -m "Remaining errors: ${{ steps.repair.outputs.remaining_errors }}" \
+              -m "Auto Repair System (Enhanced) - Closes #56"
             git push
             echo "committed=true" >> $GITHUB_OUTPUT
-            echo "✅ 修復をコミット・プッシュしました"
+            echo "Repair committed and pushed"
           else
             echo "committed=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ 変更なし（コミット不要）"
+            echo "No changes to commit"
           fi
 
   # ============================================
