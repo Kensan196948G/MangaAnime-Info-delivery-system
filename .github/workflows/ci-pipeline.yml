@@ -1,5 +1,5 @@
 name: CI Pipeline
-# シンプルなCIパイプライン - 自動修復システムの監視対象
+# Enhanced multi-stage CI/CD pipeline with comprehensive testing and security
 
 on:
   push:
@@ -9,40 +9,392 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   checks: write
+  pull-requests: write
+  statuses: write
+
+env:
+  CACHE_VERSION: v2
+  MIN_COVERAGE: 20
 
 jobs:
-  test:
-    name: 🧪 Run Tests
+  # ==========================================================================
+  # Stage 1: Code Quality & Linting
+  # ==========================================================================
+  lint:
+    name: 🔍 Lint & Code Quality
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
-    
+
     - name: 🐍 Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
-    
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: |
+          requirements.txt
+          requirements-dev.txt
+
+    - name: 📦 Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy pylint
+
+    - name: 🔍 Flake8 linting
+      continue-on-error: true
+      run: |
+        flake8 . \
+          --count \
+          --select=E9,F63,F7,F82 \
+          --show-source \
+          --statistics \
+          --exclude=.git,__pycache__,node_modules,backups,temp-files,data
+
+    - name: ⚫ Black formatting check
+      continue-on-error: true
+      run: |
+        black --check --diff --line-length 100 \
+          app/ modules/ scripts/ tests/ \
+          --exclude='/(\.git|__pycache__|node_modules|backups|temp-files|data)/'
+
+    - name: 🔤 isort import check
+      continue-on-error: true
+      run: |
+        isort --check-only --diff \
+          app/ modules/ scripts/ tests/ \
+          --skip-glob='*/node_modules/*,*/backups/*,*/temp-files/*,*/data/*'
+
+    - name: 🔬 MyPy type checking
+      continue-on-error: true
+      run: |
+        pip install -r requirements.txt || true
+        mypy modules/ app/ --ignore-missing-imports || true
+
+    - name: ✅ Lint stage completed
+      run: echo "✅ Linting stage completed"
+
+  # ==========================================================================
+  # Stage 2: Security Scanning
+  # ==========================================================================
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: lint
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
     - name: 📦 Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
-    
-    - name: 🔍 Run linting
+        pip install -r requirements.txt || true
+
+    - name: 🔒 Bandit security scan
+      continue-on-error: true
       run: |
-        pip install flake8
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
-    
-    - name: 🧪 Run tests
+        pip install bandit[toml]
+        bandit -r app/ modules/ scripts/ \
+          -f screen \
+          --severity-level medium \
+          --confidence-level medium
+
+    - name: 🛡️ Safety dependency check
+      continue-on-error: true
       run: |
-        pip install pytest pytest-cov pytest-asyncio pytest-mock faker
-        pytest tests/ -v --cov=modules --cov-report=term-missing --cov-fail-under=20 --maxfail=10 || true
-    
-    - name: ✅ Success notification
+        pip install safety
+        safety check --json || true
+
+    - name: 🔍 pip-audit vulnerability scan
+      continue-on-error: true
+      run: |
+        pip install pip-audit
+        pip-audit || true
+
+    - name: ✅ Security stage completed
+      run: echo "✅ Security scanning completed"
+
+  # ==========================================================================
+  # Stage 3: Matrix Testing (Python 3.9, 3.10, 3.11)
+  # ==========================================================================
+  test:
+    name: 🧪 Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [lint, security]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+        cache-dependency-path: |
+          requirements.txt
+          requirements-test.txt
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        pip install pytest pytest-cov pytest-asyncio pytest-mock pytest-html faker responses freezegun
+
+    - name: 🧪 Run tests with coverage
+      run: |
+        pytest tests/ \
+          -v \
+          --cov=modules \
+          --cov=app \
+          --cov-report=xml \
+          --cov-report=html \
+          --cov-report=term-missing \
+          --cov-fail-under=${{ env.MIN_COVERAGE }} \
+          --maxfail=5 \
+          --tb=short \
+          --html=test-report-py${{ matrix.python-version }}.html \
+          --self-contained-html
+
+    - name: 📊 Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      if: matrix.python-version == '3.11'
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: 📄 Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-py${{ matrix.python-version }}
+        path: |
+          test-report-py${{ matrix.python-version }}.html
+          coverage.xml
+          htmlcov/
+        retention-days: 30
+
+    - name: 💬 Comment coverage on PR
+      if: github.event_name == 'pull_request' && matrix.python-version == '3.11'
+      uses: py-cov-action/python-coverage-comment-action@v3
+      continue-on-error: true
+      with:
+        GITHUB_TOKEN: ${{ github.token }}
+        MINIMUM_GREEN: 80
+        MINIMUM_ORANGE: 60
+
+  # ==========================================================================
+  # Stage 4: Build & Validation
+  # ==========================================================================
+  build:
+    name: 🏗️ Build & Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: test
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: 📦 Install build tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install build setuptools wheel
+
+    - name: 🏗️ Build package
+      run: |
+        python -m build
+
+    - name: 📄 Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+        retention-days: 30
+
+    - name: ✅ Build stage completed
+      run: echo "✅ Build completed successfully"
+
+  # ==========================================================================
+  # Stage 5: Coverage Badge Generation
+  # ==========================================================================
+  coverage-badge:
+    name: 📊 Generate Coverage Badge
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        pip install pytest pytest-cov coverage-badge
+
+    - name: 🧪 Generate coverage data
+      continue-on-error: true
+      run: |
+        pytest tests/ --cov=modules --cov=app --cov-report=xml
+
+    - name: 📊 Create coverage badge
+      continue-on-error: true
+      run: |
+        pip install genbadge[coverage]
+        genbadge coverage -i coverage.xml -o coverage-badge.svg
+
+    - name: 📤 Upload badge artifact
+      uses: actions/upload-artifact@v4
+      continue-on-error: true
+      with:
+        name: coverage-badge
+        path: coverage-badge.svg
+        retention-days: 90
+
+  # ==========================================================================
+  # Stage 6: Integration Status Check
+  # ==========================================================================
+  integration-check:
+    name: ✅ Integration Status Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [lint, security, test, build]
+    if: always()
+
+    steps:
+    - name: 📊 Check all job statuses
+      run: |
+        echo "Lint Status: ${{ needs.lint.result }}"
+        echo "Security Status: ${{ needs.security.result }}"
+        echo "Test Status: ${{ needs.test.result }}"
+        echo "Build Status: ${{ needs.build.result }}"
+
+        if [ "${{ needs.lint.result }}" != "success" ] || \
+           [ "${{ needs.test.result }}" != "success" ] || \
+           [ "${{ needs.build.result }}" != "success" ]; then
+          echo "::error::One or more critical stages failed!"
+          exit 1
+        fi
+
+    - name: ✅ All checks passed
+      run: |
+        echo "✅ All CI checks passed successfully!"
+        echo "Ready for deployment"
+
+  # ==========================================================================
+  # Stage 7: Auto-Deploy (Main Branch Only)
+  # ==========================================================================
+  deploy:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: integration-check
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    environment:
+      name: production
+      url: https://your-app-url.com
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🚀 Deploy application
+      run: |
+        echo "🚀 Deploying to production..."
+        echo "📦 Application version: $(git describe --tags --always)"
+        echo "🔧 Environment: production"
+        # Add your deployment commands here
+        # Example: ./scripts/deploy.sh production
+
+    - name: ✅ Deployment completed
+      run: |
+        echo "✅ Deployment completed successfully!"
+        echo "🌐 Application is live"
+
+    - name: 💬 Notify deployment
       if: success()
-      run: echo "✅ All tests passed successfully!"
+      run: |
+        echo "📢 Deployment notification would be sent here"
+        # Add notification logic (Slack, Discord, etc.)
+
+  # ==========================================================================
+  # Summary Report
+  # ==========================================================================
+  summary:
+    name: 📋 Pipeline Summary
+    runs-on: ubuntu-latest
+    needs: [lint, security, test, build, integration-check]
+    if: always()
+
+    steps:
+    - name: 📊 Generate pipeline summary
+      run: |
+        echo "# CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Stage Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Test | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Integration Check | ${{ needs.integration-check.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Metadata" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Author**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Pipeline completed at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

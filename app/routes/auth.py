@@ -149,18 +149,35 @@ class UserStore:
 # 環境変数でDB版とメモリ版を切り替え
 USE_DB_STORE = os.getenv("USE_DB_STORE", "true").lower() == "true"
 
-if USE_DB_STORE:
-    try:
-        from app.models.user_db import UserDBStore
+# 遅延初期化用のプレースホルダー
+_user_store = None
 
-        user_store = UserDBStore()
-        logger.info("UserDBStore（DB版）を使用します")
-    except ImportError as e:
-        logger.warning(f"UserDBStoreの読み込み失敗: {e}。メモリ版を使用します")
-        user_store = UserStore()
-else:
-    user_store = UserStore()
-    logger.info("UserStore（メモリ版）を使用します")
+
+def get_user_store():
+    """ユーザーストアを遅延初期化して返す（循環インポート回避）"""
+    global _user_store
+    if _user_store is None:
+        if USE_DB_STORE:
+            try:
+                from app.models.user_db import UserDBStore
+                _user_store = UserDBStore()
+                logger.info("UserDBStore（DB版）を使用します")
+            except ImportError as e:
+                logger.warning(f"UserDBStoreの読み込み失敗: {e}。メモリ版を使用します")
+                _user_store = UserStore()
+        else:
+            _user_store = UserStore()
+            logger.info("UserStore（メモリ版）を使用します")
+    return _user_store
+
+
+# 後方互換性のためのプロパティ風アクセス
+class _UserStoreProxy:
+    """user_storeへの後方互換アクセスを提供するプロキシクラス"""
+    def __getattr__(self, name):
+        return getattr(get_user_store(), name)
+
+user_store = _UserStoreProxy()
 
 
 def init_login_manager(app) -> LoginManager:
