@@ -1,0 +1,88 @@
+name: 🚨 失敗時自動Issue作成
+
+# 他のワークフローが失敗した時に自動でIssue作成
+on:
+  workflow_run:
+    workflows:
+      - "CI Pipeline"
+    types:
+      - completed
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  create-issue-on-failure:
+    name: 失敗時Issue作成
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+
+    steps:
+      - name: 📥 チェックアウト
+        uses: actions/checkout@v4
+
+      - name: 🚨 失敗Issue作成
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflow = context.payload.workflow_run;
+            const title = `🚨 ワークフロー失敗: ${workflow.name}`;
+            const body = `## ワークフロー失敗レポート
+
+**ワークフロー**: ${workflow.name}
+**実行ID**: ${workflow.id}
+**コミット**: ${workflow.head_sha}
+**ブランチ**: ${workflow.head_branch}
+**実行時刻**: ${workflow.created_at}
+**実行URL**: ${workflow.html_url}
+
+### 対応が必要です
+
+このIssueは自動生成されました。
+エラーログを確認して修正してください。
+
+cc: @${context.repo.owner}
+`;
+
+            // 既存の同じワークフロー失敗Issueを確認
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'workflow-failure,auto-generated',
+              per_page: 10
+            });
+
+            const duplicateIssue = existingIssues.data.find(issue =>
+              issue.title.includes(workflow.name)
+            );
+
+            if (duplicateIssue) {
+              // 既存Issueにコメント追加
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: duplicateIssue.number,
+                body: `### 🔄 再度失敗しました
+
+**実行ID**: ${workflow.id}
+**実行時刻**: ${workflow.created_at}
+**実行URL**: ${workflow.html_url}
+
+引き続き対応が必要です。`
+              });
+
+              console.log(`既存Issue #${duplicateIssue.number} にコメント追加しました`);
+            } else {
+              // 新規Issue作成
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['workflow-failure', 'auto-generated', 'bug']
+              });
+
+              console.log(`新規Issue #${issue.data.number} を作成しました`);
+            }
