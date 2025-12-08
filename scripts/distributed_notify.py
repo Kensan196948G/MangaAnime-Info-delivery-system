@@ -259,8 +259,11 @@ def main():
     print(f"\n📅 セッション: {session or '手動実行'}")
     print(f"📧 送信予定: {to_send}通")
 
-    if not args.force:
+    # cron実行時は自動開始、手動実行時のみ確認
+    if not args.force and sys.stdin.isatty():
         input("\n▶️  送信を開始します。Enter を押してください...")
+    else:
+        print("\n▶️  自動実行モード: 送信を開始します...")
 
     # セッション実行
     start_time = datetime.now()
