@@ -28,6 +28,7 @@ logging.basicConfig(
     ],
 )
 
+
 class DashboardEnabledReleaseNotifier:
     """ダッシュボード機能統合版リリース通知システム"""
 

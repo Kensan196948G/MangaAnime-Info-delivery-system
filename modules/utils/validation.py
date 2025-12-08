@@ -4,7 +4,6 @@ Data validation utilities for MangaAnime Info Delivery System.
 Provides common validation functions to eliminate code duplication.
 """
 
-import logging
 import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional

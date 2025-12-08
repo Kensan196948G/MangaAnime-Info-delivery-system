@@ -101,9 +101,7 @@ class TitleTranslator:
 
         # Season番号を除いて検索
         base_title = title.replace(" Season 2", "").replace(" Season 3", "")
-        base_title = base_title.replace(
-            " 2nd Season", "").replace(
-            " 3rd Season", "")
+        base_title = base_title.replace(" 2nd Season", "").replace(" 3rd Season", "")
 
         if base_title in self.title_map:
             japanese_title = self.title_map[base_title]

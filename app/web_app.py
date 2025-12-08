@@ -2210,7 +2210,6 @@ def api_test_configuration():
     """Test all system configurations"""
     import os
     import smtplib
-    import sqlite3
     import ssl
 
     import requests
@@ -2746,7 +2745,6 @@ def api_sources():
         - Statistics from collection_stats table
     """
     try:
-        import sqlite3
         from datetime import datetime
 
         config = load_config()

@@ -5,7 +5,6 @@ REST API用のAPIキー認証機能を提供
 """
 
 import logging
-import os
 import secrets
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -174,12 +173,17 @@ def create_api_key():
 
     try:
         api_key = api_key_store.generate_key(user_id, name, permissions)
-        return jsonify({
-            "key": api_key.key,
-            "name": api_key.name,
-            "permissions": api_key.permissions,
-            "created_at": api_key.created_at.isoformat(),
-        }), 201
+        return (
+            jsonify(
+                {
+                    "key": api_key.key,
+                    "name": api_key.name,
+                    "permissions": api_key.permissions,
+                    "created_at": api_key.created_at.isoformat(),
+                }
+            ),
+            201,
+        )
     except Exception as e:
         logger.error(f"API key creation error: {e}")
         return jsonify({"error": str(e)}), 500
@@ -195,10 +199,12 @@ def verify_api_key():
 
     key_obj = api_key_store.verify_key(api_key)
     if key_obj:
-        return jsonify({
-            "valid": True,
-            "user_id": key_obj.user_id,
-            "permissions": key_obj.permissions,
-        })
+        return jsonify(
+            {
+                "valid": True,
+                "user_id": key_obj.user_id,
+                "permissions": key_obj.permissions,
+            }
+        )
 
     return jsonify({"valid": False, "error": "Invalid API key"}), 401

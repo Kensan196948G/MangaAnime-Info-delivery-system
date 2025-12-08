@@ -1172,7 +1172,7 @@ class DatabaseManager:
                     "log_pages": result[1],
                     "checkpointed_pages": result[2],
                     "success": result[0] == 0,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
                 }
                 self.logger.info(
                     f"WAL checkpoint executed: busy={result[0]}, "
@@ -1198,7 +1198,7 @@ class DatabaseManager:
                 return {
                     "valid": is_valid,
                     "result": result,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
                 }
         except Exception as e:
             self.logger.error(f"Integrity check failed: {e}")

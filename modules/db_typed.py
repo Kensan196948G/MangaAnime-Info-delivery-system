@@ -3,7 +3,6 @@
 """
 
 import hashlib
-import logging
 import sqlite3
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union

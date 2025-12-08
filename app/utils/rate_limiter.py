@@ -4,7 +4,6 @@ Flask-Limiterのラッパーとカスタム設定
 """
 
 import logging
-from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -69,8 +68,10 @@ class DummyLimiter:
 
     def limit(self, limit_string: str):
         """何もしないデコレータ"""
+
         def decorator(f):
             return f
+
         return decorator
 
     def exempt(self, f):
@@ -80,4 +81,3 @@ class DummyLimiter:
 
 class RateLimitExceeded(Exception):
     """レート制限超過例外"""
-    pass

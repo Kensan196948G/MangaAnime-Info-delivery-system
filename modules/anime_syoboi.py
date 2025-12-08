@@ -580,6 +580,7 @@ def fetch_and_store() -> dict:
         dict: 収集結果のサマリー
     """
     from .db import get_db
+
     try:
         # データ収集（同期版を使用）
         works, releases = fetch_syoboi_works_and_releases_sync(days_ahead=14)

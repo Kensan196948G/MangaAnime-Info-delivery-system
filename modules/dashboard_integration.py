@@ -3,7 +3,6 @@ Dashboard Integration Module
 監視・統計ダッシュボード統合機能
 """
 
-import logging
 import sqlite3
 import time
 from contextlib import contextmanager

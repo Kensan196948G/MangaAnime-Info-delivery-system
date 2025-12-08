@@ -9,15 +9,13 @@
 
 import logging
 import os
-import secrets
 import sqlite3
-from datetime import datetime, timedelta
-from functools import wraps
+from datetime import datetime
 from typing import Dict, Optional
 
-from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import generate_password_hash
 
 logger = logging.getLogger(__name__)
 
@@ -88,9 +86,7 @@ class UserStore:
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
-            cursor = conn.execute(
-                "SELECT * FROM users WHERE email = ?", (email,)
-            )
+            cursor = conn.execute("SELECT * FROM users WHERE email = ?", (email,))
             row = cursor.fetchone()
             conn.close()
 
@@ -108,7 +104,7 @@ class UserStore:
             password_hash = generate_password_hash(new_password)
             conn.execute(
                 "UPDATE users SET password_hash = ?, updated_at = ? WHERE email = ?",
-                (password_hash, datetime.now(), email)
+                (password_hash, datetime.now(), email),
             )
             conn.commit()
             conn.close()

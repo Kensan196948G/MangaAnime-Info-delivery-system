@@ -12,7 +12,6 @@ import sys
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
 from werkzeug.security import generate_password_hash
 
@@ -34,7 +33,8 @@ class UserDBStore:
     def _init_db(self):
         """データベーステーブルを初期化"""
         with self.get_connection() as conn:
-            conn.execute('''
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS users (
                     id TEXT PRIMARY KEY,
                     username TEXT UNIQUE NOT NULL,
@@ -44,7 +44,8 @@ class UserDBStore:
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     last_login DATETIME
                 )
-            ''')
+            """
+            )
 
     @contextmanager
     def get_connection(self):
@@ -65,6 +66,7 @@ class UserDBStore:
         """SQLiteのRowをUserオブジェクトに変換"""
         # 遅延インポートで循環インポートを回避
         from app.routes.auth import User
+
         return User(
             id=row["id"],
             username=row["username"],
@@ -100,6 +102,7 @@ class UserDBStore:
     def add_user(self, username: str, password: str, is_admin: bool = False):
         """新規ユーザーを追加"""
         import secrets
+
         # 遅延インポートで循環インポートを回避
         from app.routes.auth import User
 

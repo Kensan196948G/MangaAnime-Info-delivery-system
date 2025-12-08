@@ -3,7 +3,6 @@
 ログイン失敗回数の追跡とアカウントロック機能
 """
 
-import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple

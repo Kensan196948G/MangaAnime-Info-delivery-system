@@ -1517,6 +1517,7 @@ def fetch_and_store() -> dict:
     """
     from .config import get_config
     from .db import get_db
+
     try:
         # 設定取得
         config_manager = get_config()
