@@ -58,7 +58,7 @@ def add_security_headers(response):
 
 
 # ダッシュボード Blueprint を登録
-app.register_bluelogger.info(dashboard_bp)
+app.register_blueprint(dashboard_bp)
 
 # グローバル変数
 db_manager = DatabaseManager()
