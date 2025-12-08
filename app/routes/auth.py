@@ -160,6 +160,7 @@ def get_user_store():
         if USE_DB_STORE:
             try:
                 from app.models.user_db import UserDBStore
+
                 _user_store = UserDBStore()
                 logger.info("UserDBStore（DB版）を使用します")
             except ImportError as e:
@@ -174,8 +175,10 @@ def get_user_store():
 # 後方互換性のためのプロパティ風アクセス
 class _UserStoreProxy:
     """user_storeへの後方互換アクセスを提供するプロキシクラス"""
+
     def __getattr__(self, name):
         return getattr(get_user_store(), name)
+
 
 user_store = _UserStoreProxy()
 
