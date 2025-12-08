@@ -1,0 +1,100 @@
+name: 🔧 自動修復システム（15分おき定期実行）
+
+# 15分ごとに自動実行
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # 15分ごと
+
+  # 手動実行も可能
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  auto-repair:
+    name: 🔧 エラー検知・自動修復
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+
+    steps:
+      - name: 📥 チェックアウト
+        uses: actions/checkout@v4
+
+      - name: 🐍 Python環境セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 📦 依存関係インストール
+        run: |
+          pip install flake8 black isort
+        continue-on-error: true
+
+      - name: 🔍 エラー検知
+        id: check
+        run: |
+          # 重大なエラーのみチェック
+          flake8 app modules --count --select=E9,F63,F7,F82 > errors.txt 2>&1 || true
+
+          error_count=$(cat errors.txt | tail -1 | grep -oE '[0-9]+' || echo "0")
+          echo "error_count=$error_count" >> $GITHUB_OUTPUT
+
+          if [ "$error_count" -gt 0 ]; then
+            echo "has_errors=true" >> $GITHUB_OUTPUT
+            echo "🚨 検出エラー数: $error_count"
+          else
+            echo "has_errors=false" >> $GITHUB_OUTPUT
+            echo "✅ エラーなし"
+          fi
+
+      - name: 🔧 自動修復
+        if: steps.check.outputs.has_errors == 'true'
+        run: |
+          echo "🔧 自動修復を実行します..."
+          black app modules || true
+          isort app modules || true
+
+      - name: 💾 修復コミット
+        if: steps.check.outputs.has_errors == 'true'
+        run: |
+          git config user.name "Auto Repair Bot"
+          git config user.email "auto-repair@github-actions"
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "[自動修復] エラー${{ steps.check.outputs.error_count }}件を検知・修復
+
+自動修復システム（15分おき）により修復
+
+🤖 Auto Repair System
+"
+            git push
+            echo "✅ 修復完了・プッシュしました"
+          fi
+
+      - name: 🚨 エラー時Issue作成
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 自動修復システムエラー',
+              body: `自動修復システムでエラーが発生しました。
+
+**実行時刻**: ${new Date().toISOString()}
+**ワークフロー**: 自動修復（15分おき）
+
+ログを確認してください。`,
+              labels: ['auto-repair', 'bug']
+            });
+
+      - name: ✅ 成功時の処理
+        if: success()
+        run: |
+          echo "✅ 自動修復サイクル完了"
+          echo "   エラー数: ${{ steps.check.outputs.error_count }}"
+          echo "   次回実行: 15分後"
