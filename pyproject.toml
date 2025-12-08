@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "manga-anime-info-delivery-system"
+version = "1.0.0"
+description = "アニメ・マンガ最新情報配信システム"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31.0",
+    "feedparser>=6.0.10",
+    "google-auth>=2.23.0",
+    "google-auth-oauthlib>=1.1.0",
+    "google-auth-httplib2>=0.1.1",
+    "google-api-python-client>=2.100.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.7.1",
+    "types-requests>=2.31.0.10",
+    "flake8>=6.1.0",
+    "black>=23.12.0",
+    "isort>=5.13.2",
+    "pylint>=3.0.3",
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+strict_concatenate = true
+
+[[tool.mypy.overrides]]
+module = [
+    "requests.*",
+    "bs4.*",
+    "feedparser.*",
+    "google.*",
+    "googleapiclient.*",
+    "google_auth_oauthlib.*",
+    "anthropic.*",
+    "flask.*",
+    "PIL.*",
+    "icalendar.*",
+    "schedule.*",
+]
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.pylint.messages_control]
+max-line-length = 100
+disable = [
+    "C0111",  # missing-docstring
+    "C0103",  # invalid-name
+    "R0913",  # too-many-arguments
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--strict-markers --cov=modules --cov=app --cov-report=html --cov-report=term"

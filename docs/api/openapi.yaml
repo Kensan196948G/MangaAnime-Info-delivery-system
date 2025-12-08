@@ -1,0 +1,1559 @@
+openapi: 3.0.0
+
+info:
+  title: MangaAnime Information Delivery System API
+  version: 1.0.0
+  description: |
+    アニメ・マンガの最新情報を自動収集・配信するシステムのREST API仕様書
+
+    本APIは、アニメやマンガの作品情報、リリース情報、ウォッチリスト管理、
+    ユーザー認証、システムヘルスチェックなどの機能を提供します。
+
+    ## 主な機能
+    - 作品情報の検索・取得
+    - リリース情報の管理
+    - ウォッチリスト機能
+    - カレンダー同期
+    - 通知管理
+    - ユーザー認証・認可
+    - システム監視・ヘルスチェック
+
+    ## 認証方式
+    1. **セッションベース認証**: Web UIでのログイン後、Cookieベースのセッション
+    2. **APIキー認証**: `X-API-Key`ヘッダーまたは`api_key`クエリパラメータ
+
+  contact:
+    name: MangaAnime Info System
+    url: https://github.com/yourusername/MangaAnime-Info-delivery-system
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: https://api.mangaanime.example.com
+    description: Production server
+
+tags:
+  - name: Health
+    description: システムヘルスチェックとメトリクス
+  - name: Works
+    description: アニメ・マンガ作品情報の管理
+  - name: Releases
+    description: エピソード・巻のリリース情報
+  - name: Watchlist
+    description: ユーザーのウォッチリスト管理
+  - name: Authentication
+    description: ユーザー認証・認可
+  - name: Users
+    description: ユーザー管理（管理者のみ）
+  - name: API Keys
+    description: APIキーの管理
+  - name: Calendar
+    description: Googleカレンダー連携
+  - name: Notifications
+    description: 通知管理
+  - name: Collection
+    description: データ収集とソース管理
+  - name: Statistics
+    description: 統計情報とレポート
+
+security:
+  - cookieAuth: []
+  - apiKeyAuth: []
+
+paths:
+  # ===========================
+  # Health Check Endpoints
+  # ===========================
+  /health:
+    get:
+      tags:
+        - Health
+      summary: 基本的なヘルスチェック
+      description: アプリケーションが稼働しているかを確認します
+      operationId: healthCheck
+      responses:
+        '200':
+          description: システムは正常に稼働中
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: healthy
+                timestamp: '2025-12-08T10:30:00Z'
+                service: manga-anime-info-system
+
+  /health/live:
+    get:
+      tags:
+        - Health
+      summary: Liveness probe
+      description: Kubernetesのliveness probe用エンドポイント
+      operationId: livenessCheck
+      responses:
+        '200':
+          description: アプリケーションプロセスは稼働中
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: alive
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /health/ready:
+    get:
+      tags:
+        - Health
+      summary: Readiness probe
+      description: アプリケーションがトラフィックを受け入れる準備ができているかを確認
+      operationId: readinessCheck
+      responses:
+        '200':
+          description: アプリケーションは準備完了
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessResponse'
+        '503':
+          description: アプリケーションは準備未完了
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessResponse'
+
+  /health/detailed:
+    get:
+      tags:
+        - Health
+      summary: 詳細なヘルスチェック
+      description: データベース、ディスク、メモリなど全コンポーネントの状態を確認
+      operationId: detailedHealthCheck
+      responses:
+        '200':
+          description: システムの詳細な健全性情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedHealthResponse'
+
+  /metrics:
+    get:
+      tags:
+        - Health
+      summary: Prometheusメトリクス
+      description: Prometheus形式のメトリクスを提供
+      operationId: prometheusMetrics
+      responses:
+        '200':
+          description: Prometheusメトリクス
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |
+                # HELP mangaanime_uptime_seconds Application uptime in seconds
+                # TYPE mangaanime_uptime_seconds gauge
+                mangaanime_uptime_seconds 3600
+                # HELP mangaanime_works_total Total number of works in database
+                # TYPE mangaanime_works_total gauge
+                mangaanime_works_total 150
+
+  # ===========================
+  # Works Endpoints
+  # ===========================
+  /api/works:
+    get:
+      tags:
+        - Works
+      summary: 作品一覧の取得
+      description: |
+        アニメ・マンガ作品の一覧を取得します。
+        フィルタリング、ソート、ページネーションに対応しています。
+      operationId: getWorks
+      security:
+        - cookieAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: type
+          in: query
+          description: 作品タイプでフィルタ
+          schema:
+            type: string
+            enum: [anime, manga]
+        - name: search
+          in: query
+          description: タイトル検索キーワード
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: 取得件数の上限
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          description: オフセット（ページネーション用）
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: sort
+          in: query
+          description: ソート順
+          schema:
+            type: string
+            enum: [created_at_desc, created_at_asc, title_asc, title_desc]
+            default: created_at_desc
+      responses:
+        '200':
+          description: 作品一覧の取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorksListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/works/{workId}:
+    get:
+      tags:
+        - Works
+      summary: 作品詳細の取得
+      description: 指定されたIDの作品詳細情報とリリース履歴を取得します
+      operationId: getWorkById
+      security:
+        - cookieAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: workId
+          in: path
+          required: true
+          description: 作品ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 作品詳細の取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # ===========================
+  # Releases Endpoints
+  # ===========================
+  /api/releases/recent:
+    get:
+      tags:
+        - Releases
+      summary: 最近のリリース一覧
+      description: 直近7日間のリリース情報を取得します
+      operationId: getRecentReleases
+      security:
+        - cookieAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: days
+          in: query
+          description: 取得期間（日数）
+          schema:
+            type: integer
+            default: 7
+            minimum: 1
+            maximum: 30
+        - name: type
+          in: query
+          description: 作品タイプでフィルタ
+          schema:
+            type: string
+            enum: [anime, manga]
+      responses:
+        '200':
+          description: 最近のリリース一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReleasesListResponse'
+
+  /api/releases/upcoming:
+    get:
+      tags:
+        - Releases
+      summary: 今後のリリース予定
+      description: 未来のリリース予定を取得します
+      operationId: getUpcomingReleases
+      security:
+        - cookieAuth: []
+        - apiKeyAuth: []
+      parameters:
+        - name: days
+          in: query
+          description: 取得期間（日数）
+          schema:
+            type: integer
+            default: 7
+            minimum: 1
+            maximum: 30
+      responses:
+        '200':
+          description: 今後のリリース予定一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReleasesListResponse'
+
+  # ===========================
+  # Watchlist Endpoints
+  # ===========================
+  /watchlist/api/list:
+    get:
+      tags:
+        - Watchlist
+      summary: ウォッチリスト一覧
+      description: ログインユーザーのウォッチリスト一覧を取得
+      operationId: getWatchlist
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: ウォッチリスト一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /watchlist/api/add:
+    post:
+      tags:
+        - Watchlist
+      summary: ウォッチリストに追加
+      description: 指定した作品をウォッチリストに追加
+      operationId: addToWatchlist
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - work_id
+              properties:
+                work_id:
+                  type: integer
+                  description: 作品ID
+      responses:
+        '200':
+          description: ウォッチリストに追加成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistAddResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: 既にウォッチリストに登録済み
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /watchlist/api/remove/{workId}:
+    delete:
+      tags:
+        - Watchlist
+      summary: ウォッチリストから削除
+      description: 指定した作品をウォッチリストから削除
+      operationId: removeFromWatchlist
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: workId
+          in: path
+          required: true
+          description: 作品ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ウォッチリストから削除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /watchlist/api/update/{workId}:
+    put:
+      tags:
+        - Watchlist
+      summary: ウォッチリスト設定の更新
+      description: 通知設定を更新
+      operationId: updateWatchlistSettings
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: workId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notify_new_episodes:
+                  type: boolean
+                  description: エピソード通知の有効/無効
+                notify_new_volumes:
+                  type: boolean
+                  description: 巻通知の有効/無効
+      responses:
+        '200':
+          description: 設定更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  settings:
+                    type: object
+
+  /watchlist/api/stats:
+    get:
+      tags:
+        - Watchlist
+      summary: ウォッチリスト統計
+      description: ウォッチリストの統計情報を取得
+      operationId: getWatchlistStats
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 統計情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchlistStatsResponse'
+
+  # ===========================
+  # Authentication Endpoints
+  # ===========================
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: ログイン
+      description: ユーザー認証とセッション開始
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session=abcdef123456; Path=/; HttpOnly; SameSite=Lax
+        '401':
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: ログアウト
+      description: セッションを終了
+      operationId: logout
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: ユーザー登録
+      description: 新規ユーザーアカウント作成
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: ユーザー登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '409':
+          description: ユーザー名が既に使用されている
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ===========================
+  # API Keys Endpoints
+  # ===========================
+  /api-keys/:
+    get:
+      tags:
+        - API Keys
+      summary: APIキー一覧表示
+      description: ログインユーザーのAPIキー一覧ページ
+      operationId: apiKeyIndex
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: APIキー管理ページ（HTML）
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /api-keys/api/list:
+    get:
+      tags:
+        - API Keys
+      summary: APIキー一覧（JSON）
+      description: ログインユーザーのAPIキー一覧をJSON形式で取得
+      operationId: apiKeyList
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: APIキー一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeysListResponse'
+
+  /api-keys/generate:
+    post:
+      tags:
+        - API Keys
+      summary: APIキー生成
+      description: 新しいAPIキーを生成
+      operationId: generateApiKey
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: APIキーの名前
+                permissions:
+                  type: string
+                  description: 権限（カンマ区切り）
+                  default: read
+      responses:
+        '302':
+          description: 生成成功、リダイレクト
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  /api-keys/revoke/{key}:
+    post:
+      tags:
+        - API Keys
+      summary: APIキー無効化
+      description: 指定したAPIキーを無効化
+      operationId: revokeApiKey
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: APIキー文字列
+          schema:
+            type: string
+      responses:
+        '302':
+          description: 無効化成功、リダイレクト
+        '403':
+          description: 権限がない
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ===========================
+  # Users Management (Admin)
+  # ===========================
+  /users/api/stats:
+    get:
+      tags:
+        - Users
+      summary: ユーザー統計
+      description: ユーザー統計情報（管理者のみ）
+      operationId: getUserStats
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: ユーザー統計情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  # ===========================
+  # Calendar Endpoints
+  # ===========================
+  /api/calendar/sync:
+    post:
+      tags:
+        - Calendar
+      summary: カレンダー同期実行
+      description: Googleカレンダーとの同期を手動実行
+      operationId: syncCalendar
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 同期成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarSyncResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/calendar/events:
+    get:
+      tags:
+        - Calendar
+      summary: カレンダーイベント一覧
+      description: 登録済みのカレンダーイベント一覧を取得
+      operationId: getCalendarEvents
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: イベント一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarEventsResponse'
+
+  /api/calendar/stats:
+    get:
+      tags:
+        - Calendar
+      summary: カレンダー統計
+      description: カレンダー同期の統計情報を取得
+      operationId: getCalendarStats
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: カレンダー統計
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarStatsResponse'
+
+  # ===========================
+  # Collection Endpoints
+  # ===========================
+  /api/manual-collection:
+    post:
+      tags:
+        - Collection
+      summary: 手動データ収集
+      description: データ収集を手動でトリガー
+      operationId: triggerManualCollection
+      security:
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source:
+                  type: string
+                  enum: [all, anilist, rss, bookwalker, danime]
+                  description: 収集対象のソース
+      responses:
+        '200':
+          description: 収集開始
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  job_id:
+                    type: string
+                  message:
+                    type: string
+
+  /api/collection-status:
+    get:
+      tags:
+        - Collection
+      summary: 収集ステータス
+      description: データ収集処理の現在のステータスを取得
+      operationId: getCollectionStatus
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 収集ステータス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectionStatusResponse'
+
+  /api/sources:
+    get:
+      tags:
+        - Collection
+      summary: データソース一覧
+      description: 利用可能なデータソースの一覧と状態を取得
+      operationId: getDataSources
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: データソース一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataSourcesResponse'
+
+  # ===========================
+  # Statistics Endpoints
+  # ===========================
+  /api/stats:
+    get:
+      tags:
+        - Statistics
+      summary: システム統計情報
+      description: 作品数、リリース数などの統計情報を取得
+      operationId: getSystemStats
+      security:
+        - cookieAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: 統計情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatsResponse'
+
+  /api/notification-status:
+    get:
+      tags:
+        - Notifications
+      summary: 通知ステータス
+      description: 通知の実行状況を取得
+      operationId: getNotificationStatus
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 通知ステータス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationStatusResponse'
+
+# ===========================
+# Components
+# ===========================
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: セッションベース認証（Web UI用）
+
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        APIキー認証
+        ヘッダー: `X-API-Key: your-api-key`
+        または
+        クエリパラメータ: `?api_key=your-api-key`
+
+  schemas:
+    # ===========================
+    # Health Schemas
+    # ===========================
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        service:
+          type: string
+
+    ReadinessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ready, not_ready]
+        timestamp:
+          type: string
+          format: date-time
+        checks:
+          type: object
+          properties:
+            database:
+              type: object
+              properties:
+                status:
+                  type: string
+                works_count:
+                  type: integer
+                releases_count:
+                  type: integer
+            config:
+              type: object
+              properties:
+                status:
+                  type: string
+                config_loaded:
+                  type: boolean
+        uptime:
+          type: object
+          properties:
+            started_at:
+              type: string
+              format: date-time
+            uptime_seconds:
+              type: integer
+            uptime_human:
+              type: string
+
+    DetailedHealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+        environment:
+          type: string
+        uptime:
+          type: object
+        checks:
+          type: object
+          properties:
+            database:
+              type: object
+            config:
+              type: object
+            disk:
+              type: object
+            memory:
+              type: object
+
+    # ===========================
+    # Work Schemas
+    # ===========================
+    Work:
+      type: object
+      required:
+        - id
+        - title
+        - type
+      properties:
+        id:
+          type: integer
+          description: 作品ID
+          example: 1
+        title:
+          type: string
+          description: 作品タイトル
+          example: 鬼滅の刃
+        title_kana:
+          type: string
+          description: タイトル（カナ）
+          example: キメツノヤイバ
+        title_en:
+          type: string
+          description: 英語タイトル
+          example: Demon Slayer
+        type:
+          type: string
+          enum: [anime, manga]
+          description: 作品タイプ
+          example: anime
+        official_url:
+          type: string
+          format: uri
+          description: 公式サイトURL
+          example: https://kimetsu.com
+        image_url:
+          type: string
+          format: uri
+          description: 作品画像URL
+        description:
+          type: string
+          description: 作品説明
+        status:
+          type: string
+          enum: [upcoming, ongoing, completed]
+          description: 配信状態
+        created_at:
+          type: string
+          format: date-time
+          description: 登録日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+
+    WorksListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        count:
+          type: integer
+          description: 取得件数
+        total:
+          type: integer
+          description: 総件数
+        works:
+          type: array
+          items:
+            $ref: '#/components/schemas/Work'
+
+    WorkDetailResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        work:
+          $ref: '#/components/schemas/Work'
+        releases:
+          type: array
+          items:
+            $ref: '#/components/schemas/Release'
+        statistics:
+          type: object
+          properties:
+            total_episodes:
+              type: integer
+            total_volumes:
+              type: integer
+            latest_release_date:
+              type: string
+              format: date
+
+    # ===========================
+    # Release Schemas
+    # ===========================
+    Release:
+      type: object
+      required:
+        - id
+        - work_id
+        - release_type
+      properties:
+        id:
+          type: integer
+          description: リリースID
+        work_id:
+          type: integer
+          description: 作品ID
+        release_type:
+          type: string
+          enum: [episode, volume]
+          description: リリースタイプ
+          example: episode
+        number:
+          type: string
+          description: エピソード・巻番号
+          example: "1"
+        platform:
+          type: string
+          description: 配信プラットフォーム
+          example: dアニメストア
+        release_date:
+          type: string
+          format: date
+          description: リリース日
+          example: "2025-12-08"
+        source:
+          type: string
+          description: 情報ソース
+          example: anilist
+        source_url:
+          type: string
+          format: uri
+          description: ソースURL
+        notified:
+          type: boolean
+          description: 通知済みかどうか
+        calendar_synced:
+          type: boolean
+          description: カレンダー同期済みかどうか
+        created_at:
+          type: string
+          format: date-time
+
+    ReleasesListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        count:
+          type: integer
+        releases:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Release'
+              - type: object
+                properties:
+                  work:
+                    $ref: '#/components/schemas/Work'
+
+    # ===========================
+    # Watchlist Schemas
+    # ===========================
+    WatchlistItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        work_id:
+          type: integer
+        notify_new_episodes:
+          type: boolean
+        notify_new_volumes:
+          type: boolean
+        priority:
+          type: integer
+          minimum: 0
+          maximum: 5
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        work:
+          $ref: '#/components/schemas/Work'
+
+    WatchlistResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        count:
+          type: integer
+        watchlist:
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchlistItem'
+
+    WatchlistAddResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        watchlist_id:
+          type: integer
+        work:
+          type: object
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+
+    WatchlistStatsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        stats:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: 総登録数
+            anime:
+              type: integer
+              description: アニメ作品数
+            manga:
+              type: integer
+              description: マンガ作品数
+            notify_episodes:
+              type: integer
+              description: エピソード通知有効数
+            notify_volumes:
+              type: integer
+              description: 巻通知有効数
+
+    # ===========================
+    # Authentication Schemas
+    # ===========================
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          example: admin
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: password123
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            username:
+              type: string
+            is_admin:
+              type: boolean
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          example: newuser
+        password:
+          type: string
+          format: password
+          minLength: 6
+        email:
+          type: string
+          format: email
+
+    RegisterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        user_id:
+          type: string
+
+    # ===========================
+    # API Keys Schemas
+    # ===========================
+    ApiKey:
+      type: object
+      properties:
+        key:
+          type: string
+          description: APIキー（一部のみ表示）
+          example: sk_abc123...
+        name:
+          type: string
+          description: キー名
+        permissions:
+          type: string
+          description: 権限（カンマ区切り）
+        created_at:
+          type: string
+          format: date-time
+        last_used:
+          type: string
+          format: date-time
+          nullable: true
+        is_active:
+          type: boolean
+
+    ApiKeysListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        count:
+          type: integer
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiKey'
+
+    # ===========================
+    # Users Schemas
+    # ===========================
+    UserStatsResponse:
+      type: object
+      properties:
+        total_users:
+          type: integer
+        admin_users:
+          type: integer
+        regular_users:
+          type: integer
+
+    # ===========================
+    # Calendar Schemas
+    # ===========================
+    CalendarSyncResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        synced_count:
+          type: integer
+          description: 同期した件数
+        failed_count:
+          type: integer
+          description: 失敗した件数
+        message:
+          type: string
+
+    CalendarEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        work_id:
+          type: integer
+        release_id:
+          type: integer
+        event_title:
+          type: string
+        event_date:
+          type: string
+          format: date
+        description:
+          type: string
+        calendar_id:
+          type: string
+        event_id:
+          type: string
+
+    CalendarEventsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        count:
+          type: integer
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarEvent'
+
+    CalendarStatsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        stats:
+          type: object
+          properties:
+            total_events:
+              type: integer
+            synced_events:
+              type: integer
+            pending_sync:
+              type: integer
+            last_sync:
+              type: string
+              format: date-time
+
+    # ===========================
+    # Collection Schemas
+    # ===========================
+    CollectionStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [idle, running, completed, failed]
+        current_job:
+          type: object
+          nullable: true
+          properties:
+            job_id:
+              type: string
+            started_at:
+              type: string
+              format: date-time
+            progress:
+              type: number
+              minimum: 0
+              maximum: 1
+            collected_items:
+              type: integer
+
+    DataSource:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [api, rss]
+        status:
+          type: string
+          enum: [active, inactive, error]
+        last_run:
+          type: string
+          format: date-time
+        success_rate:
+          type: number
+        items_collected:
+          type: integer
+
+    DataSourcesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSource'
+
+    # ===========================
+    # Statistics Schemas
+    # ===========================
+    SystemStatsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        stats:
+          type: object
+          properties:
+            total_works:
+              type: integer
+              description: 総作品数
+            total_releases:
+              type: integer
+              description: 総リリース数
+            anime_count:
+              type: integer
+              description: アニメ作品数
+            manga_count:
+              type: integer
+              description: マンガ作品数
+            recent_releases:
+              type: integer
+              description: 直近のリリース数（7日間）
+            upcoming_releases:
+              type: integer
+              description: 今後のリリース数（7日間）
+
+    NotificationStatusResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        status:
+          type: object
+          properties:
+            pending_notifications:
+              type: integer
+            last_notification:
+              type: string
+              format: date-time
+            total_sent_today:
+              type: integer
+            success_rate:
+              type: number
+
+    # ===========================
+    # Error Schemas
+    # ===========================
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: エラーメッセージ
+          example: Invalid request
+        message:
+          type: string
+          description: 詳細なエラーメッセージ（日本語）
+          example: リクエストが不正です
+        details:
+          type: object
+          description: エラーの詳細情報
+
+  responses:
+    BadRequestError:
+      description: リクエストが不正です
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Bad Request
+            message: リクエストパラメータが不正です
+
+    UnauthorizedError:
+      description: 認証が必要です
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Unauthorized
+            message: 認証が必要です。ログインしてください。
+
+    ForbiddenError:
+      description: アクセス権限がありません
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Forbidden
+            message: この操作を実行する権限がありません
+
+    NotFoundError:
+      description: リソースが見つかりません
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Not Found
+            message: 指定されたリソースが見つかりません
+
+    InternalServerError:
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: Internal Server Error
+            message: サーバーエラーが発生しました。管理者に連絡してください。
