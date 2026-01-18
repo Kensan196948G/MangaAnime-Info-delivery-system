@@ -130,15 +130,13 @@ class AuditLoggerDB:
         """統計情報を取得"""
         with self.get_connection() as conn:
             # 総数・成功数・失敗数
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 SELECT 
                     COUNT(*) as total_logs,
                     SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as success_count,
                     SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as failure_count
                 FROM audit_logs
-                """
-            )
+                """)
             row = cursor.fetchone()
 
             total_logs = row["total_logs"]
@@ -147,14 +145,12 @@ class AuditLoggerDB:
             success_rate = (success_count / total_logs * 100) if total_logs > 0 else 0
 
             # イベントタイプ別集計
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 SELECT event_type, COUNT(*) as count
                 FROM audit_logs
                 GROUP BY event_type
                 ORDER BY count DESC
-                """
-            )
+                """)
             event_counts = {row["event_type"]: row["count"] for row in cursor.fetchall()}
 
             return {

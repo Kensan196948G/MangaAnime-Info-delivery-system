@@ -523,8 +523,7 @@ def dashboard():
     conn = get_db_connection()
 
     # Get recent releases (last 7 days) with proper title display
-    recent_releases = conn.execute(
-        """
+    recent_releases = conn.execute("""
         SELECT w.title as title, w.title as original_title,
                w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url, r.notified
@@ -533,12 +532,10 @@ def dashboard():
         WHERE r.release_date >= date('now', '-7 days')
         ORDER BY r.release_date DESC, w.title
         LIMIT 50
-    """
-    ).fetchall()
+    """).fetchall()
 
     # Get upcoming releases (next 7 days) with proper title display
-    upcoming_releases = conn.execute(
-        """
+    upcoming_releases = conn.execute("""
         SELECT w.title as title, w.title as original_title,
                w.type, r.release_type, r.number, r.platform,
                r.release_date, r.source_url
@@ -547,8 +544,7 @@ def dashboard():
         WHERE r.release_date > date('now') AND r.release_date <= date('now', '+7 days')
         ORDER BY r.release_date, w.title
         LIMIT 50
-    """
-    ).fetchall()
+    """).fetchall()
 
     # Get statistics
     stats = {
@@ -941,8 +937,7 @@ def api_recent_releases():
     """API endpoint for recent releases (AJAX) with proper title display"""
     try:
         conn = get_db_connection()
-        releases = conn.execute(
-            """
+        releases = conn.execute("""
             SELECT w.title, w.title_kana, w.type, r.release_type, r.number, r.platform,
                    r.release_date, r.notified
             FROM releases r
@@ -950,8 +945,7 @@ def api_recent_releases():
             WHERE r.release_date >= date('now', '-1 days')
             ORDER BY r.release_date DESC
             LIMIT 10
-        """
-        ).fetchall()
+        """).fetchall()
         conn.close()
 
         data = [dict(release) for release in releases]
@@ -970,8 +964,7 @@ def api_upcoming_releases():
     """API endpoint for upcoming releases with proper title display"""
     try:
         conn = get_db_connection()
-        releases = conn.execute(
-            """
+        releases = conn.execute("""
             SELECT w.id, w.title, w.title_kana, w.type,
                    r.id as release_id, r.release_type, r.number, r.platform,
                    r.release_date, r.source_url, r.notified, r.created_at
@@ -980,8 +973,7 @@ def api_upcoming_releases():
             WHERE r.release_date >= date('now')
             ORDER BY r.release_date ASC
             LIMIT 50
-        """
-        ).fetchall()
+        """).fetchall()
         conn.close()
 
         data = [dict(release) for release in releases]
@@ -1040,28 +1032,24 @@ def collection_settings():
     conn = get_db_connection()
     try:
         # Get API statistics
-        api_stats = conn.execute(
-            """
+        api_stats = conn.execute("""
             SELECT
                 COALESCE(SUM(items_collected), 0) as total_items,
                 COALESCE(AVG(success_rate), 0) as avg_success_rate,
                 COALESCE(AVG(avg_response_time), 0) as avg_response_time
             FROM collection_stats
             WHERE source_type = 'api'
-        """
-        ).fetchone()
+        """).fetchone()
 
         # Get RSS statistics
-        rss_stats = conn.execute(
-            """
+        rss_stats = conn.execute("""
             SELECT
                 COALESCE(SUM(items_collected), 0) as total_items,
                 COALESCE(AVG(success_rate), 0) as avg_success_rate,
                 COALESCE(AVG(avg_response_time), 0) as avg_response_time
             FROM collection_stats
             WHERE source_type = 'rss'
-        """
-        ).fetchone()
+        """).fetchone()
 
         stats = {
             "api": {
@@ -1097,13 +1085,11 @@ def api_rss_feeds():
         conn = get_db_connection()
         stats_dict = {}
         try:
-            stats = conn.execute(
-                """
+            stats = conn.execute("""
                 SELECT source_id, items_collected, success_rate, last_run, avg_response_time
                 FROM collection_stats
                 WHERE source_type = 'rss'
-            """
-            ).fetchall()
+            """).fetchall()
 
             for stat in stats:
                 stats_dict[stat["source_id"]] = {
@@ -1459,24 +1445,20 @@ def api_collection_status():
 
     # Get collection metrics from collection_stats table
     # Sum of items_collected from sources that ran today
-    today_collected = conn.execute(
-        """
+    today_collected = conn.execute("""
         SELECT COALESCE(SUM(items_collected), 0)
         FROM collection_stats
         WHERE date(last_run, 'localtime') = date('now', 'localtime')
            OR date(updated_at, 'localtime') = date('now', 'localtime')
-    """
-    ).fetchone()[0]
+    """).fetchone()[0]
 
     # If no runs today, show total from all sources as reference
     if today_collected == 0:
-        today_collected = conn.execute(
-            """
+        today_collected = conn.execute("""
             SELECT COALESCE(SUM(items_collected), 0)
             FROM collection_stats
             WHERE items_collected > 0
-        """
-        ).fetchone()[0]
+        """).fetchone()[0]
 
     metrics = {
         "todayCollected": today_collected,
@@ -1812,13 +1794,11 @@ def api_collection_processes():
         cursor = conn.cursor()
 
         # Get all statistics
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT source_id, source_name, source_type, total_attempts, successful_attempts,
                    items_collected, success_rate, avg_response_time, last_run
             FROM collection_stats
-        """
-        )
+        """)
         stats_dict = {row["source_id"]: dict(row) for row in cursor.fetchall()}
         conn.close()
 
@@ -2536,19 +2516,16 @@ def api_notification_status():
         conn = get_db_connection()
 
         # メール通知の最終実行時刻と統計を取得
-        email_last = conn.execute(
-            """
+        email_last = conn.execute("""
             SELECT executed_at, success, error_message, releases_count
             FROM notification_history
             WHERE notification_type = 'email'
             ORDER BY executed_at DESC
             LIMIT 1
-        """
-        ).fetchone()
+        """).fetchone()
 
         # メール通知の本日の統計
-        email_stats_today = conn.execute(
-            """
+        email_stats_today = conn.execute("""
             SELECT
                 COUNT(*) as total_executions,
                 SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as success_count,
@@ -2556,34 +2533,28 @@ def api_notification_status():
                 SUM(CASE WHEN success = 1 THEN releases_count ELSE 0 END) as total_releases
             FROM notification_history
             WHERE notification_type = 'email' AND DATE(executed_at) = DATE('now')
-        """
-        ).fetchone()
+        """).fetchone()
 
         # メール通知の直近のエラー
-        email_recent_errors = conn.execute(
-            """
+        email_recent_errors = conn.execute("""
             SELECT executed_at, error_message, releases_count
             FROM notification_history
             WHERE notification_type = 'email' AND success = 0
             ORDER BY executed_at DESC
             LIMIT 5
-        """
-        ).fetchall()
+        """).fetchall()
 
         # カレンダー登録の最終実行時刻と統計を取得
-        calendar_last = conn.execute(
-            """
+        calendar_last = conn.execute("""
             SELECT executed_at, success, error_message, releases_count
             FROM notification_history
             WHERE notification_type = 'calendar'
             ORDER BY executed_at DESC
             LIMIT 1
-        """
-        ).fetchone()
+        """).fetchone()
 
         # カレンダー登録の本日の統計
-        calendar_stats_today = conn.execute(
-            """
+        calendar_stats_today = conn.execute("""
             SELECT
                 COUNT(*) as total_executions,
                 SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as success_count,
@@ -2591,26 +2562,21 @@ def api_notification_status():
                 SUM(CASE WHEN success = 1 THEN releases_count ELSE 0 END) as total_events
             FROM notification_history
             WHERE notification_type = 'calendar' AND DATE(executed_at) = DATE('now')
-        """
-        ).fetchone()
+        """).fetchone()
 
         # カレンダー登録の直近のエラー
-        calendar_recent_errors = conn.execute(
-            """
+        calendar_recent_errors = conn.execute("""
             SELECT executed_at, error_message, releases_count
             FROM notification_history
             WHERE notification_type = 'calendar' AND success = 0
             ORDER BY executed_at DESC
             LIMIT 5
-        """
-        ).fetchall()
+        """).fetchall()
 
         # settingsテーブルからチェック間隔を取得
-        check_interval = conn.execute(
-            """
+        check_interval = conn.execute("""
             SELECT value FROM settings WHERE key = 'check_interval_hours'
-        """
-        ).fetchone()
+        """).fetchone()
 
         interval_hours = int(check_interval["value"]) if check_interval else 1
 
@@ -2765,13 +2731,11 @@ def api_sources():
         cursor = conn.cursor()
 
         # Get all statistics
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT source_id, source_name, source_type, total_attempts, successful_attempts,
                    items_collected, success_rate, avg_response_time, last_run
             FROM collection_stats
-        """
-        )
+        """)
         stats_dict = {row["source_id"]: dict(row) for row in cursor.fetchall()}
         conn.close()
 
@@ -4073,31 +4037,23 @@ def api_calendar_stats():
                 "total_events": conn.execute(
                     "SELECT COUNT(*) as count FROM calendar_events"
                 ).fetchone()["count"],
-                "events_this_month": conn.execute(
-                    """
+                "events_this_month": conn.execute("""
                     SELECT COUNT(*) as count FROM calendar_events
                     WHERE strftime('%Y-%m', event_date) = strftime('%Y-%m', 'now')
-                """
-                ).fetchone()["count"],
-                "events_next_month": conn.execute(
-                    """
+                """).fetchone()["count"],
+                "events_next_month": conn.execute("""
                     SELECT COUNT(*) as count FROM calendar_events
                     WHERE strftime('%Y-%m', event_date) = strftime('%Y-%m', date('now', '+1 month'))
-                """
-                ).fetchone()["count"],
-                "upcoming_7days": conn.execute(
-                    """
+                """).fetchone()["count"],
+                "upcoming_7days": conn.execute("""
                     SELECT COUNT(*) as count FROM calendar_events
                     WHERE event_date >= date('now')
                       AND event_date <= date('now', '+7 days')
-                """
-                ).fetchone()["count"],
-                "synced_releases": conn.execute(
-                    """
+                """).fetchone()["count"],
+                "synced_releases": conn.execute("""
                     SELECT COUNT(DISTINCT release_id) as count FROM calendar_events
                     WHERE release_id IS NOT NULL
-                """
-                ).fetchone()["count"],
+                """).fetchone()["count"],
                 "total_releases": conn.execute(
                     "SELECT COUNT(*) as count FROM releases WHERE release_date >= date('now')"
                 ).fetchone()["count"],

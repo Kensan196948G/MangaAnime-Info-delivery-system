@@ -64,8 +64,7 @@ class AniListBatchClient:
         # エイリアスを使って複数作品を1クエリで取得
         queries = []
         for idx, anime_id in enumerate(anime_ids):
-            queries.append(
-                f"""
+            queries.append(f"""
             anime{idx}: Media(id: {anime_id}, type: ANIME) {{
                 id
                 title {{
@@ -123,8 +122,7 @@ class AniListBatchClient:
                     episode
                 }}
             }}
-            """
-            )
+            """)
 
         query = "query {" + "\n".join(queries) + "}"
         return query

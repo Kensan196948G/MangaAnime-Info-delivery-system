@@ -48,12 +48,10 @@ def get_dashboard_statistics():
     stats["total_users"] = cursor.fetchone()["count"]
 
     # アクティブユーザー（24時間以内にログイン）
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT COUNT(*) as count FROM users
         WHERE last_login > datetime('now', '-1 day')
-    """
-    )
+    """)
     stats["active_users"] = cursor.fetchone()["count"]
 
     # APIキー数
@@ -61,31 +59,25 @@ def get_dashboard_statistics():
     stats["active_api_keys"] = cursor.fetchone()["count"]
 
     # 監査ログ数（24時間）
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT COUNT(*) as count FROM audit_logs
         WHERE timestamp > datetime('now', '-1 day')
-    """
-    )
+    """)
     stats["audit_logs_24h"] = cursor.fetchone()["count"]
 
     # ロック中アカウント
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT COUNT(*) as count FROM users
         WHERE locked_until > datetime('now')
-    """
-    )
+    """)
     stats["locked_accounts"] = cursor.fetchone()["count"]
 
     # 失敗したログイン試行（24時間）
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT COUNT(*) as count FROM audit_logs
         WHERE action = 'login_failed'
         AND timestamp > datetime('now', '-1 day')
-    """
-    )
+    """)
     stats["failed_logins_24h"] = cursor.fetchone()["count"]
 
     conn.close()
@@ -97,14 +89,12 @@ def get_locked_accounts():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT id, username, email, locked_until, failed_attempts
         FROM users
         WHERE locked_until > datetime('now')
         ORDER BY locked_until DESC
-    """
-    )
+    """)
 
     accounts = [dict(row) for row in cursor.fetchall()]
     conn.close()
@@ -145,16 +135,14 @@ def get_security_alerts():
     cursor = conn.cursor()
 
     # 複数回の失敗ログイン（1時間以内に5回以上）
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT username, ip_address, COUNT(*) as attempts
         FROM audit_logs
         WHERE action = 'login_failed'
         AND timestamp > datetime('now', '-1 hour')
         GROUP BY username, ip_address
         HAVING attempts >= 5
-    """
-    )
+    """)
 
     for row in cursor.fetchall():
         alerts.append(
@@ -167,14 +155,12 @@ def get_security_alerts():
         )
 
     # 24時間以内のロック
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT username, locked_until
         FROM users
         WHERE locked_until > datetime('now')
         AND locked_until < datetime('now', '+1 day')
-    """
-    )
+    """)
 
     for row in cursor.fetchall():
         alerts.append(
@@ -187,16 +173,14 @@ def get_security_alerts():
         )
 
     # APIキー使用量異常（1時間に100回以上）
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT al.details, COUNT(*) as count
         FROM audit_logs al
         WHERE al.action = 'api_request'
         AND al.timestamp > datetime('now', '-1 hour')
         GROUP BY al.details
         HAVING count > 100
-    """
-    )
+    """)
 
     for row in cursor.fetchall():
         alerts.append(
@@ -218,21 +202,18 @@ def get_audit_statistics():
     cursor = conn.cursor()
 
     # アクション別統計（24時間）
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT action, COUNT(*) as count
         FROM audit_logs
         WHERE timestamp > datetime('now', '-1 day')
         GROUP BY action
         ORDER BY count DESC
-    """
-    )
+    """)
 
     action_stats = [dict(row) for row in cursor.fetchall()]
 
     # 時間別統計（過去24時間、1時間ごと）
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             strftime('%Y-%m-%d %H:00:00', timestamp) as hour,
             COUNT(*) as count
@@ -240,8 +221,7 @@ def get_audit_statistics():
         WHERE timestamp > datetime('now', '-1 day')
         GROUP BY hour
         ORDER BY hour
-    """
-    )
+    """)
 
     hourly_stats = [dict(row) for row in cursor.fetchall()]
 
@@ -256,8 +236,7 @@ def get_api_usage_stats():
     cursor = conn.cursor()
 
     # APIキー別使用回数（24時間）
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             ak.key_name,
             ak.key_prefix,
@@ -271,8 +250,7 @@ def get_api_usage_stats():
         GROUP BY ak.id
         ORDER BY request_count DESC
         LIMIT 10
-    """
-    )
+    """)
 
     api_usage = [dict(row) for row in cursor.fetchall()]
     conn.close()

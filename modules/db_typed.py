@@ -34,8 +34,7 @@ def init_db(db_path: str = "data/db.sqlite3") -> None:
     cursor = conn.cursor()
 
     # worksテーブル
-    cursor.execute(
-        """
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS works (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
@@ -45,12 +44,10 @@ def init_db(db_path: str = "data/db.sqlite3") -> None:
             official_url TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-    """
-    )
+    """)
 
     # releasesテーブル
-    cursor.execute(
-        """
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS releases (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             work_id INTEGER NOT NULL,
@@ -66,12 +63,10 @@ def init_db(db_path: str = "data/db.sqlite3") -> None:
             UNIQUE(work_id, release_type, number, platform, release_date),
             FOREIGN KEY(work_id) REFERENCES works(id)
         )
-    """
-    )
+    """)
 
     # calendar_eventsテーブル
-    cursor.execute(
-        """
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS calendar_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             release_id INTEGER NOT NULL,
@@ -80,8 +75,7 @@ def init_db(db_path: str = "data/db.sqlite3") -> None:
             synced_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(release_id) REFERENCES releases(id)
         )
-    """
-    )
+    """)
 
     conn.commit()
     conn.close()
@@ -213,8 +207,7 @@ def get_unnotified_releases(db_path: str = "data/db.sqlite3") -> List[Dict[str, 
     conn = get_connection(db_path)
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             r.id as release_id,
             r.work_id,
@@ -230,8 +223,7 @@ def get_unnotified_releases(db_path: str = "data/db.sqlite3") -> List[Dict[str, 
         JOIN works w ON r.work_id = w.id
         WHERE r.notified = 0
         ORDER BY r.release_date ASC
-    """
-    )
+    """)
 
     releases: List[Dict[str, Any]] = [dict(row) for row in cursor.fetchall()]
     conn.close()
@@ -269,8 +261,7 @@ def get_unsynced_calendar_releases(db_path: str = "data/db.sqlite3") -> List[Dic
     conn = get_connection(db_path)
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             r.id as release_id,
             r.work_id,
@@ -285,8 +276,7 @@ def get_unsynced_calendar_releases(db_path: str = "data/db.sqlite3") -> List[Dic
         JOIN works w ON r.work_id = w.id
         WHERE r.calendar_synced = 0
         ORDER BY r.release_date ASC
-    """
-    )
+    """)
 
     releases: List[Dict[str, Any]] = [dict(row) for row in cursor.fetchall()]
     conn.close()

@@ -53,8 +53,7 @@ class NotificationHistoryManager:
                 logger.info("notification_history テーブルを確認しました（既存）")
             else:
                 # 新規テーブルを作成（既存スキーマ互換）
-                cursor.execute(
-                    """
+                cursor.execute("""
                     CREATE TABLE IF NOT EXISTS notification_history (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         notification_type TEXT NOT NULL,
@@ -66,24 +65,19 @@ class NotificationHistoryManager:
                         details TEXT,
                         metadata TEXT
                     )
-                """
-                )
+                """)
                 logger.info("notification_history テーブルを作成しました")
 
             # インデックスを作成
-            cursor.execute(
-                """
+            cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_created_at
                 ON notification_history(created_at DESC)
-            """
-            )
+            """)
 
-            cursor.execute(
-                """
+            cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_type_success
                 ON notification_history(notification_type, success)
-            """
-            )
+            """)
 
             conn.commit()
             conn.close()
@@ -278,12 +272,10 @@ class NotificationHistoryManager:
                 }
 
             # 最終実行時刻
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT executed_at FROM notification_history
                 ORDER BY executed_at DESC LIMIT 1
-            """
-            )
+            """)
             last_execution = cursor.fetchone()
             last_execution = last_execution[0] if last_execution else None
 

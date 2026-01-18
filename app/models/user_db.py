@@ -33,8 +33,7 @@ class UserDBStore:
     def _init_db(self):
         """データベーステーブルを初期化"""
         with self.get_connection() as conn:
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     id TEXT PRIMARY KEY,
                     username TEXT UNIQUE NOT NULL,
@@ -44,8 +43,7 @@ class UserDBStore:
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     last_login DATETIME
                 )
-            """
-            )
+            """)
 
     @contextmanager
     def get_connection(self):

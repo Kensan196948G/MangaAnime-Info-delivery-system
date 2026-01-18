@@ -312,16 +312,14 @@ URL: {release.get('source_url', 'N/A')}
         conn = self._get_connection()
         cursor = conn.cursor()
 
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT
                 COUNT(*) as total,
                 SUM(CASE WHEN calendar_synced = 1 THEN 1 ELSE 0 END) as synced,
                 SUM(CASE WHEN calendar_synced = 0 THEN 1 ELSE 0 END) as unsynced,
                 ROUND(SUM(CASE WHEN calendar_synced = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) as sync_rate
             FROM releases
-        """
-        )
+        """)
 
         stats = dict(cursor.fetchone())
         conn.close()
@@ -353,13 +351,11 @@ URL: {release.get('source_url', 'N/A')}
         cursor = conn.cursor()
 
         # calendar_synced = 1 だが calendar_event_id が NULL のレコード
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT COUNT(*) as inconsistent
             FROM releases
             WHERE calendar_synced = 1 AND calendar_event_id IS NULL
-        """
-        )
+        """)
 
         inconsistent = cursor.fetchone()["inconsistent"]
         conn.close()

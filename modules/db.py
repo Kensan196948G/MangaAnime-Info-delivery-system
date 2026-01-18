@@ -287,8 +287,7 @@ class DatabaseManager:
         with self.get_connection() as conn:
             try:
                 # Create works table
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE TABLE IF NOT EXISTS works (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         title TEXT NOT NULL,
@@ -298,12 +297,10 @@ class DatabaseManager:
                         official_url TEXT,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
-                """
-                )
+                """)
 
                 # Create releases table
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE TABLE IF NOT EXISTS releases (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         work_id INTEGER NOT NULL,
@@ -318,12 +315,10 @@ class DatabaseManager:
                         FOREIGN KEY (work_id) REFERENCES works (id) ON DELETE CASCADE,
                         UNIQUE(work_id, release_type, number, platform, release_date)
                     )
-                """
-                )
+                """)
 
                 # Create settings table
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE TABLE IF NOT EXISTS settings (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         key TEXT UNIQUE NOT NULL,
@@ -333,12 +328,10 @@ class DatabaseManager:
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
-                """
-                )
+                """)
 
                 # Create notification_history table
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE TABLE IF NOT EXISTS notification_history (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         notification_type TEXT CHECK(notification_type IN ('email','calendar')),
@@ -348,8 +341,7 @@ class DatabaseManager:
                         releases_count INTEGER DEFAULT 0,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
-                """
-                )
+                """)
 
                 # Create indexes for better performance
                 conn.execute("CREATE INDEX IF NOT EXISTS idx_works_title ON works(title)")
@@ -657,11 +649,9 @@ class DatabaseManager:
             stats = {}
 
             # Count works by type
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 SELECT type, COUNT(*) FROM works GROUP BY type
-            """
-            )
+            """)
             for row in cursor.fetchall():
                 stats[f"{row[0]}_works"] = row[1]
 
@@ -686,15 +676,11 @@ class DatabaseManager:
             Number of releases deleted
         """
         with self.get_connection() as conn:
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 DELETE FROM releases
                 WHERE notified = 1
                 AND created_at < date('now', '-{} days')
-            """.format(
-                    days
-                )
-            )
+            """.format(days))
 
             deleted_count = cursor.rowcount
             conn.commit()

@@ -307,12 +307,10 @@ class BackendValidator:
         try:
             with db.get_connection() as conn:
                 # This should fail due to foreign key constraint
-                cursor = conn.execute(
-                    """
+                cursor = conn.execute("""
                     INSERT INTO releases (work_id, release_type)
                     VALUES (999999, 'episode')
-                """
-                )
+                """)
                 conn.rollback()
                 foreign_key_enforced = False
         except Exception:

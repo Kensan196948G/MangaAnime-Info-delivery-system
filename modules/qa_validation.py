@@ -444,12 +444,10 @@ class DataIntegrityValidator:
     def _check_referential_integrity(self, conn: sqlite3.Connection) -> None:
         """Check referential integrity constraints"""
         # Check for orphaned releases
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT COUNT(*) FROM releases
             WHERE work_id NOT IN (SELECT id FROM works)
-        """
-        )
+        """)
         orphaned_count = cursor.fetchone()[0]
 
         if orphaned_count > 0:
@@ -464,12 +462,10 @@ class DataIntegrityValidator:
             )
 
         # Check for invalid work types
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT COUNT(*) FROM works
             WHERE type NOT IN ('anime', 'manga')
-        """
-        )
+        """)
         invalid_types = cursor.fetchone()[0]
 
         if invalid_types > 0:
@@ -486,12 +482,10 @@ class DataIntegrityValidator:
     def _check_data_consistency(self, conn: sqlite3.Connection) -> None:
         """Check data consistency across tables"""
         # Check for inconsistent title formats
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT id, title FROM works
             WHERE LENGTH(title) < 2 OR LENGTH(title) > 500
-        """
-        )
+        """)
         invalid_titles = cursor.fetchall()
 
         if invalid_titles:
@@ -506,12 +500,10 @@ class DataIntegrityValidator:
             )
 
         # Check for invalid release dates
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT COUNT(*) FROM releases
             WHERE release_date < '1900-01-01' OR release_date > DATE('now', '+2 years')
-        """
-        )
+        """)
         invalid_dates = cursor.fetchone()[0]
 
         if invalid_dates > 0:
@@ -528,13 +520,11 @@ class DataIntegrityValidator:
     def _check_duplicate_data(self, conn: sqlite3.Connection) -> None:
         """Check for duplicate data entries"""
         # Check for duplicate works
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT title, COUNT(*) as count FROM works
             GROUP BY LOWER(title)
             HAVING count > 1
-        """
-        )
+        """)
         duplicates = cursor.fetchall()
 
         if duplicates:
@@ -550,14 +540,12 @@ class DataIntegrityValidator:
             )
 
         # Check for exact duplicate releases
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT work_id, release_type, number, platform, release_date, COUNT(*) as count
             FROM releases
             GROUP BY work_id, release_type, number, platform, release_date
             HAVING count > 1
-        """
-        )
+        """)
         duplicate_releases = cursor.fetchall()
 
         if duplicate_releases:
@@ -574,12 +562,10 @@ class DataIntegrityValidator:
     def _check_data_completeness(self, conn: sqlite3.Connection) -> None:
         """Check data completeness"""
         # Check for incomplete work records
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT COUNT(*) FROM works
             WHERE title IS NULL OR title = '' OR type IS NULL OR type = ''
-        """
-        )
+        """)
         incomplete_works = cursor.fetchone()[0]
 
         if incomplete_works > 0:
@@ -594,12 +580,10 @@ class DataIntegrityValidator:
             )
 
         # Check for incomplete releases
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT COUNT(*) FROM releases
             WHERE work_id IS NULL OR release_date IS NULL OR platform IS NULL OR platform = ''
-        """
-        )
+        """)
         incomplete_releases = cursor.fetchone()[0]
 
         if incomplete_releases > 0:
@@ -616,14 +600,12 @@ class DataIntegrityValidator:
     def _check_data_format_compliance(self, conn: sqlite3.Connection) -> None:
         """Check data format compliance"""
         # Check URL formats
-        cursor = conn.execute(
-            """
+        cursor = conn.execute("""
             SELECT COUNT(*) FROM works
             WHERE official_url IS NOT NULL
             AND official_url != ''
             AND official_url NOT LIKE 'http%'
-        """
-        )
+        """)
         invalid_urls = cursor.fetchone()[0]
 
         if invalid_urls > 0:
@@ -767,15 +749,13 @@ class PerformanceValidator:
 
             # Test complex join query
             join_start = time.time()
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 SELECT w.title, COUNT(r.id)
                 FROM works w
                 LEFT JOIN releases r ON w.id = r.work_id
                 GROUP BY w.id
                 LIMIT 100
-            """
-            )
+            """)
             cursor.fetchall()
             join_time = (time.time() - join_start) * 1000  # milliseconds
 

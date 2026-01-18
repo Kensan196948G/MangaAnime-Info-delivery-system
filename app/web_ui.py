@@ -125,16 +125,14 @@ def index():
         # 最新のリリース情報を取得
         with sqlite3.connect("db.sqlite3") as conn:
             conn.row_factory = sqlite3.Row
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 SELECT w.title, r.release_type, r.number, r.platform,
                        r.release_date, r.notified, w.type
                 FROM releases r
                 JOIN works w ON r.work_id = w.id
                 ORDER BY r.release_date DESC, r.created_at DESC
                 LIMIT 50
-            """
-            )
+            """)
             releases = [dict(row) for row in cursor.fetchall()]
 
             # 統計情報を取得
@@ -144,12 +142,10 @@ def index():
             cursor = conn.execute("SELECT COUNT(*) as count FROM releases WHERE notified = 1")
             notified_releases = cursor.fetchone()["count"]
 
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 SELECT COUNT(*) as count FROM releases
                 WHERE release_date >= date('now') AND release_date <= date('now', '+7 days')
-            """
-            )
+            """)
             upcoming_releases = cursor.fetchone()["count"]
 
     except Exception as e:
@@ -384,12 +380,10 @@ def api_system_stats():
             cursor = conn.execute("SELECT COUNT(*) as count FROM releases WHERE notified = 1")
             total_notifications = cursor.fetchone()["count"]
 
-            cursor = conn.execute(
-                """
+            cursor = conn.execute("""
                 SELECT COUNT(*) as count FROM releases
                 WHERE notified = 1 AND created_at > datetime('now', '-24 hours')
-            """
-            )
+            """)
             recent_notifications = cursor.fetchone()["count"]
 
             return jsonify(

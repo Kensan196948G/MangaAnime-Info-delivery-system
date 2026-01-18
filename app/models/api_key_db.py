@@ -52,8 +52,7 @@ class APIKeyDBStore:
     def _init_db(self):
         """テーブル初期化"""
         with self.get_connection() as conn:
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE TABLE IF NOT EXISTS api_keys (
                     key TEXT PRIMARY KEY,
                     user_id TEXT NOT NULL,
@@ -64,20 +63,15 @@ class APIKeyDBStore:
                     permissions TEXT DEFAULT 'read',
                     FOREIGN KEY (user_id) REFERENCES users(id)
                 )
-            """
-            )
+            """)
 
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_api_keys_user_id ON api_keys(user_id)
-            """
-            )
+            """)
 
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_api_keys_is_active ON api_keys(is_active)
-            """
-            )
+            """)
 
     def generate_key(self, user_id: str, name: str, permissions: List[str] = None) -> APIKey:
         """APIキーを生成"""

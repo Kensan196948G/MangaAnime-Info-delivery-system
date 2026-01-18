@@ -33,8 +33,7 @@ class DashboardService:
         """ダッシュボード用テーブルの初期化"""
         try:
             with sqlite3.connect(self.db_path) as conn:
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE TABLE IF NOT EXISTS dashboard_stats (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         metric_name TEXT NOT NULL,
@@ -44,11 +43,9 @@ class DashboardService:
                         source TEXT,
                         metadata TEXT
                     )
-                """
-                )
+                """)
 
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE TABLE IF NOT EXISTS system_health (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         component TEXT NOT NULL,
@@ -57,22 +54,17 @@ class DashboardService:
                         error_message TEXT,
                         performance_score REAL
                     )
-                """
-                )
+                """)
 
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE INDEX IF NOT EXISTS idx_dashboard_stats_timestamp
                     ON dashboard_stats(timestamp)
-                """
-                )
+                """)
 
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE INDEX IF NOT EXISTS idx_dashboard_stats_metric
                     ON dashboard_stats(metric_name, timestamp)
-                """
-                )
+                """)
         except Exception as e:
             logger.error(f"Failed to initialize dashboard tables: {e}")
 
@@ -97,13 +89,11 @@ class DashboardService:
                 metrics = [dict(row) for row in cursor.fetchall()]
 
                 # システムヘルス状態を取得
-                cursor = conn.execute(
-                    """
+                cursor = conn.execute("""
                     SELECT component, status, last_check, error_message, performance_score
                     FROM system_health
                     ORDER BY last_check DESC
-                """
-                )
+                """)
 
                 health = [dict(row) for row in cursor.fetchall()]
 
@@ -125,21 +115,18 @@ class DashboardService:
                 conn.row_factory = sqlite3.Row
 
                 # AniList API統計
-                cursor = conn.execute(
-                    """
+                cursor = conn.execute("""
                     SELECT AVG(metric_value) as avg_response_time,
                            COUNT(*) as total_requests,
                            MAX(metric_value) as max_response_time
                     FROM dashboard_stats
                     WHERE metric_name = 'anilist_response_time'
                     AND timestamp > datetime('now', '-24 hours')
-                """
-                )
+                """)
                 anilist_stats = dict(cursor.fetchone() or {})
 
                 # RSS収集統計
-                cursor = conn.execute(
-                    """
+                cursor = conn.execute("""
                     SELECT
                         SUM(CASE WHEN metric_name = 'rss_success' THEN metric_value ELSE 0 END) as successes,
                         SUM(CASE WHEN metric_name = 'rss_error' THEN metric_value ELSE 0 END) as errors,
@@ -147,31 +134,26 @@ class DashboardService:
                     FROM dashboard_stats
                     WHERE metric_name IN ('rss_success', 'rss_error')
                     AND timestamp > datetime('now', '-24 hours')
-                """
-                )
+                """)
                 rss_stats = dict(cursor.fetchone() or {})
 
                 # データベースパフォーマンス
-                cursor = conn.execute(
-                    """
+                cursor = conn.execute("""
                     SELECT AVG(metric_value) as avg_query_time,
                            COUNT(*) as total_queries
                     FROM dashboard_stats
                     WHERE metric_name = 'db_query_time'
                     AND timestamp > datetime('now', '-24 hours')
-                """
-                )
+                """)
                 db_stats = dict(cursor.fetchone() or {})
 
                 # 通知統計
-                cursor = conn.execute(
-                    """
+                cursor = conn.execute("""
                     SELECT COUNT(*) as total_notifications
                     FROM releases
                     WHERE notified = 1
                     AND created_at > datetime('now', '-24 hours')
-                """
-                )
+                """)
                 notification_stats = dict(cursor.fetchone() or {})
 
                 return {
