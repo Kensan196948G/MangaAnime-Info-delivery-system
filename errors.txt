@@ -250,52 +250,52 @@ modules/audit_log_db.py:33:13: F821 undefined name 'logger'
 modules/audit_log_db.py:68:9: F821 undefined name 'logger'
         logger.log(
         ^
-modules/audit_log_db.py:215:9: F821 undefined name 'logger'
+modules/audit_log_db.py:211:9: F821 undefined name 'logger'
         logger.info("AuditLoggerDB（DB版）を使用します")
         ^
-modules/audit_log_db.py:217:9: F821 undefined name 'logger'
+modules/audit_log_db.py:213:9: F821 undefined name 'logger'
         logger.warning(f"AuditLoggerDB初期化失敗: {e}。メモリ版を使用します")
         ^
-modules/audit_log_db.py:225:5: F821 undefined name 'logger'
+modules/audit_log_db.py:221:5: F821 undefined name 'logger'
     logger.info("AuditLogger（メモリ版）を使用します")
     ^
-modules/backend_validator.py:987:9: F821 undefined name 'logger'
+modules/backend_validator.py:985:9: F821 undefined name 'logger'
         logger.info("Starting backend validation...")
         ^
-modules/backend_validator.py:992:13: F821 undefined name 'logger'
+modules/backend_validator.py:990:13: F821 undefined name 'logger'
             logger.info(f"\n{'='*60}")
             ^
-modules/backend_validator.py:993:13: F821 undefined name 'logger'
+modules/backend_validator.py:991:13: F821 undefined name 'logger'
             logger.info("BACKEND VALIDATION REPORT")
             ^
-modules/backend_validator.py:994:13: F821 undefined name 'logger'
+modules/backend_validator.py:992:13: F821 undefined name 'logger'
             logger.info(f"{'='*60}")
             ^
-modules/backend_validator.py:995:13: F821 undefined name 'logger'
+modules/backend_validator.py:993:13: F821 undefined name 'logger'
             logger.info(f"Total Tests: {report.total_tests}")
             ^
-modules/backend_validator.py:996:13: F821 undefined name 'logger'
+modules/backend_validator.py:994:13: F821 undefined name 'logger'
             logger.info(f"Passed: {report.passed_tests}")
             ^
-modules/backend_validator.py:997:13: F821 undefined name 'logger'
+modules/backend_validator.py:995:13: F821 undefined name 'logger'
             logger.error(f"Failed")
             ^
-modules/backend_validator.py:998:13: F821 undefined name 'logger'
+modules/backend_validator.py:996:13: F821 undefined name 'logger'
             logger.info(f"Success")
             ^
-modules/backend_validator.py:999:13: F821 undefined name 'logger'
+modules/backend_validator.py:997:13: F821 undefined name 'logger'
             logger.info(f"Total Duration: {report.total_duration:.2f}s")
             ^
-modules/backend_validator.py:1000:13: F821 undefined name 'logger'
+modules/backend_validator.py:998:13: F821 undefined name 'logger'
             logger.info(f"{'='*60}")
             ^
-modules/backend_validator.py:1005:17: F821 undefined name 'logger'
+modules/backend_validator.py:1003:17: F821 undefined name 'logger'
                 logger.info("\nFAILED TESTS:")
                 ^
-modules/backend_validator.py:1007:21: F821 undefined name 'logger'
+modules/backend_validator.py:1005:21: F821 undefined name 'logger'
                     logger.info(f"  ✗ {test.test_name}: {test.error_message}")
                     ^
-modules/backend_validator.py:1014:13: F821 undefined name 'logger'
+modules/backend_validator.py:1012:13: F821 undefined name 'logger'
             logger.info(f"Validation failed with error: {e}")
             ^
 modules/brute_force_protection.py:34:9: F821 undefined name 'logger'
@@ -490,7 +490,7 @@ modules/calendar_sync_manager.py:263:13: F821 undefined name 'logger'
 modules/calendar_sync_manager.py:303:9: F821 undefined name 'logger'
         logger.error(f"Release {release_id}: {error_message}")
         ^
-modules/calendar_sync_manager.py:342:9: F821 undefined name 'logger'
+modules/calendar_sync_manager.py:340:9: F821 undefined name 'logger'
         logger.info("失敗した同期のリトライ機能は未実装です")
         ^
 modules/config_helper.py:34:13: F821 undefined name 'logger'
@@ -646,25 +646,25 @@ modules/dashboard_integration.py:253:17: F821 undefined name 'logger'
 modules/dashboard_integration.py:261:13: F821 undefined name 'logger'
             logger.error(f"Failed to cleanup old metrics: {e}")
             ^
-modules/db_typed.py:88:5: F821 undefined name 'logger'
+modules/db_typed.py:82:5: F821 undefined name 'logger'
     logger.info("データベース初期化完了")
     ^
-modules/db_typed.py:144:9: F821 undefined name 'logger'
+modules/db_typed.py:138:9: F821 undefined name 'logger'
         logger.info(f"作品登録: {title} (ID: {work_id})")
         ^
-modules/db_typed.py:194:9: F821 undefined name 'logger'
+modules/db_typed.py:188:9: F821 undefined name 'logger'
         logger.info(f"リリース登録: work_id={work_id}, {release_type} {number}")
         ^
-modules/db_typed.py:198:9: F821 undefined name 'logger'
+modules/db_typed.py:192:9: F821 undefined name 'logger'
         logger.debug(f"リリース重複: work_id={work_id}, {release_type} {number}")
         ^
-modules/db_typed.py:256:5: F821 undefined name 'logger'
+modules/db_typed.py:248:5: F821 undefined name 'logger'
     logger.info(f"通知済みマーク: release_id={release_id}")
     ^
-modules/db_typed.py:323:9: F821 undefined name 'logger'
+modules/db_typed.py:313:9: F821 undefined name 'logger'
         logger.warning(f"カレンダーイベント重複: event_id={event_id}")
         ^
-modules/db_typed.py:327:5: F821 undefined name 'logger'
+modules/db_typed.py:317:5: F821 undefined name 'logger'
     logger.info(f"カレンダー同期済みマーク: release_id={release_id}, event_id={event_id}")
     ^
 modules/error_notifier.py:299:9: F821 undefined name 'logger'
@@ -709,37 +709,37 @@ modules/filter_logic_typed.py:342:5: F821 undefined name 'logger'
 modules/filter_logic_typed.py:371:5: F821 undefined name 'logger'
     logger.info(f"複合フィルタリング結果: 最終許可={len(current_items)}件")
     ^
-modules/graphql_client.py:146:17: F821 undefined name 'logger'
+modules/graphql_client.py:144:17: F821 undefined name 'logger'
                 logger.info(f"Rate limit reached. Waiting {wait_time:.2f} seconds...")
                 ^
-modules/graphql_client.py:191:25: F821 undefined name 'logger'
+modules/graphql_client.py:189:25: F821 undefined name 'logger'
                         logger.warning(f"Rate limited. Waiting {retry_after} seconds...")
                         ^
-modules/graphql_client.py:199:25: F821 undefined name 'logger'
+modules/graphql_client.py:197:25: F821 undefined name 'logger'
                         logger.error(f"GraphQL errors: {data['errors']}")
                         ^
-modules/graphql_client.py:205:17: F821 undefined name 'logger'
+modules/graphql_client.py:203:17: F821 undefined name 'logger'
                 logger.warning(f"Request failed (attempt {attempt + 1}/{self.max_retries}): {e}")
                 ^
-modules/graphql_client.py:231:13: F821 undefined name 'logger'
+modules/graphql_client.py:229:13: F821 undefined name 'logger'
             logger.info(f"Fetching batch {i//self.MAX_BATCH_SIZE + 1}: {len(batch)} anime")
             ^
-modules/graphql_client.py:245:25: F821 undefined name 'logger'
+modules/graphql_client.py:243:25: F821 undefined name 'logger'
                         logger.warning(f"No data for anime ID {anime_id}")
                         ^
-modules/graphql_client.py:248:17: F821 undefined name 'logger'
+modules/graphql_client.py:246:17: F821 undefined name 'logger'
                 logger.error(f"Failed to fetch batch: {e}")
                 ^
-modules/graphql_client.py:252:9: F821 undefined name 'logger'
+modules/graphql_client.py:250:9: F821 undefined name 'logger'
         logger.info(f"Successfully fetched {len(results)}/{len(anime_ids)} anime")
         ^
-modules/graphql_client.py:314:13: F821 undefined name 'logger'
+modules/graphql_client.py:312:13: F821 undefined name 'logger'
             logger.error(f"Failed to search anime by season: {e}")
             ^
-modules/graphql_client.py:382:17: F821 undefined name 'logger'
+modules/graphql_client.py:380:17: F821 undefined name 'logger'
                 logger.error(f"Failed to fetch upcoming releases: {e}")
                 ^
-modules/graphql_client.py:385:9: F821 undefined name 'logger'
+modules/graphql_client.py:383:9: F821 undefined name 'logger'
         logger.info(f"Found {len(all_schedules)} upcoming releases in next {days_ahead} days")
         ^
 modules/logger.py:172:5: F821 undefined name 'logger'
@@ -871,88 +871,88 @@ modules/notification_history.py:51:21: F821 undefined name 'logger'
 modules/notification_history.py:53:17: F821 undefined name 'logger'
                 logger.info("notification_history テーブルを確認しました（既存）")
                 ^
-modules/notification_history.py:71:17: F821 undefined name 'logger'
+modules/notification_history.py:69:17: F821 undefined name 'logger'
                 logger.info("notification_history テーブルを作成しました")
                 ^
-modules/notification_history.py:92:13: F821 undefined name 'logger'
+modules/notification_history.py:86:13: F821 undefined name 'logger'
             logger.error(f"テーブル作成エラー: {e}")
             ^
-modules/notification_history.py:147:13: F821 undefined name 'logger'
+modules/notification_history.py:141:13: F821 undefined name 'logger'
             logger.info(
             ^
-modules/notification_history.py:154:13: F821 undefined name 'logger'
+modules/notification_history.py:148:13: F821 undefined name 'logger'
             logger.error(f"履歴記録エラー: {e}")
             ^
-modules/notification_history.py:218:13: F821 undefined name 'logger'
+modules/notification_history.py:212:13: F821 undefined name 'logger'
             logger.error(f"履歴取得エラー: {e}")
             ^
-modules/notification_history.py:301:13: F821 undefined name 'logger'
+modules/notification_history.py:293:13: F821 undefined name 'logger'
             logger.error(f"統計取得エラー: {e}")
             ^
-modules/notification_history.py:370:13: F821 undefined name 'logger'
+modules/notification_history.py:362:13: F821 undefined name 'logger'
             logger.info(f"{deleted_count}件の古い履歴を削除しました")
             ^
-modules/notification_history.py:374:13: F821 undefined name 'logger'
+modules/notification_history.py:366:13: F821 undefined name 'logger'
             logger.error(f"履歴削除エラー: {e}")
             ^
-modules/notification_history.py:410:13: F821 undefined name 'logger'
+modules/notification_history.py:402:13: F821 undefined name 'logger'
             logger.info(f"履歴を {output_path} にエクスポートしました")
             ^
-modules/notification_history.py:414:13: F821 undefined name 'logger'
+modules/notification_history.py:406:13: F821 undefined name 'logger'
             logger.error(f"履歴エクスポートエラー: {e}")
             ^
-modules/notification_history.py:467:5: F821 undefined name 'logger'
+modules/notification_history.py:459:5: F821 undefined name 'logger'
     logger.info(f"\n最近の履歴 ({len(history)}件):")
     ^
-modules/notification_history.py:469:9: F821 undefined name 'logger'
+modules/notification_history.py:461:9: F821 undefined name 'logger'
         logger.info(
         ^
-modules/notification_history.py:475:5: F821 undefined name 'logger'
+modules/notification_history.py:467:5: F821 undefined name 'logger'
     logger.info(f"\n統計情報:")
     ^
-modules/notification_history.py:476:5: F821 undefined name 'logger'
+modules/notification_history.py:468:5: F821 undefined name 'logger'
     logger.info(f"  総通知数: {stats['total_notifications']}")
     ^
-modules/notification_history.py:477:5: F821 undefined name 'logger'
+modules/notification_history.py:469:5: F821 undefined name 'logger'
     logger.info(f"  成功率: {stats['success_rate']}%")
     ^
-modules/notification_history.py:478:5: F821 undefined name 'logger'
+modules/notification_history.py:470:5: F821 undefined name 'logger'
     logger.info(f"  最終実行: {stats['last_execution']}")
     ^
-modules/notification_history.py:482:5: F821 undefined name 'logger'
+modules/notification_history.py:474:5: F821 undefined name 'logger'
     logger.info(f"  次回実行: {next_run}")
     ^
-modules/qa_validation.py:1114:5: F821 undefined name 'logger'
+modules/qa_validation.py:1094:5: F821 undefined name 'logger'
     logger.info("Starting comprehensive QA audit...")
     ^
-modules/qa_validation.py:1117:5: F821 undefined name 'logger'
+modules/qa_validation.py:1097:5: F821 undefined name 'logger'
     logger.info("\nQA Audit Results:")
     ^
-modules/qa_validation.py:1118:5: F821 undefined name 'logger'
+modules/qa_validation.py:1098:5: F821 undefined name 'logger'
     logger.info(f"Overall Score: {results['overall_score']}/100")
     ^
-modules/qa_validation.py:1119:5: F821 undefined name 'logger'
+modules/qa_validation.py:1099:5: F821 undefined name 'logger'
     logger.info(f"Quality Level: {results['summary']['quality_level']}")
     ^
-modules/qa_validation.py:1120:5: F821 undefined name 'logger'
+modules/qa_validation.py:1100:5: F821 undefined name 'logger'
     logger.info(f"Total Issues: {results['summary']['total_issues_found']}")
     ^
-modules/qa_validation.py:1121:5: F821 undefined name 'logger'
+modules/qa_validation.py:1101:5: F821 undefined name 'logger'
     logger.info(f"Code Quality: {results['summary']['code_quality_score']}/100")
     ^
-modules/qa_validation.py:1122:5: F821 undefined name 'logger'
+modules/qa_validation.py:1102:5: F821 undefined name 'logger'
     logger.info(f"Data Integrity: {results['summary']['data_integrity_score']}/100")
     ^
-modules/qa_validation.py:1123:5: F821 undefined name 'logger'
+modules/qa_validation.py:1103:5: F821 undefined name 'logger'
     logger.info(f"Performance: {results['summary']['performance_score']}/100")
     ^
-modules/qa_validation.py:1126:9: F821 undefined name 'logger'
+modules/qa_validation.py:1106:9: F821 undefined name 'logger'
         logger.info("\nTop Action Items:")
         ^
-modules/qa_validation.py:1128:13: F821 undefined name 'logger'
+modules/qa_validation.py:1108:13: F821 undefined name 'logger'
             logger.info(f"{i}. {item}")
             ^
-modules/qa_validation.py:1133:9: F821 undefined name 'logger'
+modules/qa_validation.py:1113:9: F821 undefined name 'logger'
         logger.info(f"\nDetailed report saved to: {output_file}")
         ^
 modules/rate_limiter.py:56:9: F821 undefined name 'logger'
