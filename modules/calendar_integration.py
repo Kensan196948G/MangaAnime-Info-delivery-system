@@ -794,6 +794,7 @@ class CalendarManager:
             return False
         try:
             from googleapiclient.discovery import build
+
             self.service = build("calendar", "v3")
             self._authenticated = True
             return True
@@ -850,9 +851,7 @@ class CalendarManager:
                 event_body["location"] = location
 
             created = (
-                self.service.events()
-                .insert(calendarId=self.calendar_id, body=event_body)
-                .execute()
+                self.service.events().insert(calendarId=self.calendar_id, body=event_body).execute()
             )
             return created
         except Exception as e:

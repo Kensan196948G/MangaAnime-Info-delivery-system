@@ -150,20 +150,21 @@ class InputSanitizer:
         title = re.sub(r'[<>"\'\x00-\x1f\x7f-\x9f]', "", title)
 
         # Remove dangerous protocol prefixes (XSS prevention)
-        title = re.sub(r'(?i)javascript\s*:', '', title)
-        title = re.sub(r'(?i)vbscript\s*:', '', title)
-        title = re.sub(r'(?i)data\s*:', '', title)
+        title = re.sub(r"(?i)javascript\s*:", "", title)
+        title = re.sub(r"(?i)vbscript\s*:", "", title)
+        title = re.sub(r"(?i)data\s*:", "", title)
 
         # Remove HTML event handler attributes (onerror=, onclick=, etc.)
-        title = re.sub(r'(?i)\bon\w+\s*=', '', title)
+        title = re.sub(r"(?i)\bon\w+\s*=", "", title)
 
         # Remove SQL injection patterns (defense in depth)
         title = re.sub(
-            r'(?i)\b(DROP|DELETE|TRUNCATE|ALTER|CREATE|INSERT|UPDATE|UNION|SELECT|EXEC(?:UTE)?)\s+(TABLE|DATABASE|FROM|INTO|ALL)\b',
-            '', title
+            r"(?i)\b(DROP|DELETE|TRUNCATE|ALTER|CREATE|INSERT|UPDATE|UNION|SELECT|EXEC(?:UTE)?)\s+(TABLE|DATABASE|FROM|INTO|ALL)\b",
+            "",
+            title,
         )
-        title = re.sub(r'--', '', title)   # SQLコメントマーカー除去
-        title = re.sub(r';+', '', title)   # ステートメント区切り除去
+        title = re.sub(r"--", "", title)  # SQLコメントマーカー除去
+        title = re.sub(r";+", "", title)  # ステートメント区切り除去
 
         return title.strip()
 

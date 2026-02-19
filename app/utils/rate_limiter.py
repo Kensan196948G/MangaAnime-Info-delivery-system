@@ -60,7 +60,7 @@ def init_limiter(app, storage_uri: str = "memory://"):
         from flask_limiter.util import get_remote_address
 
         # app.configのRATELIMIT_DEFAULTを優先、なければRATE_LIMITSのデフォルト値を使用
-        default_limits = app.config.get('RATELIMIT_DEFAULT', [RATE_LIMITS["default"]])
+        default_limits = app.config.get("RATELIMIT_DEFAULT", [RATE_LIMITS["default"]])
         if isinstance(default_limits, str):
             default_limits = [default_limits]
         limiter = Limiter(

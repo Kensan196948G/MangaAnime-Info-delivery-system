@@ -388,8 +388,7 @@ class DatabaseManager:
                 )
 
                 # calendar_events table (used by web UI)
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE TABLE IF NOT EXISTS calendar_events (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         work_id INTEGER NOT NULL,
@@ -404,8 +403,7 @@ class DatabaseManager:
                         FOREIGN KEY (work_id) REFERENCES works(id),
                         FOREIGN KEY (release_id) REFERENCES releases(id)
                     )
-                    """
-                )
+                    """)
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_calendar_events_date "
                     "ON calendar_events(event_date)"
@@ -416,8 +414,7 @@ class DatabaseManager:
                 )
 
                 # collection_stats table (used by web UI dashboard)
-                conn.execute(
-                    """
+                conn.execute("""
                     CREATE TABLE IF NOT EXISTS collection_stats (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         source_id TEXT NOT NULL UNIQUE,
@@ -431,8 +428,7 @@ class DatabaseManager:
                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
-                    """
-                )
+                    """)
 
                 conn.commit()
 
@@ -1312,9 +1308,7 @@ class DatabaseManager:
                 )
                 event_id = cursor.lastrowid
                 conn.commit()
-                self.logger.info(
-                    f"Saved calendar event: '{event_data['title']}' (ID: {event_id})"
-                )
+                self.logger.info(f"Saved calendar event: '{event_data['title']}' (ID: {event_id})")
                 return event_id
             except sqlite3.Error as e:
                 self.logger.error(f"Failed to save calendar event: {e}")
@@ -1370,9 +1364,7 @@ class DatabaseManager:
                     f"(google_event_id={google_event_id})"
                 )
             else:
-                self.logger.warning(
-                    f"Calendar event {event_id} not found for sync update"
-                )
+                self.logger.warning(f"Calendar event {event_id} not found for sync update")
             return success
 
     def close_connections(self):
