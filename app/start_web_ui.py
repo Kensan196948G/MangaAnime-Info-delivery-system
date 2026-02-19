@@ -5,8 +5,10 @@ This script provides an easy way to start the web interface.
 """
 
 import argparse
+import logging
 import os
 import sys
+logger = logging.getLogger(__name__)
 
 from web_app import app
 

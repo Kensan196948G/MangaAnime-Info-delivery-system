@@ -4,6 +4,7 @@ Comprehensive security testing suite for the Anime/Manga Information Delivery Sy
 Tests all security measures, input validation, authentication, and data protection.
 """
 
+import sys
 import pytest
 import json
 import sqlite3
@@ -175,6 +176,10 @@ class TestAuthenticationSecurity:
         assert loaded_token["access_token"] == test_token["access_token"]
         assert loaded_token["refresh_token"] == test_token["refresh_token"]
 
+    @pytest.mark.skipif(
+        sys.platform == "win32",
+        reason="Unix file permissions not supported on Windows"
+    )
     def test_token_file_permissions(self, tmp_path):
         """Test token file permissions are secure"""
         token_file = tmp_path / "test_token.json"
@@ -341,7 +346,7 @@ class TestDatabaseSecurity:
 
         # Should be a valid SHA-256 hash
         assert len(hash1) == 64  # SHA-256 produces 64-character hex string
-        assert all(c in "0123456789abcde" for c in hash1)
+        assert all(c in "0123456789abcdef" for c in hash1)
 
         # Different inputs should produce different hashes
         different_hash = db_security.hash_identifier("different_data")

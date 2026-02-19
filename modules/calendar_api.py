@@ -14,6 +14,8 @@ Phase 17: カレンダー統合実装
 import json
 import logging
 import time
+
+logger = logging.getLogger(__name__)
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple

@@ -7,6 +7,8 @@ import ast
 import json
 import logging
 import os
+
+logger = logging.getLogger(__name__)
 import re
 import sqlite3
 import time

@@ -110,7 +110,7 @@ class TestCalendarManager:
         self.calendar_manager.service = mock_service
 
         # Mock successful event creation
-        mock_service.events().insert().execute.return_value = {
+        mock_service.events.return_value.insert.return_value.execute.return_value = {
             "id": "test_event_id",
             "status": "confirmed",
             "htmlLink": "https://calendar.google.com/event/test",
@@ -125,7 +125,7 @@ class TestCalendarManager:
 
         assert result["id"] == "test_event_id"
         assert result["status"] == "confirmed"
-        mock_service.events().insert.assert_called_once()
+        mock_service.events.return_value.insert.assert_called_once()
 
     @patch("googleapiclient.discovery.build")
     def test_create_all_day_event(self, mock_build):
@@ -296,7 +296,7 @@ class TestCalendarEventFormatting:
             "url": "https://viz.com/jujutsu-kaisen",
         }
 
-        description = """
+        description = f"""
         New volume of {manga_data['title']} is now available!
 
         Volume: {manga_data['volume']}

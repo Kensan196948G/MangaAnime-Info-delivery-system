@@ -23,6 +23,8 @@ load_dotenv()
 
 import logging
 import sqlite3
+
+logger = logging.getLogger(__name__)
 import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional

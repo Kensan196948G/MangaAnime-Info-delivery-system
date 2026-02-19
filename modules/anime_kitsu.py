@@ -16,6 +16,8 @@ Rate Limits: 90 requests per minute
 import asyncio
 import logging
 import time
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 

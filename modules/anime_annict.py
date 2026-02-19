@@ -17,6 +17,8 @@ import asyncio
 import json
 import logging
 import time
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 

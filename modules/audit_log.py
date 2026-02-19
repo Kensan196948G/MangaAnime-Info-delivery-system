@@ -4,6 +4,8 @@
 
 import logging
 from collections import defaultdict
+
+logger = logging.getLogger(__name__)
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum

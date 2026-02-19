@@ -7,6 +7,8 @@ OAuth2不要で動作する代替実装
 import logging
 import os
 import smtplib
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText

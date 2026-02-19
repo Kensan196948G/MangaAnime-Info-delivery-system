@@ -16,6 +16,8 @@ import hashlib
 import json
 import logging
 import os
+
+logger = logging.getLogger(__name__)
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import Dict, Optional

@@ -42,6 +42,8 @@ from modules.db import DatabaseManager
 from modules.email_scheduler import EmailScheduler
 from modules.logger import setup_logging
 
+logger = logging.getLogger(__name__)
+
 
 class ReleaseNotifierSystem:
     """アニメ・マンガ情報配信システムメインクラス"""
@@ -684,7 +686,7 @@ def main():
             exit_code = 0 if success else 1
 
     except Exception as e:
-        logger.info(f"💥 システム初期化エラー: {e}", file=sys.stderr)
+        logger.error(f"システム初期化エラー: {e}")
         exit_code = 2
 
     sys.exit(exit_code)

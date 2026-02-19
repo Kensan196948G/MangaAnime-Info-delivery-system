@@ -7,6 +7,8 @@
 import json
 import logging
 import os
+
+logger = logging.getLogger(__name__)
 import smtplib
 import sys
 from datetime import datetime, timedelta

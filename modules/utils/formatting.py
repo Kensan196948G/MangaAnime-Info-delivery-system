@@ -4,8 +4,11 @@ Data formatting utilities for MangaAnime Info Delivery System.
 Provides common formatting functions to eliminate code duplication.
 """
 
+import logging
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 def format_date(

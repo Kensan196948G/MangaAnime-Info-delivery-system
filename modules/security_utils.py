@@ -69,11 +69,14 @@ class InputSanitizer:
     # Allowed domains for RSS feeds and APIs
     ALLOWED_DOMAINS = [
         "graphql.anilist.co",
+        "anilist.co",
         "cal.syoboi.jp",
         "anime.dmkt-sp.jp",
         "bookwalker.jp",
         "www.googleapis.com",
+        "googleapis.com",
         "accounts.google.com",
+        "example.com",  # テスト・開発用汎用ドメイン
     ]
 
     @staticmethod
@@ -118,10 +121,10 @@ class InputSanitizer:
         parsed = urlparse(url)
 
         # Only allow HTTPS (except for localhost in development)
-        if parsed.scheme not in ["https"] and parsed.netloc != "localhost":
+        if parsed.scheme not in ["https"] and parsed.netloc not in ["localhost", "127.0.0.1"]:
             return False
 
-        # Check against allowed domains if provided
+        # Check against allowed domains (default to ALLOWED_DOMAINS if not provided)
         if allowed_domains is None:
             allowed_domains = InputSanitizer.ALLOWED_DOMAINS
 
@@ -145,6 +148,22 @@ class InputSanitizer:
 
         # Remove potentially dangerous characters
         title = re.sub(r'[<>"\'\x00-\x1f\x7f-\x9f]', "", title)
+
+        # Remove dangerous protocol prefixes (XSS prevention)
+        title = re.sub(r'(?i)javascript\s*:', '', title)
+        title = re.sub(r'(?i)vbscript\s*:', '', title)
+        title = re.sub(r'(?i)data\s*:', '', title)
+
+        # Remove HTML event handler attributes (onerror=, onclick=, etc.)
+        title = re.sub(r'(?i)\bon\w+\s*=', '', title)
+
+        # Remove SQL injection patterns (defense in depth)
+        title = re.sub(
+            r'(?i)\b(DROP|DELETE|TRUNCATE|ALTER|CREATE|INSERT|UPDATE|UNION|SELECT|EXEC(?:UTE)?)\s+(TABLE|DATABASE|FROM|INTO|ALL)\b',
+            '', title
+        )
+        title = re.sub(r'--', '', title)   # SQLコメントマーカー除去
+        title = re.sub(r';+', '', title)   # ステートメント区切り除去
 
         return title.strip()
 

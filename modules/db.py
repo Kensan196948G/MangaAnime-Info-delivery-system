@@ -361,6 +361,79 @@ class DatabaseManager:
                     "CREATE INDEX IF NOT EXISTS idx_notification_history_executed_at ON notification_history(executed_at)"
                 )
 
+                # Create pending_calendar_events table for development-mode calendar testing
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS pending_calendar_events (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT NOT NULL,
+                        description TEXT,
+                        start_datetime TEXT NOT NULL,
+                        end_datetime TEXT,
+                        event_type TEXT CHECK(event_type IN ('anime','manga')),
+                        work_id INTEGER,
+                        release_id INTEGER,
+                        synced INTEGER DEFAULT 0,
+                        google_event_id TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+
+                conn.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_pending_calendar_events_synced "
+                    "ON pending_calendar_events(synced)"
+                )
+                conn.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_pending_calendar_events_event_type "
+                    "ON pending_calendar_events(event_type)"
+                )
+
+                # calendar_events table (used by web UI)
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS calendar_events (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        work_id INTEGER NOT NULL,
+                        release_id INTEGER,
+                        event_title TEXT NOT NULL,
+                        event_date DATE,
+                        description TEXT,
+                        calendar_id TEXT,
+                        event_id TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (work_id) REFERENCES works(id),
+                        FOREIGN KEY (release_id) REFERENCES releases(id)
+                    )
+                    """
+                )
+                conn.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_calendar_events_date "
+                    "ON calendar_events(event_date)"
+                )
+                conn.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_calendar_events_work "
+                    "ON calendar_events(work_id)"
+                )
+
+                # collection_stats table (used by web UI dashboard)
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS collection_stats (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        source_id TEXT NOT NULL UNIQUE,
+                        source_type TEXT CHECK(source_type IN ('api', 'rss', 'scraper')),
+                        source_name TEXT,
+                        items_collected INTEGER DEFAULT 0,
+                        success_rate REAL DEFAULT 100.0,
+                        avg_response_time REAL DEFAULT 0.0,
+                        total_attempts INTEGER DEFAULT 0,
+                        last_run DATETIME,
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+
                 conn.commit()
 
                 # Initialize default settings
@@ -1189,6 +1262,118 @@ class DatabaseManager:
         except Exception as e:
             self.logger.error(f"Integrity check failed: {e}")
             return {"valid": False, "error": str(e)}
+
+    def save_calendar_event(self, event_data: dict) -> Optional[int]:
+        """
+        Save a calendar event to pending_calendar_events table.
+
+        Args:
+            event_data: Dictionary with event fields:
+                - title (required): Event title
+                - description: Event description
+                - start_datetime (required): ISO format datetime string
+                - end_datetime: ISO format datetime string
+                - event_type: 'anime' or 'manga'
+                - work_id: Associated work ID
+                - release_id: Associated release ID
+
+        Returns:
+            ID of inserted record, or None on failure
+        """
+        required_fields = ("title", "start_datetime")
+        for field in required_fields:
+            if not event_data.get(field):
+                self.logger.error(f"save_calendar_event: missing required field '{field}'")
+                return None
+
+        event_type = event_data.get("event_type")
+        if event_type and event_type not in ("anime", "manga"):
+            self.logger.error(f"save_calendar_event: invalid event_type '{event_type}'")
+            return None
+
+        with self.get_connection() as conn:
+            try:
+                cursor = conn.execute(
+                    """
+                    INSERT INTO pending_calendar_events
+                        (title, description, start_datetime, end_datetime,
+                         event_type, work_id, release_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        event_data["title"],
+                        event_data.get("description"),
+                        event_data["start_datetime"],
+                        event_data.get("end_datetime"),
+                        event_type,
+                        event_data.get("work_id"),
+                        event_data.get("release_id"),
+                    ),
+                )
+                event_id = cursor.lastrowid
+                conn.commit()
+                self.logger.info(
+                    f"Saved calendar event: '{event_data['title']}' (ID: {event_id})"
+                )
+                return event_id
+            except sqlite3.Error as e:
+                self.logger.error(f"Failed to save calendar event: {e}")
+                return None
+
+    def get_pending_calendar_events(self, synced: bool = False) -> List[dict]:
+        """
+        Retrieve calendar events from pending_calendar_events table.
+
+        Args:
+            synced: If False (default), return only unsynced events.
+                    If True, return only already-synced events.
+
+        Returns:
+            List of event dictionaries ordered by start_datetime ascending
+        """
+        with self.get_connection() as conn:
+            cursor = conn.execute(
+                """
+                SELECT * FROM pending_calendar_events
+                WHERE synced = ?
+                ORDER BY start_datetime ASC
+                """,
+                (1 if synced else 0,),
+            )
+            return [dict(row) for row in cursor.fetchall()]
+
+    def mark_calendar_event_synced(self, event_id: int, google_event_id: str) -> bool:
+        """
+        Mark a pending calendar event as synced to Google Calendar.
+
+        Args:
+            event_id: Local database ID of the pending_calendar_events row
+            google_event_id: Google Calendar event ID returned by the API
+
+        Returns:
+            True if the row was updated, False if not found
+        """
+        with self.get_connection() as conn:
+            cursor = conn.execute(
+                """
+                UPDATE pending_calendar_events
+                SET synced = 1, google_event_id = ?
+                WHERE id = ?
+                """,
+                (google_event_id, event_id),
+            )
+            conn.commit()
+            success = cursor.rowcount > 0
+            if success:
+                self.logger.info(
+                    f"Marked calendar event {event_id} as synced "
+                    f"(google_event_id={google_event_id})"
+                )
+            else:
+                self.logger.warning(
+                    f"Calendar event {event_id} not found for sync update"
+                )
+            return success
 
     def close_connections(self):
         """Close all database connections and clean up resources."""

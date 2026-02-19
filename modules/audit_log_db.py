@@ -5,6 +5,8 @@
 import json
 import logging
 import os
+
+logger = logging.getLogger(__name__)
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime

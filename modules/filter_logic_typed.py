@@ -2,8 +2,11 @@
 フィルタリングロジックモジュール（型ヒント付き）
 """
 
+import logging
 import re
 from typing import Any, Callable, Dict, List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 class ContentFilter:

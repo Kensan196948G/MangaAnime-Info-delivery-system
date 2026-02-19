@@ -769,3 +769,129 @@ class CalendarEventFormatter:
         description_parts.append("\n🤖 MangaAnime情報配信システムにより自動作成")
 
         return "\n".join(description_parts)
+
+
+class CalendarManager:
+    """
+    GoogleCalendarManagerのシンプルラッパー。
+    テスト互換性と簡易インターフェース用。
+
+    create_event(title, description, start_time, end_time=None)
+    で呼び出せるシンプルなAPIを提供する。
+    """
+
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        self.config = config or {}
+        calendar_config = self.config.get("calendar", {})
+        self.calendar_id = calendar_config.get("calendar_id", "primary")
+        self._enabled = calendar_config.get("enabled", True)
+        self.service = None
+        self._authenticated = False
+
+    def authenticate(self) -> bool:
+        """Google Calendar認証を行う"""
+        if not self._enabled:
+            return False
+        try:
+            from googleapiclient.discovery import build
+            self.service = build("calendar", "v3")
+            self._authenticated = True
+            return True
+        except Exception:
+            return False
+
+    def create_event(
+        self,
+        title: str,
+        description: str,
+        start_time: str,
+        end_time: Optional[str] = None,
+        location: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        カレンダーイベントをシンプルなインターフェースで作成する。
+
+        Args:
+            title: イベントタイトル
+            description: イベント説明
+            start_time: 開始時刻 (ISO 8601形式)
+            end_time: 終了時刻 (ISO 8601形式, 省略可)
+            location: 場所 (省略可)
+
+        Returns:
+            作成されたイベントデータ辞書またはNone
+        """
+        if not self._enabled:
+            return None
+
+        if self.service is None:
+            return None
+
+        try:
+            start_dt = datetime.fromisoformat(start_time)
+            if end_time:
+                end_dt = datetime.fromisoformat(end_time)
+            else:
+                end_dt = start_dt + timedelta(hours=1)
+
+            event_body: Dict[str, Any] = {
+                "summary": title,
+                "description": description,
+                "start": {
+                    "dateTime": start_dt.isoformat(),
+                    "timeZone": "Asia/Tokyo",
+                },
+                "end": {
+                    "dateTime": end_dt.isoformat(),
+                    "timeZone": "Asia/Tokyo",
+                },
+            }
+            if location:
+                event_body["location"] = location
+
+            created = (
+                self.service.events()
+                .insert(calendarId=self.calendar_id, body=event_body)
+                .execute()
+            )
+            return created
+        except Exception as e:
+            logger.error(f"CalendarManager.create_event failed: {e}")
+            return None
+
+    def create_anime_event(self, anime_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        アニメエピソード用のカレンダーイベントを作成する。
+
+        Args:
+            anime_data: アニメデータ辞書 (title, episode, air_date, platform等)
+
+        Returns:
+            作成されたイベントデータ辞書またはNone
+        """
+        title = anime_data.get("title", "Unknown")
+        episode = anime_data.get("episode", "")
+        platform = anime_data.get("platform", "Unknown")
+        air_date = anime_data.get("air_date", "")
+
+        event_title = f"{title} - Episode {episode}" if episode else title
+        description = f"New episode of {title} available on {platform}"
+        return self.create_event(event_title, description, air_date)
+
+    def create_manga_event(self, manga_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        マンガ新刊用のカレンダーイベントを作成する。
+
+        Args:
+            manga_data: マンガデータ辞書 (title, volume, release_date, platform等)
+
+        Returns:
+            作成されたイベントデータ辞書またはNone
+        """
+        title = manga_data.get("title", "Unknown")
+        volume = manga_data.get("volume", "")
+        release_date = manga_data.get("release_date", "")
+
+        event_title = f"{title} - Volume {volume}" if volume else title
+        description = f"New volume of {title} released"
+        return self.create_event(event_title, description, release_date)

@@ -6,6 +6,8 @@ Provides automated security testing, compliance checking, and vulnerability asse
 import json
 import logging
 import re
+
+logger = logging.getLogger(__name__)
 import time
 from collections import defaultdict
 from dataclasses import asdict, dataclass
@@ -64,11 +66,17 @@ class SecurityCompliance:
                 r'cursor\.execute\s*\(\s*["\'][^"\']*%.*["\']',
                 r"SELECT.*\+.*FROM",
                 r"INSERT.*\+.*VALUES",
+                r'f"[^"]*SELECT[^"]*\{',   # f-string SQL injection (double quotes)
+                r"f'[^']*SELECT[^']*\{",   # f-string SQL injection (single quotes)
+                r'f"[^"]*WHERE[^"]*\{',    # f-string WHERE interpolation
+                r"f'[^']*WHERE[^']*\{",    # f-string WHERE interpolation (single quotes)
             ],
             "path_traversal": [
                 r'open\s*\([^)]*\+.*["\']\.\./',
                 r'file\s*\([^)]*\+.*["\']\.\./',
                 r"os\.path\.join\([^)]*user.*input",
+                r'open\s*\([^\)]*\+',          # open() with dynamic string concat
+                r'with\s+open\s*\([^)]*\+',    # with open() with concatenation
             ],
             "command_injection": [
                 r"os\.system\s*\([^)]*\+",

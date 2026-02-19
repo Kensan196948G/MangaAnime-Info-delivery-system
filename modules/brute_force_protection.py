@@ -3,9 +3,12 @@
 ログイン失敗回数の追跡とアカウントロック機能
 """
 
+import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 class LoginAttemptTracker:
@@ -86,6 +89,11 @@ class LoginAttemptTracker:
             del self._locked_accounts[username]
             self._attempts[username] = []
             logger.info(f"管理者によるロック解除: '{username}'")
+            return True
+        # 正式ロック前でも試行記録がある場合はクリアする
+        if username in self._attempts and len(self._attempts[username]) > 0:
+            self._attempts[username] = []
+            logger.info(f"試行記録クリア（未ロック）: '{username}'")
             return True
         return False
 

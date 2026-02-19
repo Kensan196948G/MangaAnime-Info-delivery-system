@@ -295,6 +295,7 @@ class ConfigManager:
 
     DEFAULT_CONFIG_PATHS = [
         "./config.json",
+        "./config/config.json",
         "./config.local.json",
         os.path.expanduser("~/.manga-anime-notifier/config.json"),
     ]

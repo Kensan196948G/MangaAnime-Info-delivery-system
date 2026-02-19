@@ -19,6 +19,8 @@ import hashlib
 import json
 import logging
 import pickle
+
+logger = logging.getLogger(__name__)
 import time
 from collections import OrderedDict
 from typing import Any, Callable, Dict, Optional

@@ -3,9 +3,12 @@ Dashboard Integration Module
 監視・統計ダッシュボード統合機能
 """
 
+import logging
 import sqlite3
 import time
 from contextlib import contextmanager
+
+logger = logging.getLogger(__name__)
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 

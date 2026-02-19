@@ -10,6 +10,8 @@ import asyncio
 import json
 import logging
 import time
+
+logger = logging.getLogger(__name__)
 import traceback
 from dataclasses import dataclass, field
 from datetime import datetime

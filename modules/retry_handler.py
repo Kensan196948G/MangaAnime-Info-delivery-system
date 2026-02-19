@@ -3,9 +3,12 @@
 APIコールやネットワークリクエストのリトライ処理を提供
 """
 
+import logging
 import time
 from functools import wraps
 from typing import Any, Callable
+
+logger = logging.getLogger(__name__)
 
 
 class RetryException(Exception):

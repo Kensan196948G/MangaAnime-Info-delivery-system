@@ -5,8 +5,11 @@
 """
 
 import json
+import logging
 import sqlite3
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 class TitleTranslator:

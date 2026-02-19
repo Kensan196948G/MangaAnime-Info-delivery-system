@@ -19,6 +19,8 @@ JSON設定ファイルと環境変数を統合した設定管理システム。
 import json
 import logging
 import os
+
+logger = logging.getLogger(__name__)
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 

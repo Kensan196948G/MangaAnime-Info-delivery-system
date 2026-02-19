@@ -14,6 +14,20 @@ RATE_LIMITS = {
     "auth": "10 per minute",
     "strict": "5 per minute",
     "loose": "200 per minute",
+    # 複合キー（category_action形式）
+    "auth_login": "5 per minute",
+    "auth_logout": "10 per minute",
+    "auth_register": "3 per hour",
+    "auth_password_reset": "3 per hour",
+    "api_general": "100 per hour",
+    "api_read": "200 per hour",
+    "api_write": "50 per hour",
+    "api_collection": "10 per hour",
+    "api_scraping": "5 per hour",
+    "admin_general": "500 per hour",
+    "admin_read": "1000 per hour",
+    "admin_write": "100 per hour",
+    "admin_delete": "50 per hour",
 }
 
 
@@ -27,7 +41,7 @@ def get_rate_limit(limit_type: str = "default") -> str:
     Returns:
         レート制限文字列
     """
-    return RATE_LIMITS.get(limit_type, RATE_LIMITS["default"])
+    return RATE_LIMITS.get(limit_type, "100 per hour")
 
 
 def init_limiter(app, storage_uri: str = "memory://"):
@@ -45,11 +59,15 @@ def init_limiter(app, storage_uri: str = "memory://"):
         from flask_limiter import Limiter
         from flask_limiter.util import get_remote_address
 
+        # app.configのRATELIMIT_DEFAULTを優先、なければRATE_LIMITSのデフォルト値を使用
+        default_limits = app.config.get('RATELIMIT_DEFAULT', [RATE_LIMITS["default"]])
+        if isinstance(default_limits, str):
+            default_limits = [default_limits]
         limiter = Limiter(
             app=app,
             key_func=get_remote_address,
             storage_uri=storage_uri,
-            default_limits=[RATE_LIMITS["default"]],
+            default_limits=default_limits,
         )
 
         logger.info(f"Rate limiter initialized with storage: {storage_uri}")

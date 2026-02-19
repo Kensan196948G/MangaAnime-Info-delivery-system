@@ -73,7 +73,11 @@ except EnvironmentError as e:
 # ============================================================
 # Flask アプリケーション初期化
 # ============================================================
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=str(project_root / "templates"),
+    static_folder=str(project_root / "app" / "static"),
+)
 
 # ============================================================
 # セキュリティ設定

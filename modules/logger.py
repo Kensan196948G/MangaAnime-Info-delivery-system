@@ -8,6 +8,8 @@ import json
 import logging
 import logging.handlers
 import sys
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from pathlib import Path
 

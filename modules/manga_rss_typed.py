@@ -2,12 +2,15 @@
 マンガRSSフィード収集モジュール（型ヒント付き）
 """
 
+import logging
 import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 import feedparser
+
+logger = logging.getLogger(__name__)
 
 
 class RSSFeedParser:

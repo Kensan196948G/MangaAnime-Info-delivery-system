@@ -21,6 +21,8 @@
 import logging
 import time
 from collections import deque
+
+logger = logging.getLogger(__name__)
 from functools import wraps
 from threading import Lock
 from typing import Callable, Optional

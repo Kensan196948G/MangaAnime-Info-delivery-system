@@ -9,6 +9,42 @@ import hashlib
 import json
 import logging
 import re
+
+logger = logging.getLogger(__name__)
+
+
+class _SimpleCache:
+    """シンプルなメモリキャッシュ（モジュールレベルキャッシュ用）"""
+    def __init__(self):
+        self._store = {}
+
+    def get(self, key):
+        return self._store.get(key)
+
+    def set(self, key, value, ttl=None):
+        self._store[key] = value
+
+    def delete(self, key):
+        self._store.pop(key, None)
+
+    def clear(self):
+        self._store.clear()
+
+
+# モジュールレベルキャッシュ（テストでのパッチ対象）
+cache = _SimpleCache()
+
+# モジュールレベルDBオブジェクト（テストでのパッチ対象）
+class _NullDB:
+    """DBが未初期化の場合のプレースホルダー"""
+    def __getattr__(self, name):
+        def _noop(*args, **kwargs):
+            return None
+        return _noop
+
+db = _NullDB()
+
+
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass

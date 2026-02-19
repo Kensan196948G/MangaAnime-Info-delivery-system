@@ -3,7 +3,10 @@
 """
 
 import hashlib
+import logging
 import sqlite3
+
+logger = logging.getLogger(__name__)
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union
 
